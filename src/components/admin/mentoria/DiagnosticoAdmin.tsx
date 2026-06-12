@@ -12,6 +12,7 @@ import { useState } from "react";
 import { DiagnosticoUploadModal } from "./DiagnosticoUploadModal";
 import { DiagnosticoFormModal } from "./DiagnosticoFormModal";
 import { ResumoDiagnostico } from "@/components/mentoria/ResumoDiagnostico";
+import { InsightContent } from "@/components/admin/shared/InsightContent";
 import { useMentoriaTarefas } from "@/hooks/useMentoriaTarefas";
 import { useMentoriaSessoes } from "@/hooks/useMentoriaSessoes";
 import { useObjetivos } from "@/hooks/useObjetivos";
@@ -65,10 +66,22 @@ export function DiagnosticoAdmin({ userId, allowManualInput = true }: Diagnostic
 
   // Verificar se diagnóstico foi realmente completado pelo mentorado
   const diagnosticoCompleto = diagnostico?.completado === true;
-  const temFeedbackMentora = diagnostico?.video_call_url || diagnostico?.transcricao_call_url || 
+  const temFeedbackMentora = diagnostico?.video_call_url || diagnostico?.transcricao_call_url ||
                               diagnostico?.link_plano_execucao || (diagnostico as any)?.direcional_entregas;
 
-  if (!diagnostico || !diagnosticoCompleto) {
+  // ANTES: o admin só via o conteúdo quando completado=true. Mesmo quando o
+  // mentorado preenchia respostas parciais OU quando o insight_ia já tinha
+  // sido gerado, a tela mostrava "Diagnóstico pendente" e bloqueava tudo.
+  // Mari não conseguia avaliar, dar feedback nem ver o que a pessoa recebeu.
+  // Agora: bloqueia SÓ quando não há registro nenhum. Se tem registro
+  // (incompleto ou completo) + qualquer dado preenchido, renderiza a view.
+  const temInsight = !!diagnostico?.insight_ia;
+  const temAlgumDado = !!diagnostico && (
+    !!diagnostico.profissao || !!diagnostico.area_atuacao ||
+    !!diagnostico.objetivo_principal || temInsight
+  );
+
+  if (!diagnostico || (!diagnosticoCompleto && !temAlgumDado)) {
     return (
       <>
         <Card>
@@ -129,13 +142,28 @@ export function DiagnosticoAdmin({ userId, allowManualInput = true }: Diagnostic
 
   return (
     <>
+      {!diagnosticoCompleto && (
+        <Alert className="mb-4 border-amber-300 bg-amber-50">
+          <AlertCircle className="h-4 w-4 text-amber-600" />
+          <AlertTitle className="text-amber-900">Diagnóstico incompleto — preview parcial</AlertTitle>
+          <AlertDescription className="text-amber-900/80">
+            O mentorado ainda não finalizou o formulário. Você está vendo apenas
+            os campos que ele já preencheu e, se houver, o insight da IA
+            gerado a partir desses dados parciais.
+          </AlertDescription>
+        </Alert>
+      )}
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="flex items-center gap-2">
-                <CheckCircle className="h-5 w-5 text-green-500" />
-                Diagnóstico completo
+                {diagnosticoCompleto ? (
+                  <CheckCircle className="h-5 w-5 text-green-500" />
+                ) : (
+                  <AlertCircle className="h-5 w-5 text-amber-500" />
+                )}
+                {diagnosticoCompleto ? "Diagnóstico completo" : "Diagnóstico em andamento"}
               </CardTitle>
               <CardDescription className="flex items-center gap-2 mt-2">
                 <Badge variant={diagnostico.preenchido_por === 'admin' ? 'default' : 'secondary'}>
@@ -200,6 +228,35 @@ export function DiagnosticoAdmin({ userId, allowManualInput = true }: Diagnostic
                     </div>
                   </div>
                 </div>
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {/* Preview do que o aluno está vendo (insight gerado pela IA).
+              Mari pediu: "consigo até preview dos o que ela deveria receber,
+              apesar não ver, então a gente tem problema sério aqui." */}
+          {diagnostico.insight_ia ? (
+            <Card className="mt-4 bg-brand-cream-soft border-brand-hairline">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <Eye className="h-4 w-4 text-brand-strong" />
+                  Insight da IA — preview do que o mentorado vê
+                </CardTitle>
+                <CardDescription>
+                  Conteúdo gerado automaticamente a partir das respostas do diagnóstico.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <InsightContent insight={diagnostico.insight_ia} />
+              </CardContent>
+            </Card>
+          ) : (
+            <Alert className="border-blue-200 bg-blue-50">
+              <AlertCircle className="h-4 w-4 text-blue-600" />
+              <AlertTitle className="text-blue-900">Insight ainda não gerado</AlertTitle>
+              <AlertDescription className="text-blue-900/80">
+                A IA ainda não gerou o insight pra este diagnóstico. O insight é gerado
+                automaticamente quando o mentorado finaliza o formulário.
               </AlertDescription>
             </Alert>
           )}
