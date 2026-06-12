@@ -1,29 +1,40 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
+import { useAdminViewContext } from "@/contexts/AdminViewContext";
 import { toast } from "@/hooks/use-toast";
 import type { FormData } from "@/components/mentoria/schema";
 
 export const useMentoriaForm = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const { impersonatedUserId, isViewingAs } = useAdminViewContext();
+
+  // Quando admin está simulando outro usuário (via AdminViewSelector), a
+  // LEITURA do diagnóstico tem que vir do usuário simulado, senão a tela
+  // "Meu diagnóstico" mostra vazio (admin não tem formulário próprio) em
+  // vez do diagnóstico da pessoa que está sendo visualizada.
+  // As mutações continuam usando user.id (admin real) — não queremos
+  // sobrescrever dados da mentorada sem querer durante a simulação.
+  const effectiveUserId =
+    isViewingAs && impersonatedUserId ? impersonatedUserId : user?.id;
 
   // Verificar se já existe formulário
   const { data: formulario, isLoading } = useQuery({
-    queryKey: ["formulario-diagnostico", user?.id],
+    queryKey: ["formulario-diagnostico", effectiveUserId],
     queryFn: async () => {
-      if (!user) return null;
-      
+      if (!effectiveUserId) return null;
+
       const { data, error } = await supabase
         .from("formulario_diagnostico")
         .select("*")
-        .eq("user_id", user.id)
+        .eq("user_id", effectiveUserId)
         .maybeSingle();
 
       if (error) throw error;
       return data;
     },
-    enabled: !!user,
+    enabled: !!effectiveUserId,
     staleTime: 5 * 60 * 1000, // 5 minutos - evita refetch desnecessário
     gcTime: 10 * 60 * 1000, // 10 minutos - mantém em cache
   });

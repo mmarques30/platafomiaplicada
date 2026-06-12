@@ -1,10 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
+import { useAdminViewContext } from "@/contexts/AdminViewContext";
 
 export const usePainelDiagnostico = (userId?: string) => {
   const { user } = useAuth();
-  const targetUserId = userId || user?.id;
+  const { impersonatedUserId, isViewingAs } = useAdminViewContext();
+  // Prioridade: userId explícito > usuário impersonado (simulação admin) > user.id.
+  // Sem isso, o admin simulando outro usuário cai no próprio user.id e vê vazio.
+  const targetUserId =
+    userId ||
+    (isViewingAs && impersonatedUserId ? impersonatedUserId : undefined) ||
+    user?.id;
 
   const { data: diagnostico, isLoading: isLoadingDiagnostico } = useQuery({
     queryKey: ["diagnostico", targetUserId],
