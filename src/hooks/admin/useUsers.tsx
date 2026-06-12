@@ -292,7 +292,28 @@ export function useDeleteUser() {
         body: { userId },
       });
 
-      if (functionError) throw functionError;
+      if (functionError) {
+        // Extrai a mensagem real do body do response (mesmo padrão do create-user)
+        let realMessage = functionError.message;
+        const resp = (functionError as any)?.context as Response | undefined;
+        if (resp && typeof resp.text === "function") {
+          try {
+            const text = await resp.text();
+            if (text) {
+              try {
+                const json = JSON.parse(text);
+                if (json?.error) realMessage = json.error;
+                else if (json?.message) realMessage = json.message;
+              } catch {
+                realMessage = text.slice(0, 500);
+              }
+            }
+          } catch {
+            /* ignora */
+          }
+        }
+        throw new Error(realMessage);
+      }
       if (data?.error) throw new Error(data.error);
     },
     onSuccess: () => {
