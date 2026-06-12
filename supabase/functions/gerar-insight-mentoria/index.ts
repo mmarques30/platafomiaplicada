@@ -233,18 +233,40 @@ SESSÃO DE MENTORIA:
     const { data: { user } } = await supabaseClient.auth.getUser();
     if (!user) throw new Error("Usuário não encontrado");
 
-    // Buscar formulário
+    // Buscar formulário. ANTES: filtrava por user.id do caller → quando
+    // admin disparava (ex: "Forçar finalização"), nunca encontrava o
+    // formulário do mentorado e os objetivos/projetos NUNCA eram criados.
+    // Agora: busca só pelo id e valida permissão depois.
     const { data: formulario, error } = await supabaseClient
       .from("formulario_diagnostico")
       .select("*")
       .eq("id", formulario_id)
-      .eq("user_id", user.id)
       .single();
 
     if (error || !formulario) {
       console.error("Erro ao buscar formulário:", error);
       throw new Error("Formulário não encontrado");
     }
+
+    // Permissão: dono do formulário OU admin
+    const isOwner = formulario.user_id === user.id;
+    let isAdmin = false;
+    if (!isOwner) {
+      const { data: roleRow } = await supabaseClient
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id)
+        .in("role", ["admin", "equipe"])
+        .maybeSingle();
+      isAdmin = !!roleRow;
+    }
+    if (!isOwner && !isAdmin) {
+      throw new Error("Sem permissão para gerar insight deste formulário");
+    }
+
+    // user_id efetivo do MENTORADO (dono do formulário) — usado em todos
+    // os inserts pra que os objetivos/projetos apareçam pra ele.
+    const menteeUserId: string = formulario.user_id;
 
     // Buscar catálogo de conteúdos (trilhas e módulos)
     console.log("Buscando catálogo de conteúdos...");
@@ -431,13 +453,28 @@ PRIORIDADES:
 
     console.log("Insight salvo com sucesso");
 
+    // Idempotência: se a função roda 2x (ex: cliente refinalizou, admin
+    // usou "Forçar finalização" depois), evita duplicar objetivos/projetos
+    // gerados anteriormente por IA. Remove os antigos antes de inserir os novos.
+    await supabaseClient
+      .from("objetivos_mentoria")
+      .delete()
+      .eq("user_id", menteeUserId)
+      .eq("formulario_id", formulario_id)
+      .eq("gerado_por_ia", true);
+    await supabaseClient
+      .from("projetos_mentoria")
+      .delete()
+      .eq("user_id", menteeUserId)
+      .eq("tipo", "operacional");
+
     // Salvar objetivos gerados
     if (insight.objetivos && Array.isArray(insight.objetivos)) {
       for (const obj of insight.objetivos) {
         const { error: objError } = await supabaseClient
           .from("objetivos_mentoria")
           .insert({
-            user_id: user.id,
+            user_id: menteeUserId,
             formulario_id: formulario_id,
             objetivo: obj.objetivo,
             tipo: obj.tipo,
@@ -477,7 +514,7 @@ PRIORIDADES:
         const { error: projError } = await supabaseClient
           .from("projetos_mentoria")
           .insert({
-            user_id: user.id,
+            user_id: menteeUserId,
             titulo: proj.titulo,
             descricao: proj.descricao,
             objetivo_projeto: proj.objetivo_projeto,
