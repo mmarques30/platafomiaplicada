@@ -12,7 +12,6 @@ import { useState } from "react";
 import { DiagnosticoUploadModal } from "./DiagnosticoUploadModal";
 import { DiagnosticoFormModal } from "./DiagnosticoFormModal";
 import { ResumoDiagnostico } from "@/components/mentoria/ResumoDiagnostico";
-import { InsightContent } from "@/components/admin/shared/InsightContent";
 import { useMentoriaTarefas } from "@/hooks/useMentoriaTarefas";
 import { useMentoriaSessoes } from "@/hooks/useMentoriaSessoes";
 import { useObjetivos } from "@/hooks/useObjetivos";
@@ -245,24 +244,20 @@ export function DiagnosticoAdmin({ userId, allowManualInput = true }: Diagnostic
             </Alert>
           )}
 
-          {/* Preview do que o aluno está vendo (insight gerado pela IA).
-              Mari pediu: "consigo até preview dos o que ela deveria receber,
-              apesar não ver, então a gente tem problema sério aqui." */}
+          {/* Status do insight da IA. O preview visual do que o mentorado vê
+              fica fora deste componente (DiagnosticoAcademyPanel / BusinessDashboard
+              embaixo). Aqui mostramos só o status + data, sem dump de JSON. */}
           {diagnostico.insight_ia ? (
-            <Card className="mt-4 bg-brand-cream-soft border-brand-hairline">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-base">
-                  <Eye className="h-4 w-4 text-brand-strong" />
-                  Insight da IA — preview do que o mentorado vê
-                </CardTitle>
-                <CardDescription>
-                  Conteúdo gerado automaticamente a partir das respostas do diagnóstico.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <InsightContent insight={diagnostico.insight_ia} />
-              </CardContent>
-            </Card>
+            <Alert className="border-brand-strong/30 bg-brand-cream-soft">
+              <CheckCircle className="h-4 w-4 text-brand-strong" />
+              <AlertTitle className="text-brand-strong">Insight da IA gerado</AlertTitle>
+              <AlertDescription className="text-foreground/80">
+                {diagnostico.insight_gerado_em
+                  ? `Gerado em ${format(new Date(diagnostico.insight_gerado_em), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}. `
+                  : ""}
+                Veja o preview exato logo abaixo (visão do aluno) ou abra o painel completo.
+              </AlertDescription>
+            </Alert>
           ) : (
             <Alert className="border-blue-200 bg-blue-50">
               <AlertCircle className="h-4 w-4 text-blue-600" />

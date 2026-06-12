@@ -1,13 +1,16 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { useUsers } from "@/hooks/admin/useUsers";
 import { useMentoriaSessoes } from "@/hooks/useMentoriaSessoes";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Users, FileText, Calendar, FolderKanban, Route, Plus, ClipboardList, ClipboardCheck, ListChecks, Sparkles, FolderOpen, Trash2, Monitor, Video } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { ArrowLeft, Users, FileText, Calendar, FolderKanban, Route, Plus, ClipboardList, ClipboardCheck, ListChecks, Sparkles, FolderOpen, Trash2, Monitor, Video, Eye, AlertCircle, Stethoscope, ExternalLink } from "lucide-react";
+import { BusinessDashboard } from "@/components/mentoria/business/BusinessDashboard";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -53,6 +56,22 @@ export default function MentoriaBusinessPage() {
 
   const { sessoes, createSessao, updateSessao, deleteSessao, bulkCreateSessoes, bulkDeleteSessoes } = useMentoriaSessoes(selectedUserId);
   const { data: etapas = [] } = useEtapasBusiness(contrato?.id);
+
+  // Diagnóstico do mentorado selecionado (mesma view do aluno Parceria).
+  const { data: diagnosticoParceria, isLoading: loadingDiagnostico } = useQuery({
+    queryKey: ["diagnostico-usuario-business", selectedUserId],
+    queryFn: async () => {
+      if (!selectedUserId) return null;
+      const { data, error } = await supabase
+        .from("formulario_diagnostico")
+        .select("*")
+        .eq("user_id", selectedUserId)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!selectedUserId,
+  });
 
   // Calcular número de reuniões baseado no contrato
   const totalReunioes = contrato 
@@ -176,8 +195,12 @@ export default function MentoriaBusinessPage() {
       )}
 
       {selectedUserId && (
-        <Tabs defaultValue="contrato" className="space-y-4">
+        <Tabs defaultValue="diagnostico" className="space-y-4">
           <TabsList className="bg-muted/40 border-0 rounded-lg p-1 h-auto flex-wrap gap-1">
+            <TabsTrigger value="diagnostico" className="text-xs rounded-md px-3 py-1.5 gap-1.5 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+              <Stethoscope className="h-3.5 w-3.5" />
+              Diagnóstico
+            </TabsTrigger>
             <TabsTrigger value="contrato" className="text-xs rounded-md px-3 py-1.5 gap-1.5 data-[state=active]:bg-background data-[state=active]:shadow-sm">
               <ClipboardList className="h-3.5 w-3.5" />
               Contrato
@@ -223,6 +246,65 @@ export default function MentoriaBusinessPage() {
               Reports
             </TabsTrigger>
           </TabsList>
+
+          {/* Aba Diagnóstico — mesma visão que o aluno Parceria vê. */}
+          <TabsContent value="diagnostico" className="space-y-4 mt-4">
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <div className="flex items-center gap-2">
+                <Stethoscope className="h-5 w-5 text-muted-foreground" />
+                <h2 className="text-lg font-semibold">Diagnóstico de IA</h2>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate(`/mentoria/painel-diagnostico/${selectedUserId}`)}
+                className="gap-1.5"
+              >
+                <ExternalLink className="h-3.5 w-3.5" />
+                Ver como o aluno vê
+              </Button>
+            </div>
+
+            {loadingDiagnostico ? (
+              <Card className="border-border/50">
+                <CardContent className="py-10 text-center text-muted-foreground">
+                  Carregando diagnóstico…
+                </CardContent>
+              </Card>
+            ) : diagnosticoParceria ? (
+              <div className="relative">
+                <div className="absolute -top-3 left-4 z-10">
+                  <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-500/30">
+                    <Eye className="h-3 w-3 mr-1" />
+                    VISÃO DO ALUNO
+                  </Badge>
+                </div>
+                <div className="border-2 border-dashed border-amber-500/30 rounded-xl overflow-hidden">
+                  <BusinessDashboard
+                    diagnostico={diagnosticoParceria as any}
+                    userId={selectedUserId}
+                  />
+                </div>
+                <Alert className="mt-4 bg-muted/30 border-border/50">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription className="text-sm text-muted-foreground">
+                    Painel idêntico ao que o mentorado Parceria vê em
+                    {" "}<code>/mentoria</code>. Use o botão acima pra abrir a rota real.
+                  </AlertDescription>
+                </Alert>
+              </div>
+            ) : (
+              <Card className="border-border/50">
+                <CardContent className="py-10 text-center">
+                  <Stethoscope className="h-10 w-10 mx-auto mb-3 text-muted-foreground/50" />
+                  <p className="font-medium">Diagnóstico não preenchido</p>
+                  <p className="text-sm text-muted-foreground">
+                    Este mentorado ainda não preencheu o diagnóstico de IA.
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
 
           {/* Aba Contrato */}
           <TabsContent value="contrato" className="space-y-4 mt-4">
