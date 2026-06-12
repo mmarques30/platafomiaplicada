@@ -6,10 +6,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Users, FileText, Lightbulb, Video } from "lucide-react";
+import { ArrowLeft, Users, FileText, Lightbulb } from "lucide-react";
 import { DiagnosticoAdmin } from "@/components/admin/mentoria/DiagnosticoAdmin";
 import { ProjetosIAAdmin } from "@/components/admin/mentoria/ProjetosIAAdmin";
-import { FeedbackMentoraAdmin } from "@/components/admin/mentoria/FeedbackMentoraAdmin";
 import { Badge } from "@/components/ui/badge";
 import { adminTheme } from "@/components/admin/adminTheme";
 
@@ -85,10 +84,8 @@ export default function MentoriaAcademyPage() {
               <FileText className={adminTheme.tabsIcon} />
               Diagnóstico IA
             </TabsTrigger>
-            <TabsTrigger value="feedback-mentora" className={adminTheme.tabsTrigger}>
-              <Video className={adminTheme.tabsIcon} />
-              Feedback Mentora
-            </TabsTrigger>
+            {/* Aba "Feedback Mentora" removida — controle simples agora:
+                diagnóstico IA + projetos IA gerados automaticamente. */}
             <TabsTrigger value="projetos-ia" className={adminTheme.tabsTrigger}>
               <Lightbulb className={adminTheme.tabsIcon} />
               Projetos IA
@@ -97,10 +94,6 @@ export default function MentoriaAcademyPage() {
 
           <TabsContent value="diagnostico-ia" className={adminTheme.tabsContent}>
             <DiagnosticoAdmin userId={selectedUserId} allowManualInput={false} />
-          </TabsContent>
-
-          <TabsContent value="feedback-mentora" className={adminTheme.tabsContent}>
-            <FeedbackMentoraAdmin userId={selectedUserId} />
           </TabsContent>
 
           <TabsContent value="projetos-ia" className={adminTheme.tabsContent}>

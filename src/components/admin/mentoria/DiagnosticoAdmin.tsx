@@ -67,8 +67,6 @@ export function DiagnosticoAdmin({ userId, allowManualInput = true }: Diagnostic
 
   // Verificar se diagnóstico foi realmente completado pelo mentorado
   const diagnosticoCompleto = diagnostico?.completado === true;
-  const temFeedbackMentora = diagnostico?.video_call_url || diagnostico?.transcricao_call_url ||
-                              diagnostico?.link_plano_execucao || (diagnostico as any)?.direcional_entregas;
 
   // ANTES: o admin só via o conteúdo quando completado=true. Mesmo quando o
   // mentorado preenchia respostas parciais OU quando o insight_ia já tinha
@@ -98,17 +96,7 @@ export function DiagnosticoAdmin({ userId, allowManualInput = true }: Diagnostic
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {/* Aviso de Feedback Mentora já preenchido */}
-            {diagnostico && temFeedbackMentora && (
-              <Alert className="border-blue-200 bg-blue-50">
-                <CheckCircle className="h-4 w-4 text-blue-600" />
-                <AlertTitle className="text-blue-900">Feedback da Mentora já adicionado</AlertTitle>
-                <AlertDescription className="text-blue-800">
-                  Existe feedback da mentora configurado para este mentorado, mas o diagnóstico de IA ainda não foi preenchido.
-                </AlertDescription>
-              </Alert>
-            )}
-            
+            {/* Removido o aviso de "Feedback Mentora" — esse fluxo não existe mais. */}
             <div className="flex gap-2">
               {allowManualInput && (
                 <Button variant="outline" onClick={() => setFormModalOpen(true)}>
