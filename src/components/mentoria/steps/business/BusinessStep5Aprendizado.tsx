@@ -42,7 +42,7 @@ export function BusinessStep5Aprendizado({ form, onNext, onPrev }: StepProps) {
           <Rocket className="h-5 w-5 text-primary" />
         </div>
         <div>
-          <h3 className="text-lg font-semibold text-white">Interesse em Expansão</h3>
+          <h3 className="text-lg font-semibold text-brand-strong">Interesse em Expansão</h3>
           <p className="text-sm text-muted-foreground">Além da entrega, o que mais te interessa?</p>
         </div>
       </div>
@@ -59,7 +59,7 @@ export function BusinessStep5Aprendizado({ form, onNext, onPrev }: StepProps) {
         name="interesse_alem_entrega"
         render={() => (
           <FormItem>
-            <FormLabel className="text-white">Além da entrega da solução, o que mais te interessaria?</FormLabel>
+            <FormLabel className="text-foreground">Além da entrega da solução, o que mais te interessaria?</FormLabel>
             <p className="text-xs text-muted-foreground mb-3">Selecione todas as opções que fazem sentido</p>
             <div className="space-y-3">
               {interesseAlemEntregaOptions.map((option) => (
@@ -103,7 +103,7 @@ export function BusinessStep5Aprendizado({ form, onNext, onPrev }: StepProps) {
           name="pessoas_para_capacitar_skills"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-white">Quantas pessoas você gostaria de capacitar?</FormLabel>
+              <FormLabel className="text-foreground">Quantas pessoas você gostaria de capacitar?</FormLabel>
               <FormControl>
                 <Textarea
                   placeholder="Ex: 5 pessoas do time de atendimento, 3 do marketing..."
@@ -122,7 +122,7 @@ export function BusinessStep5Aprendizado({ form, onNext, onPrev }: StepProps) {
         name="areas_futuro_ia"
         render={() => (
           <FormItem>
-            <FormLabel className="text-white">Quais áreas da empresa você pretende automatizar no futuro?</FormLabel>
+            <FormLabel className="text-foreground">Quais áreas da empresa você pretende automatizar no futuro?</FormLabel>
             <p className="text-xs text-muted-foreground mb-3">Selecione as áreas com potencial para IA</p>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {areasFuturoIAOptions.map((area) => (
@@ -163,7 +163,7 @@ export function BusinessStep5Aprendizado({ form, onNext, onPrev }: StepProps) {
         name="proximo_projeto_ia"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="text-white">Se pudesse fazer mais um projeto de IA, qual seria?</FormLabel>
+            <FormLabel className="text-foreground">Se pudesse fazer mais um projeto de IA, qual seria?</FormLabel>
             <FormControl>
               <Textarea
                 placeholder="Descreva brevemente outro processo ou área que você gostaria de automatizar..."
