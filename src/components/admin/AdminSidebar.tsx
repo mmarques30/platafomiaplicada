@@ -34,6 +34,7 @@ import {
   MessagesSquare,
   ChevronDown,
   Briefcase,
+  Wrench,
   Smartphone,
   Shield,
   LucideIcon,
@@ -90,13 +91,26 @@ const menuGroups: MenuGroup[] = [
     icon: GraduationCap,
     items: [
       { path: "/admin/mentoria/bonus", label: "Bônus Globais" },
-      { path: "/admin/mentoria/academy", label: "Academy" },
-      { path: "/admin/mentoria/skills", label: "Skills" },
-      { path: "/admin/mentoria/business", label: "Business" },
-      { path: "/admin/mentoria/business-iaplicada", label: "Business iAplicada" },
-      { path: "/admin/mentoria/preview-paineis", label: "Preview Painéis" },
-      { path: "/admin/formularios", label: "Diagnósticos" },
+      // Renomeados para alinhar com a nomenclatura "do aluno":
+      //   Academy → Aluno Academy
+      //   Business → Parceria
+      // Skills foi removido do menu (produto descontinuado por enquanto;
+      //   rotas e dados em banco ficam preservados pra não quebrar nada).
+      // Business iAplicada saiu daqui e virou "Sistemas" no novo grupo
+      //   "Consultoria" (abaixo).
+      // Preview Painéis + Diagnósticos foram removidos do sidebar — vão
+      //   ser consolidados dentro da tela de cada mentorado (PR seguinte).
+      { path: "/admin/mentoria/academy", label: "Aluno Academy" },
+      { path: "/admin/mentoria/business", label: "Parceria" },
       { path: "/admin/duvidas", label: "Central de Dúvidas" },
+    ],
+  },
+  {
+    type: "group",
+    label: "Consultoria",
+    icon: Wrench,
+    items: [
+      { path: "/admin/mentoria/business-iaplicada", label: "Sistemas" },
     ],
   },
   {

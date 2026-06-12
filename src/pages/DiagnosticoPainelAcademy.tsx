@@ -4,12 +4,10 @@ import { useEffectivePlan } from "@/hooks/useUserPlan";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { toast } from "sonner";
-import { Brain, Video, FileText, UserCog, Download } from "lucide-react";
+import { FileText, UserCog, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { DiagnosticoAcademyPanel } from "@/components/mentoria/DiagnosticoAcademyPanel";
-import { FeedbackMentora } from "@/components/mentoria/FeedbackMentora";
 import { PageTitle } from "@/components/shared/PageTitle";
 import { PageContainer } from "@/components/shared/PageContainer";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -59,26 +57,11 @@ export default function DiagnosticoPainelAcademy() {
         }
       />
 
-      {/* Sistema de Abas */}
-      <Tabs defaultValue="diagnostico" className="w-full">
-        <TabsList className="w-full md:w-auto grid grid-cols-2 md:inline-flex gap-0.5 sm:gap-1 bg-primary/20 dark:bg-primary/30 p-1 sm:p-1.5 rounded-lg sm:rounded-xl border border-primary/30 dark:border-primary/40">
-          <TabsTrigger 
-            value="diagnostico"
-            className="flex items-center justify-center gap-1 sm:gap-2 text-foreground/70 data-[state=active]:bg-brand-strong data-[state=active]:text-brand-strong-foreground data-[state=active]:shadow-lg rounded-md sm:rounded-lg px-2 sm:px-4 py-1.5 sm:py-2.5 transition-all duration-200 text-xs sm:text-sm"
-          >
-            <Brain className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-            Diagnóstico
-          </TabsTrigger>
-          <TabsTrigger 
-            value="feedback"
-            className="flex items-center justify-center gap-1 sm:gap-2 text-foreground/70 data-[state=active]:bg-brand-strong data-[state=active]:text-brand-strong-foreground data-[state=active]:shadow-lg rounded-md sm:rounded-lg px-2 sm:px-4 py-1.5 sm:py-2.5 transition-all duration-200 text-xs sm:text-sm"
-          >
-            <Video className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-            Feedback
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="diagnostico" className="space-y-6 mt-6">
+      {/* Removidas as abas de "Diagnóstico" + "Feedback" — fluxo simples
+          agora: o painel mostra o diagnóstico direto, sem aba de feedback
+          da mentora. */}
+      <div className="w-full">
+        <div className="space-y-6 mt-6">
           {isPageLoading ? (
             <Card>
               <CardContent className="py-8 space-y-4">
@@ -156,22 +139,8 @@ export default function DiagnosticoPainelAcademy() {
               </CardContent>
             </Card>
           )}
-        </TabsContent>
-
-        <TabsContent value="feedback" className="space-y-6 mt-6">
-          {isPageLoading ? (
-            <Card>
-              <CardContent className="py-8 space-y-4">
-                <Skeleton className="h-8 w-1/4" />
-                <Skeleton className="h-4 w-1/2" />
-                <Skeleton className="h-24 w-full mt-4" />
-              </CardContent>
-            </Card>
-          ) : (
-            <FeedbackMentora formulario={formulario} />
-          )}
-        </TabsContent>
-      </Tabs>
+        </div>
+      </div>
     </PageContainer>
   );
 }
