@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Component, ReactNode, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,6 +12,35 @@ import { adminTheme } from "@/components/admin/adminTheme";
 import { DiagnosticoAcademyPanel } from "@/components/mentoria/DiagnosticoAcademyPanel";
 import { DiagnosticoAdmin } from "@/components/admin/mentoria/DiagnosticoAdmin";
 
+// Boundary local — pega erro do DiagnosticoAcademyPanel pra que o admin
+// veja a causa em vez de uma tela em branco. Mari reportou "seleciono a
+// Ariane mas não aparece nada"; o suspeito principal é o painel quebrar
+// por insight_ia com shape inesperado.
+class PanelErrorBoundary extends Component<{ children: ReactNode }, { error: Error | null }> {
+  state = { error: null as Error | null };
+  static getDerivedStateFromError(error: Error) {
+    return { error };
+  }
+  componentDidCatch(error: Error) {
+    console.error("[DiagnosticoAcademyPanel] crash:", error);
+  }
+  render() {
+    if (this.state.error) {
+      return (
+        <div className="rounded-md border border-red-300 bg-red-50 p-4 text-sm">
+          <p className="font-semibold text-red-900">Erro ao renderizar o painel do aluno</p>
+          <p className="mt-1 text-red-900/80">{this.state.error.message}</p>
+          <p className="mt-2 text-xs text-red-900/60">
+            Provavelmente o `insight_ia` está com um campo faltando ou em formato
+            inesperado. Tente regerar o insight pelo botão acima.
+          </p>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 export default function MentoriaAcademyPage() {
   const navigate = useNavigate();
   const { data: allUsers = [] } = useUsers();
@@ -21,7 +50,7 @@ export default function MentoriaAcademyPage() {
   const users = allUsers.filter(u => u.plano_mentoria === "academy");
 
   // Busca o diagnóstico do mentorado selecionado (mesma estrutura do PreviewPaineisPage)
-  const { data: diagnosticoUsuario, isLoading: loadingDiagnostico } = useQuery({
+  const { data: diagnosticoUsuario, isLoading: loadingDiagnostico, error: diagnosticoError } = useQuery({
     queryKey: ["diagnostico-usuario-academy", selectedUserId],
     queryFn: async () => {
       if (!selectedUserId) return null;
@@ -105,8 +134,18 @@ export default function MentoriaAcademyPage() {
           {/* Ações administrativas (Forçar finalização, status, etc) */}
           <DiagnosticoAdmin userId={selectedUserId} allowManualInput={false} />
 
-          {/* Preview no mesmo layout do aluno */}
-          {loadingDiagnostico ? (
+          {/* Preview no mesmo layout do aluno. Wrap em ErrorBoundary pra
+              que erro de render do DiagnosticoAcademyPanel (campo faltando
+              no insight_ia, payload inesperado etc) não derrube a página
+              inteira e Mari saiba o que está acontecendo. */}
+          {diagnosticoError ? (
+            <Card className="border-red-300 bg-red-50">
+              <CardContent className="py-6 space-y-2 text-sm">
+                <p className="font-semibold text-red-900">Erro ao buscar diagnóstico</p>
+                <p className="text-red-900/80">{(diagnosticoError as any)?.message ?? String(diagnosticoError)}</p>
+              </CardContent>
+            </Card>
+          ) : loadingDiagnostico ? (
             <Card><CardContent className="py-8 text-center text-muted-foreground">Carregando diagnóstico…</CardContent></Card>
           ) : diagnosticoUsuario ? (
             <div className="relative">
@@ -117,7 +156,9 @@ export default function MentoriaAcademyPage() {
                 </Badge>
               </div>
               <div className="border-2 border-dashed border-amber-500/30 rounded-xl p-4 pt-6 bg-card/50">
-                <DiagnosticoAcademyPanel diagnostico={diagnosticoUsuario} />
+                <PanelErrorBoundary>
+                  <DiagnosticoAcademyPanel diagnostico={diagnosticoUsuario} />
+                </PanelErrorBoundary>
               </div>
               <div className="mt-4 flex items-start gap-2 text-sm text-muted-foreground">
                 <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
