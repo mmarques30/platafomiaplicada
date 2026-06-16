@@ -288,7 +288,8 @@ export function DiagnosticoAdmin({ userId, allowManualInput = true }: Diagnostic
                 <p>
                   A IA ainda não gerou o insight pra este diagnóstico. Pode ter
                   falhado silenciosamente na finalização. Clique abaixo pra
-                  forçar a geração agora.
+                  forçar a geração agora — o toast vai mostrar o motivo real
+                  se falhar de novo.
                 </p>
                 <Button
                   size="sm"

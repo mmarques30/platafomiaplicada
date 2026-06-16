@@ -219,14 +219,13 @@ export function useDiagnosticoAdmin(userId?: string) {
         const msg = await extractEdgeFunctionError(invokeError);
         throw new Error(`Diagnóstico marcado como completo, mas falha ao gerar o insight: ${msg}`);
       }
-
       return updated;
     },
     onSuccess: () => {
       toast({
         title: "Diagnóstico finalizado",
         description:
-          "Mentorado destravado e insight gerado. Já está disponível no painel do aluno.",
+          "Mentorado destravado. O insight será gerado em alguns segundos e ficará disponível no painel.",
       });
       queryClient.invalidateQueries({ queryKey: ["admin-formularios"] });
       queryClient.invalidateQueries({ queryKey: ["diagnostico-admin"] });
