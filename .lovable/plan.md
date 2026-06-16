@@ -1,38 +1,28 @@
-## Problema
+## Situação
 
-O build do deploy falhou porque o bundle `assets/index-sL9mcLWa.js` tem 13.2 MB e o limite atual de precache do PWA está em 12 MB (`maximumFileSizeToCacheInBytes: 12 * 1024 * 1024` em `vite.config.ts`).
+- Os PRs #85, #86 e #87 estão mergeados na `main` do GitHub.
+- O editor da Lovable ainda não refletiu esses commits (sync GitHub → Lovable atrasada).
+- O preview e o site publicado estão rodando código antigo.
 
-Além disso, o publish anterior foi bloqueado por 4 findings críticos de segurança (RLS) que precisam ser resolvidos antes de subir.
+## Importante (limitação)
 
-## Mudanças propostas
+Eu não controlo diretamente o webhook GitHub → Lovable. O que posso fazer daqui é disparar um novo **publish**, que executa um build pegando o último commit conhecido pelo projeto. Se a sync do GitHub ainda não tiver entregue os commits, republicar **não vai resolver** — vai apenas rebuildar o código antigo.
 
-### 1. Desbloquear o build (rápido)
-Em `vite.config.ts`, aumentar o limite para 20 MB:
+## Plano
 
-```ts
-workbox: {
-  maximumFileSizeToCacheInBytes: 20 * 1024 * 1024,
-  ...
-}
-```
+1. Verificar via `project_urls--get_urls` e `publish_settings--get_publish_settings` o estado atual de publish.
+2. Disparar `preview_ui--publish` com `website_info_status=already_relevant` (título, meta, OG, favicon já foram revisados no último deploy).
+3. Após o deploy, pedir pra você abrir `https://plataforma.iaplicada.com` em aba anônima (PWA tem cache agressivo) e validar se as 3 features apareceram:
+   - #85: 5 ferramentas em uma linha
+   - #86: cache de progresso
+   - #87: regenerar insight da Ariane
+4. **Se não aparecerem**, é confirmado que a sync GitHub → Lovable está travada. Nesse caso o caminho é:
+   - Você ir em **Plus (+) → GitHub** no editor e usar a opção de reconectar/forçar pull, **ou**
+   - Abrir um arquivo qualquer no editor da Lovable e salvar (qualquer write da Lovable força reconciliação com o GitHub), **ou**
+   - Contatar suporte Lovable se persistir.
 
-Isso resolve a falha imediata. (Observação: o bundle de 13 MB é grande — vale considerar code-splitting num passo futuro, mas fora do escopo deste deploy.)
+## O que NÃO vou fazer
 
-### 2. Corrigir os 4 findings críticos de segurança (RLS)
-
-a) **`materiais_comunidade`** — política SELECT atual permite `{public}` ler todos materiais ativos, inclusive `visibilidade='pago'`. Nova política: exigir `auth.uid() IS NOT NULL` E (`visibilidade <> 'pago'` OU usuário tem plano pago).
-
-b) **`webhook_lia_logs`** — SELECT atual `USING (true)` expõe dados de pagamento (emails, payloads) a qualquer autenticado. Restringir SELECT a `has_role(auth.uid(), 'admin')`.
-
-c) **Storage `entregas-equipe-skills`** — políticas só checam `auth.role()='authenticated'`. Adicionar verificação de membership via join com `membros_equipe_skills` usando o path do arquivo (primeiro segmento = `equipe_id`).
-
-d) **`avaliacoes_materiais_comunidade`** + **`video_ratings`** (warns, mas vale corrigir junto) — restringir SELECT a `auth.uid() IS NOT NULL`.
-
-Tudo via nova migration timestampada em `supabase/migrations/`.
-
-### 3. Republicar
-Após build verde + migration aplicada, chamar publish novamente para o domínio `plataforma.iaplicada.com` / `platafomiaplicada.lovable.app`.
-
-## Pergunta antes de prosseguir
-
-Posso aplicar **todas** as correções de RLS acima (itens 2a–2d) na mesma migration, ou prefere que eu **só** suba o fix do build (item 1) e ignore os findings de segurança temporariamente pra publicar mais rápido?
+- Não vou reimplementar as 3 PRs por cima (risco de conflito quando a sync vier).
+- Não vou tocar em código, migrations ou edge functions.
+- Não vou mudar visibilidade do publish.
