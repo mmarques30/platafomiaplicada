@@ -24,8 +24,15 @@ interface DiagnosticoAdminProps {
 
 export function DiagnosticoAdmin({ userId, allowManualInput = true }: DiagnosticoAdminProps) {
   const navigate = useNavigate();
-  const { diagnostico, isLoading, deletarArquivo, forcarFinalizacao, isForcingFinalize } =
-    useDiagnosticoAdmin(userId);
+  const {
+    diagnostico,
+    isLoading,
+    deletarArquivo,
+    forcarFinalizacao,
+    isForcingFinalize,
+    regenerarInsight,
+    isRegeneratingInsight,
+  } = useDiagnosticoAdmin(userId);
   const { objetivos } = useObjetivos(userId);
   const { tarefas } = useMentoriaTarefas(userId);
   const { sessoes } = useMentoriaSessoes();
@@ -252,10 +259,25 @@ export function DiagnosticoAdmin({ userId, allowManualInput = true }: Diagnostic
               <CheckCircle className="h-4 w-4 text-brand-strong" />
               <AlertTitle className="text-brand-strong">Insight da IA gerado</AlertTitle>
               <AlertDescription className="text-foreground/80">
-                {diagnostico.insight_gerado_em
-                  ? `Gerado em ${format(new Date(diagnostico.insight_gerado_em), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}. `
-                  : ""}
-                Veja o preview exato logo abaixo (visão do aluno) ou abra o painel completo.
+                <p>
+                  {diagnostico.insight_gerado_em
+                    ? `Gerado em ${format(new Date(diagnostico.insight_gerado_em), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}. `
+                    : ""}
+                  Veja o preview exato logo abaixo (visão do aluno) ou abra o painel completo.
+                </p>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="mt-3"
+                  disabled={isRegeneratingInsight}
+                  onClick={() => {
+                    if (confirm("Regerar o insight do zero a partir das respostas atuais? O conteúdo anterior será substituído.")) {
+                      regenerarInsight(diagnostico.id);
+                    }
+                  }}
+                >
+                  {isRegeneratingInsight ? "Regenerando..." : "Regenerar insight"}
+                </Button>
               </AlertDescription>
             </Alert>
           ) : (
@@ -263,8 +285,20 @@ export function DiagnosticoAdmin({ userId, allowManualInput = true }: Diagnostic
               <AlertCircle className="h-4 w-4 text-blue-600" />
               <AlertTitle className="text-blue-900">Insight ainda não gerado</AlertTitle>
               <AlertDescription className="text-blue-900/80">
-                A IA ainda não gerou o insight pra este diagnóstico. O insight é gerado
-                automaticamente quando o mentorado finaliza o formulário.
+                <p>
+                  A IA ainda não gerou o insight pra este diagnóstico. Pode ter
+                  falhado silenciosamente na finalização. Clique abaixo pra
+                  forçar a geração agora — o toast vai mostrar o motivo real
+                  se falhar de novo.
+                </p>
+                <Button
+                  size="sm"
+                  className="mt-3 bg-blue-600 hover:bg-blue-700 text-white"
+                  disabled={isRegeneratingInsight}
+                  onClick={() => regenerarInsight(diagnostico.id)}
+                >
+                  {isRegeneratingInsight ? "Gerando..." : "Gerar insight agora"}
+                </Button>
               </AlertDescription>
             </Alert>
           )}

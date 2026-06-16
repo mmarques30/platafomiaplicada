@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { extractEdgeFunctionError } from "@/lib/edge-functions";
 
 export function useDiagnosticoAdmin(userId?: string) {
   const queryClient = useQueryClient();
@@ -204,13 +205,19 @@ export function useDiagnosticoAdmin(userId?: string) {
       if (updateError) throw updateError;
       if (!updated) throw new Error("Diagnóstico do mentorado não encontrado.");
 
-      // 2. Dispara o insight (não-bloqueante: se falhar, segue com completado=true)
-      try {
-        await supabase.functions.invoke("gerar-insight-mentoria", {
-          body: { formulario_id: updated.id },
-        });
-      } catch (e) {
-        console.warn("Falha ao gerar insight, mas o diagnóstico foi marcado como completo:", e);
+      // 2. Dispara o insight. Antes engolíamos qualquer erro em silêncio
+      // (catch console.warn) — Mari forçava finalização, a Ariane via
+      // empty state e ninguém sabia que a função tinha falhado. Agora
+      // capturamos o erro do invoke (que vem em `error`, não em throw)
+      // e o propagamos pra UI.
+      const { error: invokeError } = await supabase.functions.invoke(
+        "gerar-insight-mentoria",
+        { body: { formulario_id: updated.id } }
+      );
+
+      if (invokeError) {
+        const msg = await extractEdgeFunctionError(invokeError);
+        throw new Error(`Diagnóstico marcado como completo, mas falha ao gerar o insight: ${msg}`);
       }
       return updated;
     },
@@ -232,6 +239,37 @@ export function useDiagnosticoAdmin(userId?: string) {
     },
   });
 
+  // Regenerar insight sem mexer no `completado`. Cobre o caso de quando
+  // a Edge Function falhou silenciosamente na primeira tentativa e o
+  // aluno fica com `completado=true` + `insight_ia=null` → empty state.
+  const regenerarInsight = useMutation({
+    mutationFn: async (formularioId: string) => {
+      const { error: invokeError } = await supabase.functions.invoke(
+        "gerar-insight-mentoria",
+        { body: { formulario_id: formularioId } }
+      );
+      if (invokeError) {
+        const msg = await extractEdgeFunctionError(invokeError);
+        throw new Error(msg);
+      }
+    },
+    onSuccess: () => {
+      toast({
+        title: "Insight regenerado",
+        description: "O painel do aluno foi atualizado com o novo insight.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["admin-formularios"] });
+      queryClient.invalidateQueries({ queryKey: ["diagnostico-admin"] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro ao regenerar insight",
+        description: error.message ?? "Verifique o log da função no Supabase.",
+        variant: "destructive",
+      });
+    },
+  });
+
   return {
     diagnostico,
     isLoading,
@@ -241,6 +279,8 @@ export function useDiagnosticoAdmin(userId?: string) {
     deletarDiagnostico: deletarDiagnostico.mutate,
     forcarFinalizacao: forcarFinalizacao.mutate,
     isForcingFinalize: forcarFinalizacao.isPending,
+    regenerarInsight: regenerarInsight.mutate,
+    isRegeneratingInsight: regenerarInsight.isPending,
     isUploading: uploadArquivo.isPending,
     isSaving: salvarDiagnostico.isPending,
     isDeleting: deletarDiagnostico.isPending,
