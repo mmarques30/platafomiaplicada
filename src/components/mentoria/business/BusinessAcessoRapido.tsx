@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
 interface QuickNavItem {
   title: string;
   path: string;
-  icon: React.ComponentType<{ className?: string; strokeWidth?: number }>;
+  icon: React.ComponentType<{ className?: string }>;
   /** Marca o item como "pendente" — recebe destaque visual (anel + dot). */
   pendingKey?: "diagnostico";
 }
@@ -74,7 +74,7 @@ export function BusinessAcessoRapido() {
               : "bg-brand-strong/10 text-brand-strong group-hover:bg-brand-strong/15"
           )}
         >
-          <item.icon className="h-4 w-4" strokeWidth={1.75} />
+          <item.icon className="h-4 w-4" />
         </div>
         <span
           className={cn(
