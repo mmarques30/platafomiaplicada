@@ -2894,8 +2894,10 @@ export type Database = {
           disponibilidade_treinamento: string | null
           duvidas_preocupacoes: string | null
           empresa_nome: string | null
+          equipe_poderia_usar_ia: string | null
           equipe_precisa_aprender: string | null
           estilo_aprendizagem: string | null
+          expectativa_produto: string | null
           experiencia_consultorias: string | null
           experiencia_ia: string | null
           feedback_mentora_em: string | null
@@ -2906,16 +2908,20 @@ export type Database = {
           id: string
           idade: number | null
           impacto_financeiro_estimado: string | null
+          importancia_ia_carreira: number | null
           importancia_projeto: number | null
           insight_gerado_em: string | null
           insight_ia: Json | null
           interesse_alem_entrega: Json | null
+          interesse_projeto_customizado: string | null
+          ja_fez_curso_ia: string | null
           ja_tentou_antes: string | null
           kpi_principal: string | null
           lidera_equipe: boolean | null
           limitacoes_tecnicas: string | null
           link_plano_execucao: string | null
           linkedin: string | null
+          maior_desafio_profissional: string | null
           maior_dificuldade_ia: string | null
           maior_ladrao_tempo: string | null
           maior_medo_ia: string | null
@@ -2925,6 +2931,7 @@ export type Database = {
           meta_3_meses: string | null
           metricas_sucesso: string | null
           motivacao_mentoria: string | null
+          motivo_compra: string | null
           motivo_escolha_iaplicada: string | null
           nao_negociaveis: string | null
           nao_pode_acontecer: string | null
@@ -2950,6 +2957,7 @@ export type Database = {
           preferencia_acompanhamento: string | null
           preferencia_aprendizado: string | null
           preferencia_comunicacao: string | null
+          preferencia_contato: string | null
           preferencia_sessoes: string | null
           problema_principal: string | null
           processo_automatizar: string | null
@@ -2960,15 +2968,20 @@ export type Database = {
           quem_vai_usar: string | null
           quer_aprender: string | null
           quick_wins: Json | null
+          recomendaria_amigo: string | null
+          resultado_curso_anterior: string | null
           resultado_esperado: string | null
+          resultado_esperado_30_dias: string | null
           sistemas_integrar: Json | null
           tamanho_empresa: string | null
           tamanho_equipe: number | null
+          tarefa_repetitiva_automatizar: string | null
           tem_equipe: boolean | null
           tempo_disponivel: string | null
           tempo_experiencia: string | null
           tipo_feedback: string | null
           tipo_suporte: string | null
+          trabalha_em_empresa: string | null
           transcricao_call_url: string | null
           updated_at: string | null
           urgencia_solucao: string | null
@@ -3001,8 +3014,10 @@ export type Database = {
           disponibilidade_treinamento?: string | null
           duvidas_preocupacoes?: string | null
           empresa_nome?: string | null
+          equipe_poderia_usar_ia?: string | null
           equipe_precisa_aprender?: string | null
           estilo_aprendizagem?: string | null
+          expectativa_produto?: string | null
           experiencia_consultorias?: string | null
           experiencia_ia?: string | null
           feedback_mentora_em?: string | null
@@ -3013,16 +3028,20 @@ export type Database = {
           id?: string
           idade?: number | null
           impacto_financeiro_estimado?: string | null
+          importancia_ia_carreira?: number | null
           importancia_projeto?: number | null
           insight_gerado_em?: string | null
           insight_ia?: Json | null
           interesse_alem_entrega?: Json | null
+          interesse_projeto_customizado?: string | null
+          ja_fez_curso_ia?: string | null
           ja_tentou_antes?: string | null
           kpi_principal?: string | null
           lidera_equipe?: boolean | null
           limitacoes_tecnicas?: string | null
           link_plano_execucao?: string | null
           linkedin?: string | null
+          maior_desafio_profissional?: string | null
           maior_dificuldade_ia?: string | null
           maior_ladrao_tempo?: string | null
           maior_medo_ia?: string | null
@@ -3032,6 +3051,7 @@ export type Database = {
           meta_3_meses?: string | null
           metricas_sucesso?: string | null
           motivacao_mentoria?: string | null
+          motivo_compra?: string | null
           motivo_escolha_iaplicada?: string | null
           nao_negociaveis?: string | null
           nao_pode_acontecer?: string | null
@@ -3057,6 +3077,7 @@ export type Database = {
           preferencia_acompanhamento?: string | null
           preferencia_aprendizado?: string | null
           preferencia_comunicacao?: string | null
+          preferencia_contato?: string | null
           preferencia_sessoes?: string | null
           problema_principal?: string | null
           processo_automatizar?: string | null
@@ -3067,15 +3088,20 @@ export type Database = {
           quem_vai_usar?: string | null
           quer_aprender?: string | null
           quick_wins?: Json | null
+          recomendaria_amigo?: string | null
+          resultado_curso_anterior?: string | null
           resultado_esperado?: string | null
+          resultado_esperado_30_dias?: string | null
           sistemas_integrar?: Json | null
           tamanho_empresa?: string | null
           tamanho_equipe?: number | null
+          tarefa_repetitiva_automatizar?: string | null
           tem_equipe?: boolean | null
           tempo_disponivel?: string | null
           tempo_experiencia?: string | null
           tipo_feedback?: string | null
           tipo_suporte?: string | null
+          trabalha_em_empresa?: string | null
           transcricao_call_url?: string | null
           updated_at?: string | null
           urgencia_solucao?: string | null
@@ -3108,8 +3134,10 @@ export type Database = {
           disponibilidade_treinamento?: string | null
           duvidas_preocupacoes?: string | null
           empresa_nome?: string | null
+          equipe_poderia_usar_ia?: string | null
           equipe_precisa_aprender?: string | null
           estilo_aprendizagem?: string | null
+          expectativa_produto?: string | null
           experiencia_consultorias?: string | null
           experiencia_ia?: string | null
           feedback_mentora_em?: string | null
@@ -3120,16 +3148,20 @@ export type Database = {
           id?: string
           idade?: number | null
           impacto_financeiro_estimado?: string | null
+          importancia_ia_carreira?: number | null
           importancia_projeto?: number | null
           insight_gerado_em?: string | null
           insight_ia?: Json | null
           interesse_alem_entrega?: Json | null
+          interesse_projeto_customizado?: string | null
+          ja_fez_curso_ia?: string | null
           ja_tentou_antes?: string | null
           kpi_principal?: string | null
           lidera_equipe?: boolean | null
           limitacoes_tecnicas?: string | null
           link_plano_execucao?: string | null
           linkedin?: string | null
+          maior_desafio_profissional?: string | null
           maior_dificuldade_ia?: string | null
           maior_ladrao_tempo?: string | null
           maior_medo_ia?: string | null
@@ -3139,6 +3171,7 @@ export type Database = {
           meta_3_meses?: string | null
           metricas_sucesso?: string | null
           motivacao_mentoria?: string | null
+          motivo_compra?: string | null
           motivo_escolha_iaplicada?: string | null
           nao_negociaveis?: string | null
           nao_pode_acontecer?: string | null
@@ -3164,6 +3197,7 @@ export type Database = {
           preferencia_acompanhamento?: string | null
           preferencia_aprendizado?: string | null
           preferencia_comunicacao?: string | null
+          preferencia_contato?: string | null
           preferencia_sessoes?: string | null
           problema_principal?: string | null
           processo_automatizar?: string | null
@@ -3174,15 +3208,20 @@ export type Database = {
           quem_vai_usar?: string | null
           quer_aprender?: string | null
           quick_wins?: Json | null
+          recomendaria_amigo?: string | null
+          resultado_curso_anterior?: string | null
           resultado_esperado?: string | null
+          resultado_esperado_30_dias?: string | null
           sistemas_integrar?: Json | null
           tamanho_empresa?: string | null
           tamanho_equipe?: number | null
+          tarefa_repetitiva_automatizar?: string | null
           tem_equipe?: boolean | null
           tempo_disponivel?: string | null
           tempo_experiencia?: string | null
           tipo_feedback?: string | null
           tipo_suporte?: string | null
+          trabalha_em_empresa?: string | null
           transcricao_call_url?: string | null
           updated_at?: string | null
           urgencia_solucao?: string | null
