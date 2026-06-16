@@ -204,21 +204,31 @@ export function useDiagnosticoAdmin(userId?: string) {
       if (updateError) throw updateError;
       if (!updated) throw new Error("Diagnóstico do mentorado não encontrado.");
 
-      // 2. Dispara o insight (não-bloqueante: se falhar, segue com completado=true)
-      try {
-        await supabase.functions.invoke("gerar-insight-mentoria", {
-          body: { formulario_id: updated.id },
-        });
-      } catch (e) {
-        console.warn("Falha ao gerar insight, mas o diagnóstico foi marcado como completo:", e);
+      // 2. Dispara o insight. Antes engolíamos qualquer erro em silêncio
+      // (catch console.warn) — Mari forçava finalização, a Ariane via
+      // empty state e ninguém sabia que a função tinha falhado. Agora
+      // capturamos o erro do invoke (que vem em `error`, não em throw)
+      // e o propagamos pra UI.
+      const { error: invokeError } = await supabase.functions.invoke(
+        "gerar-insight-mentoria",
+        { body: { formulario_id: updated.id } }
+      );
+
+      if (invokeError) {
+        const msg =
+          (invokeError as any).message ??
+          (invokeError as any).context ??
+          JSON.stringify(invokeError);
+        throw new Error(`Diagnóstico marcado como completo, mas falha ao gerar o insight: ${msg}`);
       }
+
       return updated;
     },
     onSuccess: () => {
       toast({
         title: "Diagnóstico finalizado",
         description:
-          "Mentorado destravado. O insight será gerado em alguns segundos e ficará disponível no painel.",
+          "Mentorado destravado e insight gerado. Já está disponível no painel do aluno.",
       });
       queryClient.invalidateQueries({ queryKey: ["admin-formularios"] });
       queryClient.invalidateQueries({ queryKey: ["diagnostico-admin"] });
@@ -227,6 +237,40 @@ export function useDiagnosticoAdmin(userId?: string) {
       toast({
         title: "Erro ao forçar finalização",
         description: error.message ?? "Tente novamente em alguns instantes.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Regenerar insight sem mexer no `completado`. Cobre o caso de quando
+  // a Edge Function falhou silenciosamente na primeira tentativa e o
+  // aluno fica com `completado=true` + `insight_ia=null` → empty state.
+  const regenerarInsight = useMutation({
+    mutationFn: async (formularioId: string) => {
+      const { error: invokeError } = await supabase.functions.invoke(
+        "gerar-insight-mentoria",
+        { body: { formulario_id: formularioId } }
+      );
+      if (invokeError) {
+        const msg =
+          (invokeError as any).message ??
+          (invokeError as any).context ??
+          JSON.stringify(invokeError);
+        throw new Error(msg);
+      }
+    },
+    onSuccess: () => {
+      toast({
+        title: "Insight regenerado",
+        description: "O painel do aluno foi atualizado com o novo insight.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["admin-formularios"] });
+      queryClient.invalidateQueries({ queryKey: ["diagnostico-admin"] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro ao regenerar insight",
+        description: error.message ?? "Verifique o log da função no Supabase.",
         variant: "destructive",
       });
     },
@@ -241,6 +285,8 @@ export function useDiagnosticoAdmin(userId?: string) {
     deletarDiagnostico: deletarDiagnostico.mutate,
     forcarFinalizacao: forcarFinalizacao.mutate,
     isForcingFinalize: forcarFinalizacao.isPending,
+    regenerarInsight: regenerarInsight.mutate,
+    isRegeneratingInsight: regenerarInsight.isPending,
     isUploading: uploadArquivo.isPending,
     isSaving: salvarDiagnostico.isPending,
     isDeleting: deletarDiagnostico.isPending,
