@@ -139,7 +139,7 @@ export function DashboardTour({ run, previewMode, onComplete }: DashboardTourPro
         next: "Próximo",
         skip: "Pular tour",
       }}
-      styles={{
+      styles={({
         tooltip: {
           borderRadius: 14,
           border: "1px solid #EAEAE0",   // brand-hairline
@@ -160,7 +160,7 @@ export function DashboardTour({ run, previewMode, onComplete }: DashboardTourPro
           lineHeight: 1.55,
           padding: "8px 0 4px",
         },
-        buttonNext: ({
+        buttonNext: {
           backgroundColor: "#5C6F1D",    // brand-strong
           color: "#F0EFD9",              // brand-cream
           borderRadius: 8,
@@ -168,24 +168,24 @@ export function DashboardTour({ run, previewMode, onComplete }: DashboardTourPro
           fontSize: 13,
           fontWeight: 500,
           outline: "none",
-        } as React.CSSProperties),
-        buttonBack: ({
+        },
+        buttonBack: {
           color: "#5A5A52",
           fontSize: 13,
           marginRight: 8,
-        } as React.CSSProperties),
-        buttonSkip: ({
+        },
+        buttonSkip: {
           color: "#8A8A82",
           fontSize: 12,
-        } as React.CSSProperties),
-        buttonClose: ({
+        },
+        buttonClose: {
           color: "#8A8A82",
           width: 12,
           height: 12,
           top: 14,
           right: 14,
-        } as React.CSSProperties),
-      } as any}
+        },
+      }) as any}
       onEvent={handleEvent}
     />
   );

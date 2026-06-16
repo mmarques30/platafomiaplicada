@@ -245,7 +245,7 @@ export function FormularioWizard({ onCancelar, onFinalizado }: FormularioWizardP
   const getStepFields = (step: number): (keyof FormData)[] => {
     if (isBusiness) {
       switch (step) {
-        case 0: return ["cargo_atual", "empresa_nome", "tamanho_empresa"] as unknown as (keyof FormData)[];
+        case 0: return ["cargo_atual", "empresa_nome", "tamanho_empresa"] as (keyof FormData)[];
         case 1: return ["problema_principal", "processo_automatizar", "resultado_esperado"] as unknown as (keyof FormData)[];
         case 2: return [] as (keyof FormData)[];
         case 3: return [] as (keyof FormData)[];

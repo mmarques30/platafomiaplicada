@@ -1,1 +1,0 @@
-DROP POLICY IF EXISTS "Authenticated users can read logs" ON public.webhook_lia_logs;
