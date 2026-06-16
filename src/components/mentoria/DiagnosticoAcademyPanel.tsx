@@ -131,9 +131,13 @@ export function DiagnosticoAcademyPanel({ diagnostico }: DiagnosticoAcademyPanel
 
       toast.success("Diagnóstico gerado com sucesso!");
       refetch();
-    } catch (error) {
+    } catch (error: any) {
+      // Propaga o erro real (mensagem da edge function) pra ficar visível
+      // pra quem está testando — antes só "Erro ao gerar diagnóstico" sem
+      // motivo. Mari precisava disso pra debugar casos como a Ariane.
       console.error('Erro ao gerar insight:', error);
-      toast.error("Erro ao gerar diagnóstico. Tente novamente.");
+      const msg = error?.message ?? error?.context ?? "Tente novamente.";
+      toast.error(`Erro ao gerar diagnóstico: ${msg}`);
     } finally {
       setIsGenerating(false);
     }
