@@ -74,7 +74,7 @@ export function BusinessAcessoRapido() {
               : "bg-brand-strong/10 text-brand-strong group-hover:bg-brand-strong/15"
           )}
         >
-          <item.icon className="h-4 w-4" strokeWidth={1.75} />
+          <item.icon className="h-4 w-4" />
         </div>
         <span
           className={cn(
