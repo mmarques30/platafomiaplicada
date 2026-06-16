@@ -245,8 +245,8 @@ export function FormularioWizard({ onCancelar, onFinalizado }: FormularioWizardP
   const getStepFields = (step: number): (keyof FormData)[] => {
     if (isBusiness) {
       switch (step) {
-        case 0: return ["cargo_atual", "empresa_nome", "tamanho_empresa"] as (keyof FormData)[];
-        case 1: return ["problema_principal", "processo_automatizar", "resultado_esperado"] as (keyof FormData)[];
+        case 0: return ["cargo_atual", "empresa_nome", "tamanho_empresa"] as unknown as (keyof FormData)[];
+        case 1: return ["problema_principal", "processo_automatizar", "resultado_esperado"] as unknown as (keyof FormData)[];
         case 2: return [] as (keyof FormData)[];
         case 3: return [] as (keyof FormData)[];
         case 4: return [] as (keyof FormData)[];
@@ -264,20 +264,20 @@ export function FormularioWizard({ onCancelar, onFinalizado }: FormularioWizardP
           "como_conheceu_iaplicada",
           "motivo_compra",
           "expectativa_produto",
-        ];
+        ] as unknown as (keyof FormData)[];
       case 1:
-        return ["nivel_ia", "frequencia_uso_ia"];
+        return ["nivel_ia", "frequencia_uso_ia"] as unknown as (keyof FormData)[];
       case 2:
         return [
           "objetivo_principal",
           "area_aplicacao_ia",
           "resultado_esperado_30_dias",
           "como_medir_sucesso",
-        ];
+        ] as unknown as (keyof FormData)[];
       case 3:
-        return ["maior_desafio_profissional", "tempo_disponivel"];
+        return ["maior_desafio_profissional", "tempo_disponivel"] as unknown as (keyof FormData)[];
       case 4:
-        return ["nivel_comprometimento"];
+        return ["nivel_comprometimento"] as unknown as (keyof FormData)[];
       default:
         return [];
     }
