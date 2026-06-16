@@ -25,7 +25,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { extractEdgeFunctionError } from "@/lib/edge-functions";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMentoriaForm } from "@/hooks/useMentoriaForm";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
@@ -106,6 +106,26 @@ interface DiagnosticoAcademyPanelProps {
     insight_gerado_em?: string | null;
     completado?: boolean | null;
     ferramentas_ia?: unknown;
+    // Campos do formulário que podem estar parcialmente preenchidos
+    profissao?: string | null;
+    area_atuacao?: string | null;
+    tempo_experiencia?: string | null;
+    tamanho_empresa?: string | null;
+    nivel_ia?: string | null;
+    frequencia_uso_ia?: string | null;
+    maior_dificuldade_ia?: string | null;
+    objetivo_principal?: string | null;
+    meta_3_meses?: string | null;
+    meta_12_meses?: string | null;
+    area_aplicacao_ia?: string | null;
+    desafio_1?: string | null;
+    desafio_2?: string | null;
+    desafio_3?: string | null;
+    tempo_disponivel?: string | null;
+    estilo_aprendizagem?: string | null;
+    maior_medo_ia?: string | null;
+    vitoria_30_dias?: string | null;
+    [key: string]: unknown;
   };
 }
 
@@ -144,24 +164,52 @@ export function DiagnosticoAcademyPanel({ diagnostico }: DiagnosticoAcademyPanel
     }
   };
 
-  // Se ainda não tem insight gerado
+  // Se há respostas mas ainda não tem insight, dispara AUTOMATICAMENTE
+  // a geração — Mari pediu: "ela já preencheu parcial e isso já deveria
+  // gerar insight de IA". Antes mostrava só um botão estático.
+  const temRespostas = !!(
+    diagnostico.profissao ||
+    diagnostico.area_atuacao ||
+    diagnostico.objetivo_principal ||
+    (Array.isArray(diagnostico.ferramentas_ia) && diagnostico.ferramentas_ia.length > 0)
+  );
+  const autoTriggeredRef = useRef(false);
+
+  useEffect(() => {
+    if (!insight && temRespostas && !isGenerating && !autoTriggeredRef.current) {
+      autoTriggeredRef.current = true;
+      gerarInsight();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [insight, temRespostas]);
+
   if (!insight) {
     return (
       <Card className="border border-aplicada-green-800/20">
         <CardContent className="py-12">
           <div className="text-center space-y-6">
             <div className="mx-auto w-20 h-20 rounded-full bg-aplicada-green-700/10 flex items-center justify-center">
-              <Sparkles className="h-10 w-10 text-aplicada-green-700" />
+              {isGenerating ? (
+                <Loader2 className="h-10 w-10 text-aplicada-green-700 animate-spin" />
+              ) : (
+                <Sparkles className="h-10 w-10 text-aplicada-green-700" />
+              )}
             </div>
             <div className="space-y-2">
               <h3 className="text-xl font-semibold text-foreground">
-                Gere Seu Plano de Desenvolvimento
+                {isGenerating
+                  ? "Gerando seu plano com base no que você já preencheu..."
+                  : temRespostas
+                    ? "Gerar plano com o que você já compartilhou"
+                    : "Gere Seu Plano de Desenvolvimento"}
               </h3>
               <p className="text-muted-foreground max-w-md mx-auto">
-                Com base nas informações que você compartilhou, nossa IA irá criar um plano personalizado de aprendizado em IA.
+                {temRespostas
+                  ? "A IA está usando suas respostas atuais — mesmo parciais — pra montar seu plano inicial. Você pode refinar depois preenchendo o que falta."
+                  : "Com base nas informações que você compartilhou, nossa IA irá criar um plano personalizado de aprendizado em IA."}
               </p>
             </div>
-            <Button 
+            <Button
               size="lg"
               onClick={gerarInsight}
               disabled={isGenerating}
@@ -175,7 +223,7 @@ export function DiagnosticoAcademyPanel({ diagnostico }: DiagnosticoAcademyPanel
               ) : (
                 <>
                   <Sparkles className="h-5 w-5 mr-2" />
-                  Gerar Meu Diagnóstico com IA
+                  {temRespostas ? "Gerar meu plano agora" : "Gerar Meu Diagnóstico com IA"}
                 </>
               )}
             </Button>

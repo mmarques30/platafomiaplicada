@@ -233,22 +233,29 @@ SESSÃO DE MENTORIA:
     const { data: { user } } = await supabaseClient.auth.getUser();
     if (!user) throw new Error("Usuário não encontrado");
 
-    // Buscar formulário. ANTES: filtrava por user.id do caller → quando
-    // admin disparava (ex: "Forçar finalização"), nunca encontrava o
-    // formulário do mentorado e os objetivos/projetos NUNCA eram criados.
-    // Agora: busca só pelo id e valida permissão depois.
-    const { data: formulario, error } = await supabaseClient
+    // Service client bypassa RLS — necessário porque a busca pelo id
+    // do formulário (sem filtro user_id) continuava sendo bloqueada pela
+    // policy, mesmo quando o caller era admin. ANTES: o "select pelo id"
+    // foi feito com cliente autenticado e voltava vazio → "Formulário
+    // não encontrado" (motivo do bug reportado pela Mari pra Ariane).
+    const serviceClient = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+    );
+
+    const { data: formulario, error } = await serviceClient
       .from("formulario_diagnostico")
       .select("*")
       .eq("id", formulario_id)
-      .single();
+      .maybeSingle();
 
     if (error || !formulario) {
       console.error("Erro ao buscar formulário:", error);
       throw new Error("Formulário não encontrado");
     }
 
-    // Permissão: dono do formulário OU admin
+    // Permissão: dono do formulário OU admin/equipe. Continua usando o
+    // cliente autenticado pra checar a role real do caller (não bypass).
     const isOwner = formulario.user_id === user.id;
     let isAdmin = false;
     if (!isOwner) {
@@ -434,10 +441,11 @@ PRIORIDADES:
     
     const insight = JSON.parse(insightText);
 
-    // Salvar insight no banco
-    const { error: updateError } = await supabaseClient
+    // Salvar insight no banco. Service role: o admin não é dono do
+    // formulário e o RLS bloquearia o UPDATE pelo cliente autenticado.
+    const { error: updateError } = await serviceClient
       .from("formulario_diagnostico")
-      .update({ 
+      .update({
         insight_ia: insight,
         insight_gerado_em: new Date().toISOString(),
         plano_gerado: true,
@@ -456,29 +464,36 @@ PRIORIDADES:
     // Idempotência: se a função roda 2x (ex: cliente refinalizou, admin
     // usou "Forçar finalização" depois), evita duplicar objetivos/projetos
     // gerados anteriormente por IA. Remove os antigos antes de inserir os novos.
-    await supabaseClient
+    // Service role pelo mesmo motivo: admin não é dono → RLS bloqueia.
+    await serviceClient
       .from("objetivos_mentoria")
       .delete()
       .eq("user_id", menteeUserId)
       .eq("formulario_id", formulario_id)
       .eq("gerado_por_ia", true);
-    await supabaseClient
+    await serviceClient
       .from("projetos_mentoria")
       .delete()
       .eq("user_id", menteeUserId)
       .eq("tipo", "operacional");
 
-    // Salvar objetivos gerados
+    // Salvar objetivos gerados. Filtra entradas vazias da IA (form parcial
+    // pode resultar em objetos sem `objetivo`/`tipo`) pra não violar
+    // colunas NOT NULL.
     if (insight.objetivos && Array.isArray(insight.objetivos)) {
       for (const obj of insight.objetivos) {
-        const { error: objError } = await supabaseClient
+        if (!obj?.objetivo || !obj?.tipo) {
+          console.warn("Pulando objetivo inválido:", obj);
+          continue;
+        }
+        const { error: objError } = await serviceClient
           .from("objetivos_mentoria")
           .insert({
             user_id: menteeUserId,
             formulario_id: formulario_id,
             objetivo: obj.objetivo,
             tipo: obj.tipo,
-            prioridade: obj.prioridade,
+            prioridade: obj.prioridade ?? "media",
             status: "ativo",
             gerado_por_ia: true
           });
@@ -493,17 +508,21 @@ PRIORIDADES:
     // Salvar projetos sugeridos com trilhas, módulos e ferramentas
     if (insight.projetos && Array.isArray(insight.projetos)) {
       for (const proj of insight.projetos) {
+        if (!proj?.titulo) {
+          console.warn("Pulando projeto sem título:", proj);
+          continue;
+        }
         // Processar trilhas recomendadas - adicionar video_ids para cada módulo
         const modulosComVideos = await Promise.all(
           (proj.modulos_obrigatorios || []).map(async (modulo: any) => {
             // Buscar vídeos do módulo
-            const { data: videos } = await supabaseClient
+            const { data: videos } = await serviceClient
               .from("videos")
               .select("id")
               .eq("modulo_id", modulo.modulo_id)
               .eq("ativo", true)
               .order("ordem");
-            
+
             return {
               ...modulo,
               video_ids: videos?.map(v => v.id) || []
@@ -511,14 +530,14 @@ PRIORIDADES:
           })
         );
 
-        const { error: projError } = await supabaseClient
+        const { error: projError } = await serviceClient
           .from("projetos_mentoria")
           .insert({
             user_id: menteeUserId,
             titulo: proj.titulo,
-            descricao: proj.descricao,
-            objetivo_projeto: proj.objetivo_projeto,
-            contribuicao_plano: proj.contribuicao_plano,
+            descricao: proj.descricao ?? "",
+            objetivo_projeto: proj.objetivo_projeto ?? null,
+            contribuicao_plano: proj.contribuicao_plano ?? null,
             status: "planejamento",
             tipo: "operacional",
             trilhas_recomendadas: proj.trilhas_recomendadas || [],
@@ -526,7 +545,7 @@ PRIORIDADES:
             ferramentas_projeto: proj.ferramentas_projeto || [],
             progresso_preparacao: 0
           });
-        
+
         if (projError) {
           console.error("Erro ao salvar projeto:", projError);
         }
@@ -535,7 +554,7 @@ PRIORIDADES:
     }
 
     // Registrar auditoria
-    await supabaseClient
+    await serviceClient
       .from("auditoria_conteudo")
       .insert({
         tabela: "formulario_diagnostico",
