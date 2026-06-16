@@ -78,7 +78,12 @@ export const useMentoriaTarefas = (userId?: string) => {
       return data;
     },
     onSuccess: () => {
+      // Invalida todos os caches dependentes de tarefas_mentoria (não
+      // só `tarefas-mentoria`). Senão widgets de progresso, fases do
+      // processo e listagens admin ficam com valor antigo até refresh.
       queryClient.invalidateQueries({ queryKey: ["tarefas-mentoria"] });
+      queryClient.invalidateQueries({ queryKey: ["tarefas-todas-mentorados"] });
+      queryClient.invalidateQueries({ queryKey: ["fases-processo"] });
       toast({
         title: "Tarefa criada!",
         description: "A tarefa foi adicionada com sucesso"
@@ -108,6 +113,8 @@ export const useMentoriaTarefas = (userId?: string) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tarefas-mentoria"] });
+      queryClient.invalidateQueries({ queryKey: ["tarefas-todas-mentorados"] });
+      queryClient.invalidateQueries({ queryKey: ["fases-processo"] });
       toast({
         title: "Tarefa atualizada!",
         description: "As alterações foram salvas"
@@ -133,6 +140,8 @@ export const useMentoriaTarefas = (userId?: string) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tarefas-mentoria"] });
+      queryClient.invalidateQueries({ queryKey: ["tarefas-todas-mentorados"] });
+      queryClient.invalidateQueries({ queryKey: ["fases-processo"] });
       toast({
         title: "Tarefa removida",
         description: "A tarefa foi excluída"
@@ -173,6 +182,8 @@ export const useMentoriaTarefas = (userId?: string) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tarefas-mentoria"] });
+      queryClient.invalidateQueries({ queryKey: ["tarefas-todas-mentorados"] });
+      queryClient.invalidateQueries({ queryKey: ["fases-processo"] });
       toast({
         title: "Entrega enviada!",
         description: "O arquivo foi anexado à tarefa"

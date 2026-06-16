@@ -212,7 +212,17 @@ export default function TrilhaDetalhes() {
     },
     onSuccess: () => {
       toast.success("Vídeo marcado como concluído!");
-      queryClient.invalidateQueries({ queryKey: ["video-progress", user?.id] });
+      // Invalida TODAS as queries que dependem do progresso de vídeos.
+      // Antes só invalidávamos `video-progress` — barras de progresso da
+      // home/evolução/certificados/trilhas em andamento continuavam com
+      // o valor antigo até refresh manual. Daí a percepção "a plataforma
+      // não está medindo o progresso".
+      queryClient.invalidateQueries({ queryKey: ["video-progress"] });
+      queryClient.invalidateQueries({ queryKey: ["trilhas-em-andamento"] });
+      queryClient.invalidateQueries({ queryKey: ["trilhas-concluidas"] });
+      queryClient.invalidateQueries({ queryKey: ["progresso-certificados"] });
+      queryClient.invalidateQueries({ queryKey: ["progresso-geral"] });
+      queryClient.invalidateQueries({ queryKey: ["minha-evolucao"] });
     },
     onError: () => {
       toast.error("Erro ao atualizar status do vídeo");
