@@ -139,7 +139,7 @@ export function DashboardTour({ run, previewMode, onComplete }: DashboardTourPro
         next: "Próximo",
         skip: "Pular tour",
       }}
-      styles={{
+      styles={({
         tooltip: {
           borderRadius: 14,
           border: "1px solid #EAEAE0",   // brand-hairline
@@ -185,7 +185,7 @@ export function DashboardTour({ run, previewMode, onComplete }: DashboardTourPro
           top: 14,
           right: 14,
         },
-      }}
+      }) as any}
       onEvent={handleEvent}
     />
   );

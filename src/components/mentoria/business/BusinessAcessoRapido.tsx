@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
 interface QuickNavItem {
   title: string;
   path: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: React.ComponentType<{ className?: string; strokeWidth?: number }>;
   /** Marca o item como "pendente" — recebe destaque visual (anel + dot). */
   pendingKey?: "diagnostico";
 }
