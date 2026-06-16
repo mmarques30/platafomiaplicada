@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { extractEdgeFunctionError } from "@/lib/edge-functions";
 
 export function useDiagnosticoAdmin(userId?: string) {
   const queryClient = useQueryClient();
@@ -215,10 +216,7 @@ export function useDiagnosticoAdmin(userId?: string) {
       );
 
       if (invokeError) {
-        const msg =
-          (invokeError as any).message ??
-          (invokeError as any).context ??
-          JSON.stringify(invokeError);
+        const msg = await extractEdgeFunctionError(invokeError);
         throw new Error(`Diagnóstico marcado como completo, mas falha ao gerar o insight: ${msg}`);
       }
 
@@ -252,10 +250,7 @@ export function useDiagnosticoAdmin(userId?: string) {
         { body: { formulario_id: formularioId } }
       );
       if (invokeError) {
-        const msg =
-          (invokeError as any).message ??
-          (invokeError as any).context ??
-          JSON.stringify(invokeError);
+        const msg = await extractEdgeFunctionError(invokeError);
         throw new Error(msg);
       }
     },

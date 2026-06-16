@@ -23,6 +23,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { extractEdgeFunctionError } from "@/lib/edge-functions";
 import { toast } from "sonner";
 import { useState } from "react";
 import { useMentoriaForm } from "@/hooks/useMentoriaForm";
@@ -133,10 +134,10 @@ export function DiagnosticoAcademyPanel({ diagnostico }: DiagnosticoAcademyPanel
       refetch();
     } catch (error: any) {
       // Propaga o erro real (mensagem da edge function) pra ficar visível
-      // pra quem está testando — antes só "Erro ao gerar diagnóstico" sem
-      // motivo. Mari precisava disso pra debugar casos como a Ariane.
+      // pra quem está testando. O cliente supabase-js mostra "non-2xx
+      // status code" como genérico; a mensagem real vem no body.
       console.error('Erro ao gerar insight:', error);
-      const msg = error?.message ?? error?.context ?? "Tente novamente.";
+      const msg = await extractEdgeFunctionError(error);
       toast.error(`Erro ao gerar diagnóstico: ${msg}`);
     } finally {
       setIsGenerating(false);
