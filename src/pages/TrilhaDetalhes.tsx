@@ -212,11 +212,11 @@ export default function TrilhaDetalhes() {
     },
     onSuccess: () => {
       toast.success("Vídeo marcado como concluído!");
-      // Invalida TODAS as queries que dependem do progresso de vídeos.
-      // Antes só invalidávamos `video-progress` — barras de progresso da
-      // home/evolução/certificados/trilhas em andamento continuavam com
-      // o valor antigo até refresh manual. Daí a percepção "a plataforma
-      // não está medindo o progresso".
+      // IMPORTANTE: invalida TODOS os caches dependentes de `progresso_videos`,
+      // não só `video-progress`. Caso contrário a barra de progresso da home,
+      // evolução, certificados e "trilhas em andamento" ficam com cache
+      // antigo até refresh — Mari reportou "a plataforma não está medindo
+      // o progresso". NÃO REMOVER essas linhas — fix recorrente (PR #86).
       queryClient.invalidateQueries({ queryKey: ["video-progress"] });
       queryClient.invalidateQueries({ queryKey: ["trilhas-em-andamento"] });
       queryClient.invalidateQueries({ queryKey: ["trilhas-concluidas"] });
@@ -244,7 +244,7 @@ export default function TrilhaDetalhes() {
   return (
     <PageContainer>
       <Link to="/trilhas">
-        <Button variant="ghost" size="sm" className="-ml-2 mb-3 text-muted-foreground hover:text-foreground">
+        <Button variant="ghost" className="mb-4">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Voltar para Academy
         </Button>
@@ -316,7 +316,7 @@ export default function TrilhaDetalhes() {
             </div>
 
             {/* 3. Avaliação + Botão Concluir */}
-            <Card className="bg-brand-cream-soft border-brand-hairline">
+            <Card className="bg-muted/30 border-border">
               <CardContent className="p-4">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                   {/* Avaliação */}
@@ -336,7 +336,7 @@ export default function TrilhaDetalhes() {
                   {/* Botão Concluir */}
                   <div className="w-full sm:w-auto">
                     {getVideoProgress(currentVideoId || '')?.completado ? (
-                      <div className="flex items-center justify-center gap-2 py-2.5 px-5 rounded-lg bg-brand-strong text-brand-cream">
+                      <div className="flex items-center justify-center gap-2 py-2.5 px-5 rounded-lg bg-primary text-primary-foreground">
                         <CheckCircle2 className="h-4 w-4" />
                         <span className="font-medium text-sm">Concluída</span>
                       </div>
@@ -344,7 +344,7 @@ export default function TrilhaDetalhes() {
                       <Button
                         onClick={() => marcarConcluidoMutation.mutate()}
                         disabled={marcarConcluidoMutation.isPending}
-                        className="w-full sm:w-auto transition-colors bg-brand-strong hover:bg-brand-strong/90 text-brand-cream"
+                        className="w-full sm:w-auto transition-colors bg-aplicada-dark hover:bg-aplicada-dark/90 text-white"
                       >
                         <CheckCircle2 className="h-4 w-4 mr-2" />
                         Marcar como Concluída
@@ -357,9 +357,9 @@ export default function TrilhaDetalhes() {
 
             {/* 4. Card de Informações da Aula - Colapsável com header sempre visível */}
             <Collapsible open={infoExpanded} onOpenChange={setInfoExpanded}>
-              <Card className="bg-brand-cream-soft border-brand-hairline">
+              <Card className="border-border">
                 {/* Header sempre visível */}
-                <div className="flex items-center justify-between p-4 border-b border-brand-hairline">
+                <div className="flex items-center justify-between p-4 border-b border-border">
                   <h3 className="text-sm font-semibold">Informações da aula</h3>
                   <CollapsibleTrigger asChild>
                     <Button variant="ghost" size="sm" className="gap-1.5 text-muted-foreground h-8">
@@ -376,7 +376,7 @@ export default function TrilhaDetalhes() {
                 <CollapsibleContent>
                   <CardContent className="p-4 md:p-6">
                     <Tabs defaultValue="descricao" className="w-full">
-                      <TabsList className="w-full justify-start bg-transparent border-b border-brand-hairline rounded-none p-0 h-auto mb-4">
+                      <TabsList className="w-full justify-start bg-transparent border-b border-border rounded-none p-0 h-auto mb-4">
                         <TabsTrigger 
                           value="descricao"
                           className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary px-4 py-2"
@@ -447,9 +447,9 @@ export default function TrilhaDetalhes() {
                           onClick={() => handleVideoSelect(video.id)}
                           className={cn(
                             "cursor-pointer rounded-lg overflow-hidden transition-all border group",
-                            isPlaying
-                              ? "ring-2 ring-brand-strong border-brand-strong bg-brand-strong/5"
-                              : "hover:bg-brand-cream/50 border-brand-hairline bg-brand-cream-soft"
+                            isPlaying 
+                              ? "ring-2 ring-primary border-primary bg-primary/5" 
+                              : "hover:bg-muted/50 border-border bg-card"
                           )}
                         >
                           <div className="aspect-video relative overflow-hidden">
@@ -486,8 +486,8 @@ export default function TrilhaDetalhes() {
 
           {/* Sidebar Direita: Lista de Vídeos (apenas desktop) */}
           <div className="hidden lg:block w-80 xl:w-96 flex-shrink-0">
-            <Card className="sticky top-4 bg-brand-cream-soft border-brand-hairline overflow-hidden flex flex-col h-[calc(100vh-120px)] max-h-[calc(100vh-120px)]">
-              <div className="p-3 border-b border-brand-hairline bg-brand-cream-soft flex-shrink-0">
+            <Card className="sticky top-4 border-border overflow-hidden flex flex-col h-[calc(100vh-120px)] max-h-[calc(100vh-120px)]">
+              <div className="p-3 border-b border-border bg-muted/30 flex-shrink-0">
                 <h3 className="font-semibold text-sm">
                   Vídeos da trilha ({allVideos.length})
                 </h3>
@@ -506,9 +506,9 @@ export default function TrilhaDetalhes() {
                         onClick={() => handleVideoSelect(video.id)}
                         className={cn(
                           "flex gap-3 p-2 cursor-pointer transition-all border-l-2",
-                          isPlaying
-                            ? "border-l-brand-strong bg-brand-strong/10"
-                            : "border-l-transparent hover:bg-brand-cream/50"
+                          isPlaying 
+                            ? "border-l-primary bg-primary/10" 
+                            : "border-l-transparent hover:bg-muted/50"
                         )}
                       >
                         {/* Número do vídeo */}
