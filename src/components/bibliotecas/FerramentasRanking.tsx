@@ -13,6 +13,8 @@ interface Ferramenta {
   avaliacao_mari: number | null;
   avaliacao_comunidade: number | null;
   total_avaliacoes_comunidade: number | null;
+  relevancia_mercado?: number | null;
+  recencia_modelo?: number | null;
   gratuito: boolean;
   link_ferramenta: string | null;
   objetivo: string;
@@ -29,10 +31,17 @@ export function FerramentasRanking({ ferramentas, onVerMais }: FerramentasRankin
 
   // Ranking dinâmico: Top 5 ordenado por score_ranking
   const top5 = useMemo(() => {
-    // Ferramentas já vêm ordenadas por score_ranking do hook
-    // Pegar as 5 primeiras com alguma avaliação válida
+    // Ferramentas já vêm ordenadas por score_ranking do hook.
+    // Pegar as 5 primeiras com algum critério de ranking preenchido.
     return ferramentas
-      .filter(f => (f.avaliacao || 0) > 0 || (f.avaliacao_comunidade || 0) > 0)
+      .filter(
+        (f) =>
+          (f.score_ranking || 0) > 0 ||
+          (f.avaliacao || 0) > 0 ||
+          (f.avaliacao_comunidade || 0) > 0 ||
+          (f.relevancia_mercado || 0) > 0 ||
+          (f.recencia_modelo || 0) > 0
+      )
       .slice(0, 5);
   }, [ferramentas]);
 
@@ -52,7 +61,7 @@ export function FerramentasRanking({ ferramentas, onVerMais }: FerramentasRankin
           Top 5 Ferramentas Recomendadas
         </h2>
         <p className="text-muted-foreground mt-2 text-sm md:text-base">
-          Selecionadas e avaliadas pela Mari e comunidade
+          Classificadas por relevância de mercado, últimos modelos e avaliações da mentora e da comunidade
         </p>
       </div>
 

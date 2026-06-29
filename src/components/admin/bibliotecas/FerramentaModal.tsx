@@ -24,6 +24,8 @@ export function FerramentaModal({ open, onOpenChange, ferramenta }: FerramentaMo
   const createFerramenta = useCreateFerramenta();
   const updateFerramenta = useUpdateFerramenta();
   const [ratingMari, setRatingMari] = useState(5);
+  const [ratingMercado, setRatingMercado] = useState(0);
+  const [ratingModelos, setRatingModelos] = useState(0);
   const [uploading, setUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
@@ -33,6 +35,8 @@ export function FerramentaModal({ open, onOpenChange, ferramenta }: FerramentaMo
     if (ferramenta) {
       reset(ferramenta);
       setRatingMari(ferramenta.avaliacao_mari || ferramenta.avaliacao || 5);
+      setRatingMercado(ferramenta.relevancia_mercado || 0);
+      setRatingModelos(ferramenta.recencia_modelo || 0);
       setPreviewUrl(ferramenta.logo_url || null);
     } else {
       reset({
@@ -43,12 +47,16 @@ export function FerramentaModal({ open, onOpenChange, ferramenta }: FerramentaMo
         link_ferramenta: "",
         logo_url: "",
         avaliacao_mari: 5,
+        relevancia_mercado: 0,
+        recencia_modelo: 0,
         gratuito: false,
         vale_a_pena: null,
         justificativa: "",
         ativo: true,
       });
       setRatingMari(5);
+      setRatingMercado(0);
+      setRatingModelos(0);
       setPreviewUrl(null);
     }
   }, [ferramenta, reset]);
@@ -282,7 +290,75 @@ export function FerramentaModal({ open, onOpenChange, ferramenta }: FerramentaMo
                 </span>
               </div>
               <p className="text-xs text-muted-foreground mt-1">
-                Esta avaliação será usada no ranking Top 3 (peso 60%)
+                Critério do ranking (peso 30%)
+              </p>
+            </div>
+
+            {/* Relevância de mercado (0-5) */}
+            <div>
+              <Label htmlFor="relevancia_mercado" className="flex items-center gap-2">
+                <Star className="h-4 w-4 text-primary" />
+                Relevância de mercado (0-5)
+              </Label>
+              <div className="flex items-center gap-1 py-2">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    onClick={() => {
+                      const novo = ratingMercado === star ? 0 : star;
+                      setRatingMercado(novo);
+                      setValue("relevancia_mercado", novo);
+                    }}
+                    className="transition-all hover:scale-110 focus:outline-none"
+                  >
+                    <Star
+                      className={`w-6 h-6 ${
+                        star <= ratingMercado
+                          ? "fill-primary text-primary"
+                          : "text-muted hover:text-primary/40"
+                      }`}
+                    />
+                  </button>
+                ))}
+                <span className="ml-3 text-sm text-muted-foreground">{ratingMercado}/5</span>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                O quanto a ferramenta é relevante/adotada no mercado hoje (peso 30%). Clique na mesma estrela para zerar.
+              </p>
+            </div>
+
+            {/* Atualidade dos modelos / últimos modelos (0-5) */}
+            <div>
+              <Label htmlFor="recencia_modelo" className="flex items-center gap-2">
+                <Star className="h-4 w-4 text-primary" />
+                Últimos modelos / atualidade (0-5)
+              </Label>
+              <div className="flex items-center gap-1 py-2">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    onClick={() => {
+                      const novo = ratingModelos === star ? 0 : star;
+                      setRatingModelos(novo);
+                      setValue("recencia_modelo", novo);
+                    }}
+                    className="transition-all hover:scale-110 focus:outline-none"
+                  >
+                    <Star
+                      className={`w-6 h-6 ${
+                        star <= ratingModelos
+                          ? "fill-primary text-primary"
+                          : "text-muted hover:text-primary/40"
+                      }`}
+                    />
+                  </button>
+                ))}
+                <span className="ml-3 text-sm text-muted-foreground">{ratingModelos}/5</span>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                O quanto a ferramenta usa os modelos mais recentes/atuais (peso 20%). Clique na mesma estrela para zerar.
               </p>
             </div>
 
@@ -305,7 +381,7 @@ export function FerramentaModal({ open, onOpenChange, ferramenta }: FerramentaMo
                   </Badge>
                 </div>
                 <p className="text-xs text-muted-foreground mt-2">
-                  Esta avaliação é calculada automaticamente pelas avaliações dos usuários (peso 40% no ranking)
+                  Esta avaliação é calculada automaticamente pelas avaliações dos usuários (peso 20% no ranking, ponderado pelo nº de votos)
                 </p>
               </div>
             )}
