@@ -66,7 +66,7 @@ export function EnvironmentProvider({ children }: { children: ReactNode }) {
   const availableEnvironments = useMemo<Environment[]>(() => {
     // Admin vê todos para simulação
     if (isAdmin) {
-      return ["gratuito", "academy", "business_parceria"];
+      return ["gratuito", "academy", "business_parceria", "business_sistemas"];
     }
     
     // Visitante só vê gratuito
@@ -77,11 +77,11 @@ export function EnvironmentProvider({ children }: { children: ReactNode }) {
     // Baseado no plano - hierarquia paralela
     switch (plan) {
       case "business_parceria":
-        // Builder sempre tem acesso ao Academy
+        // Builder: ambiente próprio + acesso ao Academy
         return ["gratuito", "academy", "business_parceria"];
       case "business_sistemas":
-        // System entra pelo ambiente "business_parceria", identificação interna determina o que vê
-        return ["gratuito", "academy", "business_parceria"];
+        // System: ambiente próprio (entrada separada do Builder) + acesso ao Academy
+        return ["gratuito", "academy", "business_sistemas"];
       case "skills":
         // Plano legado "skills" não tem mais ambiente próprio: cai no Academy
         return ["gratuito", "academy"];
