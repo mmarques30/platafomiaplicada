@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import academyParallaxBg from "@/assets/academy-parallax-bg.jpg";
 import businessParallaxBg from "@/assets/business-parallax-bg.jpg";
-import skillsParallaxBg from "@/assets/skills-parallax-bg.jpg";
 
 const Servicos = () => {
   const navigate = useNavigate();
@@ -17,10 +16,6 @@ const Servicos = () => {
     } else {
       navigate("/auth?tab=signup");
     }
-  };
-
-  const handleSpecialistClick = () => {
-    window.open("https://wa.me/5511950566101", "_blank");
   };
 
   return (
@@ -51,36 +46,13 @@ const Servicos = () => {
       </TextParallaxContent>
 
       <TextParallaxContent
-        imgUrl={skillsParallaxBg}
-        subheading="Skills"
-        heading={<><span className="whitespace-nowrap font-bold">Sua equipe até 50%</span><br /><span className="whitespace-nowrap font-bold">mais produtiva</span></>}
-      >
-        <ExampleContent>
-          <h2 className="col-span-1 text-3xl font-bold md:col-span-4 text-white mt-8">
-            IAplicada Skills
-          </h2>
-          <div className="col-span-1 md:col-span-8 mt-8">
-            <p className="mb-4 text-base text-neutral-400 md:text-lg">
-              A solução que elimina até 20h/semana de tarefas manuais de equipes, trocando planilhas + processos repetitivos por automações práticas que rodam no dia a dia, em 12 semanas. O Skills é para líderes que querem sua equipe performando ao máximo, resolvendo os problemas reais do dia a dia - não certificados individuais ou nem conhecimento teórico.
-            </p>
-            <button
-              onClick={handleSpecialistClick}
-              className="group inline-flex items-center gap-2 px-5 py-2.5 bg-[#1a1c19] border border-[#2a2c29] text-[#9EB038] font-medium rounded-sm hover:border-[#9EB038] transition-all duration-300 uppercase tracking-wider text-xs"
-            >
-              Falar com especialista <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-300" />
-            </button>
-          </div>
-        </ExampleContent>
-      </TextParallaxContent>
-
-      <TextParallaxContent
         imgUrl={businessParallaxBg}
-        subheading="Business"
+        subheading="Builder"
         heading="A única solução que organiza sua operação."
       >
         <ExampleContent>
           <h2 className="col-span-1 text-3xl font-bold md:col-span-4 text-white mt-8">
-            IAplicada Business
+            IAplicada Builder
           </h2>
           <div className="col-span-1 md:col-span-8 mt-8">
             <p className="mb-4 text-base text-neutral-400 md:text-lg">
