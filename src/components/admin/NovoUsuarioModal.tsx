@@ -27,8 +27,8 @@ interface NovoUsuarioModalProps {
 
 const PLANOS = [
   { value: "academy", label: "Academy", description: "B2C Individual - Acesso às trilhas" },
-  { value: "business_parceria", label: "Builder", description: "Consultoria colaborativa - cliente participa" },
-  { value: "business_sistemas", label: "System", description: "iAplicada constrói - cliente acompanha" },
+  { value: "business_parceria", label: "Builder", description: "Mentoria individual - o mentorado participa do projeto" },
+  { value: "business_sistemas", label: "System", description: "B2B - empresa (iAplicada constrói, a empresa acompanha)" },
 ];
 
 export function NovoUsuarioModal({ open, onOpenChange }: NovoUsuarioModalProps) {

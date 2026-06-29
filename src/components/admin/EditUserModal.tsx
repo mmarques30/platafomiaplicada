@@ -57,8 +57,8 @@ interface EditUserModalProps {
 
 const PLANOS = [
   { value: "academy", label: "Academy", description: "B2C Individual - Acesso às trilhas" },
-  { value: "business_parceria", label: "Builder", description: "Consultoria colaborativa - cliente participa" },
-  { value: "business_sistemas", label: "System", description: "iAplicada constrói - cliente acompanha" },
+  { value: "business_parceria", label: "Builder", description: "Mentoria individual - o mentorado participa do projeto" },
+  { value: "business_sistemas", label: "System", description: "B2B - empresa (iAplicada constrói, a empresa acompanha)" },
 ];
 
 export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) {
@@ -268,8 +268,8 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
                   <Input id="linkedin" {...register("linkedin")} placeholder="https://linkedin.com/in/..." />
                 </div>
 
-                {/* Nome da Empresa - visível para planos Business */}
-                {(selectedPlano === "business_parceria" || selectedPlano === "business_sistemas") && (
+                {/* Nome da Empresa - apenas System (B2B/empresa). Builder é mentorado individual. */}
+                {selectedPlano === "business_sistemas" && (
                   <div>
                     <Label htmlFor="nome_empresa">Nome da Empresa (exibição no projeto)</Label>
                     <Input
