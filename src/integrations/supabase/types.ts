@@ -2826,6 +2826,8 @@ export type Database = {
           nome: string
           o_que_entrega: string
           objetivo: string
+          recencia_modelo: number | null
+          relevancia_mercado: number | null
           total_avaliacoes_comunidade: number | null
           updated_at: string | null
           vale_a_pena: boolean | null
@@ -2845,6 +2847,8 @@ export type Database = {
           nome: string
           o_que_entrega: string
           objetivo: string
+          recencia_modelo?: number | null
+          relevancia_mercado?: number | null
           total_avaliacoes_comunidade?: number | null
           updated_at?: string | null
           vale_a_pena?: boolean | null
@@ -2864,6 +2868,8 @@ export type Database = {
           nome?: string
           o_que_entrega?: string
           objetivo?: string
+          recencia_modelo?: number | null
+          relevancia_mercado?: number | null
           total_avaliacoes_comunidade?: number | null
           updated_at?: string | null
           vale_a_pena?: boolean | null

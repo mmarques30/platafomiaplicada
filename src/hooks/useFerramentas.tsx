@@ -19,30 +19,45 @@ export function useIACopieUse() {
   });
 }
 
-// Função para calcular score combinado de ranking
+// Função para calcular o score combinado de ranking (escala 0–5).
+//
+// Critérios (definidos com a mentora):
+//   - Relevância de mercado .......... peso 30%
+//   - Atualidade dos modelos ......... peso 20%  ("últimos modelos")
+//   - Avaliação da mentora ........... peso 30%
+//   - Avaliação da comunidade ........ peso 20%  (ponderada pela confiança = nº de votos)
+//
+// Os pesos são normalizados apenas entre os critérios que possuem valor,
+// para que o ranking degrade de forma elegante enquanto a mentora ainda não
+// preencheu relevância de mercado / atualidade dos modelos de cada ferramenta.
 function calcularScoreRanking(ferramenta: {
   avaliacao?: number | null;
+  avaliacao_mari?: number | null;
   avaliacao_comunidade?: number | null;
   total_avaliacoes_comunidade?: number | null;
+  relevancia_mercado?: number | null;
+  recencia_modelo?: number | null;
 }): number {
-  const avaliacaoMentor = ferramenta.avaliacao || 0;
+  const relevanciaMercado = ferramenta.relevancia_mercado || 0;
+  const recenciaModelo = ferramenta.recencia_modelo || 0;
+  const avaliacaoMentora = ferramenta.avaliacao_mari ?? ferramenta.avaliacao ?? 0;
   const avaliacaoComunidade = ferramenta.avaliacao_comunidade || 0;
   const totalAvaliacoes = ferramenta.total_avaliacoes_comunidade || 0;
-  
-  // Peso base: mentor 60%, comunidade 40%
-  const pesoMentor = 0.6;
-  const pesoComunidade = 0.4;
-  
-  // Fator de relevância: mais avaliações = mais confiável (máximo em 10 avaliações)
-  const fatorRelevancia = Math.min(1, totalAvaliacoes / 10);
-  
-  // Se não tem avaliações da comunidade, usa só do mentor
-  if (totalAvaliacoes === 0) {
-    return avaliacaoMentor;
-  }
-  
-  return (avaliacaoMentor * pesoMentor) + 
-         (avaliacaoComunidade * pesoComunidade * fatorRelevancia);
+
+  // Confiança da comunidade: mais votos = mais peso (saturando em 5 votos).
+  const confiancaComunidade = Math.min(1, totalAvaliacoes / 5);
+
+  const fatores = [
+    { valor: relevanciaMercado, peso: 0.3 },
+    { valor: recenciaModelo, peso: 0.2 },
+    { valor: avaliacaoMentora, peso: 0.3 },
+    { valor: avaliacaoComunidade, peso: 0.2 * confiancaComunidade },
+  ].filter((f) => f.valor > 0 && f.peso > 0);
+
+  if (fatores.length === 0) return 0;
+
+  const somaPesos = fatores.reduce((acc, f) => acc + f.peso, 0);
+  return fatores.reduce((acc, f) => acc + f.valor * f.peso, 0) / somaPesos;
 }
 
 // Hook para Ferramentas de IA com ranking dinâmico
