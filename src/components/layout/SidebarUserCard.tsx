@@ -10,8 +10,8 @@ interface SidebarUserCardProps {
 
 const planoLabel: Record<string, string> = {
   academy: "Academy",
-  business_parceria: "Business",
-  business_sistemas: "Sistemas",
+  business_parceria: "Builder",
+  business_sistemas: "System",
   skills: "Skills",
 };
 

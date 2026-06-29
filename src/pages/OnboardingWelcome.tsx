@@ -15,7 +15,7 @@ const environmentMap: Record<string, { name: string; description: string }> = {
     description: "capacitação de equipes com diagnóstico e roadmap personalizado",
   },
   organizar_operacao: {
-    name: "Business",
+    name: "Builder",
     description: "consultoria estratégica com implementação de IA na sua operação",
   },
   explorando: {

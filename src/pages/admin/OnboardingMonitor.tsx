@@ -49,8 +49,8 @@ interface UserRow {
 
 const PLANO_LABELS: Record<string, string> = {
   academy: "Academy",
-  business_parceria: "Business Parceria",
-  business_sistemas: "Business Sistemas",
+  business_parceria: "Builder",
+  business_sistemas: "System",
   skills: "Skills",
 };
 
@@ -129,8 +129,8 @@ type FilterKey = "todos" | "academy" | "business_parceria" | "business_sistemas"
 const FILTERS: { key: FilterKey; label: string }[] = [
   { key: "todos", label: "Todos" },
   { key: "academy", label: "Academy" },
-  { key: "business_parceria", label: "Business Parceria" },
-  { key: "business_sistemas", label: "Business Sistemas" },
+  { key: "business_parceria", label: "Builder" },
+  { key: "business_sistemas", label: "System" },
   { key: "skills", label: "Skills" },
   { key: "gratuito", label: "Gratuito" },
   { key: "parados", label: "Parados 3+ dias" },

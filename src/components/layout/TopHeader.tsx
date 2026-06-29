@@ -101,7 +101,7 @@ export function TopHeader() {
             <Eye className="h-4 w-4 inline mr-1" /> Visualizando como: <strong>
               {viewAs === 'visitante' 
                 ? 'Visitante' 
-                : `${impersonatedUserName} (${viewAs === 'academy' ? 'Academy' : viewAs === 'skills' ? 'Skills' : 'Business'})`
+                : `${impersonatedUserName} (${viewAs === 'academy' ? 'Academy' : viewAs === 'business_sistemas' ? 'System' : 'Builder'})`
               }
             </strong>
           </span>
@@ -177,20 +177,11 @@ export function TopHeader() {
                   </DropdownMenuItem>
                 )}
                 
-                {/* Business: só aparece se TEM acesso business */}
+                {/* Builder: só aparece se TEM acesso business */}
                 {hasEffectiveAccessTo("business") && isProdutoAtivo("business") && (
                   <DropdownMenuItem asChild>
                     <Link to="/mentoria" className="cursor-pointer">
-                      Business
-                    </Link>
-                  </DropdownMenuItem>
-                )}
-                
-                {/* Skills: aparece APENAS se o plano efetivo É skills (não para business) */}
-                {isSkills && isProdutoAtivo("skills") && (
-                  <DropdownMenuItem asChild>
-                    <Link to="/skills" className="cursor-pointer">
-                      Skills
+                      Builder
                     </Link>
                   </DropdownMenuItem>
                 )}

@@ -92,7 +92,8 @@ export function AppSidebar() {
       }
       // Fallback: se nenhum ambiente selecionado, inferir do plano
       if (!currentEnvironment) {
-        if (effectivePlan === 'skills') return 'skills';
+        // Plano legado "skills" não tem mais ambiente próprio: cai no Academy
+        if (effectivePlan === 'skills') return 'academy';
         if (effectivePlan === 'business_parceria') return 'business_parceria';
         if (effectivePlan === 'academy') return 'academy';
         if (isVisitante) return 'gratuito';
@@ -108,7 +109,8 @@ export function AppSidebar() {
       case "academy":
         return "academy";
       case "skills":
-        return "skills";
+        // Plano legado "skills" não tem mais ambiente próprio: cai no Academy
+        return "academy";
       case "business_parceria":
         return "business_parceria";
       case "business_sistemas":
@@ -168,8 +170,8 @@ export function AppSidebar() {
   // Helper para determinar URL dinâmica baseada no plano
   const getMenuUrl = (menu: { menu_key: string; url: string | null }) => {
     if (menu.menu_key === 'meu_progresso') {
-      // Skills vai para /skills/equipe (Minha Equipe)
-      if (effectivePlan === 'skills' || effectiveEnvironment === 'skills') {
+      // Plano legado "skills" ainda roteia para /skills/equipe (Minha Equipe)
+      if (effectivePlan === 'skills') {
         return '/skills/equipe';
       }
       // Business vai para /mentoria (Visão Geral)

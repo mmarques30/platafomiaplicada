@@ -21,16 +21,16 @@ export function JornadasTab() {
       icon: Building2,
       etapas: [
         { produto: "Skills", valor: "R$ 4.497/ano", tipo: "inicial" },
-        { produto: "Business", valor: "R$ 9.997 - R$ 70k", economia: "Transformação completa", tipo: "premium" },
+        { produto: "Builder", valor: "R$ 9.997 - R$ 70k", economia: "Transformação completa", tipo: "premium" },
       ],
     },
     {
       id: "b2b-business",
-      titulo: "Jornada B2B Business",
+      titulo: "Jornada B2B Builder",
       descricao: "Para empresas que precisam de transformação digital",
       icon: Building2,
       etapas: [
-        { produto: "Business", valor: "R$ 9.997 - R$ 70k", tipo: "inicial" },
+        { produto: "Builder", valor: "R$ 9.997 - R$ 70k", tipo: "inicial" },
         { produto: "Skills (Recorrência)", valor: "+R$ 1.397/pessoa/ano", economia: "Novos liderados", tipo: "upsell" },
       ],
     },
@@ -104,7 +104,7 @@ export function JornadasTab() {
         <div className="text-sm text-muted-foreground space-y-1">
           <p><strong>Academy</strong> - B2C Individual (R$ 1.497/ano)</p>
           <p><strong>Skills</strong> - B2B Equipes (R$ 4.497/ano, mínimo 3 licenças)</p>
-          <p><strong>Business</strong> - B2B Consultoria (R$ 9.997 - R$ 70.000/projeto)</p>
+          <p><strong>Builder</strong> - B2B Consultoria (R$ 9.997 - R$ 70.000/projeto)</p>
         </div>
       </Card>
     </div>

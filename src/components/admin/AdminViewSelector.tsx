@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Eye, EyeOff, User, GraduationCap, Briefcase, Building2, Wrench, Play } from "lucide-react";
+import { Eye, EyeOff, User, GraduationCap, Building2, Wrench, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -24,9 +24,8 @@ type PlanType = 'academy' | 'skills' | 'business_parceria' | 'business_sistemas'
 const viewOptions: { mode: AdminViewMode; label: string; icon: React.ReactNode }[] = [
   { mode: "visitante", label: "Visitante (gratuito)", icon: <User className="h-4 w-4" /> },
   { mode: "academy", label: "Academy", icon: <GraduationCap className="h-4 w-4" /> },
-  { mode: "skills", label: "Skills", icon: <Briefcase className="h-4 w-4" /> },
-  { mode: "business_parceria", label: "Business Parceria", icon: <Building2 className="h-4 w-4" /> },
-  { mode: "business_sistemas", label: "Business Sistemas", icon: <Wrench className="h-4 w-4" /> },
+  { mode: "business_parceria", label: "Builder", icon: <Building2 className="h-4 w-4" /> },
+  { mode: "business_sistemas", label: "System", icon: <Wrench className="h-4 w-4" /> },
 ];
 
 export function AdminViewSelector({ isAdmin }: AdminViewSelectorProps) {
@@ -43,7 +42,7 @@ export function AdminViewSelector({ isAdmin }: AdminViewSelectorProps) {
       // Visitante não requer seleção de usuário
       setViewAs(mode);
     } else {
-      // Para Academy, Skills e Business, abrir modal de seleção
+      // Para Academy, Builder e System, abrir modal de seleção
       setSelectedPlanForModal(mode as PlanType);
     }
   };

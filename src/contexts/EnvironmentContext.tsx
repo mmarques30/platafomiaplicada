@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useMemo, ReactNo
 import { useUserPlan } from "@/hooks/useUserPlan";
 import { useUserRole } from "@/hooks/useUserRole";
 
-export type Environment = "gratuito" | "academy" | "skills" | "business_parceria" | "business_sistemas";
+export type Environment = "gratuito" | "academy" | "business_parceria" | "business_sistemas";
 
 interface EnvironmentContextType {
   currentEnvironment: Environment | null;
@@ -38,20 +38,14 @@ export const ENVIRONMENT_CONFIG: Record<Environment, {
     color: "hsl(73, 55%, 46%)", // #9EB038
     description: "Trilhas completas + diagnóstico + evolução",
   },
-  skills: {
-    label: "Skills",
-    icon: "Users",
-    color: "hsl(217, 91%, 60%)",
-    description: "Academy + capacitação para equipes",
-  },
   business_parceria: {
-    label: "Business",
+    label: "Builder",
     icon: "Crown",
     color: "hsl(45, 93%, 47%)",
     description: "Academy + mentoria 1:1 + roadmap",
   },
   business_sistemas: {
-    label: "Business Sistemas",
+    label: "System",
     icon: "Wrench",
     color: "hsl(45, 93%, 47%)",
     description: "Acompanhamento de projeto - iAplicada constrói",
@@ -63,7 +57,7 @@ export function EnvironmentProvider({ children }: { children: ReactNode }) {
     return sessionStorage.getItem("selected_environment") as Environment | null;
   });
   
-  const { plan, isVisitante, isLoading: planLoading, skillsLiberado } = useUserPlan();
+  const { plan, isVisitante, isLoading: planLoading } = useUserPlan();
   const { isAdmin, isLoading: roleLoading } = useUserRole();
   
   const isLoading = planLoading || roleLoading;
@@ -72,7 +66,7 @@ export function EnvironmentProvider({ children }: { children: ReactNode }) {
   const availableEnvironments = useMemo<Environment[]>(() => {
     // Admin vê todos para simulação
     if (isAdmin) {
-      return ["gratuito", "academy", "skills", "business_parceria"];
+      return ["gratuito", "academy", "business_parceria"];
     }
     
     // Visitante só vê gratuito
@@ -83,23 +77,20 @@ export function EnvironmentProvider({ children }: { children: ReactNode }) {
     // Baseado no plano - hierarquia paralela
     switch (plan) {
       case "business_parceria":
-        // Business sempre tem academy, e skills só se liberado
-        return skillsLiberado 
-          ? ["gratuito", "academy", "skills", "business_parceria"]
-          : ["gratuito", "academy", "business_parceria"];
+        // Builder sempre tem acesso ao Academy
+        return ["gratuito", "academy", "business_parceria"];
       case "business_sistemas":
-        // Sistemas entra pelo ambiente "business_parceria", identificação interna determina o que vê
-        return skillsLiberado 
-          ? ["gratuito", "academy", "skills", "business_parceria"]
-          : ["gratuito", "academy", "business_parceria"];
+        // System entra pelo ambiente "business_parceria", identificação interna determina o que vê
+        return ["gratuito", "academy", "business_parceria"];
       case "skills":
-        return ["gratuito", "academy", "skills"];
+        // Plano legado "skills" não tem mais ambiente próprio: cai no Academy
+        return ["gratuito", "academy"];
       case "academy":
         return ["gratuito", "academy"];
       default:
         return ["gratuito"];
     }
-  }, [plan, isVisitante, isAdmin, skillsLiberado]);
+  }, [plan, isVisitante, isAdmin]);
 
   const setEnvironment = (env: Environment) => {
     setCurrentEnvironment(env);

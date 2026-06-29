@@ -28,8 +28,8 @@ interface NovoUsuarioModalProps {
 const PLANOS = [
   { value: "academy", label: "Academy", description: "B2C Individual - Acesso às trilhas" },
   { value: "skills", label: "Skills", description: "B2B - Licença corporativa" },
-  { value: "business_parceria", label: "Business Parceria", description: "Consultoria colaborativa - cliente participa" },
-  { value: "business_sistemas", label: "Business Sistemas", description: "iAplicada constrói - cliente acompanha" },
+  { value: "business_parceria", label: "Builder", description: "Consultoria colaborativa - cliente participa" },
+  { value: "business_sistemas", label: "System", description: "iAplicada constrói - cliente acompanha" },
 ];
 
 export function NovoUsuarioModal({ open, onOpenChange }: NovoUsuarioModalProps) {

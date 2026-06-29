@@ -254,11 +254,11 @@ export default function ImportarUsuarios() {
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="business_parceria" id="business_parceria" />
-                  <Label htmlFor="business_parceria" className="cursor-pointer font-normal">Business Parceria</Label>
+                  <Label htmlFor="business_parceria" className="cursor-pointer font-normal">Builder</Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="business_sistemas" id="business_sistemas" />
-                  <Label htmlFor="business_sistemas" className="cursor-pointer font-normal">Business Sistemas</Label>
+                  <Label htmlFor="business_sistemas" className="cursor-pointer font-normal">System</Label>
                 </div>
               </RadioGroup>
             </div>
