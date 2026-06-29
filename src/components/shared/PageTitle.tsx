@@ -20,23 +20,12 @@ interface PageTitleProps {
 export function PageTitle({
   primary,
   secondary,
-  eyebrow,
-  index,
   icon,
   description,
   className,
 }: PageTitleProps) {
-  const indexPadded = index !== undefined ? String(index).padStart(2, "0") : null;
-
   return (
     <header className={cn("space-y-3", className)}>
-      {(eyebrow || indexPadded) && (
-        <div className="lp-eyebrow">
-          {indexPadded && <span className="font-mono text-primary">{indexPadded}</span>}
-          {indexPadded && eyebrow && <span>—</span>}
-          {eyebrow && <span>{eyebrow}</span>}
-        </div>
-      )}
       <h1 className="flex items-baseline gap-3 font-serif-display text-3xl leading-[1.05] tracking-tight text-foreground md:text-4xl lg:text-5xl">
         {icon && <span className="self-center text-primary">{icon}</span>}
         <span>
