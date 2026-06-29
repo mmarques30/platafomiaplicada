@@ -92,7 +92,7 @@ export default function Configuracoes() {
 
 
   return (
-    <PageContainer size="narrow">
+    <PageContainer>
       <PageTitle
         primary="Configurações"
         secondary="da conta"
@@ -103,6 +103,7 @@ export default function Configuracoes() {
         {/* Progresso do Perfil */}
         <OnboardingProgressCard />
 
+        <div className="grid gap-6 lg:grid-cols-2 items-start">
         {/* Aparência */}
         <Card>
           <CardHeader>
@@ -315,7 +316,7 @@ export default function Configuracoes() {
             </CardContent>
           </Card>
         )}
-
+        </div>
       </div>
     </PageContainer>
   );

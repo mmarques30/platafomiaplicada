@@ -16,6 +16,7 @@ import { useBusinessUserId } from "@/hooks/useBusinessUserId";
 import { cn } from "@/lib/utils";
 import { PageSkeleton } from "@/components/shared/PageSkeleton";
 import { PageContainer } from "@/components/shared/PageContainer";
+import { MentoriaPageHeader } from "@/components/mentoria/MentoriaPageHeader";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -223,23 +224,11 @@ export default function MentoriaTasksBusiness() {
 
   return (
     <PageContainer>
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate("/mentoria")}>
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <div>
-            <h1 className="text-2xl font-bold flex items-center gap-2">
-              <ClipboardCheck className="h-6 w-6" />
-              Minhas Tasks
-            </h1>
-            <p className="text-muted-foreground text-sm">
-              Tarefas de validação e aprovação do seu projeto
-            </p>
-          </div>
-        </div>
-      </div>
+      <MentoriaPageHeader
+        primary="Minhas"
+        secondary="tasks"
+        description="Tarefas de validação e aprovação do seu projeto."
+      />
 
       {/* Filtros e Contadores */}
       <Card>

@@ -12,6 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { ArrowLeft, Loader2, CheckCircle2, Clock, ExternalLink, Edit3, Sparkles, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { PageContainer } from "@/components/shared/PageContainer";
+import { MentoriaPageHeader } from "@/components/mentoria/MentoriaPageHeader";
 
 /**
  * Tela única e unificada do diagnóstico (Academy + Business). Reorganizada em
@@ -121,58 +122,51 @@ export default function MentoriaDiagnostico() {
 
   return (
     <PageContainer>
-      <Button variant="ghost" onClick={() => navigate(voltarUrl)} className="mb-4 -ml-2">
-        <ArrowLeft className="h-4 w-4 mr-2" />
-        {voltarLabel}
-      </Button>
-
-      {/* Header unificado: título + status + ações */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
-        <div>
-          <p className="text-[10px] font-medium uppercase tracking-[0.16em] text-brand-strong mb-1">
-            Diagnóstico IA
-          </p>
-          <h1 className="font-serif-display text-3xl md:text-4xl text-foreground leading-tight tracking-tight">
-            Seu diagnóstico personalizado
-          </h1>
-          <div className="flex items-center gap-2 mt-3">
-            <Badge variant="outline" className={`${statusBadge.className} gap-1.5`}>
-              <statusBadge.icon className="h-3 w-3" />
-              {statusBadge.label}
-            </Badge>
-            {planoGerado && (
-              <Badge variant="outline" className="bg-brand-strong/15 text-brand-strong border-brand-strong/30 gap-1.5">
-                <CheckCircle2 className="h-3 w-3" />
-                Publicado no painel
-              </Badge>
+      <MentoriaPageHeader
+        eyebrow="Diagnóstico IA"
+        primary="Seu diagnóstico"
+        secondary="personalizado"
+        backTo={voltarUrl}
+        backLabel={voltarLabel}
+        actions={
+          <>
+            {completado && !editing && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setEditing(true)}
+                className="border-brand-hairline"
+              >
+                <Edit3 className="h-4 w-4 mr-2" />
+                Editar respostas
+              </Button>
             )}
-          </div>
-        </div>
+            {planoGerado && (
+              <Button
+                size="sm"
+                onClick={() => navigate(isBusiness ? "/mentoria" : "/diagnostico/painel")}
+                className="bg-brand-strong text-brand-cream hover:bg-brand-strong/90"
+              >
+                <ExternalLink className="h-4 w-4 mr-2" />
+                Abrir painel completo
+              </Button>
+            )}
+          </>
+        }
+      />
 
-        {/* Ações contextuais */}
-        <div className="flex gap-2">
-          {completado && !editing && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setEditing(true)}
-              className="border-brand-hairline"
-            >
-              <Edit3 className="h-4 w-4 mr-2" />
-              Editar respostas
-            </Button>
-          )}
-          {planoGerado && (
-            <Button
-              size="sm"
-              onClick={() => navigate(isBusiness ? "/mentoria" : "/diagnostico/painel")}
-              className="bg-brand-strong text-brand-cream hover:bg-brand-strong/90"
-            >
-              <ExternalLink className="h-4 w-4 mr-2" />
-              Abrir painel completo
-            </Button>
-          )}
-        </div>
+      {/* Status do diagnóstico */}
+      <div className="flex flex-wrap items-center gap-2">
+        <Badge variant="outline" className={`${statusBadge.className} gap-1.5`}>
+          <statusBadge.icon className="h-3 w-3" />
+          {statusBadge.label}
+        </Badge>
+        {planoGerado && (
+          <Badge variant="outline" className="bg-brand-strong/15 text-brand-strong border-brand-strong/30 gap-1.5">
+            <CheckCircle2 className="h-3 w-3" />
+            Publicado no painel
+          </Badge>
+        )}
       </div>
 
       {/* Banner contextual quando preenchido por admin */}

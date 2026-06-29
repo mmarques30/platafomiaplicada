@@ -12,8 +12,8 @@ import { useBusinessUserId } from "@/hooks/useBusinessUserId";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { PageTitle } from "@/components/shared/PageTitle";
 import { PageContainer } from "@/components/shared/PageContainer";
+import { MentoriaPageHeader } from "@/components/mentoria/MentoriaPageHeader";
 
 const statusConfig = {
   pendente: { label: "Pendente", className: "bg-muted text-muted-foreground" },
@@ -59,20 +59,9 @@ export default function MentoriaEtapasBusiness() {
 
   return (
     <PageContainer>
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => navigate("/mentoria")}
-        className="-ml-2 w-fit text-muted-foreground hover:text-foreground"
-      >
-        <ArrowLeft className="h-4 w-4 mr-2" />
-        Voltar
-      </Button>
-
-      <PageTitle
+      <MentoriaPageHeader
         primary="Minhas"
         secondary="fases"
-        eyebrow="Mentoria"
         description="Acompanhe o progresso das fases do seu projeto."
       />
       {/* Progresso Geral */}
