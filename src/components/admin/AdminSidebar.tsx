@@ -101,7 +101,7 @@ const menuGroups: MenuGroup[] = [
       // Preview Painéis + Diagnósticos foram removidos do sidebar — vão
       //   ser consolidados dentro da tela de cada mentorado (PR seguinte).
       { path: "/admin/mentoria/academy", label: "Aluno Academy" },
-      { path: "/admin/mentoria/business", label: "Parceria" },
+      { path: "/admin/mentoria/business", label: "Builder" },
       { path: "/admin/duvidas", label: "Central de Dúvidas" },
     ],
   },
@@ -110,7 +110,7 @@ const menuGroups: MenuGroup[] = [
     label: "Consultoria",
     icon: Wrench,
     items: [
-      { path: "/admin/mentoria/business-iaplicada", label: "Sistemas" },
+      { path: "/admin/mentoria/business-iaplicada", label: "System" },
     ],
   },
   {

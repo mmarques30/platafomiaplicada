@@ -32,14 +32,14 @@ const planConfig: Record<PlanType, { title: string; icon: React.ReactNode; empty
     emptyMessage: 'Nenhum mentorado Skills encontrado',
   },
   business_parceria: {
-    title: 'Selecionar Mentorado Business Parceria',
+    title: 'Selecionar Mentorado Builder',
     icon: <Building2 className="h-5 w-5 text-primary" />,
-    emptyMessage: 'Nenhum mentorado Business Parceria encontrado',
+    emptyMessage: 'Nenhum mentorado Builder encontrado',
   },
   business_sistemas: {
-    title: 'Selecionar Mentorado Business Sistemas',
+    title: 'Selecionar Mentorado System',
     icon: <Building2 className="h-5 w-5 text-primary" />,
-    emptyMessage: 'Nenhum mentorado Business Sistemas encontrado',
+    emptyMessage: 'Nenhum mentorado System encontrado',
   },
 };
 

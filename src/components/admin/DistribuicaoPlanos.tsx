@@ -22,8 +22,8 @@ const COLORS = {
 const LABELS = {
   academy: "Academy",
   skills: "Skills",
-  business_parceria: "Business Parceria",
-  business_sistemas: "Business Sistemas",
+  business_parceria: "Builder",
+  business_sistemas: "System",
   sem_plano: "Sem Plano",
 };
 

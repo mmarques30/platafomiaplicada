@@ -84,7 +84,7 @@ export function AvisoModal({ open, onOpenChange, aviso }: AvisoModalProps) {
                 { value: "visitante", label: "Visitantes" },
                 { value: "academy", label: "Academy" },
                 { value: "skills", label: "Skills" },
-                { value: "business", label: "Business" }
+                { value: "business", label: "Builder" }
               ].map((plano) => (
                 <div key={plano.value} className="flex items-center space-x-2">
                   <Checkbox

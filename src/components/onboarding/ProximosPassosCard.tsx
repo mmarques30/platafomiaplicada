@@ -174,7 +174,7 @@ export function ProximosPassosCard({ previewMode, onClose: onCloseExternal }: Pr
       const primeiraEtapa = etapas?.[0]?.titulo ?? "Etapa inicial";
 
       return {
-        planoLabel: "Business Parceria",
+        planoLabel: "Builder",
         titulo: totalEtapas > 0
           ? `Seu projeto tem ${totalEtapas} etapas, ${nome}. Veja o que fazer agora.`
           : `Sua mentoria está ativa, ${nome}. Veja os primeiros passos.`,
@@ -199,11 +199,11 @@ export function ProximosPassosCard({ previewMode, onClose: onCloseExternal }: Pr
 
     if (effectivePlan === "business_sistemas") {
       return {
-        planoLabel: "Business Sistemas",
+        planoLabel: "System",
         titulo: `Seu sistema está sendo construído, ${nome}.`,
         sub: "A IAplicada constrói e entrega seu sistema por etapas. Acompanhe o andamento em Meu Sistema — e use o Academy enquanto isso.",
         passos: [
-          { status: "feito", titulo: "Acesso configurado", desc: "Sua conta Business Sistemas está ativa." },
+          { status: "feito", titulo: "Acesso configurado", desc: "Sua conta System está ativa." },
           { status: "agora", label: "Comece por aqui", titulo: "Conheça o Meu Sistema", desc: "Aqui você acompanha cada etapa de construção, documentos entregues e o status do seu projeto. Você será notificado sempre que algo novo for adicionado.", cta: "Ir para Meu Sistema →", href: "/meu-sistema" },
           { status: "proximo", label: "Ao longo do projeto", titulo: "Acompanhe etapas e documentos entregues", desc: "Cada etapa tem documentos e entregas específicas. O progresso é atualizado pela equipe IAplicada conforme o trabalho avança." },
           { status: "proximo", label: "Acesso paralelo — disponível agora", titulo: "Use o Academy enquanto o sistema é construído", desc: "Você tem acesso a trilhas de aprendizado, biblioteca de prompts e ferramentas de IA. Aprenda enquanto seu sistema é entregue.", cta: "Ver trilhas disponíveis →", href: "/trilhas" },
