@@ -57,7 +57,6 @@ interface EditUserModalProps {
 
 const PLANOS = [
   { value: "academy", label: "Academy", description: "B2C Individual - Acesso às trilhas" },
-  { value: "skills", label: "Skills", description: "B2B - Licença corporativa" },
   { value: "business_parceria", label: "Builder", description: "Consultoria colaborativa - cliente participa" },
   { value: "business_sistemas", label: "System", description: "iAplicada constrói - cliente acompanha" },
 ];
@@ -224,8 +223,8 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
   
   // Mostrar configuração Skills quando plano é Skills OU qualquer Business com Skills liberado
   const isAnyBusinessPlan = selectedPlano === "business_parceria" || selectedPlano === "business_sistemas";
-  const showSkillsConfig = selectedPlano === "skills" || 
-                           (isAnyBusinessPlan && skillsLiberado);
+  // Produto Skills descontinuado: nunca exibir configuração/toggle de Skills.
+  const showSkillsConfig = false;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -389,24 +388,6 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
                   Selecione o produto/plano deste usuário
                 </p>
                 
-                {/* Switch para liberar Skills - para ambos os tipos Business */}
-                {isAnyBusinessPlan && (
-                  <div className="flex items-center justify-between space-x-2 mt-4 p-3 bg-muted/50 rounded-lg">
-                    <div>
-                      <Label htmlFor="skills-liberado" className="text-sm font-medium">
-                        Liberar acesso ao Skills
-                      </Label>
-                      <p className="text-xs text-muted-foreground">
-                        Permite acessar o ambiente Skills além do Business
-                      </p>
-                    </div>
-                    <Switch
-                      id="skills-liberado"
-                      checked={skillsLiberado}
-                      onCheckedChange={setSkillsLiberado}
-                    />
-                  </div>
-                )}
               </div>
 
               {/* Configuração Skills - aparece quando plano é Skills ou Business com Skills liberado */}

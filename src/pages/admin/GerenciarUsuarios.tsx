@@ -282,7 +282,6 @@ export default function GerenciarUsuários() {
           <SelectContent>
             <SelectItem value="all">Todos os Planos</SelectItem>
             <SelectItem value="academy">Academy</SelectItem>
-            <SelectItem value="skills">Skills</SelectItem>
             <SelectItem value="business_parceria">Builder</SelectItem>
             <SelectItem value="business_sistemas">System</SelectItem>
             <SelectItem value="none">Sem Plano</SelectItem>
