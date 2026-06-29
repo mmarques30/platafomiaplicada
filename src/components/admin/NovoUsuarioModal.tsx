@@ -27,7 +27,6 @@ interface NovoUsuarioModalProps {
 
 const PLANOS = [
   { value: "academy", label: "Academy", description: "B2C Individual - Acesso às trilhas" },
-  { value: "skills", label: "Skills", description: "B2B - Licença corporativa" },
   { value: "business_parceria", label: "Builder", description: "Consultoria colaborativa - cliente participa" },
   { value: "business_sistemas", label: "System", description: "iAplicada constrói - cliente acompanha" },
 ];
@@ -248,35 +247,6 @@ export function NovoUsuarioModal({ open, onOpenChange }: NovoUsuarioModalProps) 
               Selecione o produto/plano que este usuário terá acesso
             </p>
             
-            {/* Skills Team Selector - apenas para Skills */}
-            {selectedPlano === "skills" && (
-              <div className="mt-4">
-                <SkillsEquipeSelector
-                  value={skillsEquipeData}
-                  onChange={setSkillsEquipeData}
-                  showLiderOption={true}
-                />
-              </div>
-            )}
-            
-            {/* Switch para liberar Skills - apenas para Business colaborativo */}
-            {(selectedPlano === "business_parceria" || selectedPlano === "business_sistemas") && (
-              <div className="flex items-center justify-between space-x-2 mt-4 p-3 bg-muted/50 rounded-lg">
-                <div>
-                  <Label htmlFor="skills-liberado-novo" className="text-sm font-medium">
-                    Liberar acesso ao Skills
-                  </Label>
-                  <p className="text-xs text-muted-foreground">
-                    Permite acessar o ambiente Skills além do Business
-                  </p>
-                </div>
-                <Switch
-                  id="skills-liberado-novo"
-                  checked={skillsLiberado}
-                  onCheckedChange={setSkillsLiberado}
-                />
-              </div>
-            )}
           </div>
 
           <DialogFooter>

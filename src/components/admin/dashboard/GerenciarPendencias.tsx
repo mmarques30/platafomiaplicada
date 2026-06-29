@@ -43,7 +43,6 @@ import { adminTheme } from "@/components/admin/adminTheme";
 const PLANOS_DISPONIVEIS = [
   { value: "academy", label: "Academy" },
   { value: "business_parceria", label: "Builder" },
-  { value: "skills", label: "Skills" },
 ];
 
 const TIPOS_PENDENCIA = [
