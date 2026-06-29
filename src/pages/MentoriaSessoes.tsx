@@ -28,8 +28,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { PageTitle } from "@/components/shared/PageTitle";
 import { PageContainer } from "@/components/shared/PageContainer";
+import { MentoriaPageHeader } from "@/components/mentoria/MentoriaPageHeader";
 
 export default function MentoriaSessoes() {
   const navigate = useNavigate();
@@ -80,25 +80,11 @@ export default function MentoriaSessoes() {
 
   return (
     <PageContainer>
-      <Button
-        variant="ghost"
-        onClick={() => navigate("/mentoria")}
-        className="-ml-2 w-fit"
-      >
-        <ArrowLeft className="h-4 w-4 mr-2" />
-        Voltar para Mentoria
-      </Button>
-
-      <div className="mb-8">
-        <PageTitle
-          primary="Sessões"
-          secondary="de mentoria"
-          eyebrow="Mentoria"
-        />
-        <p className="text-muted-foreground text-base mt-2">
-          Acompanhe suas sessões e acesse gravações e transcrições
-        </p>
-      </div>
+      <MentoriaPageHeader
+        primary="Sessões"
+        secondary="de mentoria"
+        description="Acompanhe suas sessões e acesse gravações e transcrições."
+      />
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-3 max-w-md">

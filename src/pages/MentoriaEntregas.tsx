@@ -1,8 +1,8 @@
 import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { ExternalLink, FileText, Play, Monitor, Video, ChevronLeft, ChevronRight, ArrowLeft, Package } from "lucide-react";
-import { PageTitle } from "@/components/shared/PageTitle";
 import { PageContainer } from "@/components/shared/PageContainer";
+import { MentoriaPageHeader } from "@/components/mentoria/MentoriaPageHeader";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -89,17 +89,11 @@ export default function MentoriaEntregas() {
 
   return (
     <PageContainer>
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => navigate("/mentoria")}
-        className="-ml-2 w-fit text-muted-foreground hover:text-foreground"
-      >
-        <ArrowLeft className="h-4 w-4 mr-2" />
-        Voltar
-      </Button>
-
-      <PageTitle primary="Minhas" secondary="entregas" eyebrow="Mentoria" />
+      <MentoriaPageHeader
+        primary="Minhas"
+        secondary="entregas"
+        description="Acompanhe os materiais e recursos entregues no seu projeto."
+      />
 
       {/* Guia de Ferramentas */}
       <section className="space-y-3">

@@ -22,7 +22,8 @@ import { downloadUrl } from "@/lib/download";
 import { supabase } from "@/integrations/supabase/client";
 import { format, differenceInDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { PageTitle } from "@/components/shared/PageTitle";
+import { PageContainer } from "@/components/shared/PageContainer";
+import { MentoriaPageHeader } from "@/components/mentoria/MentoriaPageHeader";
 import { ArquivosProjetoSection } from "@/components/admin/business/ArquivosProjetoSection";
 import { NotasProjetoSection } from "@/components/admin/business/NotasProjetoSection";
 import { cn } from "@/lib/utils";
@@ -180,8 +181,12 @@ export default function MentoriaDocumentos() {
   })();
 
   return (
-    <div className="p-4 md:p-6 space-y-6">
-      <PageTitle primary="Documentos" />
+    <PageContainer>
+      <MentoriaPageHeader
+        primary="Documentos"
+        secondary="do projeto"
+        description="Arquivos, anotações, links, reports e contrato em um só lugar."
+      />
 
       {/* Stat Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -617,7 +622,7 @@ export default function MentoriaDocumentos() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </PageContainer>
   );
 }
 

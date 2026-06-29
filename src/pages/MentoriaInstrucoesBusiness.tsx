@@ -12,8 +12,8 @@ import { useEtapasBusiness, useInstrucoesByContrato, useUpdateInstrucao } from "
 import { useEntregasBusiness } from "@/hooks/useEntregasBusiness";
 import { useBusinessUserId } from "@/hooks/useBusinessUserId";
 import { InstrucaoCard } from "@/components/mentoria/business/InstrucaoCard";
-import { PageTitle } from "@/components/shared/PageTitle";
 import { PageContainer } from "@/components/shared/PageContainer";
+import { MentoriaPageHeader } from "@/components/mentoria/MentoriaPageHeader";
 import { cn } from "@/lib/utils";
 
 interface FaseAgrupada {
@@ -178,20 +178,9 @@ export default function MentoriaInstrucoesBusiness() {
 
   return (
     <PageContainer>
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => navigate("/mentoria")}
-        className="-ml-2 w-fit"
-      >
-        <ArrowLeft className="h-4 w-4 mr-2" />
-        Voltar
-      </Button>
-
-      <PageTitle
+      <MentoriaPageHeader
         primary="Minhas"
         secondary="instruções"
-        eyebrow="Mentoria"
         description="Instruções organizadas por fase e entrega."
       />
 
