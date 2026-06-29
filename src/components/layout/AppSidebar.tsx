@@ -83,15 +83,13 @@ export function AppSidebar() {
 
   // Em modo simulação, o EnvironmentSwitcher fica oculto; então garantimos que o filtro de menus
   // acompanhe o plano simulado (evita cenário: ambiente "business" ocultando submenus de academy/skills).
-  // Para usuários reais: se o plano é business_sistemas, forçamos esse ambiente.
+  // Builder (business_parceria) e System (business_sistemas) têm entradas separadas: respeitamos
+  // o ambiente escolhido pelo usuário e só inferimos do plano quando nada foi selecionado.
   const effectiveEnvironment = (() => {
     if (!isViewingAs) {
-      // Usuário real: se plano é business_sistemas, usar esse ambiente
-      if (effectivePlan === 'business_sistemas') {
-        return 'business_sistemas';
-      }
       // Fallback: se nenhum ambiente selecionado, inferir do plano
       if (!currentEnvironment) {
+        if (effectivePlan === 'business_sistemas') return 'business_sistemas';
         // Plano legado "skills" não tem mais ambiente próprio: cai no Academy
         if (effectivePlan === 'skills') return 'academy';
         if (effectivePlan === 'business_parceria') return 'business_parceria';

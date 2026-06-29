@@ -10,19 +10,20 @@ import { IAPLogo3D } from "@/components/IAPLogo3D";
 import { Button } from "@/components/ui/button";
 import envGratuito from "@/assets/env-gratuito.jpg";
 import envAcademy from "@/assets/env-academy.jpg";
+import envSkills from "@/assets/env-skills.jpg";
 import envBusiness from "@/assets/env-business.jpg";
 
 // Mapeia ambiente → imagem visual (sem ícones lucide).
 const ENV_IMAGE: Record<Environment, string> = {
   gratuito: envGratuito,
   academy: envAcademy,
-  business_parceria: envBusiness,
-  business_sistemas: envBusiness,
+  business_parceria: envSkills, // Builder reaproveita a imagem que era do Skills
+  business_sistemas: envBusiness, // System
 };
 
-// "business_sistemas" não aparece na seleção inicial — usuários desse plano
-// entram via "business_parceria" e a experiência é ajustada internamente.
-const ALL_ENVIRONMENTS: Environment[] = ["gratuito", "academy", "business_parceria"];
+// Builder (business_parceria) e System (business_sistemas) são produtos
+// distintos com entradas separadas no painel de ambientes.
+const ALL_ENVIRONMENTS: Environment[] = ["gratuito", "academy", "business_parceria", "business_sistemas"];
 
 export default function EnvironmentSelector() {
   const navigate = useNavigate();
@@ -128,7 +129,7 @@ export default function EnvironmentSelector() {
           ao passar o mouse num card, os outros borram e perdem opacidade,
           o card ativo cresce levemente e ganha sombra. */}
       <div
-        className="grid grid-cols-2 sm:grid-cols-3 gap-8 md:gap-12 w-full max-w-2xl"
+        className="grid grid-cols-2 sm:grid-cols-4 gap-8 md:gap-12 w-full max-w-3xl"
         onMouseLeave={() => setHovered(null)}
       >
         {ALL_ENVIRONMENTS.map((env, index) => {
