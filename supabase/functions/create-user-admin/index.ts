@@ -54,7 +54,7 @@ Deno.serve(async (req) => {
     }
 
     const { 
-      email, 
+      email: emailRaw, 
       password, 
       nomeCompleto, 
       roles: userRoles, 
@@ -66,6 +66,14 @@ Deno.serve(async (req) => {
       novaEquipe,
       papelEquipe
     } = await req.json()
+
+    // Normaliza o email (trim + minúsculas) para evitar divergência entre o
+    // cadastro e o login — uma causa comum de "credenciais inválidas".
+    const email = String(emailRaw ?? '').trim().toLowerCase()
+
+    if (!email) {
+      throw new Error('Email é obrigatório')
+    }
 
     console.log(`Admin ${user.id} creating user:`, { email, nomeCompleto, roles: userRoles, planoMentoria, origemConsultoria, empresaConsultoria, skillsLiberado, equipeId, novaEquipe, papelEquipe })
 
@@ -133,16 +141,24 @@ Deno.serve(async (req) => {
           throw new Error('Este usuário já possui um plano ativo. Edite o usuário existente em vez de criar um novo.')
         }
 
-        // Atualizar senha
-        if (password) {
-          await supabaseAdmin.auth.admin.updateUserById(userId, { password })
-          console.log('Senha atualizada para usuário existente')
+        // Atualizar senha E confirmar o email.
+        // CRÍTICO: se o usuário existente nunca confirmou o email (ex.: cadastro
+        // anterior como visitante/lead que ficou pendente), o login falha com
+        // "credenciais inválidas" mesmo com a senha correta. Forçamos email_confirm
+        // aqui para garantir que ele consiga entrar com a senha temporária.
+        const updateAuth: Record<string, unknown> = {
+          email_confirm: true,
+          user_metadata: { nome_completo: nomeCompleto },
         }
-
-        // Atualizar metadata
-        await supabaseAdmin.auth.admin.updateUserById(userId, {
-          user_metadata: { nome_completo: nomeCompleto }
-        })
+        if (password) {
+          updateAuth.password = password
+        }
+        const { error: updateAuthError } = await supabaseAdmin.auth.admin.updateUserById(userId, updateAuth)
+        if (updateAuthError) {
+          console.error('Erro ao atualizar auth do usuário existente:', updateAuthError)
+          throw updateAuthError
+        }
+        console.log('Senha/email_confirm atualizados para usuário existente')
 
         console.log('Usuário existente encontrado, promovendo:', userId)
       } else {
