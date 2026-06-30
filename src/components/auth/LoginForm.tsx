@@ -16,8 +16,8 @@ export function LoginForm() {
     setIsLoading(true);
     
     const formData = new FormData(e.currentTarget);
-    const email = formData.get("signin-email") as string;
-    const password = formData.get("signin-password") as string;
+    const email = ((formData.get("signin-email") as string) || "").trim().toLowerCase();
+    const password = (formData.get("signin-password") as string) || "";
 
     try {
       const { error } = await supabase.auth.signInWithPassword({
