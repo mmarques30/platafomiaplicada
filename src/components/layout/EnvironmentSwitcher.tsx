@@ -52,12 +52,12 @@ export function EnvironmentSwitcher() {
           variant="ghost"
           className={cn(
             "h-8 px-3 gap-2 rounded-full",
-            "bg-foreground/5 hover:bg-foreground/10 border border-brand-hairline",
-            "text-foreground font-medium text-sm"
+            "bg-white/10 hover:bg-white/15 border border-white/20",
+            "text-white hover:text-white font-medium text-sm"
           )}
         >
           <span className="hidden sm:inline">{environmentConfig.label}</span>
-          <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+          <ChevronDown className="h-3.5 w-3.5 text-white/60" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56 bg-popover border-border">
