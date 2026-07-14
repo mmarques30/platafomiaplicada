@@ -1,5 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { FavoriteButton } from "@/components/shared/FavoriteButton";
 import { 
   ChevronRight, 
@@ -13,6 +14,8 @@ import {
   LineChart, 
   Presentation,
   FileText,
+  Copy,
+  Check,
   type LucideIcon
 } from "lucide-react";
 
@@ -25,6 +28,13 @@ interface PromptRowProps {
     nivel_complexidade: string | null;
   };
   onClick: () => void;
+  /** Modo seleção (para exportar em lote) */
+  selectable?: boolean;
+  selected?: boolean;
+  onToggleSelect?: () => void;
+  /** Cópia rápida do prompt direto na linha, sem abrir o modal */
+  onQuickCopy?: () => void;
+  justCopied?: boolean;
 }
 
 const categoriaIcons: Record<string, { icon: LucideIcon; gradient: string }> = {
@@ -60,12 +70,25 @@ const getNivelColor = (nivel: string | null) => {
   }
 };
 
-export function PromptRow({ prompt, onClick }: PromptRowProps) {
+export function PromptRow({ prompt, onClick, selectable, selected, onToggleSelect, onQuickCopy, justCopied }: PromptRowProps) {
   return (
     <div
       className="flex items-center gap-4 p-4 border-b last:border-b-0 hover:bg-accent/50 transition-colors cursor-pointer group"
       onClick={onClick}
     >
+      {/* Checkbox de seleção (modo exportar em lote) */}
+      {selectable && (
+        <div
+          className="flex-shrink-0"
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleSelect?.();
+          }}
+        >
+          <Checkbox checked={selected} aria-label={`Selecionar ${prompt.titulo}`} />
+        </div>
+      )}
+
       {/* Ícone da Categoria */}
       <div className={`w-12 h-12 rounded-lg ${getGradientCategoria(prompt.categoria)} flex items-center justify-center flex-shrink-0 shadow-sm`}>
         {(() => {
@@ -94,6 +117,20 @@ export function PromptRow({ prompt, onClick }: PromptRowProps) {
 
       {/* Ações */}
       <div className="flex items-center gap-1 shrink-0">
+        {onQuickCopy && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 w-8 p-0"
+            title="Copiar prompt"
+            onClick={(e) => {
+              e.stopPropagation();
+              onQuickCopy();
+            }}
+          >
+            {justCopied ? <Check className="w-4 h-4 text-brand-strong" /> : <Copy className="w-4 h-4" />}
+          </Button>
+        )}
         <FavoriteButton 
           tipo="prompt" 
           itemId={prompt.id}

@@ -3,8 +3,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { usePrompts } from "@/hooks/useFerramentas";
-import { MessageSquare, Search } from "lucide-react";
+import { usePromptCopyLogger } from "@/hooks/usePromptCopyLogger";
+import { MessageSquare, Search, ListChecks, Copy, Download, X } from "lucide-react";
 import { PromptRow } from "@/components/bibliotecas/PromptRow";
 import { PromptDetalhesModal } from "@/components/bibliotecas/PromptDetalhesModal";
 import {
@@ -14,11 +16,84 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { PageTitle } from "@/components/shared/PageTitle";
 import { PageContainer } from "@/components/shared/PageContainer";
+import { toast } from "sonner";
+
+type PromptLike = {
+  id: string;
+  titulo: string;
+  descricao: string;
+  categoria: string;
+  nivel_complexidade: string | null;
+  prompt: string;
+  tags?: unknown;
+  ferramentas_recomendadas?: unknown;
+};
+
+const asArray = (v: unknown): string[] => (Array.isArray(v) ? (v as string[]) : []);
+
+function buildExportContent(list: PromptLike[], format: "md" | "txt" | "csv"): string {
+  if (format === "csv") {
+    const esc = (s: string) => `"${String(s ?? "").replace(/"/g, '""')}"`;
+    const header = ["titulo", "categoria", "nivel", "ferramentas", "descricao", "prompt"].join(",");
+    const rows = list.map((p) =>
+      [
+        esc(p.titulo),
+        esc(p.categoria),
+        esc(p.nivel_complexidade ?? ""),
+        esc(asArray(p.ferramentas_recomendadas).join(" | ")),
+        esc(p.descricao),
+        esc(p.prompt),
+      ].join(",")
+    );
+    return [header, ...rows].join("\n");
+  }
+
+  if (format === "md") {
+    const blocks = list.map((p) => {
+      const ferr = asArray(p.ferramentas_recomendadas);
+      const meta = [`**Categoria:** ${p.categoria}`, p.nivel_complexidade ? `**Nível:** ${p.nivel_complexidade}` : null]
+        .filter(Boolean)
+        .join(" · ");
+      const ferrLine = ferr.length ? `\n\n**Ferramentas:** ${ferr.join(", ")}` : "";
+      return `## ${p.titulo}\n\n${meta}${ferrLine}\n\n${p.descricao}\n\n\`\`\`\n${p.prompt}\n\`\`\``;
+    });
+    return `# Biblioteca de Prompts — IAplicada\n\n${blocks.join("\n\n---\n\n")}\n`;
+  }
+
+  // txt
+  const blocks = list.map((p) => {
+    const ferr = asArray(p.ferramentas_recomendadas);
+    const meta = `Categoria: ${p.categoria}${p.nivel_complexidade ? ` | Nível: ${p.nivel_complexidade}` : ""}${
+      ferr.length ? ` | Ferramentas: ${ferr.join(", ")}` : ""
+    }`;
+    return `${p.titulo}\n${"=".repeat(Math.min(p.titulo.length, 60))}\n${meta}\n\n${p.descricao}\n\n${p.prompt}`;
+  });
+  return `BIBLIOTECA DE PROMPTS — IAplicada\n\n${blocks.join("\n\n----------------------------------------\n\n")}\n`;
+}
+
+function downloadFile(filename: string, content: string, mime: string) {
+  const blob = new Blob([content], { type: `${mime};charset=utf-8` });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
 
 export default function BibliotecaPrompts() {
   const { data: prompts, isLoading } = usePrompts();
+  const { logPromptCopy } = usePromptCopyLogger();
   const [searchTerm, setSearchTerm] = useState("");
   const [filtroCategoria, setFiltroCategoria] = useState("todas");
   const [filtroNivel, setFiltroNivel] = useState("todos");
@@ -26,6 +101,9 @@ export default function BibliotecaPrompts() {
   const [filtroFerramenta, setFiltroFerramenta] = useState("todas");
   const [promptSelecionado, setPromptSelecionado] = useState<any>(null);
   const [itemsToShow, setItemsToShow] = useState(10);
+  const [modoSelecao, setModoSelecao] = useState(false);
+  const [selecionados, setSelecionados] = useState<Set<string>>(new Set());
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   // Extrair valores únicos para os dropdowns
   const categorias = useMemo(() => 
@@ -78,6 +156,73 @@ export default function BibliotecaPrompts() {
   useEffect(() => {
     setItemsToShow(10);
   }, [searchTerm, filtroCategoria, filtroNivel, filtroTag, filtroFerramenta]);
+
+  const toggleSelecionado = (id: string) => {
+    setSelecionados((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
+  const todosFiltradosSelecionados =
+    (filteredPrompts?.length ?? 0) > 0 && (filteredPrompts?.every((p) => selecionados.has(p.id)) ?? false);
+
+  const toggleSelecionarTodos = () => {
+    if (todosFiltradosSelecionados) {
+      setSelecionados(new Set());
+    } else {
+      setSelecionados(new Set((filteredPrompts ?? []).map((p) => p.id)));
+    }
+  };
+
+  const promptsSelecionados = useMemo(
+    () => (filteredPrompts ?? []).filter((p) => selecionados.has(p.id)),
+    [filteredPrompts, selecionados]
+  );
+
+  const handleQuickCopy = async (p: PromptLike) => {
+    try {
+      await navigator.clipboard.writeText(p.prompt);
+      logPromptCopy(p.id, p.titulo);
+      setCopiedId(p.id);
+      setTimeout(() => setCopiedId((cur) => (cur === p.id ? null : cur)), 1500);
+      toast.success("Prompt copiado!");
+    } catch {
+      toast.error("Não foi possível copiar");
+    }
+  };
+
+  const alvoExport = (): PromptLike[] =>
+    promptsSelecionados.length > 0 ? (promptsSelecionados as PromptLike[]) : ((filteredPrompts ?? []) as PromptLike[]);
+
+  const handleCopiarLote = async () => {
+    const list = alvoExport();
+    if (list.length === 0) return;
+    try {
+      await navigator.clipboard.writeText(buildExportContent(list, "txt"));
+      list.forEach((p) => logPromptCopy(p.id, p.titulo));
+      toast.success(`${list.length} ${list.length === 1 ? "prompt copiado" : "prompts copiados"}!`);
+    } catch {
+      toast.error("Não foi possível copiar");
+    }
+  };
+
+  const handleDownload = (format: "md" | "txt" | "csv") => {
+    const list = alvoExport();
+    if (list.length === 0) {
+      toast.error("Nenhum prompt para exportar");
+      return;
+    }
+    const ext = format;
+    const mime = format === "csv" ? "text/csv" : format === "md" ? "text/markdown" : "text/plain";
+    downloadFile(`prompts-iaplicada.${ext}`, buildExportContent(list, format), mime);
+    list.forEach((p) => logPromptCopy(p.id, p.titulo));
+    toast.success(`${list.length} ${list.length === 1 ? "prompt exportado" : "prompts exportados"} (.${ext})`);
+  };
+
+  const qtdAlvo = promptsSelecionados.length > 0 ? promptsSelecionados.length : filteredPrompts?.length ?? 0;
+  const rotuloAlvo = promptsSelecionados.length > 0 ? "selecionados" : "filtrados";
 
   return (
     <PageContainer>
@@ -159,6 +304,67 @@ export default function BibliotecaPrompts() {
         )}
       </div>
 
+      {/* Barra de exportação em lote */}
+      {!isLoading && filteredPrompts && filteredPrompts.length > 0 && (
+        <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-brand-hairline bg-brand-cream-soft px-3 py-2">
+          <div className="flex flex-wrap items-center gap-3">
+            <Button
+              variant={modoSelecao ? "default" : "outline"}
+              size="sm"
+              onClick={() => {
+                setModoSelecao((v) => !v);
+                if (modoSelecao) setSelecionados(new Set());
+              }}
+              className={modoSelecao ? "bg-brand-strong text-brand-cream hover:bg-brand-strong/90" : ""}
+            >
+              <ListChecks className="w-4 h-4 mr-2" />
+              {modoSelecao ? "Sair da seleção" : "Selecionar"}
+            </Button>
+
+            {modoSelecao && (
+              <>
+                <label className="flex items-center gap-2 text-sm cursor-pointer select-none">
+                  <Checkbox checked={todosFiltradosSelecionados} onCheckedChange={toggleSelecionarTodos} />
+                  Selecionar todos
+                </label>
+                <span className="text-sm text-muted-foreground">
+                  {selecionados.size} {selecionados.size === 1 ? "selecionado" : "selecionados"}
+                </span>
+                {selecionados.size > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setSelecionados(new Set())}
+                    className="text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1"
+                  >
+                    <X className="w-3 h-3" /> limpar
+                  </button>
+                )}
+              </>
+            )}
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={handleCopiarLote}>
+              <Copy className="w-4 h-4 mr-2" />
+              Copiar {rotuloAlvo}
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button size="sm">
+                  <Download className="w-4 h-4 mr-2" />
+                  Exportar {rotuloAlvo} ({qtdAlvo})
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => handleDownload("md")}>Markdown (.md)</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleDownload("txt")}>Texto (.txt)</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleDownload("csv")}>Planilha (.csv)</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
+      )}
+
       {/* Contador de Resultados */}
       {!isLoading && filteredPrompts && (
         <p className="text-sm text-muted-foreground">
@@ -193,6 +399,11 @@ export default function BibliotecaPrompts() {
                   key={prompt.id}
                   prompt={prompt}
                   onClick={() => setPromptSelecionado(prompt)}
+                  selectable={modoSelecao}
+                  selected={selecionados.has(prompt.id)}
+                  onToggleSelect={() => toggleSelecionado(prompt.id)}
+                  onQuickCopy={() => handleQuickCopy(prompt as PromptLike)}
+                  justCopied={copiedId === prompt.id}
                 />
               ))}
             </CardContent>
