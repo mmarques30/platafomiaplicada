@@ -1,119 +1,9 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { sendWelcomeEmail } from '../_shared/welcomeEmail.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
-}
-
-const BRAND = {
-  green: '#7C8B2A',
-  greenSoft: '#AFC040',
-  ink: '#1a1c19',
-  cream: '#F6F5EF',
-  creamSoft: '#FBFAF5',
-  muted: '#6b6f66',
-  hairline: '#e6e4da',
-}
-
-function escapeHtml(input: unknown): string {
-  return String(input ?? '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;')
-}
-
-// Monta um e-mail de boas-vindas HTML responsivo (CSS inline, seguro p/ clientes de e-mail).
-function buildWelcomeEmailHtml(params: {
-  nome: string
-  email: string
-  senha: string
-  planoLabel: string
-  plataformaUrl: string
-  logoUrl?: string | null
-}): string {
-  const primeiroNome = escapeHtml((params.nome || '').trim().split(' ')[0] || 'boas-vindas')
-  const email = escapeHtml(params.email)
-  const senha = escapeHtml(params.senha)
-  const planoLabel = escapeHtml(params.planoLabel)
-  const url = escapeHtml(params.plataformaUrl)
-  const logo = params.logoUrl
-    ? `<img src="${escapeHtml(params.logoUrl)}" alt="IAplicada" height="28" style="height:28px;display:block;border:0;" />`
-    : `<span style="font-family:Georgia,'Times New Roman',serif;font-size:22px;font-weight:700;color:#ffffff;letter-spacing:0.3px;">IAplicada</span>`
-
-  return `<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="color-scheme" content="light only" />
-<title>Bem-vindo(a) à IAplicada</title>
-</head>
-<body style="margin:0;padding:0;background-color:${BRAND.cream};">
-<div style="display:none;max-height:0;overflow:hidden;opacity:0;">Seu acesso à plataforma IAplicada está pronto — entre com seu e-mail e senha temporária.</div>
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:${BRAND.cream};padding:24px 12px;">
-  <tr>
-    <td align="center">
-      <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background-color:#ffffff;border:1px solid ${BRAND.hairline};border-radius:16px;overflow:hidden;">
-        <tr>
-          <td style="background-color:${BRAND.green};padding:22px 32px;">
-            ${logo}
-          </td>
-        </tr>
-        <tr>
-          <td style="padding:32px 32px 8px 32px;font-family:Arial,Helvetica,sans-serif;">
-            <h1 style="margin:0 0 8px 0;font-family:Georgia,'Times New Roman',serif;font-size:26px;line-height:1.2;color:${BRAND.ink};font-weight:400;">Olá, ${primeiroNome}!</h1>
-            <p style="margin:0;font-size:15px;line-height:1.6;color:${BRAND.muted};">
-              Seu acesso à plataforma <strong style="color:${BRAND.ink};">IAplicada</strong> está pronto.
-              Plano: <strong style="color:${BRAND.green};">${planoLabel}</strong>.
-            </p>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding:20px 32px 8px 32px;font-family:Arial,Helvetica,sans-serif;">
-            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:${BRAND.creamSoft};border:1px solid ${BRAND.hairline};border-radius:12px;">
-              <tr><td style="padding:18px 20px;">
-                <p style="margin:0 0 4px 0;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:${BRAND.muted};">Seus dados de acesso</p>
-                <p style="margin:0 0 10px 0;font-size:15px;color:${BRAND.ink};"><strong>E-mail:</strong> ${email}</p>
-                <p style="margin:0;font-size:15px;color:${BRAND.ink};"><strong>Senha temporária:</strong> <span style="font-family:'Courier New',monospace;background:#fff;border:1px solid ${BRAND.hairline};border-radius:6px;padding:2px 8px;">${senha}</span></p>
-              </td></tr>
-            </table>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding:20px 32px 4px 32px;font-family:Arial,Helvetica,sans-serif;">
-            <table role="presentation" cellpadding="0" cellspacing="0">
-              <tr><td style="border-radius:999px;background-color:${BRAND.green};">
-                <a href="${url}" target="_blank" style="display:inline-block;padding:14px 30px;font-size:15px;font-weight:700;color:#ffffff;text-decoration:none;border-radius:999px;">Acessar a plataforma</a>
-              </td></tr>
-            </table>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding:16px 32px 8px 32px;font-family:Arial,Helvetica,sans-serif;">
-            <p style="margin:0 0 8px 0;font-size:13px;line-height:1.6;color:${BRAND.muted};">Primeiros passos:</p>
-            <ol style="margin:0;padding-left:18px;font-size:13px;line-height:1.7;color:${BRAND.ink};">
-              <li>Acesse com o e-mail e a senha temporária acima.</li>
-              <li>Troque a senha temporária por uma senha pessoal.</li>
-              <li>Escolha seu ambiente e comece por "Início".</li>
-            </ol>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding:16px 32px 28px 32px;font-family:Arial,Helvetica,sans-serif;">
-            <p style="margin:0;font-size:12px;line-height:1.6;color:${BRAND.muted};border-top:1px solid ${BRAND.hairline};padding-top:16px;">
-              Precisa de ajuda? É só responder este e-mail.<br />
-              <span style="color:#a2a69b;">IAplicada — Inteligência aplicada ao seu dia a dia.</span>
-            </p>
-          </td>
-        </tr>
-      </table>
-    </td>
-  </tr>
-</table>
-</body>
-</html>`
 }
 
 Deno.serve(async (req) => {
@@ -467,11 +357,8 @@ Deno.serve(async (req) => {
     const action = isExistingUser ? 'promovido de visitante' : 'criado'
     console.log(`User ${action} complete - by admin:`, user.id)
 
-    // Enviar e-mail de boas-vindas.
-    // Fluxo novo: n8n (N8N_WEBHOOK_URL_WELCOME) recebe os dados + o HTML já
-    // formatado e faz o envio. O código gera o e-mail bonito; o n8n orquestra.
-    // Mantemos o Zapier como fallback temporário enquanto o n8n não estiver
-    // configurado, para não interromper os envios durante a migração.
+    // Enviar e-mail de boas-vindas (via n8n, com fallback Zapier — ver _shared/welcomeEmail.ts).
+    // Só faz sentido quando há um plano ativo (Academy/Builder/System).
     const isBusiness = effectivePlanoMentoria === 'business_parceria' || effectivePlanoMentoria === 'business_sistemas';
     const isAcademy = effectivePlanoMentoria === 'academy';
 
@@ -481,64 +368,15 @@ Deno.serve(async (req) => {
         ? 'Academy'
         : 'Gratuito';
 
-    const plataformaUrl = Deno.env.get('PLATAFORMA_URL') || 'https://plataforma.iaplicada.com';
-    const logoUrl = Deno.env.get('WELCOME_EMAIL_LOGO_URL') || null;
-
-    // Só faz sentido mandar boas-vindas quando há um plano ativo (Academy/Business).
     if (effectivePlanoMentoria && (isBusiness || isAcademy)) {
-      const html = buildWelcomeEmailHtml({
-        nome: nomeCompleto,
-        email,
-        senha: password,
-        planoLabel,
-        plataformaUrl,
-        logoUrl,
-      });
-      const subject = `Bem-vindo(a) à IAplicada — acesso ${planoLabel}`;
-
-      const payload = {
-        event: 'welcome_email',
-        acao: isExistingUser ? 'existing_user_updated' : 'new_user_created',
+      await sendWelcomeEmail({
         email,
         nome: nomeCompleto,
         senha: password,
         plano: effectivePlanoMentoria,
-        plano_label: planoLabel,
-        plataforma_url: plataformaUrl,
-        subject,
-        html,
-      };
-
-      const n8nUrl = Deno.env.get('N8N_WEBHOOK_URL_WELCOME');
-      const zapierUrl = isBusiness
-        ? Deno.env.get('ZAPIER_WEBHOOK_URL_BUSINESS')
-        : Deno.env.get('ZAPIER_WEBHOOK_URL');
-
-      if (n8nUrl) {
-        try {
-          await fetch(n8nUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
-          });
-          console.log('Boas-vindas enviadas para n8n:', effectivePlanoMentoria);
-        } catch (n8nError) {
-          console.error('Erro ao enviar para n8n (nao-bloqueante):', n8nError);
-        }
-      } else if (zapierUrl) {
-        try {
-          await fetch(zapierUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
-          });
-          console.log('Boas-vindas enviadas para Zapier (fallback):', effectivePlanoMentoria);
-        } catch (zapierError) {
-          console.error('Erro ao enviar para Zapier (nao-bloqueante):', zapierError);
-        }
-      } else {
-        console.warn('Nenhum webhook de boas-vindas configurado (N8N_WEBHOOK_URL_WELCOME / ZAPIER_*).');
-      }
+        planoLabel,
+        acao: isExistingUser ? 'existing_user_updated' : 'new_user_created',
+      });
     }
 
     return new Response(

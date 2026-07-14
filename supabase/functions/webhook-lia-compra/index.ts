@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { sendWelcomeEmail } from "../_shared/welcomeEmail.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -324,45 +325,25 @@ Deno.serve(async (req) => {
       console.log("Role aluno_trilha ja existia");
     }
 
-    // 13. Enviar dados para o Zapier (email de boas-vindas)
-    const zapierWebhookUrl = Deno.env.get("ZAPIER_WEBHOOK_URL");
-    let emailStatus: "sent" | "skipped_already_active" | "skipped_no_zapier_url" | "failed" = "sent";
+    // 13. Enviar e-mail de boas-vindas (via n8n, com fallback Zapier — mesmo
+    // template bonito usado no cadastro manual, ver _shared/welcomeEmail.ts).
+    let emailStatus = "sent";
     let emailError: string | null = null;
 
     if (userAction === "already_has_academy") {
       emailStatus = "skipped_already_active";
       console.log("Email NÃO enviado: usuário já tem academy ativo");
-    } else if (!zapierWebhookUrl) {
-      emailStatus = "skipped_no_zapier_url";
-      console.error("Email NÃO enviado: env ZAPIER_WEBHOOK_URL não configurada");
     } else {
-      try {
-        const resp = await fetch(zapierWebhookUrl, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email: customerEmail,
-            nome: customerName || customerEmail.split("@")[0],
-            senha: DEFAULT_PASSWORD,
-            plano: "Academy",
-            telefone: customerPhone,
-            offer_name: offerName,
-            plataforma_url: "https://plataforma.iaplicada.com",
-            acao: userAction,
-          }),
-        });
-        if (!resp.ok) {
-          emailStatus = "failed";
-          emailError = `Zapier respondeu HTTP ${resp.status}: ${await resp.text().catch(() => "")}`.slice(0, 500);
-          console.error("Zapier retornou erro:", emailError);
-        } else {
-          console.log("Dados enviados para Zapier com sucesso (HTTP", resp.status, ")");
-        }
-      } catch (zapierError) {
-        emailStatus = "failed";
-        emailError = zapierError instanceof Error ? zapierError.message : String(zapierError);
-        console.error("Erro ao enviar para Zapier (nao-bloqueante):", emailError);
-      }
+      const result = await sendWelcomeEmail({
+        email: customerEmail,
+        nome: customerName || customerEmail.split("@")[0],
+        senha: DEFAULT_PASSWORD,
+        plano: "academy",
+        planoLabel: "Academy",
+        acao: userAction,
+      });
+      emailStatus = result.via ? `${result.status}_${result.via}` : result.status;
+      emailError = result.error ?? null;
     }
 
     // 14. Atualizar log com sucesso (inclui status do email pra diagnóstico)
