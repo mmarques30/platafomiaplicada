@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Bell, ChevronDown, RefreshCw, Home, BookOpen, Library, Eye, Maximize2, Minimize2 } from "lucide-react";
-import logoMarcaCompleta from "@/assets/logo-aplicada-marca-completa.png";
+import logoMarcaCompleta from "@/assets/logo-aplicada-marca-completa-clara.png";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -118,7 +118,7 @@ export function TopHeader() {
       
       <header
         className={cn(
-          "fixed z-50 w-full border-b border-brand-hairline bg-brand-cream-soft transition-transform duration-300 ease-in-out",
+          "fixed z-50 w-full border-b border-white/10 bg-[#0D0D0D] text-white transition-transform duration-300 ease-in-out",
           isScrolled && !isHovered ? "-translate-y-full" : "translate-y-0",
           isAdmin && isViewingAs ? "top-10" : "top-0"
         )}
@@ -128,7 +128,7 @@ export function TopHeader() {
         <div className="relative h-14 w-full">
         {/* LEFT: SidebarTrigger + Logo + Mobile Menu */}
         <div className="absolute left-0 top-0 h-full flex items-center gap-2 ml-1 md:ml-2">
-          <SidebarTrigger className="h-10 w-10 md:h-8 md:w-8 text-foreground hover:text-foreground hover:bg-foreground/10 bg-foreground/5 rounded-md transition-colors" />
+          <SidebarTrigger className="h-10 w-10 md:h-8 md:w-8 text-white/80 hover:text-white hover:bg-white/10 bg-white/5 rounded-md transition-colors" />
           <Link to="/" className="hidden sm:block">
             <img
               src={logoMarcaCompleta}
@@ -146,7 +146,7 @@ export function TopHeader() {
             end
             className={({ isActive }) => cn(
               "text-sm font-medium transition-colors",
-              isActive ? "text-brand-strong font-semibold" : "text-foreground/60 hover:text-foreground"
+              isActive ? "text-[#AFC040] font-semibold" : "text-white/60 hover:text-white"
             )}
           >
             Página Inicial
@@ -160,7 +160,7 @@ export function TopHeader() {
                   variant="ghost" 
                   className={cn(
                     "text-sm font-medium h-auto p-0 transition-colors hover:bg-transparent",
-                    isCursosActive ? "text-brand-strong font-semibold" : "text-foreground/60 hover:text-foreground"
+                    isCursosActive ? "text-[#AFC040] font-semibold" : "text-white/60 hover:text-white"
                   )}
                 >
                   Cursos
@@ -189,7 +189,19 @@ export function TopHeader() {
             </DropdownMenu>
           )}
           
-          {/* Comunicações - visível para Academy, Skills e Business */}
+          {/* Primeiros passos - primeiro e com destaque; reabre o guia de onboarding */}
+          {!isVisitante && (
+            <button
+              type="button"
+              data-tour="primeiros-passos"
+              onClick={() => window.dispatchEvent(new CustomEvent("abrir-primeiros-passos"))}
+              className="text-sm font-semibold text-[#AFC040] rounded-full border border-[#AFC040]/40 px-3 py-1 hover:bg-[#AFC040]/10 transition-colors"
+            >
+              Primeiros passos
+            </button>
+          )}
+
+          {/* Chat AI (antes "Comunicações") */}
           {!isVisitante && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -197,10 +209,10 @@ export function TopHeader() {
                   variant="ghost" 
                   className={cn(
                     "text-sm font-medium h-auto p-0 transition-colors hover:bg-transparent",
-                    isComunicacoesActive ? "text-brand-strong font-semibold" : "text-foreground/60 hover:text-foreground"
+                    isComunicacoesActive ? "text-[#AFC040] font-semibold" : "text-white/60 hover:text-white"
                   )}
                 >
-                  Comunicações
+                  Chat AI
                   <ChevronDown className="ml-1 h-4 w-4" strokeWidth={1.5} />
                 </Button>
               </DropdownMenuTrigger>
@@ -218,18 +230,6 @@ export function TopHeader() {
               </DropdownMenuContent>
             </DropdownMenu>
           )}
-
-          {/* Primeiros passos - reabre o guia de onboarding a qualquer momento */}
-          {!isVisitante && (
-            <button
-              type="button"
-              data-tour="primeiros-passos"
-              onClick={() => window.dispatchEvent(new CustomEvent("abrir-primeiros-passos"))}
-              className="text-sm font-medium text-foreground/60 hover:text-foreground transition-colors"
-            >
-              Primeiros passos
-            </button>
-          )}
         </nav>
 
         {/* RIGHT: Environment Switcher + Admin View Selector + Refresh + Notifications + Avatar */}
@@ -243,7 +243,7 @@ export function TopHeader() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className={`hidden md:flex h-9 w-9 transition-colors ${modoFoco ? 'bg-brand-strong/10 text-brand-strong' : 'text-foreground/70 hover:text-foreground hover:bg-foreground/5'}`}
+                  className={`hidden md:flex h-9 w-9 transition-colors ${modoFoco ? 'bg-[#AFC040]/15 text-[#AFC040]' : 'text-white/70 hover:text-white hover:bg-white/10'}`}
                   onClick={toggleFoco}
                 >
                   {modoFoco ? <Minimize2 className="h-5 w-5" strokeWidth={1.5} /> : <Maximize2 className="h-5 w-5" strokeWidth={1.5} />}
@@ -260,7 +260,7 @@ export function TopHeader() {
                 <Button
                   variant="ghost" 
                   size="icon" 
-                  className="h-9 w-9 text-foreground/70 hover:text-foreground hover:bg-foreground/5"
+                  className="h-9 w-9 text-white/70 hover:text-white hover:bg-white/10"
                   onClick={forceFullAppReload}
                 >
                   <RefreshCw className="h-5 w-5" strokeWidth={1.5} />
@@ -275,7 +275,7 @@ export function TopHeader() {
           <Button
             variant="ghost" 
             size="icon" 
-            className="relative h-9 w-9 text-foreground/70 hover:text-foreground hover:bg-foreground/5"
+            className="relative h-9 w-9 text-white/70 hover:text-white hover:bg-white/10"
             onClick={() => navigate("/notificacoes")}
           >
             <Bell className="h-5 w-5" strokeWidth={1.5} />
@@ -288,17 +288,17 @@ export function TopHeader() {
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="gap-2 h-auto px-2 py-1.5 hover:bg-foreground/5">
-                <Avatar className="h-8 w-8 border border-brand-hairline">
+              <Button variant="ghost" className="gap-2 h-auto px-2 py-1.5 text-white hover:text-white hover:bg-white/10">
+                <Avatar className="h-8 w-8 border border-white/20">
                   <AvatarImage src={profile?.avatar_url || ""} />
                   <AvatarFallback className="bg-primary text-primary-foreground text-xs font-medium">
                     {getInitials(user?.email, profile?.nome_completo)}
                   </AvatarFallback>
                 </Avatar>
-                <span className="hidden md:block text-sm font-medium text-foreground">
+                <span className="hidden md:block text-sm font-medium text-white">
                   {firstName}
                 </span>
-                <ChevronDown className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
+                <ChevronDown className="h-4 w-4 text-white/60" strokeWidth={1.5} />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-52 bg-popover border-border">
