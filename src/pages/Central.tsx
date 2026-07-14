@@ -80,9 +80,9 @@ export default function Central() {
 
       <main className="w-full space-y-6 px-4 pt-6 pb-8 md:space-y-8 md:px-8 md:pt-6 md:pb-10 lg:space-y-10 lg:px-12 lg:pt-8 lg:pb-12 relative z-10 flex-1 flex flex-col">
         <PageTitle
-          primary="Central"
-          secondary="de conteúdo"
-          eyebrow="Aprender"
+          primary="Explorar"
+          secondary="conteúdos"
+          eyebrow="Explorar"
           description="Fique por dentro das novidades e aplique hoje."
         />
 

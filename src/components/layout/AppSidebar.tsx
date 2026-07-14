@@ -141,7 +141,7 @@ export function AppSidebar() {
     if (!isLoadingState && isVisitante) {
       if (parentKey === 'inicio') {
         return [
-          { menu_key: 'inicio_central', label: 'Central', url: '/central', icon: null, parent_key: 'inicio' },
+          { menu_key: 'inicio_central', label: 'Explorar', url: '/central', icon: null, parent_key: 'inicio' },
         ] as any[];
       }
       return [];
@@ -431,7 +431,7 @@ export function AppSidebar() {
                             <LucideIcons.Library className="h-4 w-4 shrink-0" strokeWidth={1.5} />
                             {!collapsed && (
                               <>
-                                <span className="text-sm flex-1 text-left">Bibliotecas</span>
+                                <span className="text-sm flex-1 text-left">Materiais</span>
                                 <LucideIcons.ChevronDown className={cn(
                                   "h-4 w-4 transition-transform duration-200",
                                   expandedMenus.includes('bibliotecas_menu') && "rotate-180"
@@ -493,7 +493,7 @@ export function AppSidebar() {
                                         : "text-muted-foreground hover:text-foreground"
                                     )}
                                   >
-                                    {!collapsed && <span>IA "Copie e Use"</span>}
+                                    {!collapsed && <span>Modelos prontos</span>}
                                   </NavLink>
                                 </SidebarMenuButton>
                               </SidebarMenuItem>
@@ -511,7 +511,7 @@ export function AppSidebar() {
                                         : "text-muted-foreground hover:text-foreground"
                                     )}
                                   >
-                                    {!collapsed && <span>Arsenal IA</span>}
+                                    {!collapsed && <span>Métodos práticos</span>}
                                   </NavLink>
                                 </SidebarMenuButton>
                               </SidebarMenuItem>
