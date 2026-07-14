@@ -101,15 +101,27 @@ export default function Dashboard() {
             <WelcomeHeader />
 
             {/* Atalho sempre disponível para reabrir os "Primeiros passos" */}
-            <div>
+            <div
+              data-tour="primeiros-passos"
+              className="rounded-2xl border border-brand-hairline bg-brand-cream-soft p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+            >
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="h-10 w-10 rounded-xl bg-brand-strong/10 flex items-center justify-center shrink-0">
+                  <ListChecks className="h-5 w-5 text-brand-strong" />
+                </div>
+                <div className="min-w-0">
+                  <p className="font-medium text-foreground">Primeiros passos</p>
+                  <p className="text-sm text-muted-foreground">
+                    Guia rápido de por onde começar. Abra sempre que quiser.
+                  </p>
+                </div>
+              </div>
               <Button
-                variant="outline"
                 size="sm"
-                className="gap-2 border-brand-hairline"
+                className="shrink-0 bg-brand-strong text-brand-cream hover:bg-brand-strong/90 gap-2"
                 onClick={() => window.dispatchEvent(new CustomEvent("abrir-primeiros-passos"))}
               >
-                <ListChecks className="h-4 w-4" />
-                Ver primeiros passos
+                Ver guia
               </Button>
             </div>
 
