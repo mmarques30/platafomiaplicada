@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Bell, ChevronDown, RefreshCw, Home, BookOpen, Library, Eye, Maximize2, Minimize2 } from "lucide-react";
-import logoMarcaCompleta from "@/assets/logo-aplicada-marca-completa-clara.png";
+import logoMarcaCompleta from "@/assets/logo-auth-fundo-escuro.png";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
