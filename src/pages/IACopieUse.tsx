@@ -50,7 +50,7 @@ export default function IACopieUse() {
   return (
     <PageContainer>
       <div className="mb-6 md:mb-8">
-        <PageTitle primary="IA" secondary="copie e use" eyebrow="Recursos" />
+        <PageTitle primary="Modelos" secondary="prontos" eyebrow="Recursos" />
         <p className="text-sm md:text-base text-muted-foreground mt-1">
           Ferramentas de IA prontas para você copiar e usar
         </p>

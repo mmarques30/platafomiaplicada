@@ -118,7 +118,7 @@ export default function MetodosAplicar() {
   return (
     <div className="p-4 md:p-6 space-y-4 md:space-y-6 min-w-0 overflow-hidden">
       <div className="mb-6 md:mb-8">
-        <PageTitle primary="Arsenal" secondary="IA" />
+        <PageTitle primary="Métodos" secondary="práticos" />
         <p className="text-sm md:text-base text-muted-foreground mt-1">
           Skills, prompts e recursos para maximizar sua inteligência artificial
         </p>
