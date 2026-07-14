@@ -71,7 +71,7 @@ export function AdminViewSelector({ isAdmin }: AdminViewSelectorProps) {
           <Button 
             variant={viewAs ? "default" : "outline"} 
             size="sm" 
-            className={`h-8 gap-2 ${viewAs ? "bg-amber-500 hover:bg-amber-600 text-black" : ""}`}
+            className={`h-8 gap-2 ${viewAs ? "bg-amber-500 hover:bg-amber-600 text-black" : "border-white/25 bg-transparent text-white hover:bg-white/10 hover:text-white"}`}
           >
             <Eye className="h-4 w-4" />
             {getButtonLabel()}
