@@ -1,4 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { sendWelcomeEmail } from '../_shared/welcomeEmail.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -356,36 +357,26 @@ Deno.serve(async (req) => {
     const action = isExistingUser ? 'promovido de visitante' : 'criado'
     console.log(`User ${action} complete - by admin:`, user.id)
 
-    // Enviar email de boas-vindas via Zapier (Business ou Academy)
+    // Enviar e-mail de boas-vindas (via n8n, com fallback Zapier — ver _shared/welcomeEmail.ts).
+    // Só faz sentido quando há um plano ativo (Academy/Builder/System).
     const isBusiness = effectivePlanoMentoria === 'business_parceria' || effectivePlanoMentoria === 'business_sistemas';
     const isAcademy = effectivePlanoMentoria === 'academy';
-    const zapierUrl = isBusiness
-      ? Deno.env.get('ZAPIER_WEBHOOK_URL_BUSINESS')
-      : isAcademy
-        ? Deno.env.get('ZAPIER_WEBHOOK_URL')
-        : null;
 
-    if (zapierUrl) {
-      try {
-        await fetch(zapierUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            email,
-            nome: nomeCompleto,
-            senha: password,
-            plano: effectivePlanoMentoria,
-            plano_label: isBusiness
-              ? (effectivePlanoMentoria === 'business_sistemas' ? 'Business Sistemas' : 'Business Parceria')
-              : 'Academy',
-            plataforma_url: 'https://plataforma.iaplicada.com',
-            acao: isExistingUser ? 'existing_user_updated' : 'new_user_created',
-          }),
-        });
-        console.log('Dados enviados para Zapier:', effectivePlanoMentoria)
-      } catch (zapierError) {
-        console.error('Erro ao enviar para Zapier (nao-bloqueante):', zapierError)
-      }
+    const planoLabel = isBusiness
+      ? (effectivePlanoMentoria === 'business_sistemas' ? 'System' : 'Builder')
+      : isAcademy
+        ? 'Academy'
+        : 'Gratuito';
+
+    if (effectivePlanoMentoria && (isBusiness || isAcademy)) {
+      await sendWelcomeEmail({
+        email,
+        nome: nomeCompleto,
+        senha: password,
+        plano: effectivePlanoMentoria,
+        planoLabel,
+        acao: isExistingUser ? 'existing_user_updated' : 'new_user_created',
+      });
     }
 
     return new Response(
