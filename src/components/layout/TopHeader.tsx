@@ -218,6 +218,18 @@ export function TopHeader() {
               </DropdownMenuContent>
             </DropdownMenu>
           )}
+
+          {/* Primeiros passos - reabre o guia de onboarding a qualquer momento */}
+          {!isVisitante && (
+            <button
+              type="button"
+              data-tour="primeiros-passos"
+              onClick={() => window.dispatchEvent(new CustomEvent("abrir-primeiros-passos"))}
+              className="text-sm font-medium text-foreground/60 hover:text-foreground transition-colors"
+            >
+              Primeiros passos
+            </button>
+          )}
         </nav>
 
         {/* RIGHT: Environment Switcher + Admin View Selector + Refresh + Notifications + Avatar */}
