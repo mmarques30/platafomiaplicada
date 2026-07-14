@@ -25,6 +25,7 @@ interface TrilhaComContagem {
   imagem_url: string | null;
   categoria: string | null;
   classificacao: string | null;
+  ferramentas: string[] | null;
   ordem: number;
   visivel_apenas_pro: boolean;
   created_at: string;
@@ -34,13 +35,14 @@ interface TrilhaComContagem {
 export function TodasAsTrilhas() {
   const [ordenar, setOrdenar] = useState("ordem");
   const [classificacaoFiltro, setClassificacaoFiltro] = useState("todas");
+  const [ferramentaFiltro, setFerramentaFiltro] = useState("todas");
 
   const { data: trilhas, isLoading } = useQuery({
     queryKey: ["todas-trilhas-com-contagem"],
     queryFn: async () => {
       const { data: trilhasData, error: tError } = await supabase
         .from("trilhas")
-        .select("id, titulo, imagem_url, categoria, classificacao, ordem, visivel_apenas_pro, created_at")
+        .select("id, titulo, imagem_url, categoria, classificacao, ferramentas, ordem, visivel_apenas_pro, created_at")
         .eq("visivel_mentorados", true)
         .order("ordem");
 
@@ -75,6 +77,14 @@ export function TodasAsTrilhas() {
     return cls.sort();
   }, [trilhas]);
 
+  // Extract unique ferramentas/modelos
+  const ferramentas = useMemo(() => {
+    if (!trilhas) return [];
+    const set = new Set<string>();
+    trilhas.forEach((t) => (Array.isArray(t.ferramentas) ? t.ferramentas : []).forEach((f) => f && set.add(f)));
+    return Array.from(set).sort();
+  }, [trilhas]);
+
   // Filter and sort
   const trilhasFiltradas = useMemo(() => {
     if (!trilhas) return [];
@@ -82,6 +92,10 @@ export function TodasAsTrilhas() {
 
     if (classificacaoFiltro !== "todas") {
       result = result.filter((t) => t.classificacao === classificacaoFiltro);
+    }
+
+    if (ferramentaFiltro !== "todas") {
+      result = result.filter((t) => Array.isArray(t.ferramentas) && t.ferramentas.includes(ferramentaFiltro));
     }
 
     switch (ordenar) {
@@ -96,7 +110,7 @@ export function TodasAsTrilhas() {
     }
 
     return result;
-  }, [trilhas, classificacaoFiltro, ordenar]);
+  }, [trilhas, classificacaoFiltro, ferramentaFiltro, ordenar]);
 
   if (isLoading) {
     return (
@@ -139,6 +153,22 @@ export function TodasAsTrilhas() {
             ))}
           </SelectContent>
         </Select>
+
+        {ferramentas.length > 0 && (
+          <Select value={ferramentaFiltro} onValueChange={setFerramentaFiltro}>
+            <SelectTrigger className="h-9 w-auto min-w-[170px] rounded-full border-primary/20 bg-primary/5 text-xs text-primary/80 hover:bg-primary/10 hover:border-primary/30 transition-colors">
+              <SelectValue placeholder="Ferramenta" />
+            </SelectTrigger>
+            <SelectContent className="border-primary/20 bg-background [&_[role=option]]:text-xs [&_[role=option]]:focus:bg-primary/10 [&_[role=option]]:focus:text-primary">
+              <SelectItem value="todas">Todas as ferramentas</SelectItem>
+              {ferramentas.map((f) => (
+                <SelectItem key={f} value={f}>
+                  {f}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
       </div>
 
       {/* Carousel */}
@@ -184,6 +214,19 @@ export function TodasAsTrilhas() {
                         )}
                         <span>{trilha.total_videos} vídeos</span>
                       </div>
+                      {Array.isArray(trilha.ferramentas) && trilha.ferramentas.length > 0 && (
+                        <div className="flex items-center gap-1 flex-wrap pt-0.5">
+                          <span className="text-[10px] text-muted-foreground">Funciona em:</span>
+                          {trilha.ferramentas.map((f) => (
+                            <span
+                              key={f}
+                              className="bg-brand-strong/10 text-brand-strong px-2 py-0.5 rounded-full text-[10px] font-medium"
+                            >
+                              {f}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </CarouselItem>
