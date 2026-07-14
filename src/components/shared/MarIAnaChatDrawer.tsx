@@ -27,6 +27,13 @@ interface MarIAnaChatDrawerProps {
   onClose: () => void;
 }
 
+// Sugestões de partida (guiam o uso: trilha, ferramenta, diagnóstico).
+const SUGESTOES = [
+  "Qual trilha eu começo primeiro?",
+  "Qual ferramenta de IA usar (ChatGPT, Gemini...)?",
+  "Como faço meu diagnóstico?",
+];
+
 export function MarIAnaChatDrawer({ onClose }: MarIAnaChatDrawerProps) {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -340,12 +347,7 @@ export function MarIAnaChatDrawer({ onClose }: MarIAnaChatDrawerProps) {
               Qual sua dúvida hoje?
             </p>
             <div className="w-full space-y-2 px-1">
-              {[
-                "Qual meu próximo passo na mentoria?",
-                "Como usar IA para automatizar tarefas?",
-                "Me sugira uma trilha de aprendizado",
-                "Quais ferramentas de IA devo começar?",
-              ].map((suggestion) => (
+              {SUGESTOES.map((suggestion) => (
                 <button
                   key={suggestion}
                   onClick={() => sendMessage(suggestion)}
@@ -426,6 +428,23 @@ export function MarIAnaChatDrawer({ onClose }: MarIAnaChatDrawerProps) {
             </div>
           </div>
         ))}
+
+        {/* Sugestões junto da mensagem de boas-vindas (conversa ainda não iniciada) */}
+        {!isLoadingHistory && messages.length > 0 && !messages.some((m) => m.role === "user") && !isLoading && !isStreaming && (
+          <div className="space-y-2 px-1 pt-1">
+            <p className="text-[11px] text-muted-foreground px-1">Sugestões pra começar:</p>
+            {SUGESTOES.map((suggestion) => (
+              <button
+                key={suggestion}
+                onClick={() => sendMessage(suggestion)}
+                disabled={isLoading || isStreaming}
+                className="w-full text-left text-xs px-3 py-2 rounded-lg border border-border bg-muted/30 hover:bg-muted transition-colors text-foreground/80 hover:text-foreground disabled:opacity-50"
+              >
+                {suggestion}
+              </button>
+            ))}
+          </div>
+        )}
 
         {isLoading && !isStreaming && (
           <div className="flex justify-start">
