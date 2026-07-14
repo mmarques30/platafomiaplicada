@@ -2,19 +2,20 @@
 //  - create-user-admin (cadastro manual pelo admin)
 //  - webhook-lia-compra (automação de pagamento / Academy)
 //
-// Gera um HTML bonito com a identidade da IAplicada e faz o envio via n8n
-// (N8N_WEBHOOK_URL_WELCOME). Enquanto o n8n não estiver configurado, cai de
-// volta no Zapier para não interromper os envios durante a migração.
+// Gera um HTML enxuto e alinhado à marca (fundo off-white, logo no topo,
+// credenciais em um painel escuro) e envia via n8n (N8N_WEBHOOK_URL_WELCOME).
 
 const BRAND = {
   green: "#7C8B2A",
+  greenBright: "#AFC040",
   ink: "#1a1c19",
   body: "#3d4038",
-  pageBg: "#E8E6DC",
-  card: "#FBFAF5",
-  creamSoft: "#FFFFFF",
+  pageBg: "#EFEDE4", // off-white / creme da marca
+  panel: "#16180F", // painel escuro para as credenciais
+  panelText: "#F3F2E9",
+  panelMuted: "#9fa392",
   muted: "#6b6f66",
-  hairline: "#dedbcf",
+  hairline: "#dcd9cc",
 };
 
 export function escapeHtml(input: unknown): string {
@@ -27,54 +28,35 @@ export function escapeHtml(input: unknown): string {
 }
 
 // Copy específico por produto — Academy, Builder e System são produtos
-// diferentes e merecem uma mensagem de boas-vindas própria.
+// diferentes e merecem uma mensagem própria. Enxuto de propósito.
 interface VariantCopy {
   intro: string;
   cta: string;
-  passos: string[];
+  dica: string;
 }
 
 const VARIANT_COPY: Record<string, VariantCopy> = {
   academy: {
-    intro:
-      "Seu acesso ao <strong>IAplicada Academy</strong> está pronto. Bora aplicar IA na sua rotina, uma trilha por vez.",
+    intro: "Seu acesso ao <strong>IAplicada Academy</strong> está pronto. Bora aplicar IA na sua rotina.",
     cta: "Acessar o Academy",
-    passos: [
-      "Acesse com o e-mail e a senha temporária acima.",
-      "Troque a senha temporária por uma senha pessoal.",
-      'Comece pela primeira trilha em "Aprender".',
-    ],
+    dica: 'Comece pela primeira trilha em "Aprender".',
   },
   business_parceria: {
-    intro:
-      "Seu acesso ao <strong>IAplicada Builder</strong> está pronto. Sua mentoria começa agora. A gente constrói junto, no seu ritmo.",
+    intro: "Seu acesso ao <strong>IAplicada Builder</strong> está pronto. Sua mentoria começa agora.",
     cta: "Acessar o Builder",
-    passos: [
-      "Acesse com o e-mail e a senha temporária acima.",
-      "Troque a senha temporária por uma senha pessoal.",
-      'Faça seu Diagnóstico e veja seu roadmap em "Mentoria".',
-    ],
+    dica: 'Faça seu Diagnóstico e veja seu roadmap em "Mentoria".',
   },
   business_sistemas: {
-    intro:
-      "Seu acesso ao <strong>IAplicada System</strong> está pronto. A partir daqui a IAplicada constrói o seu sistema e você acompanha cada etapa.",
+    intro: "Seu acesso ao <strong>IAplicada System</strong> está pronto. A IAplicada constrói e você acompanha.",
     cta: "Acessar o System",
-    passos: [
-      "Acesse com o e-mail e a senha temporária acima.",
-      "Troque a senha temporária por uma senha pessoal.",
-      'Acompanhe o andamento do projeto em "Meu Projeto".',
-    ],
+    dica: 'Acompanhe o andamento do projeto em "Meu Projeto".',
   },
 };
 
 const DEFAULT_COPY: VariantCopy = {
   intro: "Seu acesso à <strong>plataforma IAplicada</strong> está pronto.",
   cta: "Acessar a plataforma",
-  passos: [
-    "Acesse com o e-mail e a senha temporária acima.",
-    "Troque a senha temporária por uma senha pessoal.",
-    'Escolha seu ambiente e comece por "Início".',
-  ],
+  dica: 'Escolha seu ambiente e comece por "Início".',
 };
 
 export function buildWelcomeEmailHtml(params: {
@@ -89,25 +71,24 @@ export function buildWelcomeEmailHtml(params: {
   const primeiroNome = escapeHtml((params.nome || "").trim().split(" ")[0] || "boas-vindas");
   const email = escapeHtml(params.email);
   const senha = escapeHtml(params.senha);
-  const url = escapeHtml(params.plataformaUrl);
-  const copy = VARIANT_COPY[params.plano] ?? DEFAULT_COPY;
-  const passosHtml = copy.passos.map((p) => `<li>${p}</li>`).join("");
-  // Academy: reforçar a leitura das políticas (disponíveis em Configurações).
   const baseUrl = params.plataformaUrl.replace(/\/$/, "");
+  const url = escapeHtml(baseUrl);
+  const copy = VARIANT_COPY[params.plano] ?? DEFAULT_COPY;
+
+  // Logo do kit (versão escura/colorida, boa sobre o fundo off-white).
+  const logoSrc = params.logoUrl || `${baseUrl}/logo-marca-completa.png`;
+
+  // Academy: reforçar a leitura das políticas (disponíveis em Configurações).
   const policyHtml =
     params.plano === "academy"
-      ? `<tr><td style="padding:4px 32px 8px 32px;font-family:Arial,Helvetica,sans-serif;">
-            <p style="margin:0;font-size:12px;line-height:1.6;color:${BRAND.muted};">
-              Antes de começar, recomendamos ler a nossa
-              <a href="${escapeHtml(baseUrl)}/politica-servicos" target="_blank" style="color:${BRAND.green};font-weight:600;text-decoration:underline;">Política de Serviços</a>
-              (também disponível em Configurações).
-            </p>
-          </td></tr>`
+      ? `<tr><td style="padding:6px 0 0 0;font-family:Arial,Helvetica,sans-serif;">
+              <p style="margin:0;font-size:12px;line-height:1.6;color:${BRAND.muted};">
+                Antes de começar, vale ler a
+                <a href="${escapeHtml(baseUrl)}/politica-servicos" target="_blank" style="color:${BRAND.green};font-weight:600;text-decoration:underline;">Política de Serviços</a>
+                (também em Configurações).
+              </p>
+            </td></tr>`
       : "";
-  // Logo do kit da marca (versão clara, boa sobre o verde). Servida no domínio
-  // da plataforma; pode ser sobrescrita por WELCOME_EMAIL_LOGO_URL.
-  const logoSrc = params.logoUrl || `${params.plataformaUrl.replace(/\/$/, "")}/logo-marca-completa-clara.png`;
-  const logo = `<img src="${escapeHtml(logoSrc)}" alt="IAplicada" height="30" style="height:30px;display:block;border:0;" />`;
 
   return `<!DOCTYPE html>
 <html lang="pt-BR">
@@ -119,57 +100,63 @@ export function buildWelcomeEmailHtml(params: {
 </head>
 <body style="margin:0;padding:0;background-color:${BRAND.pageBg};">
 <div style="display:none;max-height:0;overflow:hidden;opacity:0;">Seu acesso à plataforma IAplicada está pronto. Entre com seu e-mail e senha temporária.</div>
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:${BRAND.pageBg};padding:24px 12px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:${BRAND.pageBg};padding:40px 16px;">
   <tr>
     <td align="center">
-      <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background-color:${BRAND.card};border:1px solid ${BRAND.hairline};border-radius:16px;overflow:hidden;">
+      <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;">
+        <!-- Logo -->
         <tr>
-          <td style="background-color:${BRAND.green};padding:22px 32px;">
-            ${logo}
+          <td style="padding:0 0 28px 0;">
+            <img src="${escapeHtml(logoSrc)}" alt="IAplicada" height="30" style="height:30px;display:block;border:0;" />
+          </td>
+        </tr>
+        <!-- Saudação + intro -->
+        <tr>
+          <td style="font-family:Georgia,'Times New Roman',serif;">
+            <h1 style="margin:0 0 10px 0;font-size:28px;line-height:1.15;color:${BRAND.ink};font-weight:400;">Olá, ${primeiroNome}!</h1>
           </td>
         </tr>
         <tr>
-          <td style="padding:32px 32px 8px 32px;font-family:Arial,Helvetica,sans-serif;">
-            <h1 style="margin:0 0 8px 0;font-family:Georgia,'Times New Roman',serif;font-size:26px;line-height:1.2;color:${BRAND.ink};font-weight:400;">Olá, ${primeiroNome}!</h1>
-            <p style="margin:0;font-size:15px;line-height:1.6;color:${BRAND.body};">
-              ${copy.intro}
+          <td style="font-family:Arial,Helvetica,sans-serif;padding:0 0 24px 0;">
+            <p style="margin:0;font-size:15px;line-height:1.6;color:${BRAND.body};">${copy.intro}</p>
+          </td>
+        </tr>
+        <!-- Painel escuro com as credenciais -->
+        <tr>
+          <td style="padding:0 0 24px 0;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:${BRAND.panel};border-radius:14px;">
+              <tr><td style="padding:22px 24px;font-family:Arial,Helvetica,sans-serif;">
+                <p style="margin:0 0 14px 0;font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:${BRAND.panelMuted};">Seus dados de acesso</p>
+                <p style="margin:0 0 12px 0;font-size:12px;color:${BRAND.panelMuted};">E-mail</p>
+                <p style="margin:-8px 0 16px 0;font-size:16px;color:${BRAND.panelText};font-weight:600;">${email}</p>
+                <p style="margin:0 0 2px 0;font-size:12px;color:${BRAND.panelMuted};">Senha temporária</p>
+                <p style="margin:0;font-size:18px;color:${BRAND.greenBright};font-weight:700;font-family:'Courier New',monospace;letter-spacing:1px;">${senha}</p>
+              </td></tr>
+            </table>
+          </td>
+        </tr>
+        <!-- CTA -->
+        <tr>
+          <td style="font-family:Arial,Helvetica,sans-serif;padding:0 0 14px 0;">
+            <table role="presentation" cellpadding="0" cellspacing="0"><tr><td style="border-radius:999px;background-color:${BRAND.green};">
+              <a href="${url}" target="_blank" style="display:inline-block;padding:14px 32px;font-size:15px;font-weight:700;color:#ffffff;text-decoration:none;border-radius:999px;">${copy.cta}</a>
+            </td></tr></table>
+          </td>
+        </tr>
+        <!-- Dica + primeiro acesso -->
+        <tr>
+          <td style="font-family:Arial,Helvetica,sans-serif;padding:0 0 6px 0;">
+            <p style="margin:0;font-size:13px;line-height:1.6;color:${BRAND.body};">
+              No primeiro acesso, troque a senha temporária por uma senha pessoal. ${copy.dica}
             </p>
           </td>
         </tr>
-        <tr>
-          <td style="padding:20px 32px 8px 32px;font-family:Arial,Helvetica,sans-serif;">
-            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:${BRAND.creamSoft};border:1px solid ${BRAND.hairline};border-radius:12px;">
-              <tr><td style="padding:18px 20px;">
-                <p style="margin:0 0 4px 0;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:${BRAND.muted};">Seus dados de acesso</p>
-                <p style="margin:0 0 10px 0;font-size:15px;color:${BRAND.ink};"><strong>E-mail:</strong> ${email}</p>
-                <p style="margin:0;font-size:15px;color:${BRAND.ink};"><strong>Senha temporária:</strong> <span style="font-family:'Courier New',monospace;background:#fff;border:1px solid ${BRAND.hairline};border-radius:6px;padding:2px 8px;">${senha}</span></p>
-              </td></tr>
-            </table>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding:20px 32px 4px 32px;font-family:Arial,Helvetica,sans-serif;">
-            <table role="presentation" cellpadding="0" cellspacing="0">
-              <tr><td style="border-radius:999px;background-color:${BRAND.green};">
-                <a href="${url}" target="_blank" style="display:inline-block;padding:14px 30px;font-size:15px;font-weight:700;color:#ffffff;text-decoration:none;border-radius:999px;">${copy.cta}</a>
-              </td></tr>
-            </table>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding:16px 32px 8px 32px;font-family:Arial,Helvetica,sans-serif;">
-            <p style="margin:0 0 8px 0;font-size:13px;line-height:1.6;color:${BRAND.muted};">Primeiros passos:</p>
-            <ol style="margin:0;padding-left:18px;font-size:13px;line-height:1.7;color:${BRAND.ink};">
-              ${passosHtml}
-            </ol>
-          </td>
-        </tr>
         ${policyHtml}
+        <!-- Rodapé -->
         <tr>
-          <td style="padding:16px 32px 28px 32px;font-family:Arial,Helvetica,sans-serif;">
-            <p style="margin:0;font-size:12px;line-height:1.6;color:${BRAND.muted};border-top:1px solid ${BRAND.hairline};padding-top:16px;">
-              Precisa de ajuda? É só responder este e-mail.<br />
-              <span style="color:#a2a69b;">IAplicada. Inteligência aplicada ao seu dia a dia.</span>
+          <td style="font-family:Arial,Helvetica,sans-serif;padding:24px 0 0 0;">
+            <p style="margin:0;font-size:12px;line-height:1.6;color:${BRAND.muted};border-top:1px solid ${BRAND.hairline};padding-top:18px;">
+              Precisa de ajuda? É só responder este e-mail.
             </p>
           </td>
         </tr>
@@ -188,8 +175,8 @@ export interface WelcomeEmailResult {
 }
 
 // Constrói o HTML e envia o e-mail de boas-vindas exclusivamente via n8n
-// (N8N_WEBHOOK_URL_WELCOME). Se o webhook não estiver configurado, apenas
-// registra e não envia (sem fallback para Zapier — por decisão de produto).
+// (N8N_WEBHOOK_URL_WELCOME). Sem webhook configurado, apenas registra (sem
+// fallback para Zapier — por decisão de produto).
 export async function sendWelcomeEmail(opts: {
   email: string;
   nome: string;
