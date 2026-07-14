@@ -21,18 +21,18 @@
 
 <script>
   // Réplica em JS do template de _shared/welcomeEmail.ts, só para pré-visualização.
-  const BRAND = { green:"#7C8B2A", ink:"#1a1c19", cream:"#F6F5EF", creamSoft:"#FBFAF5", muted:"#6b6f66", hairline:"#e6e4da" };
+  const BRAND = { green:"#7C8B2A", ink:"#1a1c19", body:"#3d4038", pageBg:"#E8E6DC", card:"#FBFAF5", creamSoft:"#FFFFFF", muted:"#6b6f66", hairline:"#dedbcf" };
   const PLATAFORMA_URL = "https://plataforma.iaplicada.com";
   const LOGO = PLATAFORMA_URL + "/logo-marca-completa-clara.png";
 
   const VARIANT_COPY = {
     academy: {
-      intro: "Seu acesso ao <strong>IAplicada Academy</strong> está pronto. Bora aplicar IA na sua rotina — uma trilha por vez.",
+      intro: "Seu acesso ao <strong>IAplicada Academy</strong> está pronto. Bora aplicar IA na sua rotina, uma trilha por vez.",
       cta: "Acessar o Academy",
       passos: ["Acesse com o e-mail e a senha temporária acima.", "Troque a senha temporária por uma senha pessoal.", 'Comece pela primeira trilha em "Aprender".'],
     },
     business_parceria: {
-      intro: "Seu acesso ao <strong>IAplicada Builder</strong> está pronto. Sua mentoria começa agora — a gente constrói junto, no seu ritmo.",
+      intro: "Seu acesso ao <strong>IAplicada Builder</strong> está pronto. Sua mentoria começa agora. A gente constrói junto, no seu ritmo.",
       cta: "Acessar o Builder",
       passos: ["Acesse com o e-mail e a senha temporária acima.", "Troque a senha temporária por uma senha pessoal.", 'Faça seu Diagnóstico e veja seu roadmap em "Mentoria".'],
     },
@@ -47,23 +47,32 @@
     const copy = VARIANT_COPY[plano] || VARIANT_COPY.academy;
     const primeiroNome = (nome || "").trim().split(" ")[0] || "boas-vindas";
     const passos = copy.passos.map((p) => "<li>" + p + "</li>").join("");
+    const policy = plano === "academy"
+      ? `<tr><td style="padding:4px 32px 8px 32px;">
+            <p style="margin:0;font-size:12px;line-height:1.6;color:${BRAND.muted};">
+              Antes de começar, recomendamos ler a nossa
+              <a href="${PLATAFORMA_URL}/politica-servicos" target="_blank" style="color:${BRAND.green};font-weight:600;text-decoration:underline;">Política de Serviços</a>
+              (também disponível em Configurações).
+            </p>
+          </td></tr>`
+      : "";
     return `
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:${BRAND.cream};padding:24px 12px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:${BRAND.pageBg};padding:24px 12px;">
   <tr><td align="center">
-    <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background-color:#ffffff;border:1px solid ${BRAND.hairline};border-radius:16px;overflow:hidden;">
+    <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background-color:${BRAND.card};border:1px solid ${BRAND.hairline};border-radius:16px;overflow:hidden;">
       <tr><td style="background-color:${BRAND.green};padding:22px 32px;">
         <img src="${LOGO}" alt="IAplicada" height="30" style="height:30px;display:block;border:0;" onerror="this.outerHTML='<span style=\\'font-family:Georgia,serif;font-size:22px;font-weight:700;color:#fff;\\'>IAplicada</span>'" />
       </td></tr>
       <tr><td style="padding:32px 32px 8px 32px;">
         <h1 style="margin:0 0 8px 0;font-family:Georgia,serif;font-size:26px;line-height:1.2;color:${BRAND.ink};font-weight:400;">Olá, ${primeiroNome}!</h1>
-        <p style="margin:0;font-size:15px;line-height:1.6;color:${BRAND.muted};">${copy.intro}</p>
+        <p style="margin:0;font-size:15px;line-height:1.6;color:${BRAND.body};">${copy.intro}</p>
       </td></tr>
       <tr><td style="padding:20px 32px 8px 32px;">
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:${BRAND.creamSoft};border:1px solid ${BRAND.hairline};border-radius:12px;">
           <tr><td style="padding:18px 20px;">
             <p style="margin:0 0 4px 0;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:${BRAND.muted};">Seus dados de acesso</p>
             <p style="margin:0 0 10px 0;font-size:15px;color:${BRAND.ink};"><strong>E-mail:</strong> ${email}</p>
-            <p style="margin:0;font-size:15px;color:${BRAND.ink};"><strong>Senha temporária:</strong> <span style="font-family:'Courier New',monospace;background:#fff;border:1px solid ${BRAND.hairline};border-radius:6px;padding:2px 8px;">${senha}</span></p>
+            <p style="margin:0;font-size:15px;color:${BRAND.ink};"><strong>Senha temporária:</strong> <span style="font-family:'Courier New',monospace;background:${BRAND.pageBg};border:1px solid ${BRAND.hairline};border-radius:6px;padding:2px 8px;">${senha}</span></p>
           </td></tr>
         </table>
       </td></tr>
@@ -76,10 +85,11 @@
         <p style="margin:0 0 8px 0;font-size:13px;line-height:1.6;color:${BRAND.muted};">Primeiros passos:</p>
         <ol style="margin:0;padding-left:18px;font-size:13px;line-height:1.7;color:${BRAND.ink};">${passos}</ol>
       </td></tr>
+      ${policy}
       <tr><td style="padding:16px 32px 28px 32px;">
         <p style="margin:0;font-size:12px;line-height:1.6;color:${BRAND.muted};border-top:1px solid ${BRAND.hairline};padding-top:16px;">
           Precisa de ajuda? É só responder este e-mail.<br />
-          <span style="color:#a2a69b;">IAplicada — Inteligência aplicada ao seu dia a dia.</span>
+          <span style="color:#a2a69b;">IAplicada. Inteligência aplicada ao seu dia a dia.</span>
         </p>
       </td></tr>
     </table>

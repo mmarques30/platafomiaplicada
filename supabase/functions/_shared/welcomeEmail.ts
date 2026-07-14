@@ -9,10 +9,12 @@
 const BRAND = {
   green: "#7C8B2A",
   ink: "#1a1c19",
-  cream: "#F6F5EF",
-  creamSoft: "#FBFAF5",
+  body: "#3d4038",
+  pageBg: "#E8E6DC",
+  card: "#FBFAF5",
+  creamSoft: "#FFFFFF",
   muted: "#6b6f66",
-  hairline: "#e6e4da",
+  hairline: "#dedbcf",
 };
 
 export function escapeHtml(input: unknown): string {
@@ -35,7 +37,7 @@ interface VariantCopy {
 const VARIANT_COPY: Record<string, VariantCopy> = {
   academy: {
     intro:
-      "Seu acesso ao <strong>IAplicada Academy</strong> está pronto. Bora aplicar IA na sua rotina — uma trilha por vez.",
+      "Seu acesso ao <strong>IAplicada Academy</strong> está pronto. Bora aplicar IA na sua rotina, uma trilha por vez.",
     cta: "Acessar o Academy",
     passos: [
       "Acesse com o e-mail e a senha temporária acima.",
@@ -45,7 +47,7 @@ const VARIANT_COPY: Record<string, VariantCopy> = {
   },
   business_parceria: {
     intro:
-      "Seu acesso ao <strong>IAplicada Builder</strong> está pronto. Sua mentoria começa agora — a gente constrói junto, no seu ritmo.",
+      "Seu acesso ao <strong>IAplicada Builder</strong> está pronto. Sua mentoria começa agora. A gente constrói junto, no seu ritmo.",
     cta: "Acessar o Builder",
     passos: [
       "Acesse com o e-mail e a senha temporária acima.",
@@ -90,6 +92,18 @@ export function buildWelcomeEmailHtml(params: {
   const url = escapeHtml(params.plataformaUrl);
   const copy = VARIANT_COPY[params.plano] ?? DEFAULT_COPY;
   const passosHtml = copy.passos.map((p) => `<li>${p}</li>`).join("");
+  // Academy: reforçar a leitura das políticas (disponíveis em Configurações).
+  const baseUrl = params.plataformaUrl.replace(/\/$/, "");
+  const policyHtml =
+    params.plano === "academy"
+      ? `<tr><td style="padding:4px 32px 8px 32px;font-family:Arial,Helvetica,sans-serif;">
+            <p style="margin:0;font-size:12px;line-height:1.6;color:${BRAND.muted};">
+              Antes de começar, recomendamos ler a nossa
+              <a href="${escapeHtml(baseUrl)}/politica-servicos" target="_blank" style="color:${BRAND.green};font-weight:600;text-decoration:underline;">Política de Serviços</a>
+              (também disponível em Configurações).
+            </p>
+          </td></tr>`
+      : "";
   // Logo do kit da marca (versão clara, boa sobre o verde). Servida no domínio
   // da plataforma; pode ser sobrescrita por WELCOME_EMAIL_LOGO_URL.
   const logoSrc = params.logoUrl || `${params.plataformaUrl.replace(/\/$/, "")}/logo-marca-completa-clara.png`;
@@ -103,12 +117,12 @@ export function buildWelcomeEmailHtml(params: {
 <meta name="color-scheme" content="light only" />
 <title>Bem-vindo(a) à IAplicada</title>
 </head>
-<body style="margin:0;padding:0;background-color:${BRAND.cream};">
-<div style="display:none;max-height:0;overflow:hidden;opacity:0;">Seu acesso à plataforma IAplicada está pronto — entre com seu e-mail e senha temporária.</div>
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:${BRAND.cream};padding:24px 12px;">
+<body style="margin:0;padding:0;background-color:${BRAND.pageBg};">
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;">Seu acesso à plataforma IAplicada está pronto. Entre com seu e-mail e senha temporária.</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:${BRAND.pageBg};padding:24px 12px;">
   <tr>
     <td align="center">
-      <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background-color:#ffffff;border:1px solid ${BRAND.hairline};border-radius:16px;overflow:hidden;">
+      <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background-color:${BRAND.card};border:1px solid ${BRAND.hairline};border-radius:16px;overflow:hidden;">
         <tr>
           <td style="background-color:${BRAND.green};padding:22px 32px;">
             ${logo}
@@ -117,7 +131,7 @@ export function buildWelcomeEmailHtml(params: {
         <tr>
           <td style="padding:32px 32px 8px 32px;font-family:Arial,Helvetica,sans-serif;">
             <h1 style="margin:0 0 8px 0;font-family:Georgia,'Times New Roman',serif;font-size:26px;line-height:1.2;color:${BRAND.ink};font-weight:400;">Olá, ${primeiroNome}!</h1>
-            <p style="margin:0;font-size:15px;line-height:1.6;color:${BRAND.muted};">
+            <p style="margin:0;font-size:15px;line-height:1.6;color:${BRAND.body};">
               ${copy.intro}
             </p>
           </td>
@@ -150,11 +164,12 @@ export function buildWelcomeEmailHtml(params: {
             </ol>
           </td>
         </tr>
+        ${policyHtml}
         <tr>
           <td style="padding:16px 32px 28px 32px;font-family:Arial,Helvetica,sans-serif;">
             <p style="margin:0;font-size:12px;line-height:1.6;color:${BRAND.muted};border-top:1px solid ${BRAND.hairline};padding-top:16px;">
               Precisa de ajuda? É só responder este e-mail.<br />
-              <span style="color:#a2a69b;">IAplicada — Inteligência aplicada ao seu dia a dia.</span>
+              <span style="color:#a2a69b;">IAplicada. Inteligência aplicada ao seu dia a dia.</span>
             </p>
           </td>
         </tr>
@@ -195,7 +210,7 @@ export async function sendWelcomeEmail(opts: {
     plataformaUrl,
     logoUrl,
   });
-  const subject = `Bem-vindo(a) à IAplicada — acesso ${opts.planoLabel}`;
+  const subject = `Bem-vindo(a) à IAplicada! Seu acesso ${opts.planoLabel}`;
 
   const payload = {
     event: "welcome_email",
