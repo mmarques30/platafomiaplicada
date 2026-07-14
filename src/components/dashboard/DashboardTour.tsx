@@ -9,7 +9,7 @@ import { useOnboardingTracking } from "@/hooks/useOnboardingTracking";
 const allSteps: Step[] = [
   {
     target: '[data-tour="primeiros-passos"]',
-    content: "Este é o seu guia de início: o passo a passo do que fazer primeiro. Ele fica sempre aqui na Home — é só clicar em 'Ver guia' quando quiser rever.",
+    content: "Este é o seu guia de início: o passo a passo do que fazer primeiro. Ele fica no menu superior, ao lado de Comunicações — clique quando quiser rever.",
     title: "Comece por aqui",
     skipBeacon: true,
     placement: "bottom" as const,
