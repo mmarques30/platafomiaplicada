@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Prévia — E-mails de boas-vindas IAplicada</title>
+<style>
+  body { margin: 0; background: #eceadf; font-family: Arial, Helvetica, sans-serif; color: #1a1c19; }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 24px 16px 60px; }
+  .page-title { font-size: 20px; font-weight: 700; margin: 8px 0 4px; }
+  .page-sub { color: #6b6f66; font-size: 14px; margin: 0 0 20px; }
+  .variant-label { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #7C8B2A; font-weight: 700; margin: 28px 0 8px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="page-title">Prévia dos e-mails de boas-vindas</div>
+  <p class="page-sub">Renderização real do template (dados de exemplo). Três variações: Academy, Builder e System.</p>
+  <div id="root"></div>
+</div>
+
+<script>
+  // Réplica em JS do template de _shared/welcomeEmail.ts, só para pré-visualização.
+  const BRAND = { green:"#7C8B2A", ink:"#1a1c19", cream:"#F6F5EF", creamSoft:"#FBFAF5", muted:"#6b6f66", hairline:"#e6e4da" };
+  const PLATAFORMA_URL = "https://plataforma.iaplicada.com";
+  const LOGO = PLATAFORMA_URL + "/logo-marca-completa-clara.png";
+
+  const VARIANT_COPY = {
+    academy: {
+      intro: "Seu acesso ao <strong>IAplicada Academy</strong> está pronto. Bora aplicar IA na sua rotina — uma trilha por vez.",
+      cta: "Acessar o Academy",
+      passos: ["Acesse com o e-mail e a senha temporária acima.", "Troque a senha temporária por uma senha pessoal.", 'Comece pela primeira trilha em "Aprender".'],
+    },
+    business_parceria: {
+      intro: "Seu acesso ao <strong>IAplicada Builder</strong> está pronto. Sua mentoria começa agora — a gente constrói junto, no seu ritmo.",
+      cta: "Acessar o Builder",
+      passos: ["Acesse com o e-mail e a senha temporária acima.", "Troque a senha temporária por uma senha pessoal.", 'Faça seu Diagnóstico e veja seu roadmap em "Mentoria".'],
+    },
+    business_sistemas: {
+      intro: "Seu acesso ao <strong>IAplicada System</strong> está pronto. A partir daqui a IAplicada constrói o seu sistema e você acompanha cada etapa.",
+      cta: "Acessar o System",
+      passos: ["Acesse com o e-mail e a senha temporária acima.", "Troque a senha temporária por uma senha pessoal.", 'Acompanhe o andamento do projeto em "Meu Projeto".'],
+    },
+  };
+
+  function buildEmail({ nome, email, senha, plano }) {
+    const copy = VARIANT_COPY[plano] || VARIANT_COPY.academy;
+    const primeiroNome = (nome || "").trim().split(" ")[0] || "boas-vindas";
+    const passos = copy.passos.map((p) => "<li>" + p + "</li>").join("");
+    return `
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:${BRAND.cream};padding:24px 12px;">
+  <tr><td align="center">
+    <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background-color:#ffffff;border:1px solid ${BRAND.hairline};border-radius:16px;overflow:hidden;">
+      <tr><td style="background-color:${BRAND.green};padding:22px 32px;">
+        <img src="${LOGO}" alt="IAplicada" height="30" style="height:30px;display:block;border:0;" onerror="this.outerHTML='<span style=\\'font-family:Georgia,serif;font-size:22px;font-weight:700;color:#fff;\\'>IAplicada</span>'" />
+      </td></tr>
+      <tr><td style="padding:32px 32px 8px 32px;">
+        <h1 style="margin:0 0 8px 0;font-family:Georgia,serif;font-size:26px;line-height:1.2;color:${BRAND.ink};font-weight:400;">Olá, ${primeiroNome}!</h1>
+        <p style="margin:0;font-size:15px;line-height:1.6;color:${BRAND.muted};">${copy.intro}</p>
+      </td></tr>
+      <tr><td style="padding:20px 32px 8px 32px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:${BRAND.creamSoft};border:1px solid ${BRAND.hairline};border-radius:12px;">
+          <tr><td style="padding:18px 20px;">
+            <p style="margin:0 0 4px 0;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:${BRAND.muted};">Seus dados de acesso</p>
+            <p style="margin:0 0 10px 0;font-size:15px;color:${BRAND.ink};"><strong>E-mail:</strong> ${email}</p>
+            <p style="margin:0;font-size:15px;color:${BRAND.ink};"><strong>Senha temporária:</strong> <span style="font-family:'Courier New',monospace;background:#fff;border:1px solid ${BRAND.hairline};border-radius:6px;padding:2px 8px;">${senha}</span></p>
+          </td></tr>
+        </table>
+      </td></tr>
+      <tr><td style="padding:20px 32px 4px 32px;">
+        <table role="presentation" cellpadding="0" cellspacing="0"><tr><td style="border-radius:999px;background-color:${BRAND.green};">
+          <a href="${PLATAFORMA_URL}" target="_blank" style="display:inline-block;padding:14px 30px;font-size:15px;font-weight:700;color:#ffffff;text-decoration:none;border-radius:999px;">${copy.cta}</a>
+        </td></tr></table>
+      </td></tr>
+      <tr><td style="padding:16px 32px 8px 32px;">
+        <p style="margin:0 0 8px 0;font-size:13px;line-height:1.6;color:${BRAND.muted};">Primeiros passos:</p>
+        <ol style="margin:0;padding-left:18px;font-size:13px;line-height:1.7;color:${BRAND.ink};">${passos}</ol>
+      </td></tr>
+      <tr><td style="padding:16px 32px 28px 32px;">
+        <p style="margin:0;font-size:12px;line-height:1.6;color:${BRAND.muted};border-top:1px solid ${BRAND.hairline};padding-top:16px;">
+          Precisa de ajuda? É só responder este e-mail.<br />
+          <span style="color:#a2a69b;">IAplicada — Inteligência aplicada ao seu dia a dia.</span>
+        </p>
+      </td></tr>
+    </table>
+  </td></tr>
+</table>`;
+  }
+
+  const exemplos = [
+    { label: "Academy", plano: "academy", nome: "Marina", email: "marina@empresa.com", senha: "aplica2026" },
+    { label: "Builder (mentoria individual)", plano: "business_parceria", nome: "Rodrigo", email: "rodrigo@empresa.com", senha: "aplica2026" },
+    { label: "System (B2B / empresa)", plano: "business_sistemas", nome: "Camila", email: "camila@empresa.com", senha: "aplica2026" },
+  ];
+
+  const root = document.getElementById("root");
+  root.innerHTML = exemplos
+    .map((e) => `<div class="variant-label">${e.label}</div>` + buildEmail(e))
+    .join("");
+</script>
+</body>
+</html>
