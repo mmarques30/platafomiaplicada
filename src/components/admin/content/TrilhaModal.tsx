@@ -11,6 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useCreateTrilha, useUpdateTrilha } from "@/hooks/admin/useContent";
 import { useNextOrdem } from "@/hooks/admin/useNextOrdem";
+import { FERRAMENTAS_MODELOS_IA } from "@/lib/ferramentasModelos";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Upload, X, AlertCircle } from "lucide-react";
@@ -54,6 +55,7 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
       imagem_url: "",
       duracao_estimada: 0,
       cohost_nome: "",
+      ferramentas: [] as string[],
     },
   });
 
@@ -77,6 +79,7 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
       setValue("visivel_apenas_pro", trilha.visivel_apenas_pro ?? false);
       setValue("nivel_minimo_acesso", trilha.nivel_minimo_acesso || "academy");
       setValue("bloqueada", trilha.bloqueada ?? false);
+      setValue("ferramentas", Array.isArray(trilha.ferramentas) ? trilha.ferramentas : []);
     } else {
       reset({
         titulo: "",
@@ -93,6 +96,7 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
         imagem_url: "",
         duracao_estimada: 0,
         cohost_nome: "",
+        ferramentas: [],
       });
       setSelectedCategoria("núcleo");
       setShowCustomCategoria(false);
@@ -365,6 +369,38 @@ export function TrilhaModal({ open, onOpenChange, trilha }: TrilhaModalProps) {
             )}
             <p className="text-xs text-muted-foreground">
               Descreve o que o aluno vai aprender (ex: Produtividade, Rotina, Carreira)
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Ferramentas / modelos compatíveis</Label>
+            <div className="flex flex-wrap gap-2">
+              {FERRAMENTAS_MODELOS_IA.map((f) => {
+                const atual = (watch("ferramentas") as string[]) || [];
+                const checked = atual.includes(f);
+                return (
+                  <label
+                    key={f}
+                    className={`flex items-center gap-2 text-sm cursor-pointer border rounded-full px-3 py-1.5 transition-colors ${
+                      checked ? "border-primary bg-primary/10 text-primary" : "border-border hover:border-primary/40"
+                    }`}
+                  >
+                    <Checkbox
+                      checked={checked}
+                      onCheckedChange={(c) => {
+                        const set = new Set(atual);
+                        if (c) set.add(f);
+                        else set.delete(f);
+                        setValue("ferramentas", Array.from(set));
+                      }}
+                    />
+                    {f}
+                  </label>
+                );
+              })}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Aparece como "Funciona em: ..." no card e permite o aluno filtrar por ferramenta.
             </p>
           </div>
 

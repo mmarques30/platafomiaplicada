@@ -5812,6 +5812,7 @@ export type Database = {
           created_at: string | null
           descricao: string | null
           duracao_estimada: number | null
+          ferramentas: string[] | null
           id: string
           imagem_url: string | null
           nivel: string
@@ -5834,6 +5835,7 @@ export type Database = {
           created_at?: string | null
           descricao?: string | null
           duracao_estimada?: number | null
+          ferramentas?: string[] | null
           id?: string
           imagem_url?: string | null
           nivel: string
@@ -5856,6 +5858,7 @@ export type Database = {
           created_at?: string | null
           descricao?: string | null
           duracao_estimada?: number | null
+          ferramentas?: string[] | null
           id?: string
           imagem_url?: string | null
           nivel?: string
