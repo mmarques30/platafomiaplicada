@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { AlertCircle, X, ListChecks } from "lucide-react";
+import { AlertCircle, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { NovidadesSemana } from "@/components/dashboard/NovidadesSemana";
 import { WelcomeHeader } from "@/components/dashboard/WelcomeHeader";
@@ -99,19 +99,6 @@ export default function Dashboard() {
             )}
 
             <WelcomeHeader />
-
-            {/* Atalho sempre disponível para reabrir os "Primeiros passos" */}
-            <div>
-              <Button
-                variant="outline"
-                size="sm"
-                className="gap-2 border-brand-hairline"
-                onClick={() => window.dispatchEvent(new CustomEvent("abrir-primeiros-passos"))}
-              >
-                <ListChecks className="h-4 w-4" />
-                Ver primeiros passos
-              </Button>
-            </div>
 
             {/* Layout linear single-column. Ordem prioriza ação imediata em cima
                (briefing + urgências), depois progresso e onboarding condicional,
