@@ -113,6 +113,14 @@ export function ProximosPassosCard({ previewMode, onClose: onCloseExternal }: Pr
     }
   }, [profile?.primeiro_acesso, user?.id, previewMode]);
 
+  // Permite reabrir os "Primeiros passos" a qualquer momento (ex.: botão na Home).
+  useEffect(() => {
+    if (previewMode) return;
+    const abrir = () => setMostrar(true);
+    window.addEventListener("abrir-primeiros-passos", abrir);
+    return () => window.removeEventListener("abrir-primeiros-passos", abrir);
+  }, [previewMode]);
+
   const config = useMemo((): PlanConfig | null => {
     if (!mostrar) return null;
 
@@ -145,7 +153,7 @@ export function ProximosPassosCard({ previewMode, onClose: onCloseExternal }: Pr
         passos: [
           { status: "feito", titulo: "Plataforma configurada e tour concluído", desc: "Você já conhece os recursos principais e sabe onde encontrar tudo." },
           { status: "agora", label: "Faça agora — 15 minutos", titulo: "Preencha seu Diagnóstico de IA", desc: "A MarIAna analisa seu perfil e gera um painel com seus principais gaps, pontos fortes e prioridades de aprendizado personalizado.", cta: "Iniciar Diagnóstico →", href: "/mentoria/diagnostico" },
-          { status: "proximo", label: "Após o diagnóstico", titulo: "Comece sua primeira Trilha recomendada", desc: "Vídeos práticos, exercícios aplicados e projetos reais. Progresso salvo automaticamente. Acesse também prompts prontos e ferramentas nas Bibliotecas." },
+          { status: "proximo", label: "Após o diagnóstico", titulo: "Comece sua primeira Trilha e explore as Bibliotecas", desc: "Vídeos práticos e projetos reais, com progresso salvo. E nas Bibliotecas você já tem prompts prontos e ferramentas de IA para usar no dia a dia.", cta: "Ver Bibliotecas →", href: "/biblioteca-prompts" },
           { status: "proximo", label: "Ao longo da jornada", titulo: "Acumule conquistas e emita seu Certificado", desc: "Cada trilha gera conquistas rastreadas em Evolução. O certificado é emitido ao concluir — compartilhável no LinkedIn." },
         ],
         ctaLabel: "Iniciar meu Diagnóstico →",
