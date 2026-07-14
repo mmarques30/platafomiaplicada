@@ -117,11 +117,13 @@ export function buildWelcomeEmailHtml(params: {
 
 export interface WelcomeEmailResult {
   status: "sent" | "skipped_no_webhook" | "failed";
-  via: "n8n" | "zapier" | null;
+  via: "n8n" | null;
   error?: string;
 }
 
-// Constrói o HTML e envia o e-mail de boas-vindas via n8n (preferencial) ou Zapier (fallback).
+// Constrói o HTML e envia o e-mail de boas-vindas exclusivamente via n8n
+// (N8N_WEBHOOK_URL_WELCOME). Se o webhook não estiver configurado, apenas
+// registra e não envia (sem fallback para Zapier — por decisão de produto).
 export async function sendWelcomeEmail(opts: {
   email: string;
   nome: string;
@@ -156,39 +158,28 @@ export async function sendWelcomeEmail(opts: {
     html,
   };
 
-  const isBusiness = opts.plano === "business_parceria" || opts.plano === "business_sistemas";
   const n8nUrl = Deno.env.get("N8N_WEBHOOK_URL_WELCOME");
-  const zapierUrl = isBusiness
-    ? Deno.env.get("ZAPIER_WEBHOOK_URL_BUSINESS")
-    : Deno.env.get("ZAPIER_WEBHOOK_URL");
-
-  const target = n8nUrl
-    ? { url: n8nUrl, via: "n8n" as const }
-    : zapierUrl
-      ? { url: zapierUrl, via: "zapier" as const }
-      : null;
-
-  if (!target) {
-    console.warn("Nenhum webhook de boas-vindas configurado (N8N_WEBHOOK_URL_WELCOME / ZAPIER_*).");
+  if (!n8nUrl) {
+    console.warn("Webhook de boas-vindas do n8n não configurado (N8N_WEBHOOK_URL_WELCOME). E-mail não enviado.");
     return { status: "skipped_no_webhook", via: null };
   }
 
   try {
-    const resp = await fetch(target.url, {
+    const resp = await fetch(n8nUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
     if (!resp.ok) {
-      const error = `${target.via} respondeu HTTP ${resp.status}: ${await resp.text().catch(() => "")}`.slice(0, 500);
+      const error = `n8n respondeu HTTP ${resp.status}: ${await resp.text().catch(() => "")}`.slice(0, 500);
       console.error("Erro ao enviar boas-vindas:", error);
-      return { status: "failed", via: target.via, error };
+      return { status: "failed", via: "n8n", error };
     }
-    console.log(`Boas-vindas enviadas via ${target.via} (${opts.plano})`);
-    return { status: "sent", via: target.via };
+    console.log(`Boas-vindas enviadas via n8n (${opts.plano})`);
+    return { status: "sent", via: "n8n" };
   } catch (err) {
     const error = err instanceof Error ? err.message : String(err);
     console.error("Erro ao enviar boas-vindas (nao-bloqueante):", error);
-    return { status: "failed", via: target.via, error };
+    return { status: "failed", via: "n8n", error };
   }
 }
