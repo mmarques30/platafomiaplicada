@@ -24,10 +24,62 @@ export function escapeHtml(input: unknown): string {
     .replace(/'/g, "&#39;");
 }
 
+// Copy específico por produto — Academy, Builder e System são produtos
+// diferentes e merecem uma mensagem de boas-vindas própria.
+interface VariantCopy {
+  intro: string;
+  cta: string;
+  passos: string[];
+}
+
+const VARIANT_COPY: Record<string, VariantCopy> = {
+  academy: {
+    intro:
+      "Seu acesso ao <strong>IAplicada Academy</strong> está pronto. Bora aplicar IA na sua rotina — uma trilha por vez.",
+    cta: "Acessar o Academy",
+    passos: [
+      "Acesse com o e-mail e a senha temporária acima.",
+      "Troque a senha temporária por uma senha pessoal.",
+      'Comece pela primeira trilha em "Aprender".',
+    ],
+  },
+  business_parceria: {
+    intro:
+      "Seu acesso ao <strong>IAplicada Builder</strong> está pronto. Sua mentoria começa agora — a gente constrói junto, no seu ritmo.",
+    cta: "Acessar o Builder",
+    passos: [
+      "Acesse com o e-mail e a senha temporária acima.",
+      "Troque a senha temporária por uma senha pessoal.",
+      'Faça seu Diagnóstico e veja seu roadmap em "Mentoria".',
+    ],
+  },
+  business_sistemas: {
+    intro:
+      "Seu acesso ao <strong>IAplicada System</strong> está pronto. A partir daqui a IAplicada constrói o seu sistema e você acompanha cada etapa.",
+    cta: "Acessar o System",
+    passos: [
+      "Acesse com o e-mail e a senha temporária acima.",
+      "Troque a senha temporária por uma senha pessoal.",
+      'Acompanhe o andamento do projeto em "Meu Projeto".',
+    ],
+  },
+};
+
+const DEFAULT_COPY: VariantCopy = {
+  intro: "Seu acesso à <strong>plataforma IAplicada</strong> está pronto.",
+  cta: "Acessar a plataforma",
+  passos: [
+    "Acesse com o e-mail e a senha temporária acima.",
+    "Troque a senha temporária por uma senha pessoal.",
+    'Escolha seu ambiente e comece por "Início".',
+  ],
+};
+
 export function buildWelcomeEmailHtml(params: {
   nome: string;
   email: string;
   senha: string;
+  plano: string;
   planoLabel: string;
   plataformaUrl: string;
   logoUrl?: string | null;
@@ -35,11 +87,13 @@ export function buildWelcomeEmailHtml(params: {
   const primeiroNome = escapeHtml((params.nome || "").trim().split(" ")[0] || "boas-vindas");
   const email = escapeHtml(params.email);
   const senha = escapeHtml(params.senha);
-  const planoLabel = escapeHtml(params.planoLabel);
   const url = escapeHtml(params.plataformaUrl);
-  const logo = params.logoUrl
-    ? `<img src="${escapeHtml(params.logoUrl)}" alt="IAplicada" height="28" style="height:28px;display:block;border:0;" />`
-    : `<span style="font-family:Georgia,'Times New Roman',serif;font-size:22px;font-weight:700;color:#ffffff;letter-spacing:0.3px;">IAplicada</span>`;
+  const copy = VARIANT_COPY[params.plano] ?? DEFAULT_COPY;
+  const passosHtml = copy.passos.map((p) => `<li>${p}</li>`).join("");
+  // Logo do kit da marca (versão clara, boa sobre o verde). Servida no domínio
+  // da plataforma; pode ser sobrescrita por WELCOME_EMAIL_LOGO_URL.
+  const logoSrc = params.logoUrl || `${params.plataformaUrl.replace(/\/$/, "")}/logo-marca-completa-clara.png`;
+  const logo = `<img src="${escapeHtml(logoSrc)}" alt="IAplicada" height="30" style="height:30px;display:block;border:0;" />`;
 
   return `<!DOCTYPE html>
 <html lang="pt-BR">
@@ -64,8 +118,7 @@ export function buildWelcomeEmailHtml(params: {
           <td style="padding:32px 32px 8px 32px;font-family:Arial,Helvetica,sans-serif;">
             <h1 style="margin:0 0 8px 0;font-family:Georgia,'Times New Roman',serif;font-size:26px;line-height:1.2;color:${BRAND.ink};font-weight:400;">Olá, ${primeiroNome}!</h1>
             <p style="margin:0;font-size:15px;line-height:1.6;color:${BRAND.muted};">
-              Seu acesso à plataforma <strong style="color:${BRAND.ink};">IAplicada</strong> está pronto.
-              Plano: <strong style="color:${BRAND.green};">${planoLabel}</strong>.
+              ${copy.intro}
             </p>
           </td>
         </tr>
@@ -84,7 +137,7 @@ export function buildWelcomeEmailHtml(params: {
           <td style="padding:20px 32px 4px 32px;font-family:Arial,Helvetica,sans-serif;">
             <table role="presentation" cellpadding="0" cellspacing="0">
               <tr><td style="border-radius:999px;background-color:${BRAND.green};">
-                <a href="${url}" target="_blank" style="display:inline-block;padding:14px 30px;font-size:15px;font-weight:700;color:#ffffff;text-decoration:none;border-radius:999px;">Acessar a plataforma</a>
+                <a href="${url}" target="_blank" style="display:inline-block;padding:14px 30px;font-size:15px;font-weight:700;color:#ffffff;text-decoration:none;border-radius:999px;">${copy.cta}</a>
               </td></tr>
             </table>
           </td>
@@ -93,9 +146,7 @@ export function buildWelcomeEmailHtml(params: {
           <td style="padding:16px 32px 8px 32px;font-family:Arial,Helvetica,sans-serif;">
             <p style="margin:0 0 8px 0;font-size:13px;line-height:1.6;color:${BRAND.muted};">Primeiros passos:</p>
             <ol style="margin:0;padding-left:18px;font-size:13px;line-height:1.7;color:${BRAND.ink};">
-              <li>Acesse com o e-mail e a senha temporária acima.</li>
-              <li>Troque a senha temporária por uma senha pessoal.</li>
-              <li>Escolha seu ambiente e comece por "Início".</li>
+              ${passosHtml}
             </ol>
           </td>
         </tr>
@@ -139,6 +190,7 @@ export async function sendWelcomeEmail(opts: {
     nome: opts.nome,
     email: opts.email,
     senha: opts.senha,
+    plano: opts.plano,
     planoLabel: opts.planoLabel,
     plataformaUrl,
     logoUrl,
