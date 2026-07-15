@@ -103,7 +103,7 @@ export function PendenciasOnboarding() {
   const progressPercent = (completedCount / totalCount) * 100;
 
   return (
-    <div className="bg-[hsl(72_6%_18%)] border border-white/10 rounded-lg sm:rounded-xl overflow-hidden">
+    <div className="bg-foreground border border-white/10 rounded-lg sm:rounded-xl overflow-hidden">
       {/* Header compacto - sempre visível */}
       <div 
         className="flex items-center justify-between px-3 sm:px-4 py-2.5 sm:py-3 cursor-pointer hover:bg-white/5 transition-colors"
