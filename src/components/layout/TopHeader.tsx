@@ -118,7 +118,7 @@ export function TopHeader() {
       
       <header
         className={cn(
-          "fixed z-50 w-full border-b border-white/10 bg-[#0D0D0D] text-white transition-transform duration-300 ease-in-out",
+          "fixed z-50 w-full border-b border-white/10 bg-[#2E2E2E] text-white transition-transform duration-300 ease-in-out",
           isScrolled && !isHovered ? "-translate-y-full" : "translate-y-0",
           isAdmin && isViewingAs ? "top-10" : "top-0"
         )}
@@ -195,7 +195,7 @@ export function TopHeader() {
               type="button"
               data-tour="primeiros-passos"
               onClick={() => window.dispatchEvent(new CustomEvent("abrir-primeiros-passos"))}
-              className="text-sm font-semibold text-[#0D0D0D] bg-brand-cream rounded-full px-3.5 py-1 hover:bg-brand-cream/90 transition-colors"
+              className="text-sm font-semibold text-[#2E2E2E] bg-brand-cream rounded-full px-3.5 py-1 hover:bg-brand-cream/90 transition-colors"
             >
               Primeiros passos
             </button>
