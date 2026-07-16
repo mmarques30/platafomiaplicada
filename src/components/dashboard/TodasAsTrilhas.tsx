@@ -32,27 +32,52 @@ interface TrilhaComContagem {
   total_videos: number;
 }
 
+const TRILHAS_BASE_SELECT =
+  "id, titulo, imagem_url, categoria, classificacao, ordem, visivel_apenas_pro, created_at";
+
+function isMissingFerramentasColumn(error: { code?: string; message?: string } | null) {
+  return (
+    error?.code === "42703" ||
+    (error?.message?.includes("ferramentas") && error?.message?.includes("does not exist")) ||
+    false
+  );
+}
+
 export function TodasAsTrilhas() {
   const [ordenar, setOrdenar] = useState("ordem");
   const [classificacaoFiltro, setClassificacaoFiltro] = useState("todas");
   const [ferramentaFiltro, setFerramentaFiltro] = useState("todas");
 
-  const { data: trilhas, isLoading } = useQuery({
+  const { data: trilhas, isLoading, isError } = useQuery({
     queryKey: ["todas-trilhas-com-contagem"],
     queryFn: async () => {
-      const { data: trilhasData, error: tError } = await supabase
+      let trilhasData: Array<Record<string, unknown>> | null = null;
+
+      const fullQuery = await supabase
         .from("trilhas")
-        .select("id, titulo, imagem_url, categoria, classificacao, ferramentas, ordem, visivel_apenas_pro, created_at")
+        .select(`${TRILHAS_BASE_SELECT}, ferramentas`)
         .eq("visivel_mentorados", true)
         .order("ordem");
 
-      if (tError) throw tError;
+      if (fullQuery.error && isMissingFerramentasColumn(fullQuery.error)) {
+        const fallbackQuery = await supabase
+          .from("trilhas")
+          .select(TRILHAS_BASE_SELECT)
+          .eq("visivel_mentorados", true)
+          .order("ordem");
+
+        if (fallbackQuery.error) throw fallbackQuery.error;
+        trilhasData = fallbackQuery.data;
+      } else {
+        if (fullQuery.error) throw fullQuery.error;
+        trilhasData = fullQuery.data;
+      }
 
       const { data: videosCounts, error: vError } = await supabase
         .from("videos")
         .select("trilha_id")
         .eq("ativo", true)
-        .in("trilha_id", (trilhasData || []).map((t) => t.id));
+        .in("trilha_id", (trilhasData || []).map((t) => t.id as string));
 
       if (vError) throw vError;
 
@@ -65,7 +90,8 @@ export function TodasAsTrilhas() {
 
       return (trilhasData || []).map((t) => ({
         ...t,
-        total_videos: countMap[t.id] || 0,
+        ferramentas: Array.isArray(t.ferramentas) ? (t.ferramentas as string[]) : [],
+        total_videos: countMap[t.id as string] || 0,
       })) as TrilhaComContagem[];
     },
   });
@@ -122,6 +148,14 @@ export function TodasAsTrilhas() {
           ))}
         </div>
       </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <p className="text-muted-foreground text-center py-8">
+        Não foi possível carregar as trilhas. Tente atualizar a página.
+      </p>
     );
   }
 
