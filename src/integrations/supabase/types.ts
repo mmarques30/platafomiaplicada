@@ -6332,6 +6332,10 @@ export type Database = {
         Args: { p_points: number; p_user_id: string }
         Returns: undefined
       }
+      admin_delete_user: {
+        Args: { p_user_id: string }
+        Returns: Json
+      }
       calcular_prazo_sla: { Args: { p_user_id: string }; Returns: string }
       calcular_progresso_preparacao: {
         Args: { p_projeto_id: string; p_user_id: string }

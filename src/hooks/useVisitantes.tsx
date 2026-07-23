@@ -118,12 +118,14 @@ export function useVisitantes() {
 
   const deleteVisitante = useMutation({
     mutationFn: async (userId: string) => {
-      const { data, error } = await supabase.functions.invoke("delete-user", {
-        body: { userId },
+      const { data, error } = await supabase.rpc("admin_delete_user", {
+        p_user_id: userId,
       });
 
-      if (error) throw error;
-      if (data?.error) throw new Error(data.error);
+      if (error) throw new Error(error.message);
+      if (data && typeof data === "object" && "error" in data && (data as { error?: string }).error) {
+        throw new Error(String((data as { error?: string }).error));
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["visitantes"] });
