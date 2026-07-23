@@ -69,3 +69,39 @@ GRANT EXECUTE ON FUNCTION public.admin_delete_user(uuid) TO service_role;
 
 COMMENT ON FUNCTION public.admin_delete_user(uuid) IS
   'Admin-only user deletion that bypasses RLS on CASCADE/SET NULL from auth.users';
+
+-- Hotfix complementar: permite que o cascade do auth.admin.deleteUser
+-- (role supabase_auth_admin) passe no RLS das tabelas public que
+-- referenciam auth.users / profiles. Mantém compatibilidade com a edge
+-- function antiga até o frontend/RPC novo estar deployado.
+DO $policies$
+DECLARE
+  r record;
+BEGIN
+  FOR r IN
+    SELECT DISTINCT c.relname AS table_name
+    FROM pg_constraint con
+    JOIN pg_class c ON c.oid = con.conrelid
+    JOIN pg_namespace n ON n.oid = c.relnamespace
+    JOIN pg_class confc ON confc.oid = con.confrelid
+    JOIN pg_namespace confn ON confn.oid = confc.relnamespace
+    WHERE con.contype = 'f'
+      AND n.nspname = 'public'
+      AND (
+        (confn.nspname = 'auth' AND confc.relname = 'users')
+        OR (confn.nspname = 'public' AND confc.relname = 'profiles')
+      )
+      AND c.relrowsecurity
+  LOOP
+    BEGIN
+      EXECUTE format(
+        'CREATE POLICY supabase_auth_admin_delete_user_cascade ON public.%I FOR ALL TO supabase_auth_admin USING (true) WITH CHECK (true)',
+        r.table_name
+      );
+    EXCEPTION
+      WHEN duplicate_object THEN
+        NULL;
+    END;
+  END LOOP;
+END
+$policies$;
