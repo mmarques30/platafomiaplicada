@@ -69,60 +69,22 @@ Deno.serve(async (req) => {
 
     console.log(`Deletando usuário: ${userId}`)
 
-    // PRE-CLEANUP: deletar registros das tabelas conhecidas que referenciam
-    // o user_id antes de tentar o auth.deleteUser. Algumas tabelas não têm
-    // ON DELETE CASCADE configurado, e o auth.admin.deleteUser falha quando
-    // qualquer FK constraint bloqueia (a mensagem do Supabase é genérica e
-    // não diz qual tabela, o que tornava o erro impossível de diagnosticar).
-    const cleanupTables: string[] = [
-      "objetivos_mentoria",
-      "projetos_mentoria",
-      "formulario_diagnostico",
-      "tarefas_mentoria",
-      "mentoria_sessoes",
-      "contratos_business",
-      "candidaturas_mentoria",
-      "membros_equipe_skills",
-      "diagnostico_skills",
-      "tasks_business",
-      "notas_projeto_business",
-      "links_business",
-      "documentos_business",
-      "user_onboarding_responses",
-      "signup_attempts",
-      "community_reactions",
-      "community_posts",
-      "community_comments",
-      "progresso_videos",
-      "favoritos",
-    ];
-
-    for (const table of cleanupTables) {
-      const { error: cleanupErr } = await supabaseAdmin
-        .from(table)
-        .delete()
-        .eq("user_id", userId);
-      if (cleanupErr) {
-        // Não-bloqueante: log só. Tabela pode não existir nesse projeto
-        // específico ou não ter user_id (silenciamos pra não bloquear).
-        console.warn(`[cleanup ${table}]`, cleanupErr.message);
-      }
-    }
-
-    // Deletar usuário do Auth (profile/roles via CASCADE)
-    const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(userId)
+    // IMPORTANTE: não usar auth.admin.deleteUser aqui.
+    // O cascade do Auth roda como supabase_auth_admin e falha com
+    // "Database error deleting user" quando RLS bloqueia UPDATE/DELETE
+    // nas FKs CASCADE/SET NULL das tabelas public.
+    // admin_delete_user é SECURITY DEFINER e bypassa RLS.
+    const { data: deleteResult, error: deleteError } = await supabaseAdmin.rpc(
+      'admin_delete_user',
+      { p_user_id: userId }
+    )
 
     if (deleteError) {
-      // Retorna detalhes específicos do erro pra admin saber o que bloqueou
       console.error('Erro ao deletar usuário:', deleteError)
-      const detail =
-        (deleteError as any).message ??
-        (deleteError as any).code ??
-        JSON.stringify(deleteError);
-      throw new Error(`Auth delete falhou: ${detail}`);
+      throw new Error(deleteError.message || 'Falha ao deletar usuário')
     }
 
-    console.log('Usuário deletado com sucesso')
+    console.log('Usuário deletado com sucesso', deleteResult)
 
     return new Response(
       JSON.stringify({ success: true, message: 'Usuário deletado com sucesso' }),

@@ -288,33 +288,16 @@ export function useDeleteUser() {
 
   return useMutation({
     mutationFn: async ({ userId }: { userId: string }) => {
-      const { data, error: functionError } = await supabase.functions.invoke("delete-user", {
-        body: { userId },
+      // RPC SECURITY DEFINER: evita "Database error deleting user" do
+      // auth.admin.deleteUser quando o CASCADE/SET NULL esbarra em RLS.
+      const { data, error } = await supabase.rpc("admin_delete_user", {
+        p_user_id: userId,
       });
 
-      if (functionError) {
-        // Extrai a mensagem real do body do response (mesmo padrão do create-user)
-        let realMessage = functionError.message;
-        const resp = (functionError as any)?.context as Response | undefined;
-        if (resp && typeof resp.text === "function") {
-          try {
-            const text = await resp.text();
-            if (text) {
-              try {
-                const json = JSON.parse(text);
-                if (json?.error) realMessage = json.error;
-                else if (json?.message) realMessage = json.message;
-              } catch {
-                realMessage = text.slice(0, 500);
-              }
-            }
-          } catch {
-            /* ignora */
-          }
-        }
-        throw new Error(realMessage);
+      if (error) throw new Error(error.message);
+      if (data && typeof data === "object" && "error" in data && (data as { error?: string }).error) {
+        throw new Error(String((data as { error?: string }).error));
       }
-      if (data?.error) throw new Error(data.error);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-users"] });
