@@ -17,7 +17,6 @@ import { Moon, Sun, Bell, Lock, AlertTriangle, FileText, Smartphone, Download, C
 import { forceFullAppReload } from "@/lib/pwaUpdate";
 import { PageTitle } from "@/components/shared/PageTitle";
 import { PageContainer } from "@/components/shared/PageContainer";
-import { OnboardingProgressCard } from "@/components/configuracoes/OnboardingProgressCard";
 
 export default function Configuracoes() {
   const { user, signOut } = useAuth();
@@ -98,9 +97,6 @@ export default function Configuracoes() {
       />
 
       <div className="space-y-6">
-        {/* Progresso do Perfil */}
-        <OnboardingProgressCard />
-
         <div className="grid gap-6 lg:grid-cols-2 items-start">
         {/* Instalar Aplicativo */}
         <Card>

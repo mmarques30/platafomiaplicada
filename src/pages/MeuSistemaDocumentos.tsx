@@ -572,7 +572,7 @@ export default function MeuSistemaDocumentos() {
           </DialogHeader>
           <ScrollArea className="max-h-[60vh]">
             <div
-              className="prose prose-sm prose-invert max-w-none p-4 prose-invert"
+              className="prose prose-sm max-w-none p-4"
               dangerouslySetInnerHTML={{ __html: sanitizeHtml(viewingReport?.html || "") }}
             />
           </ScrollArea>

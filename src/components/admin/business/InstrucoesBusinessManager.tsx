@@ -189,7 +189,7 @@ function InstrucaoItemAdmin({
             )}
           </div>
           {instrucao.descricao && (
-            <div className="text-xs text-muted-foreground mt-1 prose prose-sm prose-invert max-w-none prose-p:my-1 prose-ul:my-1 prose-li:my-0 prose-invert">
+            <div className="text-xs text-muted-foreground mt-1 prose prose-sm max-w-none prose-p:my-1 prose-ul:my-1 prose-li:my-0">
               <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
                 {instrucao.descricao}
               </ReactMarkdown>
@@ -218,7 +218,7 @@ function InstrucaoItemAdmin({
                         Prompt Sugerido
                       </span>
                     </div>
-                    <div className="text-sm text-status-info dark:text-status-info/40 prose prose-sm prose-invert max-w-none prose-p:my-1 prose-ul:my-1 prose-li:my-0 prose-invert">
+                    <div className="text-sm text-status-info dark:text-status-info/40 prose prose-sm max-w-none prose-p:my-1 prose-ul:my-1 prose-li:my-0">
                       <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
                         {instrucao.prompt_sugerido}
                       </ReactMarkdown>
@@ -234,7 +234,7 @@ function InstrucaoItemAdmin({
                         Dicas
                       </span>
                     </div>
-                    <div className="text-sm text-status-warning dark:text-status-warning/40 prose prose-sm prose-invert max-w-none prose-p:my-1 prose-ul:my-1 prose-li:my-0 prose-invert">
+                    <div className="text-sm text-status-warning dark:text-status-warning/40 prose prose-sm max-w-none prose-p:my-1 prose-ul:my-1 prose-li:my-0">
                       <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
                         {instrucao.dicas}
                       </ReactMarkdown>

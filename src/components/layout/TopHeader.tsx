@@ -143,7 +143,7 @@ export function TopHeader() {
             end
             className={({ isActive }) => cn(
               "text-sm font-medium transition-colors",
-              isActive ? "text-primary font-semibold" : "text-white/60 hover:text-white"
+              isActive ? "text-lime font-semibold" : "text-white/60 hover:text-white"
             )}
           >
             Página Inicial
@@ -157,7 +157,7 @@ export function TopHeader() {
                   variant="ghost" 
                   className={cn(
                     "text-sm font-medium h-auto p-0 transition-colors hover:bg-transparent",
-                    isCursosActive ? "text-primary font-semibold" : "text-white/60 hover:text-white"
+                    isCursosActive ? "text-lime font-semibold" : "text-white/60 hover:text-white"
                   )}
                 >
                   Cursos
@@ -192,7 +192,7 @@ export function TopHeader() {
               type="button"
               data-tour="primeiros-passos"
               onClick={() => window.dispatchEvent(new CustomEvent("abrir-primeiros-passos"))}
-              className="text-sm font-semibold text-primary-foreground bg-primary rounded-full px-3.5 py-1 hover:bg-lime transition-colors"
+              className="text-sm font-semibold text-charcoal bg-lime rounded-full px-3.5 py-1 hover:bg-lime/85 transition-colors"
             >
               Primeiros passos
             </button>
@@ -206,7 +206,7 @@ export function TopHeader() {
                   variant="ghost" 
                   className={cn(
                     "text-sm font-medium h-auto p-0 transition-colors hover:bg-transparent",
-                    isComunicacoesActive ? "text-primary font-semibold" : "text-white/60 hover:text-white"
+                    isComunicacoesActive ? "text-lime font-semibold" : "text-white/60 hover:text-white"
                   )}
                 >
                   Chat AI
@@ -240,7 +240,7 @@ export function TopHeader() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className={`hidden md:flex h-9 w-9 transition-colors ${modoFoco ? 'bg-primary/15 text-primary' : 'text-white/70 hover:text-white hover:bg-white/10'}`}
+                  className={`hidden md:flex h-9 w-9 transition-colors ${modoFoco ? 'bg-lime/20 text-lime' : 'text-white/70 hover:text-white hover:bg-white/10'}`}
                   onClick={toggleFoco}
                 >
                   {modoFoco ? <Minimize2 className="h-5 w-5" strokeWidth={1.5} /> : <Maximize2 className="h-5 w-5" strokeWidth={1.5} />}

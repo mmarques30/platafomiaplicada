@@ -384,7 +384,7 @@ export function MarIAnaChatDrawer({ onClose }: MarIAnaChatDrawerProps) {
               >
                 {message.role === "assistant" ? (
                   <div className="flex items-start gap-1">
-                    <div className="prose prose-xs prose-invert max-w-none text-sm prose-invert">
+                    <div className="prose prose-xs max-w-none text-sm">
                       <ReactMarkdown
                         remarkPlugins={[remarkGfm]}
                         components={{

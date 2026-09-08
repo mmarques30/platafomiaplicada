@@ -151,7 +151,7 @@ export default function SkillsEquipe() {
             {consolidado.insights_ia && (
               <div className="p-4 rounded-lg bg-muted/50">
                 <h4 className="font-medium mb-2">Insights</h4>
-                <div className="prose prose-sm max-w-none prose-invert prose-invert">
+                <div className="prose prose-sm max-w-none">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>
                     {consolidado.insights_ia}
                   </ReactMarkdown>

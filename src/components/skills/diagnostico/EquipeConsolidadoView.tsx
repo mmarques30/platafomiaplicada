@@ -171,7 +171,7 @@ export default function EquipeConsolidadoView({ consolidado }: EquipeConsolidado
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="prose prose-sm max-w-none prose-invert prose-invert">
+            <div className="prose prose-sm max-w-none">
               <ReactMarkdown remarkPlugins={[remarkGfm]}>
                 {consolidado.insights_ia}
               </ReactMarkdown>

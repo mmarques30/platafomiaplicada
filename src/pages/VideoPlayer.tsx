@@ -306,7 +306,7 @@ export default function VideoPlayer() {
                   <TabsContent value="info" className="space-y-4 mt-4">
                     <div>
                       <h3 className="font-semibold mb-2">Descrição</h3>
-                      <div className="prose prose-sm prose-invert max-w-none text-muted-foreground prose-invert">
+                      <div className="prose prose-sm max-w-none text-muted-foreground">
                         <ReactMarkdown remarkPlugins={[remarkGfm]}>
                           {video.descricao || "Sem descrição disponível."}
                         </ReactMarkdown>
