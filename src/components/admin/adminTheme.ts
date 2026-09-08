@@ -26,10 +26,8 @@ export const adminTheme = {
   cardDescription: "text-sm text-muted-foreground",
 
   // Tabs em pill estilo LP (rounded-full + brand-strong active)
-  tabsList:
-    "bg-brand-cream-soft border border-brand-hairline rounded-full p-1 h-auto inline-flex flex-wrap gap-1",
-  tabsTrigger:
-    "text-xs font-medium rounded-full px-4 py-1.5 gap-1.5 text-muted-foreground transition-colors data-[state=active]:bg-brand-strong data-[state=active]:text-brand-strong-foreground",
+  tabsList: "flex-wrap",
+  tabsTrigger: "gap-1.5 text-xs",
   tabsIcon: "h-3.5 w-3.5",
   tabsContent: "mt-6",
 

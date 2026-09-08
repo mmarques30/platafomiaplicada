@@ -1,3 +1,6 @@
+import claudeLogo from "@/assets/logos/claude-logo.png";
+import chatgptLogo from "@/assets/logos/chatgpt-logo.png";
+
 // Categorias padrão para Métodos de Aplicação (mantido para compatibilidade)
 export const METODOS_CATEGORIAS = [
   "Produtividade",
@@ -40,6 +43,18 @@ export function normalizarFerramenta(valor: string | null | undefined): string |
   if (v.includes("perplexity")) return "Perplexity";
   return null;
 }
+
+/**
+ * Logo e site oficial de cada ferramenta do arsenal. O ToolLogo usa o logo
+ * local quando existe e, na falta dele, o favicon do site.
+ */
+export const FERRAMENTA_INFO: Record<string, { logo?: string; link: string }> = {
+  Claude: { logo: claudeLogo, link: "https://claude.ai" },
+  ChatGPT: { logo: chatgptLogo, link: "https://chatgpt.com" },
+  Gemini: { link: "https://gemini.google.com" },
+  Copilot: { link: "https://copilot.microsoft.com" },
+  Perplexity: { link: "https://www.perplexity.ai" },
+};
 
 export const ARSENAL_FERRAMENTAS = [
   { value: "Claude", label: "Claude", icon: "🟠", color: "bg-orange-500/10 text-orange-700 border-orange-500/30" },

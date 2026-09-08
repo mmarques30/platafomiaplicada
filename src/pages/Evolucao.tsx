@@ -17,8 +17,7 @@ import { PageTitle } from "@/components/shared/PageTitle";
 import { PageContainer } from "@/components/shared/PageContainer";
 import { PageSkeleton } from "@/components/shared/PageSkeleton";
 
-const TAB_CLASS =
-  "rounded-full px-4 py-2 text-sm font-medium transition-colors data-[state=active]:bg-chrome data-[state=active]:text-chrome-foreground data-[state=active]:shadow-sm sm:px-5";
+const TAB_CLASS = "sm:px-5";
 
 /**
  * "Meu progresso" — visão única da Academy. Ex-Builder e ex-Skills (hoje

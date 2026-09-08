@@ -9,9 +9,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ToolLogo } from "@/components/shared/ToolLogo";
 import { FavoriteButton } from "@/components/shared/FavoriteButton";
-import { useMetodos } from "@/hooks/useFerramentas";
+import { useMetodos, useFerramentasIA } from "@/hooks/useFerramentas";
 import { Search, Zap, BookOpen, FileText, ExternalLink, ArrowLeft, Users, Sparkles, Copy, Check } from "lucide-react";
-import { ARSENAL_FERRAMENTAS, normalizarFerramenta, ARSENAL_NIVEIS, ARSENAL_TIPOS } from "@/lib/metodosCategories";
+import { ARSENAL_FERRAMENTAS, FERRAMENTA_INFO, normalizarFerramenta, ARSENAL_NIVEIS, ARSENAL_TIPOS } from "@/lib/metodosCategories";
 import { PageTitle } from "@/components/shared/PageTitle";
 import { MateriaisBibliotecaTab } from "@/components/biblioteca/MateriaisBibliotecaTab";
 import { toast } from "sonner";
@@ -21,6 +21,19 @@ export default function MetodosAplicar() {
   const activeTab = searchParams.get("tab") || "skills";
   
   const { data: metodos, isLoading } = useMetodos();
+  const { data: ferramentasIA } = useFerramentasIA();
+
+  // Logo da ferramenta: primeiro o cadastro da Biblioteca de Ferramentas
+  // (logo_url / link), depois o logo local ou o favicon do site oficial.
+  const logoProps = (nome: string) => {
+    const alvo = normalizarFerramenta(nome) ?? nome;
+    const daBase = (ferramentasIA || []).find((f: any) => normalizarFerramenta(f.nome) === alvo);
+    const info = FERRAMENTA_INFO[alvo];
+    return {
+      logoUrl: daBase?.logo_url || info?.logo || null,
+      linkFerramenta: daBase?.link_ferramenta || info?.link || null,
+    };
+  };
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFerramenta, setSelectedFerramenta] = useState<string | null>(null);
   const [selectedBibliotecaTipo, setSelectedBibliotecaTipo] = useState<string | null>(null);
@@ -118,7 +131,7 @@ export default function MetodosAplicar() {
   };
 
   return (
-    <div className="p-4 md:p-6 space-y-4 md:space-y-6 min-w-0 overflow-hidden">
+    <div className="cards-light p-4 md:p-6 space-y-4 md:space-y-6 min-w-0 overflow-hidden">
       <div className="mb-6 md:mb-8">
         <PageTitle primary="Métodos" secondary="práticos" />
         <p className="text-sm md:text-base text-muted-foreground mt-1">
@@ -127,24 +140,24 @@ export default function MetodosAplicar() {
       </div>
 
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-        <TabsList className="w-full md:w-auto grid grid-cols-3 md:inline-flex gap-0.5 sm:gap-1 bg-primary/20 dark:bg-primary/30 p-1 sm:p-1.5 rounded-lg sm:rounded-xl border border-primary/30 dark:border-primary/40 mb-6">
+        <TabsList className="grid w-full grid-cols-3 md:inline-flex md:w-auto mb-6">
           <TabsTrigger 
             value="skills"
-            className="flex items-center justify-center gap-1 sm:gap-2 text-foreground/70 data-[state=active]:bg-brand-strong data-[state=active]:text-brand-strong-foreground data-[state=active]:shadow-lg rounded-md sm:rounded-lg px-2 sm:px-4 py-1.5 sm:py-2.5 transition-all duration-200 text-xs sm:text-sm"
+            className="gap-1 sm:gap-2 text-xs sm:text-sm"
           >
             <Zap className="h-4 w-4" />
             Skills
           </TabsTrigger>
           <TabsTrigger 
             value="biblioteca"
-            className="flex items-center justify-center gap-1 sm:gap-2 text-foreground/70 data-[state=active]:bg-brand-strong data-[state=active]:text-brand-strong-foreground data-[state=active]:shadow-lg rounded-md sm:rounded-lg px-2 sm:px-4 py-1.5 sm:py-2.5 transition-all duration-200 text-xs sm:text-sm"
+            className="gap-1 sm:gap-2 text-xs sm:text-sm"
           >
             <BookOpen className="h-4 w-4" />
             Biblioteca
           </TabsTrigger>
           <TabsTrigger 
             value="materiais"
-            className="flex items-center justify-center gap-1 sm:gap-2 text-foreground/70 data-[state=active]:bg-brand-strong data-[state=active]:text-brand-strong-foreground data-[state=active]:shadow-lg rounded-md sm:rounded-lg px-2 sm:px-4 py-1.5 sm:py-2.5 transition-all duration-200 text-xs sm:text-sm"
+            className="gap-1 sm:gap-2 text-xs sm:text-sm"
           >
             <Users className="h-4 w-4" />
             Materiais
@@ -262,9 +275,7 @@ export default function MetodosAplicar() {
                       className="p-5 cursor-pointer transition-colors border hover:border-primary/50 flex flex-col items-center text-center gap-3"
                       onClick={() => setSelectedFerramenta(ferramenta.value)}
                     >
-                      <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-muted">
-                        <ToolLogo toolName={ferramenta.label} size="md" />
-                      </div>
+                      <ToolLogo toolName={ferramenta.label} {...logoProps(ferramenta.value)} size="lg" className="!bg-transparent" />
                       <div>
                         <h3 className="font-semibold text-sm">{ferramenta.label}</h3>
                         <p className="text-xs text-muted-foreground mt-0.5">
@@ -300,7 +311,7 @@ export default function MetodosAplicar() {
                         <div className="flex items-center gap-1.5 flex-wrap">
                           {normalizarFerramenta(skill.ferramenta) ? (
                             <Badge variant="outline" className="gap-1.5 text-xs">
-                              <ToolLogo toolName={normalizarFerramenta(skill.ferramenta)!} size="sm" />
+                              <ToolLogo toolName={normalizarFerramenta(skill.ferramenta)!} {...logoProps(skill.ferramenta)} size="sm" className="!h-5 !w-5 !p-0" />
                               {normalizarFerramenta(skill.ferramenta)}
                             </Badge>
                           ) : (

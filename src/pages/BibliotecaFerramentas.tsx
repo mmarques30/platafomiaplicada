@@ -69,7 +69,7 @@ export default function BibliotecaFerramentas() {
   }, [searchTerm, filtroCategoria, filtroPreco, filtroValeAPena]);
 
   return (
-    <PageContainer>
+    <PageContainer className="cards-light">
       {/* Cabeçalho */}
       <PageTitle primary="Biblioteca" secondary="de ferramentas" eyebrow="Recursos" />
 

@@ -242,7 +242,7 @@ export default function TrilhaDetalhes() {
   }
 
   return (
-    <PageContainer>
+    <PageContainer className="cards-light">
       <Link to="/trilhas">
         <Button variant="ghost" className="mb-4">
           <ArrowLeft className="h-4 w-4 mr-2" />
@@ -376,16 +376,16 @@ export default function TrilhaDetalhes() {
                 <CollapsibleContent>
                   <CardContent className="p-4 md:p-6">
                     <Tabs defaultValue="descricao" className="w-full">
-                      <TabsList className="w-full justify-start bg-transparent border-b border-border rounded-none p-0 h-auto mb-4">
+                      <TabsList className="w-fit mb-4">
                         <TabsTrigger 
                           value="descricao"
-                          className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary px-4 py-2"
+                         
                         >
                           Descrição
                         </TabsTrigger>
                         <TabsTrigger 
                           value="comentarios"
-                          className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary px-4 py-2"
+                         
                         >
                           Comentários
                         </TabsTrigger>

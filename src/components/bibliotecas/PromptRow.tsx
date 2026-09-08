@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { FavoriteButton } from "@/components/shared/FavoriteButton";
+import { splitTitulo } from "./PromptCard";
 import { 
   ChevronRight, 
   TrendingUp, 
@@ -28,10 +28,6 @@ interface PromptRowProps {
     nivel_complexidade: string | null;
   };
   onClick: () => void;
-  /** Modo seleção (para exportar em lote) */
-  selectable?: boolean;
-  selected?: boolean;
-  onToggleSelect?: () => void;
   /** Cópia rápida do prompt direto na linha, sem abrir o modal */
   onQuickCopy?: () => void;
   justCopied?: boolean;
@@ -70,25 +66,13 @@ const getNivelColor = (nivel: string | null) => {
   }
 };
 
-export function PromptRow({ prompt, onClick, selectable, selected, onToggleSelect, onQuickCopy, justCopied }: PromptRowProps) {
+export function PromptRow({ prompt, onClick, onQuickCopy, justCopied }: PromptRowProps) {
+  const { eyebrow, titulo } = splitTitulo(prompt.titulo);
   return (
     <div
       className="flex items-center gap-4 p-4 border-b last:border-b-0 hover:bg-accent/50 transition-colors cursor-pointer group"
       onClick={onClick}
     >
-      {/* Checkbox de seleção (modo exportar em lote) */}
-      {selectable && (
-        <div
-          className="flex-shrink-0"
-          onClick={(e) => {
-            e.stopPropagation();
-            onToggleSelect?.();
-          }}
-        >
-          <Checkbox checked={selected} aria-label={`Selecionar ${prompt.titulo}`} />
-        </div>
-      )}
-
       {/* Ícone da Categoria */}
       <div className={`w-12 h-12 rounded-lg ${getGradientCategoria(prompt.categoria)} flex items-center justify-center flex-shrink-0 shadow-sm`}>
         {(() => {
@@ -99,7 +83,10 @@ export function PromptRow({ prompt, onClick, selectable, selected, onToggleSelec
 
       {/* Título e Descrição */}
       <div className="flex-1 min-w-0">
-        <h3 className="font-semibold text-base truncate mb-1">{prompt.titulo}</h3>
+        {eyebrow && (
+          <span className="block text-[11px] font-medium uppercase tracking-[0.12em] text-primary">{eyebrow}</span>
+        )}
+        <h3 className="font-semibold text-base truncate mb-0.5">{titulo}</h3>
         <p className="text-sm text-muted-foreground truncate">{prompt.descricao}</p>
       </div>
 

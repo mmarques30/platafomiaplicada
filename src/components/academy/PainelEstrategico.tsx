@@ -145,20 +145,20 @@ export function PainelEstrategico() {
 
       {/* Tabs */}
       <Tabs defaultValue="tarefas" className="w-full">
-        <TabsList className="w-full md:w-auto grid grid-cols-4 md:inline-flex gap-0.5 sm:gap-1 bg-primary/20 dark:bg-primary/30 p-1 sm:p-1.5 rounded-lg sm:rounded-xl border border-primary/30 dark:border-primary/40">
-          <TabsTrigger value="objetivos" className="flex items-center justify-center gap-1 sm:gap-2 text-foreground/70 data-[state=active]:bg-brand-strong data-[state=active]:text-brand-strong-foreground data-[state=active]:shadow-lg rounded-md sm:rounded-lg px-2 sm:px-4 py-1.5 sm:py-2.5 transition-all duration-200 text-xs sm:text-sm">
+        <TabsList className="grid w-full grid-cols-4 md:inline-flex md:w-auto">
+          <TabsTrigger value="objetivos" className="gap-1 sm:gap-2 text-xs sm:text-sm">
             <Target className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             <span className="hidden sm:inline">Objetivos</span>
           </TabsTrigger>
-          <TabsTrigger value="tarefas" className="flex items-center justify-center gap-1 sm:gap-2 text-foreground/70 data-[state=active]:bg-brand-strong data-[state=active]:text-brand-strong-foreground data-[state=active]:shadow-lg rounded-md sm:rounded-lg px-2 sm:px-4 py-1.5 sm:py-2.5 transition-all duration-200 text-xs sm:text-sm">
+          <TabsTrigger value="tarefas" className="gap-1 sm:gap-2 text-xs sm:text-sm">
             <ListTodo className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             <span className="hidden sm:inline">Minhas Tarefas</span>
           </TabsTrigger>
-          <TabsTrigger value="roadmap" className="flex items-center justify-center gap-1 sm:gap-2 text-foreground/70 data-[state=active]:bg-brand-strong data-[state=active]:text-brand-strong-foreground data-[state=active]:shadow-lg rounded-md sm:rounded-lg px-2 sm:px-4 py-1.5 sm:py-2.5 transition-all duration-200 text-xs sm:text-sm">
+          <TabsTrigger value="roadmap" className="gap-1 sm:gap-2 text-xs sm:text-sm">
             <Map className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             <span className="hidden sm:inline">Roadmap</span>
           </TabsTrigger>
-          <TabsTrigger value="duvidas" className="flex items-center justify-center gap-1 sm:gap-2 text-foreground/70 data-[state=active]:bg-brand-strong data-[state=active]:text-brand-strong-foreground data-[state=active]:shadow-lg rounded-md sm:rounded-lg px-2 sm:px-4 py-1.5 sm:py-2.5 transition-all duration-200 text-xs sm:text-sm">
+          <TabsTrigger value="duvidas" className="gap-1 sm:gap-2 text-xs sm:text-sm">
             <MessageCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             <span className="hidden sm:inline">Dúvidas</span>
           </TabsTrigger>

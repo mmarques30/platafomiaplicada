@@ -196,52 +196,52 @@ export default function MentoriaBusinessPage() {
 
       {selectedUserId && (
         <Tabs defaultValue="diagnostico" className="space-y-4">
-          <TabsList className="bg-muted/40 border-0 rounded-lg p-1 h-auto flex-wrap gap-1">
-            <TabsTrigger value="diagnostico" className="text-xs rounded-md px-3 py-1.5 gap-1.5 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+          <TabsList className="flex-wrap">
+            <TabsTrigger value="diagnostico" className="text-xs gap-1.5">
               <Stethoscope className="h-3.5 w-3.5" />
               Diagnóstico
             </TabsTrigger>
-            <TabsTrigger value="contrato" className="text-xs rounded-md px-3 py-1.5 gap-1.5 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+            <TabsTrigger value="contrato" className="text-xs gap-1.5">
               <ClipboardList className="h-3.5 w-3.5" />
               Contrato
             </TabsTrigger>
-            <TabsTrigger value="etapas" className="text-xs rounded-md px-3 py-1.5 gap-1.5 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+            <TabsTrigger value="etapas" className="text-xs gap-1.5">
               <Route className="h-3.5 w-3.5" />
               Etapas
             </TabsTrigger>
-            <TabsTrigger value="sessoes" className="text-xs rounded-md px-3 py-1.5 gap-1.5 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+            <TabsTrigger value="sessoes" className="text-xs gap-1.5">
               <Calendar className="h-3.5 w-3.5" />
               Sessões
             </TabsTrigger>
-            <TabsTrigger value="entregas" className="text-xs rounded-md px-3 py-1.5 gap-1.5 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+            <TabsTrigger value="entregas" className="text-xs gap-1.5">
               <FolderKanban className="h-3.5 w-3.5" />
               Entregas
             </TabsTrigger>
-            <TabsTrigger value="processos" className="text-xs rounded-md px-3 py-1.5 gap-1.5 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+            <TabsTrigger value="processos" className="text-xs gap-1.5">
               <FileText className="h-3.5 w-3.5" />
               Processos
             </TabsTrigger>
-            <TabsTrigger value="telas" className="text-xs rounded-md px-3 py-1.5 gap-1.5 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+            <TabsTrigger value="telas" className="text-xs gap-1.5">
               <Monitor className="h-3.5 w-3.5" />
               Telas
             </TabsTrigger>
-            <TabsTrigger value="videos" className="text-xs rounded-md px-3 py-1.5 gap-1.5 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+            <TabsTrigger value="videos" className="text-xs gap-1.5">
               <Video className="h-3.5 w-3.5" />
               Vídeos
             </TabsTrigger>
-            <TabsTrigger value="instrucoes" className="text-xs rounded-md px-3 py-1.5 gap-1.5 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+            <TabsTrigger value="instrucoes" className="text-xs gap-1.5">
               <ListChecks className="h-3.5 w-3.5" />
               Instruções
             </TabsTrigger>
-            <TabsTrigger value="tasks" className="text-xs rounded-md px-3 py-1.5 gap-1.5 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+            <TabsTrigger value="tasks" className="text-xs gap-1.5">
               <ClipboardCheck className="h-3.5 w-3.5" />
               Tasks
             </TabsTrigger>
-            <TabsTrigger value="documentos" className="text-xs rounded-md px-3 py-1.5 gap-1.5 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+            <TabsTrigger value="documentos" className="text-xs gap-1.5">
               <FolderOpen className="h-3.5 w-3.5" />
               Documentos
             </TabsTrigger>
-            <TabsTrigger value="reports" className="text-xs rounded-md px-3 py-1.5 gap-1.5 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+            <TabsTrigger value="reports" className="text-xs gap-1.5">
               <FileText className="h-3.5 w-3.5" />
               Reports
             </TabsTrigger>

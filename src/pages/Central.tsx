@@ -1,488 +1,229 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
-import { motion } from "framer-motion";
-import { Newspaper, Globe, Lightbulb, FileText, ExternalLink, ImageIcon, Users } from "lucide-react";
+import { Newspaper, Globe, Lightbulb, FileText, ExternalLink, ImageIcon, Users, LayoutGrid } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useConteudosDashboard, TipoConteudo } from "@/hooks/useConteudosDashboard";
+import { useConteudosDashboard, TipoConteudo, ConteudoDashboard } from "@/hooks/useConteudosDashboard";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { PageTitle } from "@/components/shared/PageTitle";
+import { PageContainer } from "@/components/shared/PageContainer";
+import { ConteudoCard } from "@/components/dashboard/ConteudoCard";
 import { CriadoresComunidadeTab } from "@/components/comunidade/CriadoresComunidadeTab";
-import logo3d from "@/assets/logo-3d.png";
 
 type TabValue = TipoConteudo | "todos" | "criadores";
 
 const tabs = [
-  { value: "todos" as const, label: "Todos", icon: FileText },
+  { value: "todos" as const, label: "Todos", icon: LayoutGrid },
   { value: "noticia" as TipoConteudo, label: "Notícias IA", icon: Globe },
-  { value: "dica" as TipoConteudo, label: "Dicas Práticas", icon: Lightbulb },
+  { value: "dica" as TipoConteudo, label: "Dicas práticas", icon: Lightbulb },
   { value: "newsletter" as TipoConteudo, label: "Newsletter", icon: Newspaper },
   { value: "criadores" as const, label: "Criadores", icon: Users },
 ];
 
-const tipoIcons = {
-  newsletter: Newspaper,
-  noticia: Globe,
-  dica: Lightbulb,
+const TIPO_LABEL: Record<string, string> = {
+  newsletter: "Newsletter",
+  noticia: "Notícia",
+  dica: "Dica prática",
 };
 
-const tipoBadgeColors = {
-  newsletter: "bg-aplicada-green-700/10 text-aplicada-green-700 border-aplicada-green-700/30",
-  noticia: "bg-aplicada-green-600/10 text-aplicada-green-600 border-aplicada-green-600/30",
-  dica: "bg-aplicada-green-800/10 text-aplicada-green-800 border-aplicada-green-800/30",
-};
+const validTabs: TabValue[] = ["todos", "noticia", "dica", "newsletter", "criadores"];
+
+function GradeConteudos({
+  itens,
+  isLoading,
+  vazio,
+  onSelect,
+}: {
+  itens: ConteudoDashboard[];
+  isLoading: boolean;
+  vazio: string;
+  onSelect: (c: ConteudoDashboard) => void;
+}) {
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+          <Skeleton key={i} className="h-[240px] rounded-2xl" />
+        ))}
+      </div>
+    );
+  }
+  if (itens.length === 0) {
+    return (
+      <div className="rounded-2xl border border-dashed border-border py-16 text-center">
+        <p className="text-sm text-muted-foreground">{vazio}</p>
+      </div>
+    );
+  }
+  return (
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      {itens.map((c) => (
+        <ConteudoCard key={c.id} conteudo={c} onClick={() => onSelect(c)} />
+      ))}
+    </div>
+  );
+}
 
 export default function Central() {
-  const [searchParams] = useSearchParams();
-  const tabFromUrl = searchParams.get('tab') as TabValue | null;
-  
-  const validTabs: TabValue[] = ["todos", "noticia", "dica", "newsletter", "criadores"];
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tabFromUrl = searchParams.get("tab") as TabValue | null;
   const [activeTab, setActiveTab] = useState<TabValue>(
     tabFromUrl && validTabs.includes(tabFromUrl) ? tabFromUrl : "todos"
   );
+  const [selectedConteudo, setSelectedConteudo] = useState<ConteudoDashboard | null>(null);
 
   useEffect(() => {
-    if (tabFromUrl && validTabs.includes(tabFromUrl)) {
-      setActiveTab(tabFromUrl);
-    }
+    if (tabFromUrl && validTabs.includes(tabFromUrl)) setActiveTab(tabFromUrl);
   }, [tabFromUrl]);
-  const [selectedConteudo, setSelectedConteudo] = useState<any>(null);
-  
+
+  const handleTabChange = (v: string) => {
+    setActiveTab(v as TabValue);
+    if (v === "todos") searchParams.delete("tab");
+    else searchParams.set("tab", v);
+    setSearchParams(searchParams, { replace: true });
+  };
+
   const { data: newsletters, isLoading: loadingNewsletter } = useConteudosDashboard("newsletter");
   const { data: noticias, isLoading: loadingNoticia } = useConteudosDashboard("noticia");
   const { data: dicas, isLoading: loadingDica } = useConteudosDashboard("dica");
 
   const isLoading = loadingNewsletter || loadingNoticia || loadingDica;
 
-  const allConteudos = [
-    ...(newsletters || []),
-    ...(noticias || []),
-    ...(dicas || []),
-  ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-
-  const filteredConteudos = activeTab === "todos" 
-    ? allConteudos 
-    : allConteudos.filter(c => c.tipo === activeTab);
+  const allConteudos = useMemo(
+    () =>
+      [...(newsletters || []), ...(noticias || []), ...(dicas || [])].sort(
+        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      ),
+    [newsletters, noticias, dicas]
+  );
 
   return (
-    <div className="min-h-screen bg-background relative overflow-hidden flex flex-col">
-      {/* Background Logo - Decorativo Lateral */}
-      <div className="absolute -right-20 -bottom-20 pointer-events-none">
-        <img 
-          src={logo3d} 
-          alt="" 
-          className="w-[300px] h-[300px] md:w-[400px] md:h-[400px] object-contain opacity-[0.05] select-none"
-        />
-      </div>
+    <PageContainer>
+      <PageTitle primary="Explorar" secondary="conteúdos" />
 
-      <main className="w-full space-y-6 px-4 pt-6 pb-8 md:space-y-8 md:px-8 md:pt-6 md:pb-10 lg:space-y-10 lg:px-12 lg:pt-8 lg:pb-12 relative z-10 flex-1 flex flex-col">
-        <PageTitle
-          primary="Explorar"
-          secondary="conteúdos"
-          eyebrow="Explorar"
-          description="Fique por dentro das novidades e aplique hoje."
-        />
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
+        <TabsList className="flex w-full flex-wrap justify-start sm:inline-flex sm:w-auto">
+          {tabs.map((tab) => (
+            <TabsTrigger key={tab.value} value={tab.value} className="gap-1.5 px-3 text-xs sm:px-4 sm:text-sm">
+              <tab.icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              {tab.label}
+            </TabsTrigger>
+          ))}
+        </TabsList>
 
-        {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as TabValue)} className="flex-1 flex flex-col">
-          <TabsList className="inline-flex w-fit gap-0.5 sm:gap-1 bg-primary/20 dark:bg-primary/30 p-1 sm:p-1.5 rounded-lg sm:rounded-xl border border-primary/30 dark:border-primary/40">
-            {tabs.map((tab) => (
-              <TabsTrigger
-                key={tab.value}
-                value={tab.value}
-                className="flex items-center justify-center gap-1 sm:gap-2 text-foreground/70 data-[state=active]:bg-brand-strong data-[state=active]:text-brand-strong-foreground data-[state=active]:shadow-lg rounded-md sm:rounded-lg px-2 sm:px-4 py-1.5 sm:py-2.5 transition-all duration-200 text-xs sm:text-sm"
-              >
-                <tab.icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                <span className="hidden sm:inline">{tab.label}</span>
-              </TabsTrigger>
-            ))}
-          </TabsList>
+        <TabsContent value="todos" className="mt-6">
+          <GradeConteudos
+            itens={allConteudos}
+            isLoading={isLoading}
+            vazio="Nenhum conteúdo disponível"
+            onSelect={setSelectedConteudo}
+          />
+        </TabsContent>
+        <TabsContent value="noticia" className="mt-6">
+          <GradeConteudos
+            itens={noticias || []}
+            isLoading={loadingNoticia}
+            vazio="Nenhuma notícia disponível"
+            onSelect={setSelectedConteudo}
+          />
+        </TabsContent>
+        <TabsContent value="dica" className="mt-6">
+          <GradeConteudos
+            itens={dicas || []}
+            isLoading={loadingDica}
+            vazio="Nenhuma dica disponível"
+            onSelect={setSelectedConteudo}
+          />
+        </TabsContent>
+        <TabsContent value="newsletter" className="mt-6">
+          <GradeConteudos
+            itens={newsletters || []}
+            isLoading={loadingNewsletter}
+            vazio="Nenhuma newsletter disponível"
+            onSelect={setSelectedConteudo}
+          />
+        </TabsContent>
+        <TabsContent value="criadores" className="mt-6">
+          <CriadoresComunidadeTab />
+        </TabsContent>
+      </Tabs>
 
-          {/* Tab Criadores */}
-          <TabsContent value="criadores" className="mt-6 flex-1">
-            <CriadoresComunidadeTab />
-          </TabsContent>
+      {/* Modal de detalhes */}
+      <Dialog open={!!selectedConteudo} onOpenChange={() => setSelectedConteudo(null)}>
+        <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto">
+          {selectedConteudo && (
+            <div className="space-y-4">
+              {selectedConteudo.imagem_url && (
+                <div className="aspect-video w-full overflow-hidden rounded-xl bg-muted">
+                  <img src={selectedConteudo.imagem_url} alt={selectedConteudo.titulo} className="h-full w-full object-cover" />
+                </div>
+              )}
 
-          {/* Tabs de Conteúdo - Todos, Notícias, Dicas, Newsletter */}
-          <TabsContent value="todos" className="mt-6 flex-1">
-            {isLoading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-                {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
-                  <Skeleton key={i} className="h-72 rounded-xl" />
-                ))}
+              <div>
+                <div className="mb-2 flex items-center gap-2">
+                  <Badge variant="outline">{TIPO_LABEL[selectedConteudo.tipo] ?? selectedConteudo.tipo}</Badge>
+                  <span className="text-sm text-muted-foreground">
+                    {new Date(selectedConteudo.created_at).toLocaleDateString("pt-BR")}
+                  </span>
+                </div>
+                <h2 className="font-serif-display text-2xl text-foreground md:text-3xl">{selectedConteudo.titulo}</h2>
+                {selectedConteudo.resumo && <p className="mt-2 text-muted-foreground">{selectedConteudo.resumo}</p>}
               </div>
-            ) : allConteudos.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-                {allConteudos.map((conteudo) => {
-                  const TipoIcon = tipoIcons[conteudo.tipo as keyof typeof tipoIcons];
-                  return (
-                    <motion.div
-                      key={conteudo.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      whileHover={{ y: -4 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <Card 
-                        className="h-full cursor-pointer hover:shadow-lg transition-all border border-border hover:border-aplicada-green-700/40 overflow-hidden group"
-                        onClick={() => setSelectedConteudo(conteudo)}
-                      >
-                        {conteudo.imagem_url ? (
-                          <div className="aspect-video w-full overflow-hidden bg-muted">
-                            <img 
-                              src={conteudo.imagem_url} 
-                              alt={conteudo.titulo}
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                            />
-                          </div>
-                        ) : (
-                          <div className="aspect-video w-full bg-gradient-to-br from-primary/20 via-primary/10 to-background flex items-center justify-center">
-                            <img src={logo3d} alt="" className="w-20 h-20 opacity-20" />
-                          </div>
-                        )}
 
-                        <CardHeader className="pb-2">
-                          <div className="flex items-center justify-between gap-2 mb-2">
-                            <Badge variant="outline" className={tipoBadgeColors[conteudo.tipo as keyof typeof tipoBadgeColors]}>
-                              {conteudo.tipo === 'newsletter' ? 'Newsletter' : 
-                               conteudo.tipo === 'noticia' ? 'Notícia' : 'Dica'}
-                            </Badge>
-                            {conteudo.destaque && (
-                              <Badge className="bg-primary text-primary-foreground">Destaque</Badge>
-                            )}
-                          </div>
-                          <CardTitle className="text-lg line-clamp-2 group-hover:text-aplicada-green-600 transition-colors">
-                            {conteudo.titulo}
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <p className="text-sm text-muted-foreground line-clamp-3">
-                            {conteudo.resumo}
-                          </p>
-                          <div className="flex items-center gap-2 mt-4 text-xs text-muted-foreground">
-                            <span>{new Date(conteudo.created_at).toLocaleDateString('pt-BR')}</span>
-                            {conteudo.link_externo && (
-                              <ExternalLink className="w-3 h-3 text-aplicada-green-600" />
-                            )}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </motion.div>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="text-center py-12">
-                <img src={logo3d} alt="" className="w-24 h-24 mx-auto opacity-20 mb-4" />
-                <p className="text-muted-foreground">Nenhum conteúdo disponível</p>
-              </div>
-            )}
-          </TabsContent>
+              {selectedConteudo.conteudo && (
+                <div
+                  className="prose prose-sm max-w-none"
+                  style={{
+                    fontSize: (selectedConteudo as any).estilo_texto?.fontSize || 16,
+                    lineHeight: (selectedConteudo as any).estilo_texto?.lineHeight || 1.5,
+                    fontWeight: (selectedConteudo as any).estilo_texto?.fontWeight || "normal",
+                    textAlign: (selectedConteudo as any).estilo_texto?.textAlign || "left",
+                  }}
+                >
+                  <p className="whitespace-pre-wrap">{selectedConteudo.conteudo}</p>
+                </div>
+              )}
 
-          <TabsContent value="noticia" className="mt-6 flex-1">
-            {loadingNoticia ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-                {[1, 2, 3, 4].map(i => (
-                  <Skeleton key={i} className="h-72 rounded-xl" />
-                ))}
-              </div>
-            ) : (noticias || []).length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-                {(noticias || []).map((conteudo) => (
-                  <motion.div
-                    key={conteudo.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    whileHover={{ y: -4 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <Card 
-                      className="h-full cursor-pointer hover:shadow-lg transition-all border border-border hover:border-aplicada-green-700/40 overflow-hidden group"
-                      onClick={() => setSelectedConteudo(conteudo)}
-                    >
-                      {conteudo.imagem_url ? (
-                        <div className="aspect-video w-full overflow-hidden bg-muted">
-                          <img 
-                            src={conteudo.imagem_url} 
-                            alt={conteudo.titulo}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          />
-                        </div>
-                      ) : (
-                        <div className="aspect-video w-full bg-gradient-to-br from-primary/20 via-primary/10 to-background flex items-center justify-center">
-                          <img src={logo3d} alt="" className="w-20 h-20 opacity-20" />
-                        </div>
-                      )}
-
-                      <CardHeader className="pb-2">
-                        <div className="flex items-center justify-between gap-2 mb-2">
-                          <Badge variant="outline" className={tipoBadgeColors[conteudo.tipo as keyof typeof tipoBadgeColors]}>
-                            Notícia
-                          </Badge>
-                          {conteudo.destaque && (
-                            <Badge className="bg-primary text-primary-foreground">Destaque</Badge>
-                          )}
-                        </div>
-                        <CardTitle className="text-lg line-clamp-2 group-hover:text-aplicada-green-600 transition-colors">
-                          {conteudo.titulo}
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-sm text-muted-foreground line-clamp-3">
-                          {conteudo.resumo}
-                        </p>
-                        <div className="flex items-center gap-2 mt-4 text-xs text-muted-foreground">
-                          <span>{new Date(conteudo.created_at).toLocaleDateString('pt-BR')}</span>
-                          {conteudo.link_externo && (
-                            <ExternalLink className="w-3 h-3 text-aplicada-green-600" />
-                          )}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-12">
-                <img src={logo3d} alt="" className="w-24 h-24 mx-auto opacity-20 mb-4" />
-                <p className="text-muted-foreground">Nenhuma notícia disponível</p>
-              </div>
-            )}
-          </TabsContent>
-
-          <TabsContent value="dica" className="mt-6 flex-1">
-            {loadingDica ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-                {[1, 2, 3, 4].map(i => (
-                  <Skeleton key={i} className="h-72 rounded-xl" />
-                ))}
-              </div>
-            ) : (dicas || []).length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-                {(dicas || []).map((conteudo) => (
-                  <motion.div
-                    key={conteudo.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    whileHover={{ y: -4 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <Card 
-                      className="h-full cursor-pointer hover:shadow-lg transition-all border border-border hover:border-aplicada-green-700/40 overflow-hidden group"
-                      onClick={() => setSelectedConteudo(conteudo)}
-                    >
-                      {conteudo.imagem_url ? (
-                        <div className="aspect-video w-full overflow-hidden bg-muted">
-                          <img 
-                            src={conteudo.imagem_url} 
-                            alt={conteudo.titulo}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          />
-                        </div>
-                      ) : (
-                        <div className="aspect-video w-full bg-gradient-to-br from-primary/20 via-primary/10 to-background flex items-center justify-center">
-                          <img src={logo3d} alt="" className="w-20 h-20 opacity-20" />
-                        </div>
-                      )}
-
-                      <CardHeader className="pb-2">
-                        <div className="flex items-center justify-between gap-2 mb-2">
-                          <Badge variant="outline" className={tipoBadgeColors[conteudo.tipo as keyof typeof tipoBadgeColors]}>
-                            Dica
-                          </Badge>
-                          {conteudo.destaque && (
-                            <Badge className="bg-primary text-primary-foreground">Destaque</Badge>
-                          )}
-                        </div>
-                        <CardTitle className="text-lg line-clamp-2 group-hover:text-aplicada-green-600 transition-colors">
-                          {conteudo.titulo}
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-sm text-muted-foreground line-clamp-3">
-                          {conteudo.resumo}
-                        </p>
-                        <div className="flex items-center gap-2 mt-4 text-xs text-muted-foreground">
-                          <span>{new Date(conteudo.created_at).toLocaleDateString('pt-BR')}</span>
-                          {conteudo.link_externo && (
-                            <ExternalLink className="w-3 h-3 text-aplicada-green-600" />
-                          )}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-12">
-                <img src={logo3d} alt="" className="w-24 h-24 mx-auto opacity-20 mb-4" />
-                <p className="text-muted-foreground">Nenhuma dica disponível</p>
-              </div>
-            )}
-          </TabsContent>
-
-          <TabsContent value="newsletter" className="mt-6 flex-1">
-            {loadingNewsletter ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-                {[1, 2, 3, 4].map(i => (
-                  <Skeleton key={i} className="h-72 rounded-xl" />
-                ))}
-              </div>
-            ) : (newsletters || []).length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-                {(newsletters || []).map((conteudo) => (
-                  <motion.div
-                    key={conteudo.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    whileHover={{ y: -4 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <Card 
-                      className="h-full cursor-pointer hover:shadow-lg transition-all border border-border hover:border-aplicada-green-700/40 overflow-hidden group"
-                      onClick={() => setSelectedConteudo(conteudo)}
-                    >
-                      {conteudo.imagem_url ? (
-                        <div className="aspect-video w-full overflow-hidden bg-muted">
-                          <img 
-                            src={conteudo.imagem_url} 
-                            alt={conteudo.titulo}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          />
-                        </div>
-                      ) : (
-                        <div className="aspect-video w-full bg-gradient-to-br from-primary/20 via-primary/10 to-background flex items-center justify-center">
-                          <img src={logo3d} alt="" className="w-20 h-20 opacity-20" />
-                        </div>
-                      )}
-
-                      <CardHeader className="pb-2">
-                        <div className="flex items-center justify-between gap-2 mb-2">
-                          <Badge variant="outline" className={tipoBadgeColors[conteudo.tipo as keyof typeof tipoBadgeColors]}>
-                            Newsletter
-                          </Badge>
-                          {conteudo.destaque && (
-                            <Badge className="bg-primary text-primary-foreground">Destaque</Badge>
-                          )}
-                        </div>
-                        <CardTitle className="text-lg line-clamp-2 group-hover:text-aplicada-green-600 transition-colors">
-                          {conteudo.titulo}
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-sm text-muted-foreground line-clamp-3">
-                          {conteudo.resumo}
-                        </p>
-                        <div className="flex items-center gap-2 mt-4 text-xs text-muted-foreground">
-                          <span>{new Date(conteudo.created_at).toLocaleDateString('pt-BR')}</span>
-                          {conteudo.link_externo && (
-                            <ExternalLink className="w-3 h-3 text-aplicada-green-600" />
-                          )}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-12">
-                <img src={logo3d} alt="" className="w-24 h-24 mx-auto opacity-20 mb-4" />
-                <p className="text-muted-foreground">Nenhuma newsletter disponível</p>
-              </div>
-            )}
-          </TabsContent>
-        </Tabs>
-
-        {/* Modal de Detalhes */}
-        <Dialog open={!!selectedConteudo} onOpenChange={() => setSelectedConteudo(null)}>
-          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-            {selectedConteudo && (
-              <div className="space-y-4">
-                {/* Imagem Principal */}
-                {selectedConteudo.imagem_url && (
-                  <div className="aspect-video w-full overflow-hidden rounded-lg bg-muted">
-                    <img 
-                      src={selectedConteudo.imagem_url} 
-                      alt={selectedConteudo.titulo}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                )}
-
-                {/* Header */}
+              {(selectedConteudo as any).galeria_imagens?.length > 0 && (
                 <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <Badge variant="outline" className={tipoBadgeColors[selectedConteudo.tipo as keyof typeof tipoBadgeColors]}>
-                      {selectedConteudo.tipo === 'newsletter' ? 'Newsletter' : 
-                       selectedConteudo.tipo === 'noticia' ? 'Notícia' : 'Dica'}
-                    </Badge>
-                    <span className="text-sm text-muted-foreground">
-                      {new Date(selectedConteudo.created_at).toLocaleDateString('pt-BR')}
-                    </span>
+                  <h3 className="mb-2 flex items-center gap-2 text-sm font-medium">
+                    <ImageIcon className="h-4 w-4" />
+                    Galeria
+                  </h3>
+                  <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
+                    {(selectedConteudo as any).galeria_imagens.map((url: string, index: number) => (
+                      <div key={index} className="aspect-video overflow-hidden rounded-lg bg-muted">
+                        <img src={url} alt={`Imagem ${index + 1}`} className="h-full w-full object-cover" />
+                      </div>
+                    ))}
                   </div>
-                  <h2 className="text-2xl font-bold">{selectedConteudo.titulo}</h2>
-                  <p className="text-muted-foreground mt-2">{selectedConteudo.resumo}</p>
                 </div>
+              )}
 
-                {/* Conteúdo Completo */}
-                {selectedConteudo.conteudo && (
-                  <div 
-                    className="prose prose-sm max-w-none"
-                    style={{
-                      fontSize: selectedConteudo.estilo_texto?.fontSize || 16,
-                      lineHeight: selectedConteudo.estilo_texto?.lineHeight || 1.5,
-                      fontWeight: selectedConteudo.estilo_texto?.fontWeight || 'normal',
-                      textAlign: selectedConteudo.estilo_texto?.textAlign || 'left',
-                    }}
-                  >
-                    <p className="whitespace-pre-wrap">{selectedConteudo.conteudo}</p>
-                  </div>
+              <div className="flex gap-2 border-t border-border pt-4">
+                {(selectedConteudo as any).arquivo_pdf_url && (
+                  <Button variant="outline" size="pill" asChild>
+                    <a href={(selectedConteudo as any).arquivo_pdf_url} target="_blank" rel="noopener noreferrer">
+                      <FileText className="mr-2 h-4 w-4" />
+                      Ver PDF
+                    </a>
+                  </Button>
                 )}
-
-                {/* Galeria de Imagens */}
-                {selectedConteudo.galeria_imagens && selectedConteudo.galeria_imagens.length > 0 && (
-                  <div>
-                    <h3 className="text-sm font-medium mb-2 flex items-center gap-2">
-                      <ImageIcon className="w-4 h-4" />
-                      Galeria
-                    </h3>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                      {selectedConteudo.galeria_imagens.map((url: string, index: number) => (
-                        <div key={index} className="aspect-video rounded-lg overflow-hidden bg-muted">
-                          <img src={url} alt={`Imagem ${index + 1}`} className="w-full h-full object-cover" />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                {selectedConteudo.link_externo && (
+                  <Button size="pill" asChild>
+                    <a href={selectedConteudo.link_externo} target="_blank" rel="noopener noreferrer">
+                      <ExternalLink className="mr-2 h-4 w-4" />
+                      Acessar link
+                    </a>
+                  </Button>
                 )}
-
-                {/* Ações */}
-                <div className="flex gap-2 pt-4 border-t">
-                  {selectedConteudo.arquivo_pdf_url && (
-                    <Button variant="outline" asChild>
-                      <a href={selectedConteudo.arquivo_pdf_url} target="_blank" rel="noopener noreferrer">
-                        <FileText className="w-4 h-4 mr-2" />
-                        Ver PDF
-                      </a>
-                    </Button>
-                  )}
-                  {selectedConteudo.link_externo && (
-                    <Button asChild>
-                      <a href={selectedConteudo.link_externo} target="_blank" rel="noopener noreferrer">
-                        <ExternalLink className="w-4 h-4 mr-2" />
-                        Acessar Link
-                      </a>
-                    </Button>
-                  )}
-                </div>
               </div>
-            )}
-          </DialogContent>
-        </Dialog>
-      </main>
-    </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    </PageContainer>
   );
 }

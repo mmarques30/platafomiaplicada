@@ -48,7 +48,7 @@ export default function IACopieUse() {
   };
 
   return (
-    <PageContainer>
+    <PageContainer className="cards-light">
       <div className="mb-6 md:mb-8">
         <PageTitle primary="Modelos" secondary="prontos" eyebrow="Recursos" />
         <p className="text-sm md:text-base text-muted-foreground mt-1">
