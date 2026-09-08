@@ -14,7 +14,6 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Moon, Sun, Bell, Lock, AlertTriangle, FileText, Smartphone, Download, CheckCircle2, RefreshCw } from "lucide-react";
-import { useTheme } from "next-themes";
 import { forceFullAppReload } from "@/lib/pwaUpdate";
 import { PageTitle } from "@/components/shared/PageTitle";
 import { PageContainer } from "@/components/shared/PageContainer";
@@ -23,7 +22,6 @@ import { OnboardingProgressCard } from "@/components/configuracoes/OnboardingPro
 export default function Configuracoes() {
   const { user, signOut } = useAuth();
   const { isVisitante } = useUserRole();
-  const { theme, setTheme } = useTheme();
   const { canInstall, isInstalled, deviceType, triggerInstall } = usePWAInstall();
   const navigate = useNavigate();
   const [notificacoesEmail, setNotificacoesEmail] = useState(true);
@@ -104,32 +102,6 @@ export default function Configuracoes() {
         <OnboardingProgressCard />
 
         <div className="grid gap-6 lg:grid-cols-2 items-start">
-        {/* Aparência */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              {theme === "dark" ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
-              Aparência
-            </CardTitle>
-            <CardDescription>Personalize a aparência do sistema</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label htmlFor="dark-mode">Modo Escuro</Label>
-                <p className="text-sm text-muted-foreground">
-                  Ative o tema escuro para melhor visualização
-                </p>
-              </div>
-              <Switch
-                id="dark-mode"
-                checked={theme === "dark"}
-                onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")}
-              />
-            </div>
-        </CardContent>
-        </Card>
-
         {/* Instalar Aplicativo */}
         <Card>
           <CardHeader>

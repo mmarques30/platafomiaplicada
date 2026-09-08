@@ -8,11 +8,11 @@ export function RankingTicker() {
 
   if (isLoading) {
     return (
-      <section className="rounded-lg bg-[#E9EBC6] p-2 sm:p-3 shadow-sm">
+      <section className="rounded-lg bg-card border border-border p-2 sm:p-3 shadow-sm">
         <div className="flex items-center justify-center gap-3">
-          <Skeleton className="h-4 w-24 bg-[#0D0D0D]/10" />
-          <Skeleton className="h-4 w-32 bg-[#0D0D0D]/10" />
-          <Skeleton className="h-4 w-28 bg-[#0D0D0D]/10" />
+          <Skeleton className="h-4 w-24 bg-muted" />
+          <Skeleton className="h-4 w-32 bg-muted" />
+          <Skeleton className="h-4 w-28 bg-muted" />
         </div>
       </section>
     );
@@ -25,7 +25,7 @@ export function RankingTicker() {
   const topSalvo = data?.topSalvos?.[0];
 
   return (
-    <section data-ranking-ticker className="rounded-lg bg-[#E9EBC6] p-3 sm:p-4 shadow-sm">
+    <section data-ranking-ticker className="rounded-lg bg-card border border-border p-3 sm:p-4 shadow-sm">
       {/* Métricas */}
       <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-5">
         {/* Top Aluno */}
@@ -41,7 +41,7 @@ export function RankingTicker() {
         )}
 
         {/* Separador */}
-        {topAula && <div className="h-4 w-px bg-[#0D0D0D]/15 hidden sm:block" />}
+        {topAula && <div className="h-4 w-px bg-border hidden sm:block" />}
 
         {/* Top Aula */}
         {topAula && (
@@ -56,7 +56,7 @@ export function RankingTicker() {
         )}
 
         {/* Separador */}
-        {topFerramenta && <div className="h-4 w-px bg-[#0D0D0D]/15 hidden sm:block" />}
+        {topFerramenta && <div className="h-4 w-px bg-border hidden sm:block" />}
 
         {/* Top Ferramenta */}
         {topFerramenta && (
@@ -69,7 +69,7 @@ export function RankingTicker() {
         )}
 
         {/* Separador */}
-        {topPrompt && <div className="h-4 w-px bg-[#0D0D0D]/15 hidden sm:block" />}
+        {topPrompt && <div className="h-4 w-px bg-border hidden sm:block" />}
 
         {/* Top Prompt */}
         {topPrompt && (
@@ -84,7 +84,7 @@ export function RankingTicker() {
         )}
 
         {/* Separador */}
-        {topSalvo && <div className="h-4 w-px bg-[#0D0D0D]/15 hidden sm:block" />}
+        {topSalvo && <div className="h-4 w-px bg-border hidden sm:block" />}
 
         {/* Conteúdo Mais Salvo */}
         {topSalvo && (
@@ -98,7 +98,7 @@ export function RankingTicker() {
 
         {/* Mensagem quando não há dados */}
         {!topAluno && !topAula && !topFerramenta && !topPrompt && !topSalvo && (
-          <span className="text-xs text-[#0D0D0D]/60">
+          <span className="text-xs text-muted-foreground">
             Nenhum destaque disponível ainda
           </span>
         )}
@@ -119,20 +119,20 @@ interface RankingItemProps {
 
 function RankingItem({ icon: Icon, label, value, percentual, tendencia, stars, href }: RankingItemProps) {
   const content = (
-    <div className="flex items-center gap-1.5 text-[#0D0D0D] cursor-pointer hover:opacity-70 transition-opacity">
+    <div className="flex items-center gap-1.5 text-foreground cursor-pointer hover:opacity-70 transition-opacity">
       <Icon className="w-3.5 h-3.5 flex-shrink-0" />
       <span className="text-xs font-medium truncate max-w-[100px] sm:max-w-[120px]">
         {label}
       </span>
       
       {stars !== undefined ? (
-        <span className="text-xs font-bold flex items-center gap-0.5 text-[#0D0D0D]">
+        <span className="text-xs font-bold flex items-center gap-0.5 text-foreground">
           <Star className="w-3 h-3 fill-current" />
           {stars}
         </span>
       ) : (
         <div className="flex items-center gap-1">
-          <span className="text-xs font-bold text-[#0D0D0D]">{value}</span>
+          <span className="text-xs font-bold text-foreground">{value}</span>
           
           {tendencia === 'up' && (
             <span className="flex items-center gap-0.5 text-green-600 text-[10px] font-bold">
@@ -147,7 +147,7 @@ function RankingItem({ icon: Icon, label, value, percentual, tendencia, stars, h
             </span>
           )}
           {tendencia === 'stable' && (
-            <span className="flex items-center gap-0.5 text-[#0D0D0D]/50 text-[10px] font-bold">
+            <span className="flex items-center gap-0.5 text-muted-foreground text-[10px] font-bold">
               <Minus className="w-3 h-3" />
               0%
             </span>
