@@ -75,12 +75,13 @@
   :root,
   .dark {
     /* Superfícies */
-    --background: 60 100% 98%;        /* #fffff6 creme da LP */
-    --surface: 0 0% 95%;              /* #f2f2f2 (inputs, faixas) */
+    --background: 0 0% 96%;           /* #f5f5f5 neutro, menos branco */
+    --surface: 0 0% 100%;             /* branco (inputs, faixas fora de cards) */
     --foreground: 0 0% 5%;            /* #0d0d0d cocoa */
 
-    --card: 0 0% 100%;                /* branco */
-    --card-foreground: 0 0% 5%;
+    /* Cards escuros e modernos (grafite) sobre a página clara */
+    --card: 80 10% 10%;               /* #181c14 grafite */
+    --card-foreground: 67 31% 94%;    /* creme */
 
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 5%;
@@ -90,15 +91,15 @@
     --primary-foreground: 0 0% 100%;
 
     /* Secondary: verde claro de apoio (texto cocoa) */
-    --secondary: 73 45% 90%;
+    --secondary: 73 30% 92%;
     --secondary-foreground: 0 0% 5%;
 
     /* Muted */
-    --muted: 60 30% 95%;
-    --muted-foreground: 75 4% 40%;    /* cinza-oliva legível */
+    --muted: 0 0% 94%;
+    --muted-foreground: 0 0% 40%;
 
     /* Accent: hover de menus/itens */
-    --accent: 60 30% 94%;
+    --accent: 0 0% 93%;
     --accent-foreground: 0 0% 5%;
 
     --destructive: 352 71% 51%;       /* #db2b42 alerta da LP */
@@ -113,7 +114,7 @@
     /* Paleta de marca (nomeada) */
     --lime: 73 50% 50%;               /* #afc040 brand */
     --olive: 73 57% 34%;              /* #738925 */
-    --sage: 75 4% 40%;
+    --sage: 0 0% 40%;
     --charcoal: 0 0% 5%;
 
     /* Status */
@@ -123,8 +124,8 @@
     --status-danger: 352 71% 51%;
 
     /* Brand tokens legados: mesmos papéis de antes, na paleta da LP */
-    --brand-cream: 60 30% 95%;
-    --brand-cream-soft: 60 100% 98%;
+    --brand-cream: 0 0% 95%;
+    --brand-cream-soft: 0 0% 98%;
     --brand-strong: 73 58% 27%;       /* #5c6f1d CTA sólido */
     --brand-strong-foreground: 0 0% 100%;
     --brand-ink: 0 0% 5%;
@@ -132,7 +133,7 @@
 
     /* Chrome do topo: charcoal fino, como o header da LP */
     --chrome: 0 0% 5%;
-    --chrome-foreground: 60 100% 98%;
+    --chrome-foreground: 0 0% 100%;
     --chrome-border: 0 0% 12%;
     --chrome-accent: 0 0% 12%;
 
@@ -141,7 +142,7 @@
     --sidebar-foreground: 0 0% 5%;
     --sidebar-primary: 73 57% 34%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 60 30% 95%;
+    --sidebar-accent: 0 0% 95%;
     --sidebar-accent-foreground: 0 0% 5%;
     --sidebar-border: 0 0% 90%;
     --sidebar-ring: 73 57% 34%;
@@ -158,26 +159,71 @@
     --chart-5: 36 79% 47%;
   }
 
-  /* Blocos de texto rico (markdown/prose) lidos dos tokens, sem depender
-     de prose-invert: funcionam em qualquer tema. */
-  .prose {
-    --tw-prose-body: hsl(var(--foreground) / 0.88);
-    --tw-prose-headings: hsl(var(--foreground));
-    --tw-prose-lead: hsl(var(--muted-foreground));
-    --tw-prose-links: hsl(var(--primary));
-    --tw-prose-bold: hsl(var(--foreground));
-    --tw-prose-counters: hsl(var(--muted-foreground));
-    --tw-prose-bullets: hsl(var(--primary));
-    --tw-prose-hr: hsl(var(--border));
-    --tw-prose-quotes: hsl(var(--foreground));
-    --tw-prose-quote-borders: hsl(var(--primary) / 0.4);
-    --tw-prose-captions: hsl(var(--muted-foreground));
-    --tw-prose-code: hsl(var(--foreground));
-    --tw-prose-pre-code: hsl(var(--foreground));
-    --tw-prose-pre-bg: hsl(var(--muted));
-    --tw-prose-th-borders: hsl(var(--border));
-    --tw-prose-td-borders: hsl(var(--border));
+  /* Escopo escuro dos cards: tudo que estiver dentro de um .bg-card (Card,
+     WelcomeHeader, etc.) passa a ler estes tokens — texto creme, bordas e
+     superfícies grafite, botão primário em lime. Popovers/dialogs em portal
+     ficam fora do escopo e continuam claros. */
+  .bg-card,
+  .card-dark {
+    color-scheme: dark;
+    --background: 80 10% 13%;         /* inputs e faixas dentro do card */
+    --foreground: 67 31% 94%;
+    --card: 80 10% 10%;
+    --card-foreground: 67 31% 94%;
+    --surface: 80 10% 14%;
+    --muted: 80 8% 17%;
+    --muted-foreground: 82 8% 68%;
+    --accent: 80 8% 18%;
+    --accent-foreground: 67 31% 94%;
+    --secondary: 73 30% 24%;
+    --secondary-foreground: 67 31% 94%;
+    --border: 80 8% 22%;
+    --input: 80 8% 26%;
+    --primary: 69 71% 52%;            /* lime */
+    --primary-foreground: 80 27% 4%;
+    --ring: 69 71% 52%;
+    --lime: 68 77% 63%;
+    --brand-strong: 73 50% 50%;       /* #afc040 */
+    --brand-strong-foreground: 80 27% 4%;
+    --brand-cream: 80 8% 15%;
+    --brand-cream-soft: 80 10% 13%;
+    --brand-hairline: 80 8% 22%;
+    --brand-ink: 67 31% 94%;
+    --sage: 82 8% 68%;
+    --charcoal: 67 31% 94%;
+    --status-success: 69 71% 52%;
+    --status-warning: 36 79% 57%;
+    --status-info: 206 70% 58%;
+    --status-danger: 352 71% 56%;
+    --chart-1: 69 71% 52%;
+    --chart-2: 73 50% 50%;
+    --chart-3: 82 8% 68%;
   }
+
+}
+
+
+/* Blocos de texto rico (markdown/prose) lidos dos tokens. Fora de @layer de
+   propósito: precisa vencer as cores fixas do plugin typography, inclusive
+   dentro dos cards escuros. */
+.prose {
+  --tw-prose-body: hsl(var(--foreground) / 0.88);
+  --tw-prose-headings: hsl(var(--foreground));
+  --tw-prose-lead: hsl(var(--muted-foreground));
+  --tw-prose-links: hsl(var(--primary));
+  --tw-prose-bold: hsl(var(--foreground));
+  --tw-prose-counters: hsl(var(--muted-foreground));
+  --tw-prose-bullets: hsl(var(--primary));
+  --tw-prose-hr: hsl(var(--border));
+  --tw-prose-quotes: hsl(var(--foreground));
+  --tw-prose-quote-borders: hsl(var(--primary) / 0.4);
+  --tw-prose-captions: hsl(var(--muted-foreground));
+  --tw-prose-code: hsl(var(--foreground));
+  --tw-prose-pre-code: hsl(var(--foreground));
+  --tw-prose-pre-bg: hsl(var(--muted));
+  --tw-prose-th-borders: hsl(var(--border));
+  --tw-prose-td-borders: hsl(var(--border));
+  color: hsl(var(--foreground) / 0.88);
 }
 
 @layer components {

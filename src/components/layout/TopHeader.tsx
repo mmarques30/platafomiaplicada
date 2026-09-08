@@ -186,18 +186,6 @@ export function TopHeader() {
             </DropdownMenu>
           )}
           
-          {/* Primeiros passos - primeiro e com destaque; reabre o guia de onboarding */}
-          {!isVisitante && (
-            <button
-              type="button"
-              data-tour="primeiros-passos"
-              onClick={() => window.dispatchEvent(new CustomEvent("abrir-primeiros-passos"))}
-              className="text-sm font-semibold text-charcoal bg-lime rounded-full px-3.5 py-1 hover:bg-lime/85 transition-colors"
-            >
-              Primeiros passos
-            </button>
-          )}
-
           {/* Chat AI (antes "Comunicações") */}
           {!isVisitante && (
             <DropdownMenu>
