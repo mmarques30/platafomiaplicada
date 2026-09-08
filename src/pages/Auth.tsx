@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
 import { IAplicadaBackground } from "@/components/auth/IAplicadaBackground";
@@ -58,36 +58,7 @@ export default function Auth() {
     <div className="ia-entry relative flex min-h-[100dvh] w-full flex-col overflow-x-hidden">
       <IAplicadaBackground />
 
-      {/* Topo minimal: logo + links, como o header da LP na / */}
-      <motion.header
-        initial={{ opacity: 0, y: -8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="relative z-10 flex h-[72px] items-center justify-between px-6 md:px-10"
-      >
-        <button
-          type="button"
-          onClick={() => setView("hero")}
-          className="flex items-center"
-          aria-label="IAplicada"
-        >
-          <img src={logoIAplicada} alt="IAplicada" className="h-7 w-auto md:h-8" />
-        </button>
-        <nav className="ia-entry-mono flex items-center gap-6">
-          <Link to="/sobre" className="ia-entry-nav-link">
-            Sobre
-          </Link>
-          <button
-            type="button"
-            onClick={() => setView("login")}
-            className="ia-entry-nav-link"
-          >
-            Entrar
-          </button>
-        </nav>
-      </motion.header>
-
-      <main className="relative z-10 flex flex-1 items-center justify-center px-6 pb-12 pt-6 md:pb-16">
+      <main className="relative z-10 flex flex-1 items-center justify-center px-6 pb-12 pt-10 md:pb-16">
         <AnimatePresence mode="wait">
           {view === "hero" ? (
             <motion.div
@@ -109,11 +80,14 @@ export default function Auth() {
               exit={{ opacity: 0, y: -12, transition: { duration: 0.2 } }}
               transition={{ duration: 0.4 }}
             >
-              <EntryAccessCard
-                mode={view}
-                onModeChange={setView}
-                onBack={() => setView("hero")}
-              />
+              <div className="flex w-full max-w-md flex-col items-center gap-8">
+                <img src={logoIAplicada} alt="IAplicada" className="h-7 w-auto md:h-8" />
+                <EntryAccessCard
+                  mode={view}
+                  onModeChange={setView}
+                  onBack={() => setView("hero")}
+                />
+              </div>
             </motion.div>
           )}
         </AnimatePresence>

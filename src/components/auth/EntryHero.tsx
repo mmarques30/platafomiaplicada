@@ -1,17 +1,11 @@
 import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
+import logoIAplicada from "@/assets/logo-auth-fundo-escuro.png";
 
 interface EntryHeroProps {
   /** Disparado pelo CTA "Começar a aplicar" — abre o acesso (email + senha). */
   onStart: () => void;
 }
-
-const PLATFORM_HIGHLIGHTS = [
-  "Trilhas práticas",
-  "Métodos para aplicar",
-  "Biblioteca de prompts",
-  "MarIAna, sua assistente",
-];
 
 /**
  * EntryHero — primeira tela da plataforma, no branding da LP iaplicada.com.
@@ -21,35 +15,31 @@ const PLATFORM_HIGHLIGHTS = [
  * foto, o fundo é o quadriculado escuro da LP (IAplicadaBackground) e a
  * tipografia segue o hero da LP: Instrument Serif italic com trecho em lime.
  *
- * A frase diz o que a pessoa consegue fazer ao entrar: aprender, aplicar e
- * entregar mais rápido — eco direto do "Faça o dobro. Entregue em metade do
- * tempo." usado em iaplicada.com.
+ * Copy = proposta de valor da LP: "Faça o dobro. Entregue em metade do tempo."
  */
 export function EntryHero({ onStart }: EntryHeroProps) {
   return (
     <div className="w-full max-w-5xl text-center">
-      <motion.span
+      <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45, delay: 0.05 }}
-        className="ia-entry-mono inline-flex items-center gap-2.5"
+        className="ia-entry-logo-row"
       >
-        <span className="ia-entry-mono__rule" aria-hidden />
-        IAplicada · Plataforma
-        <span className="ia-entry-mono__rule" aria-hidden />
-      </motion.span>
+        <span className="ia-entry-logo-row__rule" aria-hidden />
+        <img src={logoIAplicada} alt="IAplicada" className="ia-entry-logo-row__logo" />
+        <span className="ia-entry-logo-row__rule" aria-hidden />
+      </motion.div>
 
       <motion.h1
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.55, delay: 0.12 }}
-        className="ia-entry-h1 mt-7"
+        className="ia-entry-h1 mt-8"
       >
-        Aprenda IA de verdade.
+        Faça o dobro.
         <br />
-        <em>Aplique no seu trabalho hoje.</em>
-        <br />
-        Entregue em metade do tempo.
+        <em>Entregue em metade do tempo.</em>
       </motion.h1>
 
       <motion.p
@@ -58,16 +48,14 @@ export function EntryHero({ onStart }: EntryHeroProps) {
         transition={{ duration: 0.5, delay: 0.22 }}
         className="ia-entry-sub mx-auto mt-7 max-w-2xl"
       >
-        Trilhas práticas, métodos, biblioteca de prompts e a MarIAna, sua
-        assistente de IA. Tudo em um lugar só para você aprender, aplicar e
-        acompanhar seus resultados.
+        Tudo em um só lugar para você aumentar seus resultados.
       </motion.p>
 
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.32 }}
-        className="mt-10 flex flex-col items-center gap-4"
+        className="mt-10 flex justify-center"
       >
         <button type="button" onClick={onStart} className="ia-entry-cta group">
           <span className="ia-entry-cta__label">Começar a aplicar</span>
@@ -76,29 +64,7 @@ export function EntryHero({ onStart }: EntryHeroProps) {
             <ArrowUpRight className="absolute h-5 w-5 -translate-x-10 transition-all duration-500 ease-in-out group-hover:-translate-x-1/2" />
           </span>
         </button>
-        <p className="ia-entry-hint">
-          Entre com seu e-mail e senha. Você já cai direto no seu ambiente.
-        </p>
       </motion.div>
-
-      <motion.ul
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.6, delay: 0.5 }}
-        className="ia-entry-strip mt-14"
-        aria-label="O que você encontra na plataforma"
-      >
-        {PLATFORM_HIGHLIGHTS.map((item, index) => (
-          <li key={item} className="ia-entry-strip__item">
-            {index > 0 && (
-              <span className="ia-entry-strip__spark" aria-hidden>
-                ✱
-              </span>
-            )}
-            <span>{item}</span>
-          </li>
-        ))}
-      </motion.ul>
     </div>
   );
 }
