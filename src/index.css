@@ -80,8 +80,8 @@
     --foreground: 0 0% 5%;            /* #0d0d0d cocoa */
 
     /* Cards escuros e modernos (grafite) sobre a página clara */
-    --card: 80 10% 10%;               /* #181c14 grafite */
-    --card-foreground: 67 31% 94%;    /* creme */
+    --card: 0 0% 7%;                  /* #121212 escuro neutro, como o topo */
+    --card-foreground: 0 0% 96%;
 
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 5%;
@@ -166,38 +166,38 @@
   .bg-card,
   .card-dark {
     color-scheme: dark;
-    --background: 80 10% 13%;         /* inputs e faixas dentro do card */
-    --foreground: 67 31% 94%;
-    --card: 80 10% 10%;
-    --card-foreground: 67 31% 94%;
-    --surface: 80 10% 14%;
-    --muted: 80 8% 17%;
-    --muted-foreground: 82 8% 68%;
-    --accent: 80 8% 18%;
-    --accent-foreground: 67 31% 94%;
-    --secondary: 73 30% 24%;
-    --secondary-foreground: 67 31% 94%;
-    --border: 80 8% 22%;
-    --input: 80 8% 26%;
+    --background: 0 0% 10%;           /* inputs e faixas dentro do card */
+    --foreground: 0 0% 96%;
+    --card: 0 0% 11%;                 /* card aninhado: um passo mais claro */
+    --card-foreground: 0 0% 96%;
+    --surface: 0 0% 11%;
+    --muted: 0 0% 14%;
+    --muted-foreground: 0 0% 66%;
+    --accent: 0 0% 15%;
+    --accent-foreground: 0 0% 96%;
+    --secondary: 73 25% 22%;
+    --secondary-foreground: 0 0% 96%;
+    --border: 0 0% 18%;
+    --input: 0 0% 22%;
     --primary: 69 71% 52%;            /* lime */
     --primary-foreground: 80 27% 4%;
     --ring: 69 71% 52%;
     --lime: 68 77% 63%;
     --brand-strong: 73 50% 50%;       /* #afc040 */
     --brand-strong-foreground: 80 27% 4%;
-    --brand-cream: 80 8% 15%;
-    --brand-cream-soft: 80 10% 13%;
-    --brand-hairline: 80 8% 22%;
-    --brand-ink: 67 31% 94%;
-    --sage: 82 8% 68%;
-    --charcoal: 67 31% 94%;
+    --brand-cream: 0 0% 12%;
+    --brand-cream-soft: 0 0% 10%;
+    --brand-hairline: 0 0% 18%;
+    --brand-ink: 0 0% 96%;
+    --sage: 0 0% 66%;
+    --charcoal: 0 0% 96%;
     --status-success: 69 71% 52%;
     --status-warning: 36 79% 57%;
     --status-info: 206 70% 58%;
     --status-danger: 352 71% 56%;
     --chart-1: 69 71% 52%;
     --chart-2: 73 50% 50%;
-    --chart-3: 82 8% 68%;
+    --chart-3: 0 0% 66%;
   }
 
 }
@@ -534,16 +534,6 @@
   .bg-card input.bg-input,
   .bg-card textarea.bg-input {
     color: hsl(72 6% 18%) !important;
-  }
-
-  .bg-muted,
-  .bg-input {
-    color: hsl(72 6% 18%) !important;
-  }
-
-  .bg-muted::placeholder,
-  .bg-input::placeholder {
-    color: hsl(72 6% 45%) !important;
   }
 
   .bg-card h1,

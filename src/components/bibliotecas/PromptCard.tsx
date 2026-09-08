@@ -1,8 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { FavoriteButton } from "@/components/shared/FavoriteButton";
-import { 
+import {
   ChevronRight,
   TrendingUp,
   Megaphone,
@@ -14,7 +13,7 @@ import {
   LineChart,
   Presentation,
   FileText,
-  type LucideIcon
+  type LucideIcon,
 } from "lucide-react";
 
 interface PromptCardProps {
@@ -28,89 +27,83 @@ interface PromptCardProps {
   onVerMais: () => void;
 }
 
-const categoriaIcons: Record<string, { icon: LucideIcon; gradient: string }> = {
-  'Vendas': { icon: TrendingUp, gradient: 'bg-gradient-to-br from-status-success to-status-success' },
-  'Marketing': { icon: Megaphone, gradient: 'bg-gradient-to-br from-secondary to-secondary' },
-  'Automacao': { icon: Settings, gradient: 'bg-gradient-to-br from-status-info to-status-info' },
-  'Comunicacao': { icon: MessageSquare, gradient: 'bg-gradient-to-br from-status-success to-status-success' },
-  'Gestao de Projetos': { icon: BarChart3, gradient: 'bg-gradient-to-br from-status-warning to-status-warning' },
-  'Produtividade': { icon: Zap, gradient: 'bg-gradient-to-br from-status-warning to-status-warning' },
-  'Comunicação & Escrita': { icon: PenTool, gradient: 'bg-gradient-to-br from-status-danger to-status-danger' },
-  'Análise de Dados': { icon: LineChart, gradient: 'bg-gradient-to-br from-status-info to-status-info' },
-  'Apresentações': { icon: Presentation, gradient: 'bg-gradient-to-br from-status-danger to-status-danger' },
+const categoriaIcons: Record<string, LucideIcon> = {
+  Vendas: TrendingUp,
+  Marketing: Megaphone,
+  Automacao: Settings,
+  Comunicacao: MessageSquare,
+  "Gestao de Projetos": BarChart3,
+  Produtividade: Zap,
+  "Comunicação & Escrita": PenTool,
+  "Análise de Dados": LineChart,
+  Apresentações: Presentation,
 };
 
-const getIconeCategoria = (categoria: string) => {
-  return categoriaIcons[categoria]?.icon || FileText;
+const NIVEL_LABEL: Record<string, string> = {
+  iniciante: "Iniciante",
+  intermediario: "Intermediário",
+  avancado: "Avançado",
 };
 
-const getGradientCategoria = (_categoria: string) => {
-  return 'bg-primary/10 border border-primary/20';
-};
-
-const getNivelColor = (nivel: string | null) => {
-  switch (nivel) {
-    case 'iniciante':
-      return 'bg-status-success text-white hover:bg-status-success';
-    case 'intermediario':
-      return 'bg-status-warning text-white hover:bg-status-warning';
-    case 'avancado':
-      return 'bg-status-danger text-white hover:bg-status-danger';
-    default:
-      return 'bg-card text-white';
-  }
-};
+/**
+ * Quebra títulos do tipo "Prompt-base — Landing Page de Isca" ou
+ * "Dashboard Financeiro | Controle de Finanças" em um rótulo curto (eyebrow)
+ * e o título limpo, sem travessão/barra no meio do título.
+ */
+export function splitTitulo(titulo: string): { eyebrow: string | null; titulo: string } {
+  const m = titulo.match(/^(.{2,40}?)\s+(?:—|–|\||-)\s+(.+)$/);
+  if (!m) return { eyebrow: null, titulo };
+  return { eyebrow: m[1].trim(), titulo: m[2].trim() };
+}
 
 export function PromptCard({ prompt, onVerMais }: PromptCardProps) {
+  const Icon = categoriaIcons[prompt.categoria] || FileText;
+  const { eyebrow, titulo } = splitTitulo(prompt.titulo);
+
   return (
-    <Card className="h-[240px] flex flex-col hover:shadow-lg transition-all">
-      <CardContent className="p-5 flex flex-col gap-3 flex-1">
-        {/* Ícone da Categoria */}
-        <div className={`w-14 h-14 rounded-xl ${getGradientCategoria(prompt.categoria)} flex items-center justify-center shadow-md`}>
-          {(() => {
-            const IconComponent = getIconeCategoria(prompt.categoria);
-            return <IconComponent className="w-7 h-7 text-primary" />;
-          })()}
-        </div>
-        
-        {/* Título */}
-        <h3 className="font-bold text-lg line-clamp-2 min-h-[3.5rem]">
-          {prompt.titulo}
-        </h3>
-        
-        {/* Descrição Resumida */}
-        <p className="text-sm text-muted-foreground line-clamp-3 flex-1">
-          {prompt.descricao}
-        </p>
-        
-        {/* Badges de Categoria e Nível */}
-        <div className="flex gap-2 flex-wrap items-center">
-          <Badge variant="secondary" className="text-xs">
+    <Card
+      className="group flex h-full min-h-[240px] cursor-pointer flex-col transition-colors hover:border-primary/50"
+      onClick={onVerMais}
+    >
+      <CardContent className="flex flex-1 flex-col gap-3 p-5">
+        {/* Linha superior: ícone da categoria + categoria + favorito */}
+        <div className="flex items-center gap-3">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted text-primary">
+            <Icon className="h-4 w-4" />
+          </div>
+          <span className="truncate text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
             {prompt.categoria}
-          </Badge>
-          {prompt.nivel_complexidade && (
-            <Badge className={`text-xs ${getNivelColor(prompt.nivel_complexidade)}`}>
-              {prompt.nivel_complexidade.charAt(0).toUpperCase() + prompt.nivel_complexidade.slice(1)}
-            </Badge>
-          )}
-          <FavoriteButton 
-            tipo="prompt" 
-            itemId={prompt.id}
-            variant="ghost"
-            size="sm"
-            className="ml-auto"
-          />
+          </span>
+          <div className="ml-auto" onClick={(e) => e.stopPropagation()}>
+            <FavoriteButton tipo="prompt" itemId={prompt.id} variant="ghost" size="sm" />
+          </div>
         </div>
-        
-        {/* Botão Ver Prompt */}
-        <Button 
-          variant="ghost" 
-          className="w-full text-primary hover:text-primary hover:bg-accent mt-auto"
-          onClick={onVerMais}
-        >
-          Ver Prompt 
-          <ChevronRight className="w-4 h-4 ml-1" />
-        </Button>
+
+        {/* Título (sem travessão) com rótulo opcional */}
+        <div>
+          {eyebrow && (
+            <span className="mb-1 block text-[11px] font-medium text-primary">{eyebrow}</span>
+          )}
+          <h3 className="line-clamp-2 text-base font-semibold leading-snug text-foreground">{titulo}</h3>
+        </div>
+
+        {/* Descrição */}
+        <p className="line-clamp-3 text-sm text-muted-foreground">{prompt.descricao}</p>
+
+        {/* Rodapé: nível + ação */}
+        <div className="mt-auto flex items-center justify-between pt-2">
+          {prompt.nivel_complexidade ? (
+            <Badge variant="outline" className="text-xs">
+              {NIVEL_LABEL[prompt.nivel_complexidade] ?? prompt.nivel_complexidade}
+            </Badge>
+          ) : (
+            <span />
+          )}
+          <span className="inline-flex items-center gap-1 text-sm font-medium text-primary">
+            Ver prompt
+            <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+          </span>
+        </div>
       </CardContent>
     </Card>
   );

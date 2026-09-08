@@ -1,4 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
+import { TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -74,7 +75,6 @@ export function RitmoCard() {
   const isUp = variacaoPct > 15;
   const isDown = variacaoPct < -15;
 
-  const borderColor = isUp ? "border-primary" : isDown ? "border-status-danger" : "border-muted-foreground/30";
   const badgeColor = isUp
     ? "bg-primary/15 text-primary"
     : isDown
@@ -82,21 +82,22 @@ export function RitmoCard() {
       : "bg-muted text-muted-foreground";
 
   const badgeText = isUp
-    ? `↑ ${variacaoPct}% acima do seu ritmo médio`
+    ? `${variacaoPct}% acima do seu ritmo médio`
     : isDown
-      ? `↓ ${Math.abs(variacaoPct)}% abaixo do seu ritmo médio`
-      : "→ Ritmo estável";
+      ? `${Math.abs(variacaoPct)}% abaixo do seu ritmo médio`
+      : "Ritmo estável";
+
+  const Icon = isUp ? TrendingUp : isDown ? TrendingDown : Minus;
 
   return (
-    <Card className={`border-t-[3px] ${borderColor}`}>
-      <CardContent className="pt-5 pb-4 space-y-2">
-        <span className="text-[10px] font-bold tracking-widest uppercase text-muted-foreground">
-          SEU RITMO
-        </span>
-        <p className="text-2xl font-bold text-foreground">
+    <Card>
+      <CardContent className="space-y-3 p-5">
+        <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">Seu ritmo</span>
+        <p className="text-3xl font-semibold leading-none text-foreground">
           {atualMedia} <span className="text-sm font-normal text-muted-foreground">módulos/semana</span>
         </p>
-        <span className={`inline-block text-xs font-medium px-2.5 py-1 rounded-full ${badgeColor}`}>
+        <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium ${badgeColor}`}>
+          <Icon className="h-3.5 w-3.5" />
           {badgeText}
         </span>
       </CardContent>

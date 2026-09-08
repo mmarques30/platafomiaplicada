@@ -1,7 +1,5 @@
-import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
-
 
 import { RankingComunidade } from "@/components/evolucao/RankingComunidade";
 import { HeroEvolucao } from "@/components/evolucao/HeroEvolucao";
@@ -10,8 +8,7 @@ import { TrilhasEmAndamentoCards } from "@/components/evolucao/TrilhasEmAndament
 import { VitrineConquistas } from "@/components/evolucao/VitrineConquistas";
 import { RitmoCard } from "@/components/evolucao/RitmoCard";
 import { BonusEvolucao } from "@/components/evolucao/BonusEvolucao";
-
-import { BusinessEvolucaoAprendizado } from "@/components/mentoria/business/BusinessEvolucaoAprendizado";
+import { AtalhosProgresso } from "@/components/evolucao/AtalhosProgresso";
 import { AbaFavoritos } from "@/components/evolucao/AbaFavoritos";
 import { useRankingComunidade } from "@/hooks/useRankingComunidade";
 import { useEffectivePlan } from "@/hooks/useUserPlan";
@@ -20,11 +17,18 @@ import { PageTitle } from "@/components/shared/PageTitle";
 import { PageContainer } from "@/components/shared/PageContainer";
 import { PageSkeleton } from "@/components/shared/PageSkeleton";
 
+const TAB_CLASS =
+  "rounded-full px-4 py-2 text-sm font-medium transition-colors data-[state=active]:bg-chrome data-[state=active]:text-chrome-foreground data-[state=active]:shadow-sm sm:px-5";
 
+/**
+ * "Meu progresso" — visão única da Academy. Ex-Builder e ex-Skills (hoje
+ * Academy) e a equipe caem aqui; o painel antigo de mentoria ficou
+ * restrito ao Insider pago.
+ */
 export default function Evolucao() {
   const { data: ranking, isLoading: loadingRanking } = useRankingComunidade();
   const { isAdmin, isLoading: roleLoading } = useUserRole();
-  const { isAcademy, isBusiness } = useEffectivePlan(isAdmin, roleLoading);
+  const { isBusinessSistemas } = useEffectivePlan(isAdmin, roleLoading);
 
   if (roleLoading) {
     return <PageSkeleton variant="evolucao" />;
@@ -32,58 +36,55 @@ export default function Evolucao() {
 
   return (
     <PageContainer>
-      <PageTitle primary="Minha" secondary="evolução" eyebrow="Progresso" />
+      <PageTitle
+        primary="Meu"
+        secondary="progresso"
+        description="Seu nível, as trilhas em andamento, conquistas e sua posição na comunidade, tudo em um só lugar."
+      />
 
-      {/* Sistema de Abas */}
       <Tabs defaultValue="minha-evolucao" className="w-full">
-        <TabsList className="w-full md:w-auto grid grid-cols-3 md:inline-flex gap-0.5 sm:gap-1 bg-primary/20 dark:bg-primary/30 p-1 sm:p-1.5 rounded-lg sm:rounded-xl border border-primary/30 dark:border-primary/40">
-          <TabsTrigger 
-            value="minha-evolucao"
-            className="flex items-center justify-center gap-1 sm:gap-2 text-foreground/70 data-[state=active]:bg-brand-strong data-[state=active]:text-brand-strong-foreground data-[state=active]:shadow-lg rounded-md sm:rounded-lg px-2 sm:px-4 py-1.5 sm:py-2.5 transition-all duration-200 text-xs sm:text-sm"
-          >
+        <TabsList className="grid h-auto w-full grid-cols-3 gap-1 rounded-full bg-muted p-1 sm:inline-flex sm:w-auto">
+          <TabsTrigger value="minha-evolucao" className={TAB_CLASS}>
             Evolução
           </TabsTrigger>
-          <TabsTrigger 
-            value="comunidade"
-            className="flex items-center justify-center gap-1 sm:gap-2 text-foreground/70 data-[state=active]:bg-brand-strong data-[state=active]:text-brand-strong-foreground data-[state=active]:shadow-lg rounded-md sm:rounded-lg px-2 sm:px-4 py-1.5 sm:py-2.5 transition-all duration-200 text-xs sm:text-sm"
-          >
+          <TabsTrigger value="comunidade" className={TAB_CLASS}>
             Ranking
           </TabsTrigger>
-          <TabsTrigger 
-            value="favoritos"
-            className="flex items-center justify-center gap-1 sm:gap-2 text-foreground/70 data-[state=active]:bg-brand-strong data-[state=active]:text-brand-strong-foreground data-[state=active]:shadow-lg rounded-md sm:rounded-lg px-2 sm:px-4 py-1.5 sm:py-2.5 transition-all duration-200 text-xs sm:text-sm"
-          >
+          <TabsTrigger value="favoritos" className={TAB_CLASS}>
             Favoritos
           </TabsTrigger>
         </TabsList>
 
-        {/* ABA 1: MINHA EVOLUÇÃO */}
-        <TabsContent value="minha-evolucao" className="space-y-6 mt-6">
+        {/* ABA 1: EVOLUÇÃO */}
+        <TabsContent value="minha-evolucao" className="mt-6 space-y-6">
           <HeroEvolucao />
-          {isBusiness && <BusinessEvolucaoAprendizado />}
-          <TrilhasEmAndamentoCards />
+
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+            <TrilhasEmAndamentoCards />
+            <div className="space-y-6">
+              <RitmoCard />
+              <AtalhosProgresso />
+            </div>
+          </div>
+
           <VitrineConquistas />
-          <RitmoCard />
-          {isAcademy && <BonusEvolucao />}
+          {!isBusinessSistemas && <BonusEvolucao />}
         </TabsContent>
 
-        {/* ABA 2: EVOLUÇÃO DA COMUNIDADE */}
-        <TabsContent value="comunidade" className="space-y-6 mt-6">
+        {/* ABA 2: RANKING DA COMUNIDADE */}
+        <TabsContent value="comunidade" className="mt-6 space-y-6">
           {loadingRanking ? (
-            <Skeleton className="h-96 w-full" />
+            <Skeleton className="h-96 w-full rounded-2xl" />
           ) : (
             <>
-              {/* Hero Comunidade */}
               <HeroComunidade />
-
-              {/* Ranking Top 3 + Lista */}
-              <RankingComunidade ranking={ranking as any || []} />
+              <RankingComunidade ranking={(ranking as any) || []} />
             </>
           )}
         </TabsContent>
 
         {/* ABA 3: FAVORITOS */}
-        <TabsContent value="favoritos" className="space-y-6 mt-6">
+        <TabsContent value="favoritos" className="mt-6 space-y-6">
           <AbaFavoritos />
         </TabsContent>
       </Tabs>

@@ -1,5 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { Check, Lock } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { useMinhaEvolucao } from "@/hooks/useMinhaEvolucao";
 import { useSequenciaEstudo } from "@/hooks/useEvolucao";
 import { useMeusCertificados } from "@/hooks/useCertificados";
@@ -18,7 +20,7 @@ export function VitrineConquistas() {
   const { data: sequencia } = useSequenciaEstudo();
   const { data: certificados } = useMeusCertificados();
 
-  const totalCertificados = certificados?.filter(c => c.status === "emitido").length || 0;
+  const totalCertificados = certificados?.filter((c) => c.status === "emitido").length || 0;
 
   const conquistas: Conquista[] = [
     {
@@ -71,57 +73,58 @@ export function VitrineConquistas() {
     },
   ];
 
+  const desbloqueadas = conquistas.filter((c) => c.desbloqueada).length;
+
   return (
-    <Card className="border-aplicada-green-900/20">
-      <CardHeader>
-        <CardTitle className="text-xl">Conquistas</CardTitle>
+    <Card>
+      <CardHeader className="flex-row items-center justify-between space-y-0 pb-3">
+        <CardTitle className="font-serif-display text-2xl font-normal">
+          Suas <em className="font-serif-italic text-primary">conquistas</em>
+        </CardTitle>
+        <span className="text-sm text-muted-foreground">
+          {desbloqueadas} de {conquistas.length}
+        </span>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {conquistas.map((conquista) => {
-            const porcentagem = Math.min(
-              (conquista.progresso / conquista.meta) * 100,
-              100
-            );
+            const porcentagem = Math.min((conquista.progresso / conquista.meta) * 100, 100);
 
             return (
               <div
                 key={conquista.id}
-                className={`rounded-lg border p-4 space-y-3 transition-all ${
-                  conquista.desbloqueada
-                    ? "border-primary/40 bg-card"
-                    : "border-border bg-card"
-                }`}
+                className={cn(
+                  "flex flex-col gap-3 rounded-xl border bg-card p-4 transition-colors",
+                  conquista.desbloqueada ? "border-primary/50" : "border-border"
+                )}
               >
-                {/* Título e descrição */}
-                <div>
-                  <span className="font-semibold text-sm block text-foreground">
-                    {conquista.titulo}
+                <div className="flex items-start gap-3">
+                  <span
+                    className={cn(
+                      "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg",
+                      conquista.desbloqueada ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                    )}
+                  >
+                    {conquista.desbloqueada ? <Check className="h-4 w-4" /> : <Lock className="h-4 w-4" />}
                   </span>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {conquista.descricao}
-                  </p>
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold text-foreground">{conquista.titulo}</p>
+                    <p className="text-xs text-muted-foreground">{conquista.descricao}</p>
+                  </div>
                 </div>
 
-                {/* Progresso */}
-                {!conquista.desbloqueada && (
-                  <div className="space-y-1">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-foreground">
+                {conquista.desbloqueada ? (
+                  <span className="text-xs font-medium text-primary">Desbloqueada</span>
+                ) : (
+                  <div className="space-y-1.5">
+                    <Progress value={porcentagem} className="h-1.5" />
+                    <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+                      <span>
                         {conquista.progresso} / {conquista.meta}
                       </span>
-                      <span className="text-foreground">
-                        {porcentagem.toFixed(0)}%
-                      </span>
+                      <span>{porcentagem.toFixed(0)}%</span>
                     </div>
-                    <Progress value={porcentagem} className="h-1" />
                   </div>
-                )}
-
-                {conquista.desbloqueada && (
-                  <p className="text-xs text-primary font-medium">
-                    ✓ Desbloqueada
-                  </p>
                 )}
               </div>
             );

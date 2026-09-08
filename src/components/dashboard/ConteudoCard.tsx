@@ -17,10 +17,10 @@ const iconMap = {
 };
 
 const iconBgMap = {
-  newsletter: "bg-primary",
-  noticia: "bg-primary/90",
-  dica: "bg-primary/80",
-  material: "bg-primary/70",
+  newsletter: "bg-muted text-primary",
+  noticia: "bg-muted text-primary",
+  dica: "bg-muted text-primary",
+  material: "bg-muted text-primary",
 };
 
 export function ConteudoCard({ conteudo }: ConteudoCardProps) {
@@ -37,13 +37,10 @@ export function ConteudoCard({ conteudo }: ConteudoCardProps) {
       whileHover={{ scale: 1.02, y: -4 }}
       whileTap={{ scale: 0.98 }}
       className={`
-        group relative p-3 sm:p-4 md:p-5 rounded-lg sm:rounded-xl 
-        bg-card/90 backdrop-blur-sm 
-        border border-primary/30 dark:border-primary/40 sm:border-2 hover:border-primary/60 
-        transition-all duration-300 cursor-pointer
-        shadow-md sm:shadow-lg hover:shadow-xl hover:shadow-primary/20
-        min-w-[200px] max-w-[240px] sm:min-w-[280px] sm:max-w-[320px] flex-shrink-0
-        h-[200px] sm:h-[240px] flex flex-col card-interactive
+        group relative p-4 md:p-5 rounded-xl
+        bg-card border border-border hover:border-primary/50
+        transition-colors duration-200 cursor-pointer
+        h-full min-h-[200px] flex flex-col card-interactive
       `}
       onClick={handleClick}
     >
@@ -57,8 +54,8 @@ export function ConteudoCard({ conteudo }: ConteudoCardProps) {
       )}
 
       {/* Icon */}
-      <div className={`w-8 h-8 sm:w-10 sm:h-10 md:w-11 md:h-11 rounded-lg sm:rounded-xl ${iconBgClass} flex items-center justify-center mb-2.5 sm:mb-3 md:mb-4 shadow-md`}>
-        <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+      <div className={`w-9 h-9 rounded-lg ${iconBgClass} flex items-center justify-center mb-3`}>
+        <Icon className="w-4 h-4" />
       </div>
 
       {/* Content */}

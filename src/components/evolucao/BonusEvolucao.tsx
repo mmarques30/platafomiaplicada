@@ -31,7 +31,7 @@ export function BonusEvolucao() {
 
   if (isLoading) {
     return (
-      <Card className="bg-card border-border">
+      <Card>
         <CardHeader>
           <Skeleton className="h-6 w-48" />
         </CardHeader>
@@ -51,10 +51,10 @@ export function BonusEvolucao() {
   }
 
   return (
-    <Card className="bg-card border-border">
+    <Card>
       <CardHeader>
-        <CardTitle className="text-foreground">
-          Bônus Exclusivos
+        <CardTitle className="font-serif-display text-2xl font-normal">
+          Bônus <em className="font-serif-italic text-primary">exclusivos</em>
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -65,16 +65,14 @@ export function BonusEvolucao() {
             return (
               <div
                 key={item.id}
-                className={`p-4 rounded-lg border-2 ${
-                  item.liberado
-                    ? "border-primary/50 bg-primary/5"
-                    : "border-muted bg-muted/30"
+                className={`flex flex-col rounded-xl border bg-card p-4 ${
+                  item.liberado ? "border-primary/50" : "border-border"
                 }`}
               >
                 <div className="flex items-start justify-between mb-2">
                   <h4 className="font-medium text-foreground">{item.nome}</h4>
                   {item.liberado ? (
-                    <Badge variant="default" className="bg-primary text-primary-foreground">
+                    <Badge className="bg-primary text-primary-foreground hover:bg-primary">
                       Liberado
                     </Badge>
                   ) : (
@@ -87,7 +85,7 @@ export function BonusEvolucao() {
                 </p>
 
                 {item.liberado ? (
-                  <div className="space-y-2">
+                  <div className="mt-auto space-y-2">
                     {item.link && (
                       <Button
                         variant="outline"
@@ -124,7 +122,7 @@ export function BonusEvolucao() {
                     )}
                   </div>
                 ) : (
-                  <div className="text-xs text-muted-foreground bg-muted/50 p-2 rounded">
+                  <div className="mt-auto rounded-lg bg-muted p-2 text-xs text-muted-foreground">
                     <span className="font-medium">Para desbloquear:</span>{" "}
                     {item.condicao_descricao || "Complete as condições necessárias"}
                   </div>

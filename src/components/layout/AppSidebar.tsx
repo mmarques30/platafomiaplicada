@@ -30,6 +30,10 @@ import { useEnvironment } from "@/hooks/useEnvironment";
 import { useSkillsMembro } from "@/hooks/useSkillsMembro";
 import * as LucideIcons from "lucide-react";
 
+// Menus que deixaram de existir no sidebar: "Comunicações" (hoje no menu
+// superior) e "Minhas dúvidas" (removido do produto).
+const HIDDEN_MENU_KEYS = ['interacoes', 'minhas_duvidas'];
+
 export function AppSidebar() {
   const { open } = useSidebar();
   const navigate = useNavigate();
@@ -95,8 +99,11 @@ export function AppSidebar() {
   // Pegar todos os menus principais (sem parent_key)
   // Excluir "Comunicações" (interacoes) do sidebar - agora está no menu superior
   // Excluir "Comunicações" (interacoes) e o grupo "Comunidade" (menu + submenus) do sidebar
+  const temGrupoMeuProgresso = sidebarMenus.some(m => m.menu_key === 'meu_progresso' && !m.parent_key);
   const allMainMenus = sidebarMenus.filter(
-    menu => !menu.parent_key && menu.menu_key !== 'interacoes' && !menu.menu_key.startsWith('comunidade')
+    menu => !menu.parent_key && !HIDDEN_MENU_KEYS.includes(menu.menu_key) && !menu.menu_key.startsWith('comunidade')
+      // "Meu progresso" e "Minha evolução" apontam para /evolucao: sem duplicar
+      && !(menu.menu_key === 'evolucao' && temGrupoMeuProgresso)
   );
   
   // Filtrar para visitantes: apenas início (sem submenus expansíveis)
@@ -123,6 +130,7 @@ export function AppSidebar() {
     const BIBLIOTECAS_KEYS = ['bibliotecas', 'biblioteca_ferramentas', 'biblioteca_prompts', 'ia_copie_use', 'metodos_aplicar'];
     return sidebarMenus
       .filter(menu => menu.parent_key === parentKey)
+      .filter(menu => !HIDDEN_MENU_KEYS.includes(menu.menu_key))
       .filter(menu => !BIBLIOTECAS_KEYS.includes(menu.menu_key))
       .filter(menu => !['skills_lider', 'skills_painel_lider'].includes(menu.menu_key) || isSkillsLider || (isAdmin && !isViewingAs) || skillsMembroLoading)
       .filter(menu => !['projeto_skills_performance'].includes(menu.menu_key) || isSkillsLider || (isAdmin && !isViewingAs) || skillsMembroLoading);
@@ -139,11 +147,9 @@ export function AppSidebar() {
   // Helper para determinar URL dinâmica baseada no plano
   const getMenuUrl = (menu: { menu_key: string; url: string | null }) => {
     if (menu.menu_key === 'meu_progresso') {
-      // Business vai para /mentoria (Visão Geral)
-      if (effectivePlan === 'business_parceria' || effectivePlan === 'business_sistemas') {
-        return '/mentoria';
-      }
-      // Demais (Academy) vai para /evolucao
+      // "Meu progresso" é sempre a visão Academy (/evolucao). O painel antigo
+      // de mentoria (/mentoria) fica restrito ao Insider pago, que nem vê
+      // este menu. Ex-Builder e ex-Skills (hoje Academy) caem aqui.
       return '/evolucao';
     }
     // Grupo sem URL (ex: meu_sistema): redireciona para primeiro filho
