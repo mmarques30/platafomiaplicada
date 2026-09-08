@@ -67,7 +67,7 @@ export function LoginForm() {
         
         <Button 
           type="submit" 
-          className="w-full h-12 bg-foreground hover:bg-foreground/90 text-background font-medium rounded-lg transition-all mt-4" 
+          className="ia-entry-form-cta w-full h-12 rounded-full text-[13.5px] uppercase tracking-[0.06em] mt-4" 
           disabled={isLoading}
         >
           {isLoading ? "Acessando..." : "Acessar"}

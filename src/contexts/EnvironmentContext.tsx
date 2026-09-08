@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useMemo, ReactNode } from "react";
-import { useUserPlan } from "@/hooks/useUserPlan";
+import { useUserPlan, type UserPlan } from "@/hooks/useUserPlan";
 import { useUserRole } from "@/hooks/useUserRole";
+import { useAuth } from "@/hooks/useAuth";
 
 export type Environment = "gratuito" | "academy" | "business_parceria" | "business_sistemas";
 
@@ -19,6 +20,9 @@ interface EnvironmentContextType {
 }
 
 const EnvironmentContext = createContext<EnvironmentContextType | undefined>(undefined);
+
+const STORAGE_KEY = "selected_environment";
+const STORAGE_OWNER_KEY = "selected_environment_user";
 
 export const ENVIRONMENT_CONFIG: Record<Environment, {
   label: string;
@@ -52,14 +56,49 @@ export const ENVIRONMENT_CONFIG: Record<Environment, {
   },
 };
 
+/** Ordem de preferência quando o plano não aponta um ambiente específico. */
+const ENVIRONMENT_PRIORITY: Environment[] = ["business_sistemas", "business_parceria", "academy", "gratuito"];
+
+/**
+ * Resolve o ambiente em que o usuário entra automaticamente após o login.
+ *
+ * Não existe mais tela de seleção: o ambiente é o do plano contratado
+ * (System, Builder ou Academy). Sem plano → Gratuito. Admin sem plano cai
+ * no Builder, o mesmo padrão que a sidebar já assumia ao inferir pelo
+ * plano efetivo.
+ */
+function resolveDefaultEnvironment(
+  availableEnvironments: Environment[],
+  plan: UserPlan,
+  isAdmin: boolean,
+): Environment {
+  const planEnvironment: Environment | null =
+    plan === "business_sistemas"
+      ? "business_sistemas"
+      : plan === "business_parceria"
+        ? "business_parceria"
+        : plan === "academy" || plan === "skills"
+          ? "academy"
+          : null;
+
+  if (planEnvironment && availableEnvironments.includes(planEnvironment)) {
+    return planEnvironment;
+  }
+  if (isAdmin && availableEnvironments.includes("business_parceria")) {
+    return "business_parceria";
+  }
+  return ENVIRONMENT_PRIORITY.find((env) => availableEnvironments.includes(env)) ?? "gratuito";
+}
+
 export function EnvironmentProvider({ children }: { children: ReactNode }) {
   const [currentEnvironment, setCurrentEnvironment] = useState<Environment | null>(() => {
-    return sessionStorage.getItem("selected_environment") as Environment | null;
+    return sessionStorage.getItem(STORAGE_KEY) as Environment | null;
   });
-  
+
+  const { user } = useAuth();
   const { plan, isVisitante, isLoading: planLoading } = useUserPlan();
   const { isAdmin, isLoading: roleLoading } = useUserRole();
-  
+
   const isLoading = planLoading || roleLoading;
 
   // Determinar ambientes disponíveis baseado no plano
@@ -68,12 +107,12 @@ export function EnvironmentProvider({ children }: { children: ReactNode }) {
     if (isAdmin) {
       return ["gratuito", "academy", "business_parceria", "business_sistemas"];
     }
-    
+
     // Visitante só vê gratuito
     if (isVisitante) {
       return ["gratuito"];
     }
-    
+
     // Baseado no plano - hierarquia paralela
     switch (plan) {
       case "business_parceria":
@@ -94,17 +133,41 @@ export function EnvironmentProvider({ children }: { children: ReactNode }) {
 
   const setEnvironment = (env: Environment) => {
     setCurrentEnvironment(env);
-    sessionStorage.setItem("selected_environment", env);
+    sessionStorage.setItem(STORAGE_KEY, env);
   };
+
+  const clearEnvironment = () => {
+    setCurrentEnvironment(null);
+    sessionStorage.removeItem(STORAGE_KEY);
+  };
+
+  // Ambiente guardado na sessão pertence a um usuário: se outro usuário
+  // entrar na mesma aba, descartar a escolha anterior.
+  useEffect(() => {
+    if (!user) return;
+    const owner = sessionStorage.getItem(STORAGE_OWNER_KEY);
+    if (owner && owner !== user.id) {
+      clearEnvironment();
+    }
+    sessionStorage.setItem(STORAGE_OWNER_KEY, user.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
 
   // Validar se o ambiente atual ainda é válido quando os ambientes disponíveis mudam
   useEffect(() => {
     if (!isLoading && currentEnvironment && !availableEnvironments.includes(currentEnvironment)) {
       // Ambiente atual não é mais válido, limpar
-      setCurrentEnvironment(null);
-      sessionStorage.removeItem("selected_environment");
+      clearEnvironment();
     }
   }, [availableEnvironments, currentEnvironment, isLoading]);
+
+  // Entrada automática: sem ambiente selecionado, resolver pelo plano.
+  // (isLoading só fica false com usuário autenticado — as queries de plano
+  // e papel ficam desabilitadas sem sessão.)
+  useEffect(() => {
+    if (isLoading || currentEnvironment) return;
+    setEnvironment(resolveDefaultEnvironment(availableEnvironments, plan, isAdmin));
+  }, [isLoading, currentEnvironment, availableEnvironments, plan, isAdmin]);
 
   const environmentConfig = currentEnvironment ? ENVIRONMENT_CONFIG[currentEnvironment] : null;
 

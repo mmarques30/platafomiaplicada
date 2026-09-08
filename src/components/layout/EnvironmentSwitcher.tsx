@@ -1,5 +1,4 @@
-import { Lock, ChevronDown, Repeat } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Lock, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -15,7 +14,6 @@ import { cn } from "@/lib/utils";
 const ALL_ENVIRONMENTS: Environment[] = ["gratuito", "academy", "business_parceria", "business_sistemas"];
 
 export function EnvironmentSwitcher() {
-  const navigate = useNavigate();
   const env = useEnvironmentSafe();
 
   if (!env) return null;
@@ -37,12 +35,6 @@ export function EnvironmentSwitcher() {
       return;
     }
     setEnvironment(env);
-  };
-
-  const handleGoToSelector = () => {
-    // Limpar ambiente para forçar ir para seleção
-    sessionStorage.removeItem("selected_environment");
-    navigate("/selecionar-ambiente");
   };
 
   return (
@@ -88,12 +80,6 @@ export function EnvironmentSwitcher() {
             </DropdownMenuItem>
           );
         })}
-
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleGoToSelector} className="cursor-pointer">
-          <Repeat className="h-4 w-4 mr-2" />
-          Voltar para seleção
-        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

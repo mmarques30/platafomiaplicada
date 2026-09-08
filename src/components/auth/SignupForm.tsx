@@ -232,7 +232,7 @@ export function SignupForm() {
         
         <Button 
           type="submit" 
-          className="w-full h-12 bg-foreground hover:bg-foreground/90 text-background font-medium rounded-lg transition-all mt-2" 
+          className="ia-entry-form-cta w-full h-12 rounded-full text-[13.5px] uppercase tracking-[0.06em] mt-2" 
           disabled={isLoading}
         >
           {isLoading ? "Criando conta..." : "Criar conta grátis"}

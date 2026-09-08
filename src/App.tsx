@@ -11,7 +11,6 @@ import { SkillsAdminTeamProvider } from "./contexts/SkillsAdminTeamContext";
 import { EnvironmentProvider } from "./contexts/EnvironmentContext";
 import Auth from "./pages/Auth";
 import Servicos from "./pages/Servicos";
-import EnvironmentSelector from "./pages/EnvironmentSelector";
 import Dashboard from "./pages/Dashboard";
 import Trilhas from "./pages/Trilhas";
 import TrilhaDetalhes from "./pages/TrilhaDetalhes";
@@ -141,7 +140,6 @@ function AppContent() {
         {/* Rotas públicas */}
         <Route path="/auth" element={<Auth />} />
         <Route path="/servicos" element={<Servicos />} />
-        <Route path="/selecionar-ambiente" element={<EnvironmentSelector />} />
         <Route path="/formularioaplica" element={<FormularioAplica />} />
         <Route path="/termos-uso" element={<PoliticaUso />} />
         <Route path="/politica-privacidade" element={<PoliticaPrivacidade />} />
