@@ -430,7 +430,7 @@ export default function Central() {
                 {/* Conteúdo Completo */}
                 {selectedConteudo.conteudo && (
                   <div 
-                    className="prose prose-sm dark:prose-invert max-w-none"
+                    className="prose prose-sm prose-invert max-w-none prose-invert"
                     style={{
                       fontSize: selectedConteudo.estilo_texto?.fontSize || 16,
                       lineHeight: selectedConteudo.estilo_texto?.lineHeight || 1.5,

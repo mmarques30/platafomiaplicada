@@ -7,7 +7,6 @@ import { Link } from "react-router-dom";
 import { NovidadesSemana } from "@/components/dashboard/NovidadesSemana";
 import { WelcomeHeader } from "@/components/dashboard/WelcomeHeader";
 import { AcademyWelcomeCard } from "@/components/dashboard/AcademyWelcomeCard";
-import { PendenciasOnboarding } from "@/components/dashboard/PendenciasOnboarding";
 import { CentralConteudo } from "@/components/dashboard/CentralConteudo";
 import { CentralConteudoGratuito } from "@/components/dashboard/CentralConteudoGratuito";
 import { RankingTicker } from "@/components/dashboard/RankingTicker";
@@ -98,7 +97,6 @@ export default function Dashboard() {
             <DashboardUrgencias />
             <AcademyWelcomeCard />
             <WeeklyProgressCard />
-            <PendenciasOnboarding />
             <CentralConteudo />
             <RankingTicker />
             {novidadesSemana && <NovidadesSemana />}

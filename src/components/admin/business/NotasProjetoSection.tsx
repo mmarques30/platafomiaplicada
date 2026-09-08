@@ -140,7 +140,7 @@ function NotaCard({ nota, readOnly, autoOpen, onUpdate, onDelete }: {
         <CollapsibleContent>
           <div className="px-4 pb-4 space-y-3 border-t border-border/30 pt-3">
             {readOnly ? (
-              <div className="prose prose-sm max-w-none">
+              <div className="prose prose-sm max-w-none prose-invert">
                 <h4 className="text-sm font-semibold mb-1">{nota.titulo}</h4>
                 <p className="text-sm text-muted-foreground whitespace-pre-wrap">{nota.conteudo || "Sem conteúdo."}</p>
               </div>

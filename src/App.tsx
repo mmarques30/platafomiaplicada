@@ -279,7 +279,7 @@ function AppContent() {
 const App = () => (
   <ErrorBoundary>
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+      <ThemeProvider attribute="class" defaultTheme="dark" forcedTheme="dark" enableSystem={false}>
         <TooltipProvider>
           <BrowserRouter>
             <AdminViewProvider>

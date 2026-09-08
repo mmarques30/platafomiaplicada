@@ -229,7 +229,7 @@ export function ResumoTab() {
           </CardHeader>
           <CardContent>
             <div className="max-h-[70vh] overflow-y-auto pr-2">
-              <div className="prose prose-sm dark:prose-invert max-w-none">
+              <div className="prose prose-sm prose-invert max-w-none prose-invert">
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
                   {resumo}
                 </ReactMarkdown>

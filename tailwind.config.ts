@@ -28,6 +28,12 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         surface: "hsl(var(--surface))",
+        chrome: {
+          DEFAULT: "hsl(var(--chrome))",
+          foreground: "hsl(var(--chrome-foreground))",
+          border: "hsl(var(--chrome-border))",
+          accent: "hsl(var(--chrome-accent))",
+        },
         /* Paleta iaplicada.com */
         lime: "hsl(var(--lime))",
         olive: "hsl(var(--olive))",

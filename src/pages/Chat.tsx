@@ -516,7 +516,7 @@ const Chat = () => {
                     >
                       {message.role === "assistant" ? (
                         <div className="flex items-start gap-1">
-                          <div className="prose prose-sm dark:prose-invert max-w-none">
+                          <div className="prose prose-sm prose-invert max-w-none prose-invert">
                             <ReactMarkdown
                               remarkPlugins={[remarkGfm]}
                               components={{
