@@ -28,8 +28,8 @@ export function StatsCard({ title, value, description, icon: Icon, onClick, tren
           <div className="text-2xl font-bold text-card-foreground">{value}</div>
           {trend && trend.value > 0 && (
             <div className={`flex items-center gap-0.5 text-xs font-medium ${
-              trend.direction === 'up' ? 'text-green-600' : 
-              trend.direction === 'down' ? 'text-red-600' : 
+              trend.direction === 'up' ? 'text-status-success' : 
+              trend.direction === 'down' ? 'text-status-danger' : 
               'text-muted-foreground'
             }`}>
               {trend.direction === 'up' && <TrendingUp className="h-3 w-3" />}

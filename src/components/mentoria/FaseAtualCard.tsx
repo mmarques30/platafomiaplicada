@@ -53,7 +53,7 @@ export function FaseAtualCard() {
   const statusColors = {
     pendente: "bg-muted text-muted-foreground",
     em_andamento: "bg-primary text-primary-foreground",
-    concluida: "bg-green-500 text-white",
+    concluida: "bg-status-success text-white",
     bloqueada: "bg-destructive text-destructive-foreground",
   };
 

@@ -98,9 +98,9 @@ export default function ProjetosMapeadosTab({ equipeId }: Props) {
   };
 
   const prioridadeColors: Record<string, string> = {
-    alta: "bg-red-500/10 text-red-600 border-red-500/20",
-    media: "bg-yellow-500/10 text-yellow-600 border-yellow-500/20",
-    baixa: "bg-green-500/10 text-green-600 border-green-500/20",
+    alta: "bg-status-danger/10 text-status-danger border-status-danger/20",
+    media: "bg-status-warning/10 text-status-warning border-status-warning/20",
+    baixa: "bg-status-success/10 text-status-success border-status-success/20",
   };
 
   // Helper to get metrics per project
@@ -142,16 +142,16 @@ export default function ProjetosMapeadosTab({ equipeId }: Props) {
       </div>
 
       {diagStatus && (
-        <div className={`flex items-center gap-2 p-3 rounded-lg text-sm ${diagStatus.completos > 0 ? "bg-green-500/10" : "bg-yellow-500/10"}`}>
+        <div className={`flex items-center gap-2 p-3 rounded-lg text-sm ${diagStatus.completos > 0 ? "bg-status-success/10" : "bg-status-warning/10"}`}>
           {diagStatus.completos > 0 ? (
             <>
-              <CheckCircle className="h-4 w-4 text-green-600 shrink-0" />
-              <span className="text-green-600">{diagStatus.completos}/{diagStatus.total} diagnósticos preenchidos — pronto para gerar projetos</span>
+              <CheckCircle className="h-4 w-4 text-status-success shrink-0" />
+              <span className="text-status-success">{diagStatus.completos}/{diagStatus.total} diagnósticos preenchidos — pronto para gerar projetos</span>
             </>
           ) : (
             <>
-              <AlertTriangle className="h-4 w-4 text-yellow-600 shrink-0" />
-              <span className="text-yellow-600">Nenhum diagnóstico preenchido ({diagStatus.total} membros). Os membros precisam preencher o diagnóstico antes de gerar projetos.</span>
+              <AlertTriangle className="h-4 w-4 text-status-warning shrink-0" />
+              <span className="text-status-warning">Nenhum diagnóstico preenchido ({diagStatus.total} membros). Os membros precisam preencher o diagnóstico antes de gerar projetos.</span>
             </>
           )}
         </div>
@@ -171,7 +171,7 @@ export default function ProjetosMapeadosTab({ equipeId }: Props) {
             const metrics = getProjetoMetrics(proj.id);
             
             return (
-              <Card key={proj.id} className={`border-border/50 hover:shadow-sm transition-shadow ${isPendenteAvaliacao ? "border-yellow-500/40" : ""}`}>
+              <Card key={proj.id} className={`border-border/50 hover:shadow-sm transition-shadow ${isPendenteAvaliacao ? "border-status-warning/40" : ""}`}>
                 <CardContent className="py-3 px-4">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1 min-w-0">
@@ -179,7 +179,7 @@ export default function ProjetosMapeadosTab({ equipeId }: Props) {
                         <h4 className="font-medium text-sm">{proj.titulo}</h4>
                         {isPendenteAvaliacao && (
                           <Badge
-                            className="bg-yellow-500/15 text-yellow-700 border-yellow-500/30 hover:bg-yellow-500/25 cursor-pointer text-xs"
+                            className="bg-status-warning/15 text-status-warning border-status-warning/30 hover:bg-status-warning/25 cursor-pointer text-xs"
                             onClick={() => handleAprovarProjeto(proj.id, tags)}
                             title="Clique para aprovar este projeto"
                           >

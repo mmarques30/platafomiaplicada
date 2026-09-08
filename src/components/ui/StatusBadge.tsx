@@ -8,9 +8,9 @@ type StatusType =
   | "critico" | "atrasado";
 
 const STATUS_STYLES: Record<string, { bg: string; text: string; defaultLabel: string }> = {
-  ativo:        { bg: "rgba(175,192,64,0.12)", text: "#C0DD97", defaultLabel: "Ativo" },
-  concluido:    { bg: "rgba(175,192,64,0.12)", text: "#C0DD97", defaultLabel: "Concluído" },
-  aprovado:     { bg: "rgba(175,192,64,0.12)", text: "#C0DD97", defaultLabel: "Aprovado" },
+  ativo:        { bg: "rgba(175,192,64,0.12)", text: "#d5e95a", defaultLabel: "Ativo" },
+  concluido:    { bg: "rgba(175,192,64,0.12)", text: "#d5e95a", defaultLabel: "Concluído" },
+  aprovado:     { bg: "rgba(175,192,64,0.12)", text: "#d5e95a", defaultLabel: "Aprovado" },
   em_andamento: { bg: "rgba(74,159,224,0.12)",  text: "#85B7EB", defaultLabel: "Em andamento" },
   pendente:     { bg: "rgba(232,164,60,0.12)",  text: "#FAC775", defaultLabel: "Pendente" },
   aguardando:   { bg: "rgba(232,164,60,0.12)",  text: "#FAC775", defaultLabel: "Aguardando" },

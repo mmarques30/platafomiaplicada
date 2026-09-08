@@ -166,7 +166,7 @@ export function GerarEtapasIAModal({ open, onOpenChange, contrato, onSuccess }: 
             <div className="space-y-3 py-2">
               {meta && (
                 <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
-                  <CheckCircle2 className="h-4 w-4 text-green-500" />
+                  <CheckCircle2 className="h-4 w-4 text-status-success" />
                   {meta.total_etapas} etapas geradas (~{meta.dias_por_etapa} dias cada)
                 </div>
               )}

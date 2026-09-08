@@ -29,11 +29,11 @@ interface Props {
 const CustomLegend = () => (
   <div className="flex items-center justify-center gap-6 pt-2">
     <div className="flex items-center gap-2">
-      <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: "#a1a1aa" }} />
+      <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: "#a3a89a" }} />
       <span className="text-xs text-muted-foreground">Projetadas</span>
     </div>
     <div className="flex items-center gap-2">
-      <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: "#9EB038" }} />
+      <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: "#c8e040" }} />
       <span className="text-xs text-muted-foreground">Executadas</span>
     </div>
   </div>
@@ -101,12 +101,12 @@ export default function EntregasProjetadasVsExecutadasChart({
           <AreaChart data={data}>
             <defs>
               <linearGradient id="gradProjetadas" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#a1a1aa" stopOpacity={0.2} />
-                <stop offset="95%" stopColor="#a1a1aa" stopOpacity={0} />
+                <stop offset="5%" stopColor="#a3a89a" stopOpacity={0.2} />
+                <stop offset="95%" stopColor="#a3a89a" stopOpacity={0} />
               </linearGradient>
               <linearGradient id="gradExecutadas" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#9EB038" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="#9EB038" stopOpacity={0} />
+                <stop offset="5%" stopColor="#c8e040" stopOpacity={0.3} />
+                <stop offset="95%" stopColor="#c8e040" stopOpacity={0} />
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" strokeOpacity={0.5} />
@@ -135,7 +135,7 @@ export default function EntregasProjetadasVsExecutadasChart({
               type="monotone"
               dataKey="projetadas"
               name="Projetadas"
-              stroke="#a1a1aa"
+              stroke="#a3a89a"
               strokeWidth={2}
               fillOpacity={1}
               fill="url(#gradProjetadas)"
@@ -144,7 +144,7 @@ export default function EntregasProjetadasVsExecutadasChart({
               type="monotone"
               dataKey="executadas"
               name="Executadas"
-              stroke="#9EB038"
+              stroke="#c8e040"
               strokeWidth={2}
               fillOpacity={1}
               fill="url(#gradExecutadas)"

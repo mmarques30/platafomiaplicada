@@ -186,7 +186,7 @@ export default function GerenciarUsuários() {
       return <Badge variant="destructive" className="text-xs">Expirado</Badge>;
     }
     
-    return <Badge variant="default" className="bg-green-600 text-xs">Ativo</Badge>;
+    return <Badge variant="default" className="bg-status-success text-xs">Ativo</Badge>;
   };
 
   const handleDeleteUser = () => {
@@ -354,12 +354,12 @@ export default function GerenciarUsuários() {
                       variant="outline"
                       className={`text-xs ${
                         (user as any).plano_mentoria === "academy"
-                          ? "border-blue-500 text-blue-700"
+                          ? "border-status-info text-status-info"
                           : (user as any).plano_mentoria === "business_sistemas"
-                          ? "border-violet-500 text-violet-700"
+                          ? "border-secondary text-secondary"
                           : (user as any).plano_mentoria === "insider_free"
-                          ? "border-indigo-300 text-indigo-600"
-                          : "border-gray-500 text-gray-700"
+                          ? "border-status-info/40 text-status-info"
+                          : "border-foreground/30 text-foreground"
                       }`}
                     >
                       {(user as any).plano_mentoria === "academy" && "Academy"}
@@ -367,7 +367,7 @@ export default function GerenciarUsuários() {
                       {(user as any).plano_mentoria === "insider_free" && "Insider Free"}
                     </Badge>
                   ) : (
-                    <Badge variant="outline" className="border-gray-400 text-gray-600 text-xs">
+                    <Badge variant="outline" className="border-border text-muted-foreground text-xs">
                       Sem Plano
                     </Badge>
                   )}
@@ -377,7 +377,7 @@ export default function GerenciarUsuários() {
                     const provider = authProviders?.[user.id] || 'email';
                     if (provider === 'google') {
                       return (
-                        <Badge className="bg-blue-100 text-blue-700 border-blue-200 text-xs flex items-center gap-1 w-fit">
+                        <Badge className="bg-status-info/15 text-status-info border-status-info/40 text-xs flex items-center gap-1 w-fit">
                           <svg className="h-3 w-3" viewBox="0 0 24 24">
                             <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                             <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -437,7 +437,7 @@ export default function GerenciarUsuários() {
                       disabled={updateOnboardingStatus.isPending}
                     />
                     {(user as any).email_acesso_enviado && (
-                      <Mail className="h-3 w-3 text-green-600" />
+                      <Mail className="h-3 w-3 text-status-success" />
                     )}
                   </div>
                 </TableCell>
@@ -455,7 +455,7 @@ export default function GerenciarUsuários() {
                       disabled={updateOnboardingStatus.isPending}
                     />
                     {(user as any).adicionado_grupo_whatsapp && (
-                      <MessageCircle className="h-3 w-3 text-green-600" />
+                      <MessageCircle className="h-3 w-3 text-status-success" />
                     )}
                   </div>
                 </TableCell>

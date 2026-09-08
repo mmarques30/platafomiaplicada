@@ -166,8 +166,8 @@ export default function SkillsEntregasTab({ equipeId }: Props) {
 
   const statusBadge = (status: string) => {
     switch (status) {
-      case "concluido": return <Badge className="bg-emerald-100 text-emerald-700 border-transparent">Concluído</Badge>;
-      case "em_andamento": return <Badge className="bg-amber-100 text-amber-700 border-transparent">Em andamento</Badge>;
+      case "concluido": return <Badge className="bg-status-success/15 text-status-success border-transparent">Concluído</Badge>;
+      case "em_andamento": return <Badge className="bg-status-warning/15 text-status-warning border-transparent">Em andamento</Badge>;
       case "atrasado": return <Badge variant="destructive">Atrasado</Badge>;
       default: return <Badge variant="outline">Pendente</Badge>;
     }
@@ -277,7 +277,7 @@ export default function SkillsEntregasTab({ equipeId }: Props) {
                           {e.titulo}
                           {isPendenteAvaliacao && (
                             <Badge
-                              className="bg-yellow-500/15 text-yellow-700 border-yellow-500/30 hover:bg-yellow-500/25 cursor-pointer text-xs shrink-0"
+                              className="bg-status-warning/15 text-status-warning border-status-warning/30 hover:bg-status-warning/25 cursor-pointer text-xs shrink-0"
                               onClick={handleAprovarEntrega}
                               title="Clique para aprovar esta entrega"
                             >

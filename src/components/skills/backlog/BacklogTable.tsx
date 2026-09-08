@@ -16,12 +16,12 @@ const statusLabels: Record<string, string> = {
 
 const statusColors: Record<string, string> = {
   levantado: "",
-  aprovado: "bg-blue-500/15 text-blue-700 border-blue-200",
+  aprovado: "bg-status-info/15 text-status-info border-status-info/40",
   nao_aprovado: "bg-destructive/15 text-destructive border-destructive/30",
-  backlog: "bg-amber-500/15 text-amber-700 border-amber-200",
-  priorizado: "bg-indigo-500/15 text-indigo-700 border-indigo-200",
-  em_execucao: "bg-[#9EB038]/15 text-[#738925] border-[#9EB038]/30",
-  entregue: "bg-emerald-500/15 text-emerald-700 border-emerald-200",
+  backlog: "bg-status-warning/15 text-status-warning border-status-warning/40",
+  priorizado: "bg-status-info/15 text-status-info border-status-info/40",
+  em_execucao: "bg-primary/15 text-secondary border-primary/30",
+  entregue: "bg-status-success/15 text-status-success border-status-success/40",
 };
 
 

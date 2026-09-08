@@ -6,16 +6,16 @@ import { useSkillsBacklog } from "@/hooks/useSkillsBacklog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const STATUS_CONFIG = {
-  levantado: { label: "Levantado", color: "bg-slate-100 text-slate-700" },
-  priorizado: { label: "Priorizado", color: "bg-blue-100 text-blue-700" },
-  em_execucao: { label: "Em Execução", color: "bg-amber-100 text-amber-700" },
-  entregue: { label: "Entregue", color: "bg-green-100 text-green-700" },
+  levantado: { label: "Levantado", color: "bg-muted text-foreground" },
+  priorizado: { label: "Priorizado", color: "bg-status-info/15 text-status-info" },
+  em_execucao: { label: "Em Execução", color: "bg-status-warning/15 text-status-warning" },
+  entregue: { label: "Entregue", color: "bg-status-success/15 text-status-success" },
 };
 
 const PRIORIDADE_CONFIG = {
-  alta: { label: "Alta", color: "bg-red-100 text-red-700" },
-  media: { label: "Média", color: "bg-amber-100 text-amber-700" },
-  baixa: { label: "Baixa", color: "bg-green-100 text-green-700" },
+  alta: { label: "Alta", color: "bg-status-danger/15 text-status-danger" },
+  media: { label: "Média", color: "bg-status-warning/15 text-status-warning" },
+  baixa: { label: "Baixa", color: "bg-status-success/15 text-status-success" },
 };
 
 export default function SkillsBacklog() {

@@ -39,7 +39,7 @@ interface BusinessPerformanceChartsProps {
 }
 
 // Using brand colors - aplicada-green variants
-const COLORS = ['#9EB038', '#7A8C2A', '#5C6A20', '#4A5519', '#3D4615'];
+const COLORS = ['#c8e040', '#7A8C2A', '#5C6A20', '#4A5519', '#3D4615'];
 
 export function BusinessPerformanceCharts({ 
   projetosProgresso, 
@@ -93,7 +93,7 @@ export function BusinessPerformanceCharts({
                 <Bar 
                   dataKey="progresso" 
                   name="Progresso"
-                  fill="#9EB038" 
+                  fill="#c8e040" 
                   radius={[0, 4, 4, 0]}
                   background={{ fill: 'hsl(var(--muted))' }}
                 />
@@ -169,9 +169,9 @@ export function BusinessPerformanceCharts({
                   type="monotone" 
                   dataKey="entregas" 
                   name="Entregas"
-                  stroke="#9EB038" 
+                  stroke="#c8e040" 
                   strokeWidth={2}
-                  dot={{ fill: '#9EB038', strokeWidth: 2 }}
+                  dot={{ fill: '#c8e040', strokeWidth: 2 }}
                   activeDot={{ r: 6, fill: '#B5C940' }}
                 />
                 <Line 

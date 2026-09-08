@@ -65,13 +65,13 @@ export default function VisualizarFormularios() {
   const getPlanoBadgeColor = (plano: string) => {
     switch (plano) {
       case "academy":
-        return "bg-blue-500/10 text-blue-500 border-blue-500/20";
+        return "bg-status-info/10 text-status-info border-status-info/20";
       case "skills":
-        return "bg-orange-500/10 text-orange-500 border-orange-500/20";
+        return "bg-status-warning/10 text-status-warning border-status-warning/20";
       case "business_parceria":
       case "business_sistemas":
       default:
-        return "bg-gray-500/10 text-gray-500 border-gray-500/20";
+        return "bg-card/10 text-muted-foreground border-foreground/30/20";
     }
   };
 
@@ -87,10 +87,10 @@ export default function VisualizarFormularios() {
         <div className="flex items-center gap-3">
           {/* Stats inline compactos */}
           <div className="hidden md:flex items-center gap-3 text-xs text-muted-foreground">
-            <span className="text-blue-500">Academy: <strong>{totalAcademy}</strong></span>
-            <span className="text-orange-500">Skills: <strong>{totalSkills}</strong></span>
-            <span className="text-purple-500">Business: <strong>{totalBusiness}</strong></span>
-            <span className="text-green-600">Completos: <strong>{totalCompletos}</strong></span>
+            <span className="text-status-info">Academy: <strong>{totalAcademy}</strong></span>
+            <span className="text-status-warning">Skills: <strong>{totalSkills}</strong></span>
+            <span className="text-secondary">Business: <strong>{totalBusiness}</strong></span>
+            <span className="text-status-success">Completos: <strong>{totalCompletos}</strong></span>
           </div>
           <div className="flex border rounded-lg">
             <Button 

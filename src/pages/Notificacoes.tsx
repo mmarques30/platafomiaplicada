@@ -15,19 +15,19 @@ const getBarColor = (tipo: string | null | undefined): string => {
     case "atrasado":
     case "alerta":
     case "prazo":
-      return "#E8684A";
+      return "#db2b42";
     case "importante":
     case "entrega":
     case "tarefa":
-      return "#E8A43C";
+      return "#e8a43c";
     case "informativo":
     case "sessao":
-      return "#4A9FE0";
+      return "#4a9fe0";
     case "conquista":
     case "certificado":
-      return "#AFC040";
+      return "#c8e040";
     default:
-      return "#2CBBA6";
+      return "#4a9fe0";
   }
 };
 
@@ -179,10 +179,10 @@ export default function Notificacoes() {
                       variant="outline"
                       className={
                         aviso.tipo === "urgente" 
-                          ? "bg-red-500/10 text-red-600 border-red-500/20" 
+                          ? "bg-status-danger/10 text-status-danger border-status-danger/20" 
                           : aviso.tipo === "importante"
-                          ? "bg-orange-500/10 text-orange-600 border-orange-500/20"
-                          : "bg-blue-500/10 text-blue-600 border-blue-500/20"
+                          ? "bg-status-warning/10 text-status-warning border-status-warning/20"
+                          : "bg-status-info/10 text-status-info border-status-info/20"
                       }
                     >
                       {aviso.tipo}

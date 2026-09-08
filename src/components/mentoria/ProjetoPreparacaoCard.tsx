@@ -52,7 +52,7 @@ export const ProjetoPreparacaoCard = ({ projetoId, userId }: ProjetoPreparacaoCa
               {preparacao.progressoGeral}% concluído
             </Badge>
             {(trilhasEmBreve.length > 0 || modulosEmBreve.length > 0) && (
-              <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">
+              <Badge variant="outline" className="bg-status-warning/15 text-status-warning border-status-warning/40">
                 <Clock className="h-3 w-3 mr-1" />
                 {trilhasEmBreve.length + modulosEmBreve.length} conteúdo(s) em breve
               </Badge>
@@ -61,12 +61,12 @@ export const ProjetoPreparacaoCard = ({ projetoId, userId }: ProjetoPreparacaoCa
         </CardHeader>
         <CardContent className="space-y-4">
           {preparacao.progressoGeral < 100 && modulosPendentes.length > 0 && (
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+            <div className="bg-status-warning/15 border border-status-warning/40 rounded-lg p-4">
               <div className="flex items-start gap-2">
-                <AlertCircle className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
+                <AlertCircle className="h-5 w-5 text-status-warning mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="font-medium text-amber-900">Atenção</p>
-                  <p className="text-sm text-amber-700">
+                  <p className="font-medium text-status-warning">Atenção</p>
+                  <p className="text-sm text-status-warning">
                     Assista esses conteúdos antes da mentoria para focar na prática
                   </p>
                 </div>
@@ -97,7 +97,7 @@ export const ProjetoPreparacaoCard = ({ projetoId, userId }: ProjetoPreparacaoCa
                       <div className="flex items-center gap-2">
                         <h4 className="font-medium">{trilha.titulo}</h4>
                         {isEmBreve && (
-                          <Badge variant="secondary" className="bg-amber-100 text-amber-800 text-xs">
+                          <Badge variant="secondary" className="bg-status-warning/15 text-status-warning text-xs">
                             <Clock className="h-3 w-3 mr-1" />
                             Em breve
                           </Badge>
@@ -115,7 +115,7 @@ export const ProjetoPreparacaoCard = ({ projetoId, userId }: ProjetoPreparacaoCa
                       )}
                     </div>
                     {!isEmBreve && progresso === 100 ? (
-                      <CheckCircle2 className="h-5 w-5 text-green-500 flex-shrink-0" />
+                      <CheckCircle2 className="h-5 w-5 text-status-success flex-shrink-0" />
                     ) : isEmBreve ? (
                       <Lock className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                     ) : (
@@ -161,7 +161,7 @@ export const ProjetoPreparacaoCard = ({ projetoId, userId }: ProjetoPreparacaoCa
                   <div className="flex items-center gap-2">
                     <h3 className="font-semibold">{trilha.titulo}</h3>
                     {isEmBreve ? (
-                      <Badge variant="secondary" className="bg-amber-100 text-amber-800">
+                      <Badge variant="secondary" className="bg-status-warning/15 text-status-warning">
                         <Clock className="h-3 w-3 mr-1" />
                         Em breve
                       </Badge>
@@ -179,7 +179,7 @@ export const ProjetoPreparacaoCard = ({ projetoId, userId }: ProjetoPreparacaoCa
                           key={mIdx}
                           className={`border rounded-lg p-3 ${
                             modulo.concluido 
-                              ? 'bg-green-50 border-green-200' 
+                              ? 'bg-status-success/15 border-status-success/40' 
                               : moduloEmBreve 
                                 ? 'bg-muted/30 border-dashed'
                                 : 'bg-white'
@@ -189,15 +189,15 @@ export const ProjetoPreparacaoCard = ({ projetoId, userId }: ProjetoPreparacaoCa
                             <div className="flex-1">
                               <div className="flex items-center gap-2">
                                 {modulo.concluido ? (
-                                  <CheckCircle2 className="h-4 w-4 text-green-600 flex-shrink-0" />
+                                  <CheckCircle2 className="h-4 w-4 text-status-success flex-shrink-0" />
                                 ) : moduloEmBreve ? (
                                   <Lock className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                                 ) : (
-                                  <div className="h-4 w-4 rounded-full border-2 border-gray-300 flex-shrink-0" />
+                                  <div className="h-4 w-4 rounded-full border-2 border-border flex-shrink-0" />
                                 )}
                                 <span className={`font-medium ${
                                   modulo.concluido 
-                                    ? 'text-green-900' 
+                                    ? 'text-status-success' 
                                     : moduloEmBreve 
                                       ? 'text-muted-foreground' 
                                       : ''
@@ -205,7 +205,7 @@ export const ProjetoPreparacaoCard = ({ projetoId, userId }: ProjetoPreparacaoCa
                                   {modulo.titulo}
                                 </span>
                                 {moduloEmBreve && (
-                                  <Badge variant="secondary" className="bg-amber-100 text-amber-800 text-xs">
+                                  <Badge variant="secondary" className="bg-status-warning/15 text-status-warning text-xs">
                                     Em breve
                                   </Badge>
                                 )}

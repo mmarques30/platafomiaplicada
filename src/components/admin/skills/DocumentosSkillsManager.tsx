@@ -21,7 +21,7 @@ import SkillsTabActions from "./SkillsTabActions";
 interface Props { equipeId: string; equipeName?: string }
 
 const tipoLabels: Record<string, string> = { contrato: "Contrato", transcricao: "Transcrição", anexo: "Anexo", solucao: "Solução", outro: "Outro" };
-const tipoColors: Record<string, string> = { contrato: "bg-primary/10 text-primary border-primary/20", transcricao: "bg-blue-500/10 text-blue-600 border-blue-500/20", anexo: "bg-amber-500/10 text-amber-600 border-amber-500/20", solucao: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20", outro: "bg-muted text-muted-foreground border-muted-foreground/20" };
+const tipoColors: Record<string, string> = { contrato: "bg-primary/10 text-primary border-primary/20", transcricao: "bg-status-info/10 text-status-info border-status-info/20", anexo: "bg-status-warning/10 text-status-warning border-status-warning/20", solucao: "bg-status-success/10 text-status-success border-status-success/20", outro: "bg-muted text-muted-foreground border-muted-foreground/20" };
 
 const iconeOptions = [
   { value: "link", label: "Link", Icon: ExternalLink },
@@ -158,7 +158,7 @@ export default function DocumentosSkillsManager({ equipeId, equipeName }: Props)
               <Card key={link.id} className="border-border/50 hover:shadow-sm transition-shadow">
                 <CardContent className="py-3 px-4"><div className="flex items-center justify-between gap-4">
                   <div className="flex items-center gap-3 flex-1 min-w-0">
-                    <div className="h-10 w-10 rounded-lg bg-blue-500/10 flex items-center justify-center"><IconComp className="h-5 w-5 text-blue-600" /></div>
+                    <div className="h-10 w-10 rounded-lg bg-status-info/10 flex items-center justify-center"><IconComp className="h-5 w-5 text-status-info" /></div>
                     <div className="flex-1 min-w-0"><h4 className="font-medium text-sm truncate">{link.titulo}</h4>{link.descricao && <p className="text-xs text-muted-foreground truncate mt-0.5">{link.descricao}</p>}</div>
                   </div>
                   <div className="flex items-center gap-2">

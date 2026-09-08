@@ -15,12 +15,12 @@ type EventoTimeline = {
 };
 
 const CONFIG = {
-  cadastro: { icon: Sparkles, color: '#AFC040' },
-  modulo: { icon: BookOpen, color: '#2CBBA6' },
-  sessao: { icon: Video, color: '#4A9FE0' },
-  etapa: { icon: CheckCircle, color: '#AFC040' },
-  entrega: { icon: Package, color: '#2CBBA6' },
-  conquista: { icon: Trophy, color: '#E8A43C' },
+  cadastro: { icon: Sparkles, color: '#c8e040' },
+  modulo: { icon: BookOpen, color: '#4a9fe0' },
+  sessao: { icon: Video, color: '#4a9fe0' },
+  etapa: { icon: CheckCircle, color: '#c8e040' },
+  entrega: { icon: Package, color: '#4a9fe0' },
+  conquista: { icon: Trophy, color: '#e8a43c' },
 } as const;
 
 export default function MinhaHistoria() {

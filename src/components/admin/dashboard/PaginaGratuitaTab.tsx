@@ -46,16 +46,16 @@ export function PaginaGratuitaTab() {
 
   const getContentTypeIcon = (type: string) => {
     switch (type) {
-      case "video": return <Video className="h-4 w-4 text-blue-500" />;
-      case "material": return <FileText className="h-4 w-4 text-green-500" />;
+      case "video": return <Video className="h-4 w-4 text-status-info" />;
+      case "material": return <FileText className="h-4 w-4 text-status-success" />;
       default: return <FileText className="h-4 w-4 text-muted-foreground" />;
     }
   };
 
   const getContentTypeBadge = (type: string) => {
     switch (type) {
-      case "video": return <Badge variant="outline" className="text-blue-500 border-blue-500">Vídeo</Badge>;
-      case "material": return <Badge variant="outline" className="text-green-500 border-green-500">Material</Badge>;
+      case "video": return <Badge variant="outline" className="text-status-info border-status-info">Vídeo</Badge>;
+      case "material": return <Badge variant="outline" className="text-status-success border-status-success">Material</Badge>;
       default: return <Badge variant="outline">{type}</Badge>;
     }
   };
@@ -218,13 +218,13 @@ export function PaginaGratuitaTab() {
                       <TableCell className="text-right">{visitor.totalAccesses}</TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-1">
-                          <Video className="h-3 w-3 text-blue-500" />
+                          <Video className="h-3 w-3 text-status-info" />
                           {visitor.videoCount}
                         </div>
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-1">
-                          <FileText className="h-3 w-3 text-green-500" />
+                          <FileText className="h-3 w-3 text-status-success" />
                           {visitor.materialCount}
                         </div>
                       </TableCell>

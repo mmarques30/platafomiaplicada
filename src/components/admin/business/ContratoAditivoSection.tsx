@@ -178,11 +178,11 @@ export function ContratoAditivoSection({
   };
 
   return (
-    <Card className="border-dashed border-amber-500/50">
+    <Card className="border-dashed border-status-warning/50">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-amber-500" />
+            <Sparkles className="h-5 w-5 text-status-warning" />
             <CardTitle className="text-base">Aditivo / Atualização Contratual</CardTitle>
           </div>
           <Button variant="ghost" size="sm" onClick={loadHistorico}>

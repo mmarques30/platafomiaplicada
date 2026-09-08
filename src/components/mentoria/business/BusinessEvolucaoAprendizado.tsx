@@ -224,7 +224,7 @@ export function BusinessEvolucaoAprendizado() {
                         {atividade.descricao}
                       </p>
                       {isFavorito(atividade.itemId) && (
-                        <Star className="h-3 w-3 text-yellow-500 fill-yellow-500 flex-shrink-0" />
+                        <Star className="h-3 w-3 text-status-warning fill-status-warning flex-shrink-0" />
                       )}
                     </div>
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">

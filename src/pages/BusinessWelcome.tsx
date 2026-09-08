@@ -84,7 +84,7 @@ export default function BusinessWelcome() {
             <div
               key={step.number}
               className="flex items-start gap-3 rounded-lg bg-card p-4"
-              style={{ borderLeft: "3px solid #2CBBA6" }}
+              style={{ borderLeft: "3px solid #4a9fe0" }}
             >
               <span
                 className="text-foreground shrink-0"
@@ -110,8 +110,8 @@ export default function BusinessWelcome() {
           disabled={loading}
           className="w-full"
           style={{
-            backgroundColor: "#AFC040",
-            color: "#0C0F0A",
+            backgroundColor: "#c8e040",
+            color: "#0c0e08",
             fontWeight: 500,
             borderRadius: 8,
             padding: "12px 32px",

@@ -133,7 +133,7 @@ export function MentoriaTab({ data }: MentoriaTabProps) {
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-yellow-500" />
+                  <div className="w-3 h-3 rounded-full bg-status-warning" />
                   <span className="text-sm">Pendentes</span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -146,7 +146,7 @@ export function MentoriaTab({ data }: MentoriaTabProps) {
               
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-blue-500" />
+                  <div className="w-3 h-3 rounded-full bg-status-info" />
                   <span className="text-sm">Em Andamento</span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -159,7 +159,7 @@ export function MentoriaTab({ data }: MentoriaTabProps) {
               
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-green-500" />
+                  <div className="w-3 h-3 rounded-full bg-status-success" />
                   <span className="text-sm">Concluídas</span>
                 </div>
                 <div className="flex items-center gap-2">

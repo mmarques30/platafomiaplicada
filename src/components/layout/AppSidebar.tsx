@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { Home, BookOpen, Star, Bell, LogOut, MessageSquare, TrendingUp, GraduationCap, Layers, ChevronDown } from "lucide-react";
-import { SidebarComunidadeItem } from "./SidebarComunidadeItem";
 import { SidebarAdminSection } from "./SidebarAdminSection";
 import { useAdminViewContext } from "@/contexts/AdminViewContext";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
@@ -95,7 +94,10 @@ export function AppSidebar() {
   
   // Pegar todos os menus principais (sem parent_key)
   // Excluir "Comunicações" (interacoes) do sidebar - agora está no menu superior
-  const allMainMenus = sidebarMenus.filter(menu => !menu.parent_key && menu.menu_key !== 'interacoes');
+  // Excluir "Comunicações" (interacoes) e o grupo "Comunidade" (menu + submenus) do sidebar
+  const allMainMenus = sidebarMenus.filter(
+    menu => !menu.parent_key && menu.menu_key !== 'interacoes' && !menu.menu_key.startsWith('comunidade')
+  );
   
   // Filtrar para visitantes: apenas início (sem submenus expansíveis)
   // Enquanto loading, não filtra como visitante para evitar flicker
@@ -494,15 +496,6 @@ export function AppSidebar() {
                   </>
                 );
               })}
-
-              <SidebarComunidadeItem
-                currentEnvironment={effectiveEnvironment}
-                collapsed={collapsed}
-                expandedMenus={expandedMenus}
-                toggleMenu={toggleMenu}
-                isMenuVisible={isMenuVisible}
-                pathname={location.pathname}
-              />
 
             </SidebarMenu>
           </SidebarGroupContent>

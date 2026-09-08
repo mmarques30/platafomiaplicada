@@ -83,7 +83,7 @@ export const ProcessoRoadmap = ({ userId, readonly = false, isAdmin = false }: P
   return (
     <div className="space-y-4">
       {/* Header de Progresso - Compacto */}
-      <div className="bg-[#E9EBC6]/20 border border-[#E9EBC6]/50 rounded-xl p-4">
+      <div className="bg-card/20 border border-border/50 rounded-xl p-4">
         <div className="flex items-center justify-between mb-3">
           <span className="text-sm font-medium text-foreground/70">Progresso Geral</span>
           <span className="text-2xl font-bold text-foreground">{progressoGeral}%</span>
@@ -99,22 +99,22 @@ export const ProcessoRoadmap = ({ userId, readonly = false, isAdmin = false }: P
         
         {/* Stats inline */}
         <div className="flex items-center gap-4 text-sm flex-wrap">
-          <span className="text-green-600 font-medium">{fasesConcluidas} concluídas</span>
+          <span className="text-status-success font-medium">{fasesConcluidas} concluídas</span>
           <span className="text-foreground/40">•</span>
           <span className="text-foreground font-medium">
             {faseAtual ? `Fase ${faseAtual.fase_numero} atual` : "Nenhuma em andamento"}
           </span>
           <span className="text-foreground/40">•</span>
-          <span className="text-amber-600 font-medium">
+          <span className="text-status-warning font-medium">
             {fases.length - fasesConcluidas - (faseAtual ? 1 : 0)} restantes
           </span>
         </div>
       </div>
 
       {/* Tabela de Fases */}
-      <div className="bg-[#E9EBC6]/15 border border-[#E9EBC6]/40 rounded-xl overflow-hidden">
+      <div className="bg-card/15 border border-border/40 rounded-xl overflow-hidden">
         {/* Header da Tabela */}
-        <div className="grid grid-cols-12 gap-2 px-4 py-3 bg-[#E9EBC6]/30 border-b text-sm font-medium text-foreground">
+        <div className="grid grid-cols-12 gap-2 px-4 py-3 bg-card/30 border-b text-sm font-medium text-foreground">
           <div className="col-span-1">#</div>
           <div className="col-span-3">Fase</div>
           <div className="col-span-5 hidden sm:block">Descrição</div>
@@ -134,16 +134,16 @@ export const ProcessoRoadmap = ({ userId, readonly = false, isAdmin = false }: P
               {/* Linha principal */}
               <div 
                 className={cn(
-                  "grid grid-cols-12 gap-2 px-4 py-3 items-center text-sm transition-colors cursor-pointer hover:bg-[#E9EBC6]/10",
-                  isAtual && "bg-[#E9EBC6]/20 border-l-4 border-l-foreground",
-                  isConcluida && "bg-green-50/50"
+                  "grid grid-cols-12 gap-2 px-4 py-3 items-center text-sm transition-colors cursor-pointer hover:bg-card/10",
+                  isAtual && "bg-card/20 border-l-4 border-l-foreground",
+                  isConcluida && "bg-status-success/50"
                 )}
                 onClick={() => handleRowClick(fase.id)}
               >
                 {/* Número */}
                 <div className={cn(
                   "col-span-1 font-bold",
-                  isConcluida && "text-green-600",
+                  isConcluida && "text-status-success",
                   isAtual && "text-foreground",
                   isPendente && "text-foreground/40"
                 )}>
@@ -152,13 +152,13 @@ export const ProcessoRoadmap = ({ userId, readonly = false, isAdmin = false }: P
                 
                 {/* Indicador + Nome */}
                 <div className="col-span-3 flex items-center gap-2">
-                  {isConcluida && <CheckCircle2 className="h-4 w-4 text-green-600 shrink-0" />}
+                  {isConcluida && <CheckCircle2 className="h-4 w-4 text-status-success shrink-0" />}
                   {isAtual && <div className="w-2 h-2 rounded-full bg-foreground animate-pulse shrink-0" />}
                   {isPendente && <Circle className="h-4 w-4 text-foreground/30 shrink-0" />}
                   
                   <span className={cn(
                     "font-medium truncate",
-                    isConcluida && "text-green-700",
+                    isConcluida && "text-status-success",
                     isAtual && "text-foreground font-semibold",
                     isPendente && "text-foreground/60"
                   )}>
@@ -169,7 +169,7 @@ export const ProcessoRoadmap = ({ userId, readonly = false, isAdmin = false }: P
                 {/* Descrição */}
                 <div className={cn(
                   "col-span-5 truncate hidden sm:block",
-                  isConcluida && "text-green-600/70",
+                  isConcluida && "text-status-success/70",
                   isAtual && "text-foreground/80",
                   isPendente && "text-foreground/40"
                 )}>
@@ -182,7 +182,7 @@ export const ProcessoRoadmap = ({ userId, readonly = false, isAdmin = false }: P
                     variant="outline"
                     className={cn(
                       "text-xs",
-                      isConcluida && "bg-green-600 text-white border-green-600",
+                      isConcluida && "bg-status-success text-white border-status-success",
                       isAtual && "bg-foreground text-white border-foreground",
                       isPendente && "border-foreground/30 text-foreground/60"
                     )}
@@ -199,7 +199,7 @@ export const ProcessoRoadmap = ({ userId, readonly = false, isAdmin = false }: P
 
               {/* Detalhes expandidos */}
               {isExpanded && (
-                <div className="px-4 py-4 bg-[#E9EBC6]/10 border-t border-[#E9EBC6]/30">
+                <div className="px-4 py-4 bg-card/10 border-t border-border/30">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {/* Datas */}
                     <div className="space-y-2">
@@ -251,7 +251,7 @@ export const ProcessoRoadmap = ({ userId, readonly = false, isAdmin = false }: P
                               setEditingProjeto(fase.projeto as ProjetoMentoria);
                               setProjetoModalOpen(true);
                             }}
-                            className="mt-2 border-foreground/20 text-foreground/80 hover:bg-[#E9EBC6]/20"
+                            className="mt-2 border-foreground/20 text-foreground/80 hover:bg-card/20"
                           >
                             <Pencil className="h-3 w-3 mr-1" />
                             Editar Projeto
@@ -263,7 +263,7 @@ export const ProcessoRoadmap = ({ userId, readonly = false, isAdmin = false }: P
 
                   {/* Tarefas */}
                   {fase.tarefas && fase.tarefas.length > 0 && (
-                    <div className="mt-4 pt-4 border-t border-[#E9EBC6]/30">
+                    <div className="mt-4 pt-4 border-t border-border/30">
                       <div className="flex items-center gap-2 text-sm font-medium text-foreground/80 mb-2">
                         <ListTodo className="h-4 w-4" />
                         Tarefas ({fase.tarefas.filter(t => t.concluida).length}/{fase.tarefas.length})
@@ -274,11 +274,11 @@ export const ProcessoRoadmap = ({ userId, readonly = false, isAdmin = false }: P
                             key={tarefa.id} 
                             className={cn(
                               "text-sm px-2 py-1 rounded flex items-center gap-2",
-                              tarefa.concluida ? "text-green-700 bg-green-50" : "text-foreground/60"
+                              tarefa.concluida ? "text-status-success bg-status-success/15" : "text-foreground/60"
                             )}
                           >
                             {tarefa.concluida ? (
-                              <CheckCircle2 className="h-3 w-3 text-green-600 shrink-0" />
+                              <CheckCircle2 className="h-3 w-3 text-status-success shrink-0" />
                             ) : (
                               <Circle className="h-3 w-3 text-foreground/30 shrink-0" />
                             )}
@@ -296,7 +296,7 @@ export const ProcessoRoadmap = ({ userId, readonly = false, isAdmin = false }: P
 
                   {/* Observações */}
                   {fase.observacoes && (
-                    <div className="mt-4 pt-4 border-t border-[#E9EBC6]/30">
+                    <div className="mt-4 pt-4 border-t border-border/30">
                       <p className="text-sm text-foreground/60">
                         <span className="font-medium">Observações:</span> {fase.observacoes}
                       </p>
@@ -305,7 +305,7 @@ export const ProcessoRoadmap = ({ userId, readonly = false, isAdmin = false }: P
 
                   {/* Botão Editar Fase - apenas para admin */}
                   {isAdmin && (
-                    <div className="mt-4 pt-4 border-t border-[#E9EBC6]/30 flex justify-end">
+                    <div className="mt-4 pt-4 border-t border-border/30 flex justify-end">
                       <Button 
                         variant="outline" 
                         size="sm"
@@ -313,7 +313,7 @@ export const ProcessoRoadmap = ({ userId, readonly = false, isAdmin = false }: P
                           e.stopPropagation();
                           handleEditFase(fase);
                         }}
-                        className="border-foreground/20 text-foreground/80 hover:bg-[#E9EBC6]/20"
+                        className="border-foreground/20 text-foreground/80 hover:bg-card/20"
                       >
                         <Pencil className="h-3 w-3 mr-1" />
                         Editar Fase

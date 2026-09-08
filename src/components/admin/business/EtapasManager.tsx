@@ -42,9 +42,9 @@ interface EtapasManagerProps {
 }
 
 const statusConfig = {
-  pendente: { label: "Pendente", className: "bg-zinc-500/10 text-zinc-600" },
-  em_andamento: { label: "Em Andamento", className: "bg-amber-500/10 text-amber-600" },
-  concluida: { label: "Concluída", className: "bg-emerald-500/10 text-emerald-600" },
+  pendente: { label: "Pendente", className: "bg-card/10 text-muted-foreground" },
+  em_andamento: { label: "Em Andamento", className: "bg-status-warning/10 text-status-warning" },
+  concluida: { label: "Concluída", className: "bg-status-success/10 text-status-success" },
 };
 
 function EtapaCard({ etapa, onEdit }: { etapa: EtapaBusiness; onEdit: () => void }) {

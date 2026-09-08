@@ -92,7 +92,7 @@ export function DiagnosticoAdmin({ userId, allowManualInput = true }: Diagnostic
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <AlertCircle className="h-5 w-5 text-yellow-500" />
+              <AlertCircle className="h-5 w-5 text-status-warning" />
               {diagnostico ? 'Diagnóstico pendente' : 'Diagnóstico não realizado'}
             </CardTitle>
             <CardDescription>
@@ -138,10 +138,10 @@ export function DiagnosticoAdmin({ userId, allowManualInput = true }: Diagnostic
   return (
     <>
       {!diagnosticoCompleto && (
-        <Alert className="mb-4 border-amber-300 bg-amber-50">
-          <AlertCircle className="h-4 w-4 text-amber-600" />
-          <AlertTitle className="text-amber-900">Diagnóstico incompleto — preview parcial</AlertTitle>
-          <AlertDescription className="text-amber-900/80">
+        <Alert className="mb-4 border-status-warning/40 bg-status-warning/15">
+          <AlertCircle className="h-4 w-4 text-status-warning" />
+          <AlertTitle className="text-status-warning">Diagnóstico incompleto — preview parcial</AlertTitle>
+          <AlertDescription className="text-status-warning/80">
             <p>
               O mentorado ainda não finalizou o formulário. Você está vendo
               apenas os campos que ele já preencheu e, se houver, o insight da
@@ -161,11 +161,11 @@ export function DiagnosticoAdmin({ userId, allowManualInput = true }: Diagnostic
                     forcarFinalizacao(userId);
                   }
                 }}
-                className="border-amber-400 bg-amber-100 text-amber-900 hover:bg-amber-200"
+                className="border-status-warning/40 bg-status-warning/15 text-status-warning hover:bg-status-warning/15"
               >
                 {isForcingFinalize ? "Finalizando..." : "Forçar finalização"}
               </Button>
-              <span className="text-xs text-amber-900/70">
+              <span className="text-xs text-status-warning/70">
                 (marca como concluído + gera o insight com os dados parciais)
               </span>
             </div>
@@ -178,9 +178,9 @@ export function DiagnosticoAdmin({ userId, allowManualInput = true }: Diagnostic
             <div>
               <CardTitle className="flex items-center gap-2">
                 {diagnosticoCompleto ? (
-                  <CheckCircle className="h-5 w-5 text-green-500" />
+                  <CheckCircle className="h-5 w-5 text-status-success" />
                 ) : (
-                  <AlertCircle className="h-5 w-5 text-amber-500" />
+                  <AlertCircle className="h-5 w-5 text-status-warning" />
                 )}
                 {diagnosticoCompleto ? "Diagnóstico completo" : "Diagnóstico em andamento"}
               </CardTitle>
@@ -281,10 +281,10 @@ export function DiagnosticoAdmin({ userId, allowManualInput = true }: Diagnostic
               </AlertDescription>
             </Alert>
           ) : (
-            <Alert className="border-blue-200 bg-blue-50">
-              <AlertCircle className="h-4 w-4 text-blue-600" />
-              <AlertTitle className="text-blue-900">Insight ainda não gerado</AlertTitle>
-              <AlertDescription className="text-blue-900/80">
+            <Alert className="border-status-info/40 bg-status-info/15">
+              <AlertCircle className="h-4 w-4 text-status-info" />
+              <AlertTitle className="text-status-info">Insight ainda não gerado</AlertTitle>
+              <AlertDescription className="text-status-info/80">
                 <p>
                   A IA ainda não gerou o insight pra este diagnóstico. Pode ter
                   falhado silenciosamente na finalização. Clique abaixo pra
@@ -293,7 +293,7 @@ export function DiagnosticoAdmin({ userId, allowManualInput = true }: Diagnostic
                 </p>
                 <Button
                   size="sm"
-                  className="mt-3 bg-blue-600 hover:bg-blue-700 text-white"
+                  className="mt-3 bg-status-info hover:bg-status-info text-white"
                   disabled={isRegeneratingInsight}
                   onClick={() => regenerarInsight(diagnostico.id)}
                 >

@@ -514,9 +514,9 @@ export function VisitantesTab({ onExportFullReport }: VisitantesTabProps) {
                             </TableCell>
                             <TableCell>
                               {converteu ? (
-                                <Badge className="bg-green-500 text-white">✓ Converteu</Badge>
+                                <Badge className="bg-status-success text-white">✓ Converteu</Badge>
                               ) : visitante ? (
-                                <Badge className="bg-yellow-500 text-white">Visitante</Badge>
+                                <Badge className="bg-status-warning text-white">Visitante</Badge>
                               ) : (
                                 <Badge variant="secondary">Não cadastrado</Badge>
                               )}
@@ -701,7 +701,7 @@ export function VisitantesTab({ onExportFullReport }: VisitantesTabProps) {
                               ) : status === 'inativo' ? (
                                 <Badge variant="secondary">Inativo</Badge>
                               ) : status === 'expirando' ? (
-                                <Badge className="bg-amber-500 text-white">Expirando</Badge>
+                                <Badge className="bg-status-warning text-white">Expirando</Badge>
                               ) : (
                                 <Badge variant="default">Ativo</Badge>
                               )}
@@ -714,7 +714,7 @@ export function VisitantesTab({ onExportFullReport }: VisitantesTabProps) {
                                   variant="outline" 
                                   className={cn(
                                     diasRestantes <= 3 && "border-destructive text-destructive",
-                                    diasRestantes > 3 && diasRestantes <= 7 && "border-amber-500 text-amber-600",
+                                    diasRestantes > 3 && diasRestantes <= 7 && "border-status-warning text-status-warning",
                                     diasRestantes > 7 && "border-primary text-primary"
                                   )}
                                 >

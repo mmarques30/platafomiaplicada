@@ -138,7 +138,7 @@ function PesquisaCard({
             <p className="text-xs text-muted-foreground">Completas</p>
           </div>
           <div className="text-center">
-            <p className="text-xl font-bold text-yellow-500">{stats?.parciais || 0}</p>
+            <p className="text-xl font-bold text-status-warning">{stats?.parciais || 0}</p>
             <p className="text-xs text-muted-foreground">Parciais</p>
           </div>
         </div>

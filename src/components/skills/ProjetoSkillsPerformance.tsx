@@ -135,7 +135,7 @@ export default function ProjetoSkillsPerformance() {
 
       {/* Ranking Híbrido */}
       <Card className="border-border bg-card overflow-hidden">
-        <CardHeader className="bg-[#9EB038]/25 rounded-t-xl">
+        <CardHeader className="bg-primary/25 rounded-t-xl">
           <CardTitle>Ranking por Colaborador</CardTitle>
           <CardDescription>Projetos e entregas combinados</CardDescription>
         </CardHeader>
@@ -161,9 +161,9 @@ export default function ProjetoSkillsPerformance() {
                     <tr key={stat.userId} className="border-b border-border last:border-0">
                       <td className="py-3 px-2">
                         <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ${
-                          stat.posicao === 1 ? "bg-[#9EB038] text-white"
-                            : stat.posicao === 2 ? "bg-[#B8CC5A] text-white"
-                            : stat.posicao === 3 ? "bg-[#D4E68A] text-[#4A5516]"
+                          stat.posicao === 1 ? "bg-primary text-white"
+                            : stat.posicao === 2 ? "bg-lime text-white"
+                            : stat.posicao === 3 ? "bg-lime text-[#4A5516]"
                             : "bg-muted text-muted-foreground"
                         }`}>{stat.posicao}</span>
                       </td>

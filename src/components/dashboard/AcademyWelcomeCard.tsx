@@ -118,11 +118,11 @@ export function AcademyWelcomeCard({ onStartTour }: AcademyWelcomeCardProps) {
           })}
         </div>
         <div style={{ marginTop: 16, padding: '12px 14px', background: 'rgba(175,192,64,0.08)', borderRadius: 10, border: '0.5px solid rgba(175,192,64,0.2)' }}>
-          <p style={{ fontSize: 11, fontWeight: 600, color: '#AFC040', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>Comece por aqui</p>
+          <p style={{ fontSize: 11, fontWeight: 600, color: '#c8e040', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>Comece por aqui</p>
           <p style={{ fontSize: 14, fontWeight: 500, color: 'hsl(var(--foreground))', marginBottom: 10 }}>{primeiraTrilha?.titulo ?? 'Introdução à IA Aplicada'}</p>
           <button
             onClick={() => navigate(primeiraTrilha ? `/trilhas/${primeiraTrilha.id}` : '/trilhas')}
-            style={{ background: '#AFC040', color: '#0C0F0A', fontSize: 13, fontWeight: 600, padding: '8px 20px', borderRadius: 8, border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}
+            style={{ background: '#c8e040', color: '#0c0e08', fontSize: 13, fontWeight: 600, padding: '8px 20px', borderRadius: 8, border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}
           >
             Começar trilha →
           </button>

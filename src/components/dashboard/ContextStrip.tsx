@@ -33,7 +33,7 @@ const DAY_ABBR: Record<string, string> = {
 function KpiItem({ valor, label }: { valor: string; label: string }) {
   return (
     <div style={{ textAlign: "center", minWidth: 60 }}>
-      <div style={{ color: "#AFC040", fontWeight: 700, fontSize: 18, lineHeight: 1.2 }}>
+      <div style={{ color: "#c8e040", fontWeight: 700, fontSize: 18, lineHeight: 1.2 }}>
         {valor}
       </div>
       <div style={{ color: "rgba(255,255,255,0.5)", fontSize: 11, fontWeight: 500, textTransform: "uppercase", letterSpacing: 0.5 }}>
@@ -223,7 +223,7 @@ export function ContextStrip() {
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        background: "#0C0F0A",
+        background: "#0c0e08",
         borderRadius: 12,
         padding: "14px 20px",
         border: "1px solid rgba(255,255,255,0.1)",
@@ -263,8 +263,8 @@ export function ContextStrip() {
           <button
             onClick={() => navigate(ctaHref)}
             style={{
-              background: "#AFC040",
-              color: "#0C0F0A",
+              background: "#c8e040",
+              color: "#0c0e08",
               fontSize: 13,
               fontWeight: 500,
               padding: "7px 14px",

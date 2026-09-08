@@ -214,11 +214,16 @@ export function WelcomeHeader() {
     <>
       <style>{`@keyframes kpiPulse { 0%,100% { opacity: 0.4 } 50% { opacity: 0.8 } }`}</style>
       <div className="w-full">
-        <div className="flex flex-col gap-6 rounded-2xl border border-brand-hairline bg-brand-cream-soft px-6 py-6 md:px-8 md:py-7">
-          {/* Top: saudação + tagline à esquerda · data à direita */}
-          <div className="flex flex-row items-start justify-between gap-4">
+        <div className="flex flex-col gap-5 rounded-2xl border border-border bg-card px-5 py-5 md:gap-6 md:px-8 md:py-7">
+          {/* Top: saudação + tagline à esquerda · data à direita.
+              No mobile a data vira uma linha discreta acima da saudação. */}
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+            <div className="flex items-center gap-2 text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground sm:hidden">
+              <Calendar className="h-3.5 w-3.5" strokeWidth={1.5} />
+              <span>{diaSemana} · {dia} {mes}</span>
+            </div>
             <div className="min-w-0 flex-1">
-              <h1 className="font-serif-display text-2xl leading-[1.05] tracking-tight text-foreground md:text-3xl lg:text-4xl">
+              <h1 className="font-serif-display text-[26px] leading-[1.05] tracking-tight text-foreground md:text-3xl lg:text-4xl">
                 {saudacao}
               </h1>
               {aulaAtiva ? (
@@ -231,7 +236,7 @@ export function WelcomeHeader() {
                 </p>
               )}
             </div>
-            <div className="flex flex-shrink-0 items-center gap-3 border-l border-brand-hairline pl-4 md:pl-6">
+            <div className="hidden flex-shrink-0 items-center gap-3 border-l border-border pl-4 sm:flex md:pl-6">
               <Calendar className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
               <div className="flex flex-col leading-tight">
                 <span className="font-serif-display text-2xl text-foreground md:text-3xl">{dia}</span>
@@ -244,19 +249,21 @@ export function WelcomeHeader() {
 
           {/* KPIs + CTA */}
           {showKpis && (
-            <div data-welcome-kpis className="border-t border-brand-hairline pt-5">
-              <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
+            <div data-welcome-kpis className="border-t border-border pt-4 md:pt-5">
+              {/* Mobile: 3 KPIs em colunas iguais + CTA em largura total.
+                  Desktop: linha única com divisores e CTA à direita. */}
+              <div className="grid grid-cols-3 gap-3 sm:flex sm:flex-wrap sm:items-center sm:gap-x-8 sm:gap-y-4">
                 <KpiCell label={kpi1Label} value={isLoadingKpis ? kpiSkeleton : kpi1Display} />
-                <span className="hidden h-8 w-px bg-brand-hairline sm:block" />
+                <span className="hidden h-8 w-px bg-border sm:block" />
                 <KpiCell label={kpi2Label} value={isLoadingKpis ? kpiSkeleton : kpi2Display} />
-                <span className="hidden h-8 w-px bg-brand-hairline sm:block" />
+                <span className="hidden h-8 w-px bg-border sm:block" />
                 <KpiCell label={kpi3Label} value={isLoadingKpis ? kpiSkeleton : kpi3Display} />
 
                 <Button
                   onClick={() => navigate(ctaHref)}
                   variant="brand-pill"
                   size="pill"
-                  className="ml-auto"
+                  className="col-span-3 mt-1 w-full sm:col-span-1 sm:ml-auto sm:mt-0 sm:w-auto"
                 >
                   {ctaLabel}
                   <ArrowRight className="ml-1.5 h-3.5 w-3.5" strokeWidth={1.75} />
@@ -272,9 +279,9 @@ export function WelcomeHeader() {
 
 function KpiCell({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <div className="min-w-[64px]">
+    <div className="min-w-0 sm:min-w-[64px]">
       <div className="font-serif-display text-2xl leading-none text-foreground">{value}</div>
-      <div className="mt-1.5 text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+      <div className="mt-1.5 truncate text-[9px] font-medium uppercase tracking-[0.1em] text-muted-foreground sm:text-[10px] sm:tracking-[0.18em]">
         {label}
       </div>
     </div>

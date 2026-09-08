@@ -296,14 +296,14 @@ export function DiagnosticoAcademyPanel({ diagnostico }: DiagnosticoAcademyPanel
       {/* Seção: Foco dos Próximos 30 Dias */}
       {recomendacaoFoco && (
         <section>
-          <Card className="bg-gradient-to-r from-amber-500/10 to-orange-500/5 border border-amber-500/30">
+          <Card className="bg-gradient-to-r from-status-warning/10 to-status-warning/5 border border-status-warning/30">
             <CardContent className="p-6">
               <div className="flex items-start gap-4">
-                <div className="p-3 rounded-xl bg-amber-500/20">
-                  <Rocket className="h-6 w-6 text-amber-600" />
+                <div className="p-3 rounded-xl bg-status-warning/20">
+                  <Rocket className="h-6 w-6 text-status-warning" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-semibold text-amber-600 mb-2">
+                  <h2 className="text-lg font-semibold text-status-warning mb-2">
                     Foco dos Próximos 30 Dias
                   </h2>
                   <p className="text-foreground leading-relaxed font-medium">{recomendacaoFoco}</p>
@@ -317,14 +317,14 @@ export function DiagnosticoAcademyPanel({ diagnostico }: DiagnosticoAcademyPanel
       {/* Seção: Alerta de Desafios */}
       {alertaDesafios && (
         <section>
-          <Card className="bg-gradient-to-r from-red-500/10 to-red-900/5 border border-red-500/30">
+          <Card className="bg-gradient-to-r from-status-danger/10 to-status-danger/5 border border-status-danger/30">
             <CardContent className="p-6">
               <div className="flex items-start gap-4">
-                <div className="p-3 rounded-xl bg-red-500/20">
-                  <AlertTriangle className="h-6 w-6 text-red-500" />
+                <div className="p-3 rounded-xl bg-status-danger/20">
+                  <AlertTriangle className="h-6 w-6 text-status-danger" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-semibold text-red-500 mb-2">
+                  <h2 className="text-lg font-semibold text-status-danger mb-2">
                     Alerta de Desafios
                   </h2>
                   <p className="text-foreground leading-relaxed">{alertaDesafios}</p>
@@ -494,9 +494,9 @@ export function DiagnosticoAcademyPanel({ diagnostico }: DiagnosticoAcademyPanel
           </h2>
           <div className="grid md:grid-cols-3 gap-4">
             {/* Curto Prazo */}
-            <Card className="border border-emerald-500/30 bg-emerald-500/5">
+            <Card className="border border-status-success/30 bg-status-success/5">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-emerald-600 flex items-center gap-2">
+                <CardTitle className="text-sm font-medium text-status-success flex items-center gap-2">
                   <Clock className="h-4 w-4" />
                   Curto Prazo
                 </CardTitle>
@@ -505,7 +505,7 @@ export function DiagnosticoAcademyPanel({ diagnostico }: DiagnosticoAcademyPanel
                 {objetivosCurtoPrazo.length > 0 ? (
                   objetivosCurtoPrazo.map((obj, idx) => (
                     <div key={idx} className="flex items-start gap-2">
-                      <CheckCircle2 className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
+                      <CheckCircle2 className="h-4 w-4 text-status-success mt-0.5 shrink-0" />
                       <p className="text-sm text-foreground">{obj.objetivo}</p>
                     </div>
                   ))
@@ -516,9 +516,9 @@ export function DiagnosticoAcademyPanel({ diagnostico }: DiagnosticoAcademyPanel
             </Card>
 
             {/* Médio Prazo */}
-            <Card className="border border-blue-500/30 bg-blue-500/5">
+            <Card className="border border-status-info/30 bg-status-info/5">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-blue-600 flex items-center gap-2">
+                <CardTitle className="text-sm font-medium text-status-info flex items-center gap-2">
                   <Target className="h-4 w-4" />
                   Médio Prazo
                 </CardTitle>
@@ -527,7 +527,7 @@ export function DiagnosticoAcademyPanel({ diagnostico }: DiagnosticoAcademyPanel
                 {objetivosMedioPrazo.length > 0 ? (
                   objetivosMedioPrazo.map((obj, idx) => (
                     <div key={idx} className="flex items-start gap-2">
-                      <CheckCircle2 className="h-4 w-4 text-blue-500 mt-0.5 shrink-0" />
+                      <CheckCircle2 className="h-4 w-4 text-status-info mt-0.5 shrink-0" />
                       <p className="text-sm text-foreground">{obj.objetivo}</p>
                     </div>
                   ))
@@ -538,9 +538,9 @@ export function DiagnosticoAcademyPanel({ diagnostico }: DiagnosticoAcademyPanel
             </Card>
 
             {/* Longo Prazo */}
-            <Card className="border border-purple-500/30 bg-purple-500/5">
+            <Card className="border border-secondary/30 bg-secondary/5">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-purple-600 flex items-center gap-2">
+                <CardTitle className="text-sm font-medium text-secondary flex items-center gap-2">
                   <Rocket className="h-4 w-4" />
                   Longo Prazo
                 </CardTitle>
@@ -549,7 +549,7 @@ export function DiagnosticoAcademyPanel({ diagnostico }: DiagnosticoAcademyPanel
                 {objetivosLongoPrazo.length > 0 ? (
                   objetivosLongoPrazo.map((obj, idx) => (
                     <div key={idx} className="flex items-start gap-2">
-                      <CheckCircle2 className="h-4 w-4 text-purple-500 mt-0.5 shrink-0" />
+                      <CheckCircle2 className="h-4 w-4 text-secondary mt-0.5 shrink-0" />
                       <p className="text-sm text-foreground">{obj.objetivo}</p>
                     </div>
                   ))

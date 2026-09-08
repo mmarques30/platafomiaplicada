@@ -57,11 +57,11 @@ export default function GerenciarTodasDuvidas() {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "respondida":
-        return <CheckCircle2 className="h-3.5 w-3.5 text-green-600" />;
+        return <CheckCircle2 className="h-3.5 w-3.5 text-status-success" />;
       case "em_analise":
-        return <AlertCircle className="h-3.5 w-3.5 text-blue-600" />;
+        return <AlertCircle className="h-3.5 w-3.5 text-status-info" />;
       default:
-        return <Clock className="h-3.5 w-3.5 text-yellow-600" />;
+        return <Clock className="h-3.5 w-3.5 text-status-warning" />;
     }
   };
 
@@ -89,11 +89,11 @@ export default function GerenciarTodasDuvidas() {
 
   const getSLAInfo = (prazo_sla: string, status: string, atrasada: boolean | null) => {
     if (status === "respondida") {
-      return { text: "Concluída", color: "text-green-600" };
+      return { text: "Concluída", color: "text-status-success" };
     }
 
     if (atrasada) {
-      return { text: "Atrasada", color: "text-red-600" };
+      return { text: "Atrasada", color: "text-status-danger" };
     }
 
     const horasRestantes = Math.max(
@@ -102,7 +102,7 @@ export default function GerenciarTodasDuvidas() {
     );
 
     if (horasRestantes <= 6) {
-      return { text: `${horasRestantes}h restantes`, color: "text-yellow-600" };
+      return { text: `${horasRestantes}h restantes`, color: "text-status-warning" };
     }
 
     return { text: `${horasRestantes}h`, color: "text-muted-foreground" };
@@ -162,7 +162,7 @@ export default function GerenciarTodasDuvidas() {
             <CardTitle className="text-xs font-medium text-muted-foreground">Pendentes</CardTitle>
           </CardHeader>
           <CardContent className="pb-3">
-            <p className="text-2xl font-bold text-yellow-600">
+            <p className="text-2xl font-bold text-status-warning">
               {duvidas.filter((d) => d.status === "pendente").length}
             </p>
           </CardContent>
@@ -172,7 +172,7 @@ export default function GerenciarTodasDuvidas() {
             <CardTitle className="text-xs font-medium text-muted-foreground">Em Análise</CardTitle>
           </CardHeader>
           <CardContent className="pb-3">
-            <p className="text-2xl font-bold text-blue-600">
+            <p className="text-2xl font-bold text-status-info">
               {duvidas.filter((d) => d.status === "em_analise").length}
             </p>
           </CardContent>
@@ -182,7 +182,7 @@ export default function GerenciarTodasDuvidas() {
             <CardTitle className="text-xs font-medium text-muted-foreground">Respondidas</CardTitle>
           </CardHeader>
           <CardContent className="pb-3">
-            <p className="text-2xl font-bold text-green-600">
+            <p className="text-2xl font-bold text-status-success">
               {duvidas.filter((d) => d.status === "respondida").length}
             </p>
           </CardContent>

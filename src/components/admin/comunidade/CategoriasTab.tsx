@@ -124,7 +124,7 @@ export function CategoriasTab() {
                         variant="ghost"
                         size="sm"
                         onClick={() => deleteCategoria.mutate(categoria.id)}
-                        className="text-red-500 hover:text-red-600"
+                        className="text-status-danger hover:text-status-danger"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>

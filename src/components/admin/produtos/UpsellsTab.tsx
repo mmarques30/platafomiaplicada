@@ -89,7 +89,7 @@ export function UpsellsTab() {
               </TableCell>
               <TableCell>{regra.produto_destino?.nome || "N/A"}</TableCell>
               <TableCell>R$ {regra.valor_desconto.toFixed(2)}</TableCell>
-              <TableCell className="text-green-600">
+              <TableCell className="text-status-success">
                 - R$ {regra.economia.toFixed(2)}
               </TableCell>
               <TableCell>

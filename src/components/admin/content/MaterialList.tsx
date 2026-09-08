@@ -16,17 +16,17 @@ export function MaterialList({ materiais, onRemove }: MaterialListProps) {
     
     switch (ext) {
       case 'pdf':
-        return <FileText className="h-4 w-4 text-red-500" />;
+        return <FileText className="h-4 w-4 text-status-danger" />;
       case 'xlsx':
       case 'xls':
       case 'csv':
-        return <Table className="h-4 w-4 text-green-600" />;
+        return <Table className="h-4 w-4 text-status-success" />;
       case 'doc':
       case 'docx':
-        return <FileText className="h-4 w-4 text-blue-500" />;
+        return <FileText className="h-4 w-4 text-status-info" />;
       case 'html':
       case 'xml':
-        return <FileCode className="h-4 w-4 text-orange-500" />;
+        return <FileCode className="h-4 w-4 text-status-warning" />;
       default:
         if (material.tipo === 'download') return <Download className="h-4 w-4" />;
         return <File className="h-4 w-4" />;

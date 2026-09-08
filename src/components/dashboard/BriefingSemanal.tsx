@@ -60,7 +60,7 @@ export function BriefingSemanal() {
 
   if (loading) {
     return (
-      <Card className="border-l-4 border-[#AFC040]">
+      <Card className="border-l-4 border-primary">
         <CardContent className="pt-5 pb-4 space-y-3">
           <Skeleton className="h-3 w-32" />
           <Skeleton className="h-5 w-3/4" />
@@ -78,7 +78,7 @@ export function BriefingSemanal() {
   };
 
   return (
-    <Card className="border-l-4 border-[#AFC040]">
+    <Card className="border-l-4 border-primary">
       <CardContent className="pt-5 pb-4 space-y-3">
         <span className="text-[10px] font-bold tracking-widest uppercase text-muted-foreground">
           BRIEFING DA SEMANA

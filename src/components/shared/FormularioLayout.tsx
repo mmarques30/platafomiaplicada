@@ -138,12 +138,12 @@ export function FormularioLayout({
         {/* Card Principal */}
         <Card className={cn(
           "bg-card/95 backdrop-blur-sm border border-primary/20 shadow-lg relative overflow-hidden",
-          isPremium && "bg-gradient-to-br from-slate-900 via-purple-950/50 to-slate-900 border-purple-500/30"
+          isPremium && "bg-gradient-to-br from-background via-secondary/50 to-background border-secondary/30"
         )}>
           {/* Premium Badge */}
           {isPremium && (
             <div className="absolute top-4 right-4 z-10">
-              <span className="px-3 py-1 text-xs font-bold uppercase tracking-wider bg-gradient-to-r from-purple-500 to-violet-500 text-white rounded-full flex items-center gap-1.5 shadow-lg shadow-purple-500/25">
+              <span className="px-3 py-1 text-xs font-bold uppercase tracking-wider bg-gradient-to-r from-secondary to-secondary text-white rounded-full flex items-center gap-1.5 shadow-lg shadow-purple-500/25">
                 <Crown className="h-3.5 w-3.5" />
                 {premiumLabel}
               </span>

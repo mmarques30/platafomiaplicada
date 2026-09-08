@@ -114,7 +114,7 @@ export default function MentoriaDiagnostico() {
   const statusBadge = completado
     ? { icon: CheckCircle2, label: "Finalizado", className: "bg-brand-strong/15 text-brand-strong border-brand-strong/30" }
     : temAlgumDado
-      ? { icon: Clock, label: "Em andamento", className: "bg-amber-500/15 text-amber-700 border-amber-500/30" }
+      ? { icon: Clock, label: "Em andamento", className: "bg-status-warning/15 text-status-warning border-status-warning/30" }
       : { icon: Sparkles, label: "Não iniciado", className: "bg-muted text-muted-foreground border-brand-hairline" };
 
   return (
@@ -168,15 +168,15 @@ export default function MentoriaDiagnostico() {
 
       {/* Banner contextual quando preenchido por admin */}
       {completado && formulario?.preenchido_por === "admin" && (
-        <Card className="mb-4 border-blue-200 bg-blue-50">
+        <Card className="mb-4 border-status-info/40 bg-status-info/15">
           <CardContent className="py-3 flex items-start gap-3">
-            <AlertCircle className="h-4 w-4 text-blue-600 mt-0.5" />
-            <div className="text-sm text-blue-900/80">
+            <AlertCircle className="h-4 w-4 text-status-info mt-0.5" />
+            <div className="text-sm text-status-info/80">
               Este diagnóstico foi preenchido durante a sessão com seu mentor.
               {formulario.arquivo_diagnostico_url && (
                 <Button
                   variant="link"
-                  className="h-auto p-0 ml-2 text-blue-700"
+                  className="h-auto p-0 ml-2 text-status-info"
                   onClick={() => window.open(formulario.arquivo_diagnostico_url, "_blank")}
                 >
                   Baixar documento original
@@ -203,13 +203,13 @@ export default function MentoriaDiagnostico() {
         <div className="space-y-6">
           {/* Banner incompleto: convida a terminar */}
           {!completado && (
-            <Card className="border-amber-200 bg-amber-50">
+            <Card className="border-status-warning/40 bg-status-warning/15">
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2 text-amber-900">
+                <CardTitle className="text-base flex items-center gap-2 text-status-warning">
                   <Clock className="h-4 w-4" />
                   Você ainda não finalizou o diagnóstico
                 </CardTitle>
-                <CardDescription className="text-amber-900/80">
+                <CardDescription className="text-status-warning/80">
                   A IA gerou um resultado parcial com base no que você já respondeu.
                   Termine de preencher pra receber um plano personalizado completo.
                 </CardDescription>

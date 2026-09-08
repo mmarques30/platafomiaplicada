@@ -86,8 +86,8 @@ export default function MentoriaTarefasDetalhes() {
   const getPrioridadeBadge = (prioridade: string | null) => {
     switch (prioridade) {
       case "alta": return <Badge variant="destructive" className="text-xs">Alta</Badge>;
-      case "critica": return <Badge variant="destructive" className="text-xs bg-red-700">Crítica</Badge>;
-      case "media": return <Badge variant="secondary" className="text-xs bg-yellow-500/20 text-yellow-600 dark:text-yellow-400">Média</Badge>;
+      case "critica": return <Badge variant="destructive" className="text-xs bg-status-danger">Crítica</Badge>;
+      case "media": return <Badge variant="secondary" className="text-xs bg-status-warning/20 text-status-warning dark:text-status-warning">Média</Badge>;
       case "baixa": return <Badge variant="outline" className="text-xs">Baixa</Badge>;
       default: return null;
     }
@@ -97,8 +97,8 @@ export default function MentoriaTarefasDetalhes() {
     const atrasada = prazoEntrega && isPast(parseISO(prazoEntrega)) && status !== "concluida";
     if (atrasada) return <Badge variant="destructive" className="text-xs"><AlertTriangle className="h-3 w-3 mr-1" />Atrasada</Badge>;
     switch (status) {
-      case "concluida": return <Badge variant="secondary" className="text-xs bg-green-500/20 text-green-600 dark:text-green-400"><CheckCircle2 className="h-3 w-3 mr-1" />Concluída</Badge>;
-      case "em_andamento": return <Badge variant="secondary" className="text-xs bg-blue-500/20 text-blue-600 dark:text-blue-400"><Clock className="h-3 w-3 mr-1" />Em Andamento</Badge>;
+      case "concluida": return <Badge variant="secondary" className="text-xs bg-status-success/20 text-status-success dark:text-status-success"><CheckCircle2 className="h-3 w-3 mr-1" />Concluída</Badge>;
+      case "em_andamento": return <Badge variant="secondary" className="text-xs bg-status-info/20 text-status-info dark:text-status-info"><Clock className="h-3 w-3 mr-1" />Em Andamento</Badge>;
       default: return <Badge variant="outline" className="text-xs">Pendente</Badge>;
     }
   };
@@ -291,8 +291,8 @@ export default function MentoriaTarefasDetalhes() {
       {viewMode === "kanban" && (
         <div className="flex gap-6 overflow-x-auto pb-4">
           <KanbanColumn title="Pendentes" tasks={tarefasPendentes} icon={Clock} colorClass="border-muted-foreground/30" />
-          <KanbanColumn title="Em Andamento" tasks={tarefasEmAndamento} icon={Clock} colorClass="border-blue-500/50" />
-          <KanbanColumn title="Concluídas" tasks={tarefasConcluidas} icon={CheckCircle2} colorClass="border-green-500/50" />
+          <KanbanColumn title="Em Andamento" tasks={tarefasEmAndamento} icon={Clock} colorClass="border-status-info/50" />
+          <KanbanColumn title="Concluídas" tasks={tarefasConcluidas} icon={CheckCircle2} colorClass="border-status-success/50" />
         </div>
       )}
 

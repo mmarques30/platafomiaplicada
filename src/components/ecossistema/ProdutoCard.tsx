@@ -33,7 +33,7 @@ export function ProdutoCard({ produto, isUserPlan, onSaibaMais }: ProdutoCardPro
     <Card 
       className={`group transition-all duration-200 hover:shadow-lg ${
         isUserPlan 
-          ? 'bg-zinc-900 border-zinc-700 text-white' 
+          ? 'bg-background border-foreground/30 text-white' 
           : 'hover:border-primary/20'
       }`}
     >
@@ -64,12 +64,12 @@ export function ProdutoCard({ produto, isUserPlan, onSaibaMais }: ProdutoCardPro
           </p>
           
           {produto.periodicidade && (
-            <p className={`text-xs ${isUserPlan ? 'text-zinc-400' : 'text-muted-foreground'}`}>
+            <p className={`text-xs ${isUserPlan ? 'text-muted-foreground' : 'text-muted-foreground'}`}>
               {produto.periodicidade}
             </p>
           )}
 
-          <p className={`text-sm line-clamp-2 ${isUserPlan ? 'text-zinc-300' : 'text-muted-foreground'}`}>
+          <p className={`text-sm line-clamp-2 ${isUserPlan ? 'text-muted-foreground' : 'text-muted-foreground'}`}>
             {produto.descricao_curta}
           </p>
         </div>
@@ -79,7 +79,7 @@ export function ProdutoCard({ produto, isUserPlan, onSaibaMais }: ProdutoCardPro
           variant={isUserPlan ? "secondary" : "outline"}
           className={`w-full ${
             isUserPlan 
-              ? 'bg-white text-zinc-900 hover:bg-zinc-100' 
+              ? 'bg-white text-foreground hover:bg-muted' 
               : 'group-hover:bg-primary/5'
           }`}
         >

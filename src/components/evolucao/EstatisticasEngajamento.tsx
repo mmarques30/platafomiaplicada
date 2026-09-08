@@ -39,7 +39,7 @@ export function EstatisticasEngajamento({ ranking }: EstatisticasEngajamentoProp
           {stats.map((stat, index) => (
           <div
             key={index}
-            className="p-4 rounded-lg bg-zinc-700 border border-zinc-600 space-y-2"
+            className="p-4 rounded-lg bg-card border border-foreground/30 space-y-2"
           >
             <p className="text-xs text-white uppercase tracking-wide">{stat.label}</p>
             <p className="text-2xl font-bold text-white">{stat.value}</p>

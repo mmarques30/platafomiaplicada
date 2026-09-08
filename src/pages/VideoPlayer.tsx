@@ -287,7 +287,7 @@ export default function VideoPlayer() {
                     </Button>
                   )}
                   {progresso?.completado && (
-                    <div className="flex items-center text-green-600">
+                    <div className="flex items-center text-status-success">
                       <CheckCircle2 className="h-5 w-5 mr-2" />
                       Vídeo concluído
                     </div>

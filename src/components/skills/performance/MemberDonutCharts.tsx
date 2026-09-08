@@ -34,14 +34,14 @@ interface MemberDonutChartsProps {
   projetos?: Projeto[];
 }
 
-const BRAND_GREEN = "#9EB038";
+const BRAND_GREEN = "#c8e040";
 const MUTED_BG = "hsl(var(--muted))";
 
 const statusColor = (s: string) => {
-  if (s === "concluido" || s === "aprovada") return "bg-[#9EB038]";
-  if (s === "em_andamento") return "bg-amber-400";
-  if (s === "atrasado") return "bg-red-400";
-  if (s === "priorizado") return "bg-blue-400";
+  if (s === "concluido" || s === "aprovada") return "bg-primary";
+  if (s === "em_andamento") return "bg-status-warning";
+  if (s === "atrasado") return "bg-status-danger";
+  if (s === "priorizado") return "bg-status-info";
   if (s === "levantado") return "bg-muted-foreground/40";
   return "bg-muted-foreground/40";
 };
@@ -113,7 +113,7 @@ export default function MemberDonutCharts({ ranking, entregas, projetos = [] }: 
   if (ranking.length === 0) {
     return (
       <Card className="border-border bg-card overflow-hidden">
-      <CardHeader className="bg-[#9EB038]/25 rounded-t-xl">
+      <CardHeader className="bg-primary/25 rounded-t-xl">
           <CardTitle>Impacto vs ROI</CardTitle>
           <CardDescription>Efetividade por membro da equipe</CardDescription>
         </CardHeader>
@@ -128,7 +128,7 @@ export default function MemberDonutCharts({ ranking, entregas, projetos = [] }: 
 
   return (
     <Card className="border-border bg-card overflow-hidden">
-      <CardHeader className="bg-[#9EB038]/10 rounded-t-xl">
+      <CardHeader className="bg-primary/10 rounded-t-xl">
         <CardTitle>Impacto vs ROI</CardTitle>
         <CardDescription>Efetividade por membro da equipe</CardDescription>
       </CardHeader>

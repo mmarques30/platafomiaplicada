@@ -20,9 +20,9 @@ import { PageContainer } from "@/components/shared/PageContainer";
 
 const tipoEventoConfig: Record<string, { label: string; icon: React.ElementType; color: string }> = {
   aula_ao_vivo: { label: "Aula ao Vivo", icon: Video, color: "text-primary" },
-  qa: { label: "Q&A", icon: HelpCircle, color: "text-blue-500" },
-  live_youtube: { label: "Live YouTube", icon: Youtube, color: "text-red-500" },
-  outro: { label: "Evento", icon: Calendar, color: "text-orange-500" },
+  qa: { label: "Q&A", icon: HelpCircle, color: "text-status-info" },
+  live_youtube: { label: "Live YouTube", icon: Youtube, color: "text-status-danger" },
+  outro: { label: "Evento", icon: Calendar, color: "text-status-warning" },
 };
 
 function ProximoEncontroCard() {
@@ -60,7 +60,7 @@ function ProximoEncontroCard() {
   const TipoIcon = config.icon;
 
   const status = proximaAula.link_reuniao ? "Confirmado" : "Aguardando";
-  const statusColor = proximaAula.link_reuniao ? "text-primary" : "text-yellow-500";
+  const statusColor = proximaAula.link_reuniao ? "text-primary" : "text-status-warning";
   const StatusIcon = proximaAula.link_reuniao ? CheckCircle : Clock;
 
   return (

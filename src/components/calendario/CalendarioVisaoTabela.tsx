@@ -100,7 +100,7 @@ export function CalendarioVisaoTabela() {
     if (!aula.data_aula) {
       return {
         label: aula.ativo ? "Ativa" : "Inativa",
-        color: aula.ativo ? "bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-400" : "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-400",
+        color: aula.ativo ? "bg-status-success/15 text-status-success dark:bg-status-success dark:text-status-success" : "bg-muted text-foreground dark:bg-background dark:text-muted-foreground",
         icon: aula.ativo ? CheckCircle2 : XCircle,
       };
     }
@@ -112,14 +112,14 @@ export function CalendarioVisaoTabela() {
     if (isPassada) {
       return {
         label: "Passada",
-        color: "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-400",
+        color: "bg-muted text-foreground dark:bg-background dark:text-muted-foreground",
         icon: Clock,
       };
     }
 
     return {
       label: aula.ativo ? "Programada" : "Inativa",
-      color: aula.ativo ? "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-400" : "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-400",
+      color: aula.ativo ? "bg-status-info/15 text-status-info dark:bg-status-info dark:text-status-info" : "bg-muted text-foreground dark:bg-background dark:text-muted-foreground",
       icon: aula.ativo ? Clock : XCircle,
     };
   };
@@ -206,9 +206,9 @@ export function CalendarioVisaoTabela() {
                         className={cn(
                           "inline-flex items-center px-2 py-1 text-xs font-medium rounded-full",
                           aula.tipo_evento === "aula_ao_vivo" && "bg-primary/10 text-primary",
-                          aula.tipo_evento === "qa" && "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-400",
-                          aula.tipo_evento === "live_youtube" && "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-400",
-                          aula.tipo_evento === "outro" && "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-400"
+                          aula.tipo_evento === "qa" && "bg-status-info/15 text-status-info dark:bg-status-info dark:text-status-info",
+                          aula.tipo_evento === "live_youtube" && "bg-status-danger/15 text-status-danger dark:bg-status-danger dark:text-status-danger",
+                          aula.tipo_evento === "outro" && "bg-muted text-foreground dark:bg-background dark:text-muted-foreground"
                         )}
                       >
                         {aula.tipo_evento === "aula_ao_vivo" && "Aula ao Vivo"}
@@ -282,9 +282,9 @@ export function CalendarioVisaoTabela() {
                           className={cn(
                             "inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-full whitespace-nowrap",
                             aula.tipo_evento === "aula_ao_vivo" && "bg-primary/10 text-primary",
-                            aula.tipo_evento === "qa" && "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-400",
-                            aula.tipo_evento === "live_youtube" && "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-400",
-                            aula.tipo_evento === "outro" && "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-400"
+                            aula.tipo_evento === "qa" && "bg-status-info/15 text-status-info dark:bg-status-info dark:text-status-info",
+                            aula.tipo_evento === "live_youtube" && "bg-status-danger/15 text-status-danger dark:bg-status-danger dark:text-status-danger",
+                            aula.tipo_evento === "outro" && "bg-muted text-foreground dark:bg-background dark:text-muted-foreground"
                           )}
                         >
                           {aula.tipo_evento === "aula_ao_vivo" && "Aula ao Vivo"}
@@ -352,9 +352,9 @@ export function CalendarioVisaoTabela() {
                   className={cn(
                     "ml-2 px-2.5 py-1 text-xs font-medium rounded-full",
                     aulaDetalhes.tipo_evento === "aula_ao_vivo" && "bg-primary/10 text-primary",
-                    aulaDetalhes.tipo_evento === "qa" && "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-400",
-                    aulaDetalhes.tipo_evento === "live_youtube" && "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-400",
-                    aulaDetalhes.tipo_evento === "outro" && "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-400"
+                    aulaDetalhes.tipo_evento === "qa" && "bg-status-info/15 text-status-info dark:bg-status-info dark:text-status-info",
+                    aulaDetalhes.tipo_evento === "live_youtube" && "bg-status-danger/15 text-status-danger dark:bg-status-danger dark:text-status-danger",
+                    aulaDetalhes.tipo_evento === "outro" && "bg-muted text-foreground dark:bg-background dark:text-muted-foreground"
                   )}
                 >
                   {aulaDetalhes.tipo_evento === "aula_ao_vivo" && "Aula ao Vivo"}

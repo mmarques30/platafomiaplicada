@@ -62,11 +62,11 @@ const PRIORIDADE_CONFIG: Record<string, { label: string; variant: 'default' | 's
 };
 
 const STATUS_CONFIG: Record<string, { label: string; icon: React.ReactNode; color: string }> = {
-  pendente: { label: 'Pendente', icon: <Clock className="h-3.5 w-3.5" />, color: 'text-amber-600' },
-  em_analise: { label: 'Em Análise', icon: <Eye className="h-3.5 w-3.5" />, color: 'text-blue-600' },
-  aprovado: { label: 'Aprovado', icon: <CheckCircle2 className="h-3.5 w-3.5" />, color: 'text-emerald-600' },
-  rejeitado: { label: 'Rejeitado', icon: <XCircle className="h-3.5 w-3.5" />, color: 'text-red-600' },
-  revisao_solicitada: { label: 'Revisão', icon: <RotateCcw className="h-3.5 w-3.5" />, color: 'text-orange-600' },
+  pendente: { label: 'Pendente', icon: <Clock className="h-3.5 w-3.5" />, color: 'text-status-warning' },
+  em_analise: { label: 'Em Análise', icon: <Eye className="h-3.5 w-3.5" />, color: 'text-status-info' },
+  aprovado: { label: 'Aprovado', icon: <CheckCircle2 className="h-3.5 w-3.5" />, color: 'text-status-success' },
+  rejeitado: { label: 'Rejeitado', icon: <XCircle className="h-3.5 w-3.5" />, color: 'text-status-danger' },
+  revisao_solicitada: { label: 'Revisão', icon: <RotateCcw className="h-3.5 w-3.5" />, color: 'text-status-warning' },
 };
 
 const TasksBusinessManager: React.FC<TasksBusinessManagerProps> = ({ contratoId, userId }) => {

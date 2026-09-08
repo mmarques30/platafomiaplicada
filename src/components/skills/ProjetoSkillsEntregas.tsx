@@ -23,12 +23,12 @@ const statusLabels: Record<string, string> = {
   aprovada: "Aprovada",
 };
 const statusColors: Record<string, string> = {
-  pendente: "bg-yellow-500/10 text-yellow-700 border-yellow-500/30",
-  em_andamento: "bg-blue-500/10 text-blue-700 border-blue-500/30",
-  concluido: "bg-green-500/10 text-green-700 border-green-500/30",
-  bloqueado: "bg-red-500/10 text-red-700 border-red-500/30",
-  aguardando_validacao: "bg-orange-500/10 text-orange-700 border-orange-500/30",
-  aprovada: "bg-emerald-500/10 text-emerald-700 border-emerald-500/30",
+  pendente: "bg-status-warning/10 text-status-warning border-status-warning/30",
+  em_andamento: "bg-status-info/10 text-status-info border-status-info/30",
+  concluido: "bg-status-success/10 text-status-success border-status-success/30",
+  bloqueado: "bg-status-danger/10 text-status-danger border-status-danger/30",
+  aguardando_validacao: "bg-status-warning/10 text-status-warning border-status-warning/30",
+  aprovada: "bg-status-success/10 text-status-success border-status-success/30",
 };
 
 const ARCHIVED_PROJECT_STATUSES = ["nao_aprovado", "descartado"];
@@ -308,7 +308,7 @@ export default function ProjetoSkillsEntregas({ equipeId }: Props) {
                       <div className="flex items-center gap-1">
                         {e.projetoTitulo || "—"}
                         {isArchived && (
-                          <Badge variant="outline" className="text-[10px] bg-red-500/10 text-red-600 border-red-500/30 ml-1">
+                          <Badge variant="outline" className="text-[10px] bg-status-danger/10 text-status-danger border-status-danger/30 ml-1">
                             Arquivado
                           </Badge>
                         )}

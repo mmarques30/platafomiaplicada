@@ -32,9 +32,9 @@ const PRIORIDADE_CONFIG = {
 };
 
 const STATUS_CONFIG = {
-  pendente: { label: "Pendente", icon: Clock, color: "text-amber-600" },
-  em_andamento: { label: "Em Andamento", icon: AlertCircle, color: "text-blue-600" },
-  concluida: { label: "Concluída", icon: CheckCircle2, color: "text-emerald-600" },
+  pendente: { label: "Pendente", icon: Clock, color: "text-status-warning" },
+  em_andamento: { label: "Em Andamento", icon: AlertCircle, color: "text-status-info" },
+  concluida: { label: "Concluída", icon: CheckCircle2, color: "text-status-success" },
   cancelada: { label: "Cancelada", icon: AlertCircle, color: "text-muted-foreground" },
 };
 

@@ -55,7 +55,7 @@ export function MemberCard({ member }: MemberCardProps) {
             </span>
           )}
           {member.is_facilitador && (
-            <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600">
+            <span className="text-xs px-2 py-0.5 rounded-full bg-status-warning/10 text-status-warning">
               Facilitador
             </span>
           )}
@@ -80,10 +80,10 @@ export function MemberCard({ member }: MemberCardProps) {
             <Circle
               className={cn(
                 "h-2 w-2 fill-current",
-                isOnline ? "text-green-500" : "text-muted-foreground/50"
+                isOnline ? "text-status-success" : "text-muted-foreground/50"
               )}
             />
-            <span className={isOnline ? "text-green-500" : ""}>
+            <span className={isOnline ? "text-status-success" : ""}>
               {isOnline ? "Online" : "Offline"}
             </span>
           </div>

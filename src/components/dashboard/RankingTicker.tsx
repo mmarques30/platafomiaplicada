@@ -135,13 +135,13 @@ function RankingItem({ icon: Icon, label, value, percentual, tendencia, stars, h
           <span className="text-xs font-bold text-foreground">{value}</span>
           
           {tendencia === 'up' && (
-            <span className="flex items-center gap-0.5 text-green-600 text-[10px] font-bold">
+            <span className="flex items-center gap-0.5 text-status-success text-[10px] font-bold">
               <TrendingUp className="w-3 h-3" />
               +{percentual}%
             </span>
           )}
           {tendencia === 'down' && (
-            <span className="flex items-center gap-0.5 text-red-500 text-[10px] font-bold">
+            <span className="flex items-center gap-0.5 text-status-danger text-[10px] font-bold">
               <TrendingDown className="w-3 h-3" />
               -{percentual}%
             </span>

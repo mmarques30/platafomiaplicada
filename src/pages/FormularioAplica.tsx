@@ -452,8 +452,8 @@ export default function FormularioAplica() {
             </p>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="bg-[#9EB038]/10 border border-[#9EB038]/20 rounded-lg p-4 text-center">
-              <Gift className="h-6 w-6 text-[#9EB038] mx-auto mb-2" />
+            <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 text-center">
+              <Gift className="h-6 w-6 text-primary mx-auto mb-2" />
               <h3 className="font-semibold text-foreground mb-2">Sua Recompensa</h3>
               <p className="text-sm text-muted-foreground">
                 {recompensaAtual || "Complete a pesquisa para receber sua recompensa exclusiva."}
@@ -480,8 +480,8 @@ export default function FormularioAplica() {
         <Card className="max-w-2xl w-full bg-card/95 backdrop-blur-sm border border-primary/20 shadow-lg text-center">
           <CardHeader className="pb-4">
             <img src={logoMarca} alt="IAplicada" className="h-12 mx-auto mb-6" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
-            <div className="w-16 h-16 bg-[#9EB038]/20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <CheckCircle2 className="h-8 w-8 text-[#9EB038]" />
+            <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <CheckCircle2 className="h-8 w-8 text-primary" />
             </div>
             <CardTitle className="text-2xl md:text-3xl text-foreground">
               Obrigado por participar!
@@ -492,10 +492,10 @@ export default function FormularioAplica() {
               Suas respostas foram registradas com sucesso. Sua recompensa será liberada em breve.
             </p>
 
-            <div className="bg-[#9EB038]/10 border border-[#9EB038]/20 rounded-lg p-4">
+            <div className="bg-primary/10 border border-primary/20 rounded-lg p-4">
               <h3 className="font-semibold text-foreground mb-3">Sua recompensa</h3>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <CheckCircle2 className="h-4 w-4 text-[#9EB038]" />
+                <CheckCircle2 className="h-4 w-4 text-primary" />
                 {recompensaAtual}
               </div>
             </div>
@@ -580,18 +580,18 @@ export default function FormularioAplica() {
                       value={emailRespondente}
                       onChange={(e) => setEmailRespondente(e.target.value)}
                       placeholder="seu@email.com"
-                      className={`bg-background border-border pr-10 ${mentoradoDetectado ? "border-[#9EB038]" : ""}`}
+                      className={`bg-background border-border pr-10 ${mentoradoDetectado ? "border-primary" : ""}`}
                     />
                     {verificandoEmail && (
                       <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground" />
                     )}
                     {mentoradoDetectado && !verificandoEmail && (
-                      <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#9EB038]" />
+                      <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-primary" />
                     )}
                   </div>
                   
                   {mentoradoDetectado && (
-                    <div className="flex items-center gap-2 text-sm text-[#9EB038] bg-[#9EB038]/10 px-3 py-2 rounded-md">
+                    <div className="flex items-center gap-2 text-sm text-primary bg-primary/10 px-3 py-2 rounded-md">
                       <CheckCircle2 className="h-4 w-4" />
                       <span>Você é um Mentorado IAplicada!</span>
                     </div>

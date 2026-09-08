@@ -65,8 +65,8 @@ export function DashboardUrgencias() {
   if (!urgency) return null;
 
   return (
-    <div className="flex items-center gap-3 rounded-lg border-l-4 border-[#E8684A] bg-card px-4 h-12 shadow-sm">
-      <AlertTriangle className="h-4 w-4 shrink-0 text-[#E8684A]" />
+    <div className="flex items-center gap-3 rounded-lg border-l-4 border-status-danger bg-card px-4 h-12 shadow-sm">
+      <AlertTriangle className="h-4 w-4 shrink-0 text-status-danger" />
       <span className="flex-1 truncate text-sm text-foreground">{urgency.text}</span>
       <Link
         to={urgency.link}

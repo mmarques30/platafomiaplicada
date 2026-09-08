@@ -67,7 +67,7 @@ export function VisaoGeralTab({ data }: VisaoGeralTabProps) {
   return (
     <div className="space-y-6">
       {/* Banner de Alertas Compacto */}
-      <Card className="border-orange-500/30 bg-orange-500/5">
+      <Card className="border-status-warning/30 bg-status-warning/5">
         <CardContent className="py-3 px-4">
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-sm font-medium text-muted-foreground mr-1">Requer atenção:</span>
@@ -81,7 +81,7 @@ export function VisaoGeralTab({ data }: VisaoGeralTabProps) {
             </Badge>
             <Badge
               variant="secondary"
-              className="cursor-pointer gap-1 bg-yellow-500/20 text-yellow-700 hover:bg-yellow-500/30"
+              className="cursor-pointer gap-1 bg-status-warning/20 text-status-warning hover:bg-status-warning/30"
               onClick={() => navigate("/admin/mentoria")}
             >
               <HelpCircle className="h-3 w-3" />
@@ -89,7 +89,7 @@ export function VisaoGeralTab({ data }: VisaoGeralTabProps) {
             </Badge>
             <Badge
               variant="secondary"
-              className="cursor-pointer gap-1 bg-yellow-500/20 text-yellow-700 hover:bg-yellow-500/30"
+              className="cursor-pointer gap-1 bg-status-warning/20 text-status-warning hover:bg-status-warning/30"
               onClick={() => navigate("/admin/mentoria")}
             >
               <FileText className="h-3 w-3" />
@@ -142,9 +142,9 @@ export function VisaoGeralTab({ data }: VisaoGeralTabProps) {
         </CardHeader>
         <CardContent className="space-y-3">
           {[
-            { label: "Visitantes", value: funilVisitantes, color: "bg-blue-500" },
-            { label: "Convertidos (30d)", value: funilConvertidos, color: "bg-amber-500" },
-            { label: "Ativos (7d)", value: funilAtivos, color: "bg-green-500" },
+            { label: "Visitantes", value: funilVisitantes, color: "bg-status-info" },
+            { label: "Convertidos (30d)", value: funilConvertidos, color: "bg-status-warning" },
+            { label: "Ativos (7d)", value: funilAtivos, color: "bg-status-success" },
           ].map((item) => (
             <div key={item.label} className="space-y-1">
               <div className="flex justify-between text-sm">

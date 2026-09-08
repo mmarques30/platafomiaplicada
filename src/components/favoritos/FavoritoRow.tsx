@@ -14,12 +14,12 @@ interface FavoritoRowProps {
 }
 
 const tipoConfig: Record<string, { icon: LucideIcon; bgColor: string; label: string }> = {
-  trilha: { icon: GraduationCap, bgColor: "bg-blue-50 dark:bg-blue-950/30", label: "Trilha" },
-  video: { icon: Play, bgColor: "bg-purple-50 dark:bg-purple-950/30", label: "Vídeo" },
-  ferramenta: { icon: Wrench, bgColor: "bg-green-50 dark:bg-green-950/30", label: "Ferramenta" },
-  prompt: { icon: MessageSquare, bgColor: "bg-orange-50 dark:bg-orange-950/30", label: "Prompt" },
-  metodo: { icon: Target, bgColor: "bg-pink-50 dark:bg-pink-950/30", label: "Método" },
-  ia_copie_use: { icon: Sparkles, bgColor: "bg-yellow-50 dark:bg-yellow-950/30", label: "IA Copie e Use" },
+  trilha: { icon: GraduationCap, bgColor: "bg-status-info/15 dark:bg-status-info/30", label: "Trilha" },
+  video: { icon: Play, bgColor: "bg-secondary/15 dark:bg-secondary/30", label: "Vídeo" },
+  ferramenta: { icon: Wrench, bgColor: "bg-status-success/15 dark:bg-status-success/30", label: "Ferramenta" },
+  prompt: { icon: MessageSquare, bgColor: "bg-status-warning/15 dark:bg-status-warning/30", label: "Prompt" },
+  metodo: { icon: Target, bgColor: "bg-status-danger/15 dark:bg-status-danger/30", label: "Método" },
+  ia_copie_use: { icon: Sparkles, bgColor: "bg-status-warning/15 dark:bg-status-warning/30", label: "IA Copie e Use" },
 };
 
 export default function FavoritoRow({ tipo, titulo, descricao, link, onRemove, isRemoving }: FavoritoRowProps) {

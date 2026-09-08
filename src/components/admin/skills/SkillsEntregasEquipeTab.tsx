@@ -13,10 +13,10 @@ const statusLabels: Record<string, string> = {
   pendente: "Pendente", em_andamento: "Em Andamento", concluido: "Concluído", bloqueado: "Bloqueado",
 };
 const statusColors: Record<string, string> = {
-  pendente: "bg-yellow-500/10 text-yellow-700 border-yellow-500/30",
-  em_andamento: "bg-blue-500/10 text-blue-700 border-blue-500/30",
-  concluido: "bg-green-500/10 text-green-700 border-green-500/30",
-  bloqueado: "bg-red-500/10 text-red-700 border-red-500/30",
+  pendente: "bg-status-warning/10 text-status-warning border-status-warning/30",
+  em_andamento: "bg-status-info/10 text-status-info border-status-info/30",
+  concluido: "bg-status-success/10 text-status-success border-status-success/30",
+  bloqueado: "bg-status-danger/10 text-status-danger border-status-danger/30",
 };
 
 export default function SkillsEntregasEquipeTab({ equipeId }: { equipeId: string }) {
@@ -147,7 +147,7 @@ export default function SkillsEntregasEquipeTab({ equipeId }: { equipeId: string
                   <TableCell><div className="flex items-center gap-2 min-w-[80px]"><Progress value={e.progresso} className="h-2 flex-1" /><span className="text-xs">{e.progresso}%</span></div></TableCell>
                   <TableCell>
                     {hasSubtarefas ? (
-                      <Badge variant="outline" className={concluidas === subtarefas.length ? "bg-green-500/10 text-green-700 border-green-500/30" : "bg-blue-500/10 text-blue-700 border-blue-500/30"}>
+                      <Badge variant="outline" className={concluidas === subtarefas.length ? "bg-status-success/10 text-status-success border-status-success/30" : "bg-status-info/10 text-status-info border-status-info/30"}>
                         {concluidas}/{subtarefas.length}
                       </Badge>
                     ) : <span className="text-muted-foreground text-xs">—</span>}
@@ -169,7 +169,7 @@ export default function SkillsEntregasEquipeTab({ equipeId }: { equipeId: string
                     <TableCell />
                     <TableCell colSpan={8} className="pl-10">
                       <div className="flex items-center gap-2 text-sm">
-                        {s.concluida ? <CheckCircle2 className="h-4 w-4 text-green-600" /> : <Circle className="h-4 w-4 text-muted-foreground" />}
+                        {s.concluida ? <CheckCircle2 className="h-4 w-4 text-status-success" /> : <Circle className="h-4 w-4 text-muted-foreground" />}
                         <span className={s.concluida ? "line-through text-muted-foreground" : ""}>{s.titulo}</span>
                       </div>
                     </TableCell>

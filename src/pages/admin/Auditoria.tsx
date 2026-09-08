@@ -162,9 +162,9 @@ export default function Auditoria() {
 
 function OperacaoBadge({ operacao }: { operacao: string }) {
   const styles: Record<string, string> = {
-    INSERT: "bg-green-100 text-green-700",
-    UPDATE: "bg-blue-100 text-blue-700",
-    DELETE: "bg-red-100 text-red-700",
+    INSERT: "bg-status-success/15 text-status-success",
+    UPDATE: "bg-status-info/15 text-status-info",
+    DELETE: "bg-status-danger/15 text-status-danger",
   };
   const labels: Record<string, string> = { INSERT: "Criação", UPDATE: "Atualização", DELETE: "Exclusão" };
 

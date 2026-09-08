@@ -19,7 +19,7 @@ export function HeroAcompanhamento() {
             <h2 className="text-3xl font-bold text-white mb-2">
               Meu <span className="text-primary">Acompanhamento</span>
             </h2>
-            <p className="text-zinc-400 text-lg">
+            <p className="text-muted-foreground text-lg">
               Diagnóstico IA e projetos para aplicar seus conhecimentos
             </p>
           </div>
@@ -29,28 +29,28 @@ export function HeroAcompanhamento() {
         <div className="grid grid-cols-3 gap-3">
           <div className={`rounded-lg border p-3 ${
             diagnosticoCompleto 
-              ? "border-primary/30 bg-zinc-700" 
-              : "border-orange-500/30 bg-orange-500/10"
+              ? "border-primary/30 bg-card" 
+              : "border-status-warning/30 bg-status-warning/10"
           }`}>
             <span className="text-xs text-white uppercase tracking-wide block mb-2">Diagnóstico</span>
             <p className={`text-xl font-semibold ${
-              diagnosticoCompleto ? "text-primary" : "text-orange-400"
+              diagnosticoCompleto ? "text-primary" : "text-status-warning"
             }`}>
               {diagnosticoCompleto ? "Completo" : "Pendente"}
             </p>
-            <p className="text-xs text-zinc-300">diagnóstico IA</p>
+            <p className="text-xs text-muted-foreground">diagnóstico IA</p>
           </div>
 
-          <div className="rounded-lg border border-zinc-600 bg-zinc-700 p-3">
+          <div className="rounded-lg border border-foreground/30 bg-card p-3">
             <span className="text-xs text-white uppercase tracking-wide block mb-2">Projetos Ativos</span>
             <p className="text-xl font-semibold text-white">{projetosAtivos}</p>
-            <p className="text-xs text-zinc-300">em andamento</p>
+            <p className="text-xs text-muted-foreground">em andamento</p>
           </div>
 
-          <div className="rounded-lg border border-zinc-600 bg-zinc-700 p-3">
+          <div className="rounded-lg border border-foreground/30 bg-card p-3">
             <span className="text-xs text-white uppercase tracking-wide block mb-2">Concluídos</span>
             <p className="text-xl font-semibold text-white">{projetosConcluidos}</p>
-            <p className="text-xs text-zinc-300">finalizados</p>
+            <p className="text-xs text-muted-foreground">finalizados</p>
           </div>
         </div>
       </div>

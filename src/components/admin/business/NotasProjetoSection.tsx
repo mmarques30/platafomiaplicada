@@ -22,9 +22,9 @@ const categoriaLabels: Record<string, string> = {
 
 const categoriaColors: Record<string, string> = {
   geral: "bg-muted text-muted-foreground",
-  reuniao: "bg-blue-500/10 text-blue-600",
-  decisao: "bg-amber-500/10 text-amber-600",
-  tecnico: "bg-emerald-500/10 text-emerald-600",
+  reuniao: "bg-status-info/10 text-status-info",
+  decisao: "bg-status-warning/10 text-status-warning",
+  tecnico: "bg-status-success/10 text-status-success",
 };
 
 const emojiGroups = [

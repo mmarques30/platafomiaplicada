@@ -45,9 +45,9 @@ export function AnimatedBackground() {
     window.addEventListener("mousemove", handleMouseMove);
 
     const animate = () => {
-      // Fundo creme suave (mesmo brand-cream-soft #F7F6E8 do topbar/welcome
+      // Fundo creme suave (mesmo brand-cream-soft #1b1f13 do topbar/welcome
       // do app interno). Light, alinhado com a LP do Academy.
-      ctx.fillStyle = "#F7F6E8";
+      ctx.fillStyle = "#1b1f13";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       particlesRef.current.forEach((particle, i) => {
@@ -68,7 +68,7 @@ export function AnimatedBackground() {
 
         ctx.beginPath();
         ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-        // brand-strong #5C6F1D (verde-escuro brand) com 30% alpha — visível em fundo light
+        // brand-strong #7a8f30 (verde-escuro brand) com 30% alpha — visível em fundo light
         ctx.fillStyle = "rgba(92, 111, 29, 0.3)";
         ctx.fill();
 
@@ -82,7 +82,7 @@ export function AnimatedBackground() {
             ctx.beginPath();
             ctx.moveTo(particle.x, particle.y);
             ctx.lineTo(otherParticle.x, otherParticle.y);
-            // primary #9EB038 (verde-oliva médio brand) alpha variável
+            // primary #c8e040 (verde-oliva médio brand) alpha variável
             ctx.strokeStyle = `rgba(158, 176, 56, ${0.25 * (1 - distance / 120)})`;
             ctx.lineWidth = 0.5;
             ctx.stroke();

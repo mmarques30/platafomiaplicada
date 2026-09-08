@@ -74,11 +74,11 @@ export function RitmoCard() {
   const isUp = variacaoPct > 15;
   const isDown = variacaoPct < -15;
 
-  const borderColor = isUp ? "border-[#AFC040]" : isDown ? "border-[#E8735A]" : "border-muted-foreground/30";
+  const borderColor = isUp ? "border-primary" : isDown ? "border-status-danger" : "border-muted-foreground/30";
   const badgeColor = isUp
-    ? "bg-[#AFC040]/15 text-[#AFC040]"
+    ? "bg-primary/15 text-primary"
     : isDown
-      ? "bg-[#E8735A]/15 text-[#E8735A]"
+      ? "bg-status-danger/15 text-status-danger"
       : "bg-muted text-muted-foreground";
 
   const badgeText = isUp

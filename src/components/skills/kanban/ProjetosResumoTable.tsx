@@ -96,7 +96,7 @@ export default function ProjetosResumoTable({ projetos, entregasEquipe, onVerMai
       </Table>
       {hasMore && (
         <div className="px-5 py-3 border-t border-border flex justify-center">
-          <Button variant="ghost" size="sm" onClick={onVerMais} className="text-xs gap-1.5 hover:text-[#9EB038]">
+          <Button variant="ghost" size="sm" onClick={onVerMais} className="text-xs gap-1.5 hover:text-primary">
             Ver todos os projetos
             <ArrowRight size={14} />
           </Button>

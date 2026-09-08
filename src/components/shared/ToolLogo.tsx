@@ -51,14 +51,14 @@ export function ToolLogo({
   // Generate a consistent color based on tool name
   const getColorClass = (name: string) => {
     const colors = [
-      "bg-blue-500/20 text-blue-600",
-      "bg-purple-500/20 text-purple-600",
-      "bg-green-500/20 text-green-600",
-      "bg-orange-500/20 text-orange-600",
-      "bg-pink-500/20 text-pink-600",
-      "bg-cyan-500/20 text-cyan-600",
-      "bg-indigo-500/20 text-indigo-600",
-      "bg-teal-500/20 text-teal-600",
+      "bg-status-info/20 text-status-info",
+      "bg-secondary/20 text-secondary",
+      "bg-status-success/20 text-status-success",
+      "bg-status-warning/20 text-status-warning",
+      "bg-status-danger/20 text-status-danger",
+      "bg-status-info/20 text-status-info",
+      "bg-status-info/20 text-status-info",
+      "bg-status-success/20 text-status-success",
     ];
     const hash = name.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
     return colors[hash % colors.length];

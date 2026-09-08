@@ -53,11 +53,11 @@ export const RoadmapTimeline = ({ sessoes, isBusiness = false }: Props) => {
               <div className="flex items-center mb-4">
                 <div className={cn(
                   "relative z-10 w-8 h-8 rounded-full flex items-center justify-center",
-                  isBusiness ? "bg-violet-500/30 ring-2 ring-violet-500/50" : "bg-aplicada-green-900"
+                  isBusiness ? "bg-secondary/30 ring-2 ring-secondary/50" : "bg-aplicada-green-900"
                 )}>
                   <span className={cn(
                     "font-bold text-sm",
-                    isBusiness ? "text-violet-300" : "text-white"
+                    isBusiness ? "text-secondary" : "text-white"
                   )}>
                     {mesIndex + 1}
                   </span>
@@ -117,14 +117,14 @@ export const RoadmapTimeline = ({ sessoes, isBusiness = false }: Props) => {
                 className={cn(
                   "text-left font-semibold px-4 py-3 transition-colors",
                   isBusiness 
-                    ? "bg-white/5 hover:bg-white/8 text-slate-100" 
+                    ? "bg-white/5 hover:bg-white/8 text-muted-foreground" 
                     : "bg-muted hover:bg-muted/80 text-card-foreground"
                 )}
               >
                 <span className="flex items-center gap-2">
                   <span className={cn(
                     "w-6 h-6 rounded-full flex items-center justify-center text-sm",
-                    isBusiness ? "bg-violet-500/30 text-violet-300" : "bg-aplicada-green-900 text-white"
+                    isBusiness ? "bg-secondary/30 text-secondary" : "bg-aplicada-green-900 text-white"
                   )}>
                     {mesIndex + 1}
                   </span>
@@ -143,7 +143,7 @@ export const RoadmapTimeline = ({ sessoes, isBusiness = false }: Props) => {
                       key={sessao.id} 
                       className={cn(
                         "border-l-2 pl-3",
-                        isBusiness ? "border-violet-500/50" : "border-aplicada-green-900"
+                        isBusiness ? "border-secondary/50" : "border-aplicada-green-900"
                       )}
                     >
                       <h4 className={cn("font-semibold", theme.textSecondary)}>

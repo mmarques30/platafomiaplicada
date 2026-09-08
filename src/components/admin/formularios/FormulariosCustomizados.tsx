@@ -185,7 +185,7 @@ export const FormulariosCustomizados = () => {
                             {expirado ? "Expirou em: " : "Expira em: "}
                             {format(new Date(formulario.data_expiracao), "dd/MM/yyyy", { locale: ptBR })}
                             {diasRestantes !== null && diasRestantes > 0 && (
-                              <span className="text-orange-500">
+                              <span className="text-status-warning">
                                 ({diasRestantes} {diasRestantes === 1 ? "dia" : "dias"})
                               </span>
                             )}

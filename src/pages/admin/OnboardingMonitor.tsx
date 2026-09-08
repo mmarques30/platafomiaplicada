@@ -128,7 +128,7 @@ const FILTERS: { key: FilterKey; label: string }[] = [
   { key: "parados", label: "Parados 3+ dias" },
 ];
 
-const FUNNEL_COLORS = ["#AFC040", "#2CBBA6", "#4A9FE0", "#E8A43C", "#AFC040"];
+const FUNNEL_COLORS = ["#c8e040", "#4a9fe0", "#4a9fe0", "#e8a43c", "#c8e040"];
 
 // ── KPI Card ──
 
@@ -280,10 +280,10 @@ export default function OnboardingMonitor() {
 
       {/* KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <KpiCard icon={Users} label="Total de usuários" value={total} accent="#4A9FE0" />
-        <KpiCard icon={CheckCircle} label="Onboarding completo" value={`${completos} (${pctCompleto}%)`} accent="#AFC040" />
-        <KpiCard icon={Clock} label="Em andamento" value={emAndamento} accent="#E8A43C" />
-        <KpiCard icon={AlertTriangle} label="Parados 3+ dias" value={parados} accent="#E8684A" />
+        <KpiCard icon={Users} label="Total de usuários" value={total} accent="#4a9fe0" />
+        <KpiCard icon={CheckCircle} label="Onboarding completo" value={`${completos} (${pctCompleto}%)`} accent="#c8e040" />
+        <KpiCard icon={Clock} label="Em andamento" value={emAndamento} accent="#e8a43c" />
+        <KpiCard icon={AlertTriangle} label="Parados 3+ dias" value={parados} accent="#db2b42" />
       </div>
 
       {/* Filters */}
@@ -351,7 +351,7 @@ export default function OnboardingMonitor() {
                         {row.etapaAtual}
                       </TableCell>
                       <TableCell>
-                        <span className={cn("text-sm font-medium", row.diasParado >= 3 && "text-[#E8684A]")}>
+                        <span className={cn("text-sm font-medium", row.diasParado >= 3 && "text-status-danger")}>
                           {row.diasParado} dias
                         </span>
                       </TableCell>
@@ -371,7 +371,7 @@ export default function OnboardingMonitor() {
                             variant={row.status === "nao_iniciou" ? "default" : "outline"}
                             className={cn(
                               adminTheme.buttonSm,
-                              row.status === "nao_iniciou" && "bg-[#E8A43C] hover:bg-[#d4932e] text-white border-0"
+                              row.status === "nao_iniciou" && "bg-status-warning hover:bg-[#d4932e] text-white border-0"
                             )}
                             disabled={notifying === row.profile.id}
                             onClick={() => handleNotificar(row)}

@@ -52,12 +52,12 @@ export function BusinessAprendizadoSection({
 
       {/* Card - Capacitar Equipe */}
       <Card className="border-border overflow-hidden relative group hover:shadow-md transition-all">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
+        <div className="absolute top-0 right-0 w-32 h-32 bg-status-info/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
         
         <CardContent className="p-6 relative z-10">
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center shrink-0">
-              <Users className="h-6 w-6 text-blue-600" />
+            <div className="w-12 h-12 rounded-xl bg-status-info/10 flex items-center justify-center shrink-0">
+              <Users className="h-6 w-6 text-status-info" />
             </div>
             
             <div className="flex-1">

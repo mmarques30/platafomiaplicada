@@ -154,9 +154,9 @@ export default function HistoricoSenhas() {
         <Card>
           <CardContent className="pt-4">
             <div className="flex items-center gap-2">
-              <CheckCircle className="h-5 w-5 text-green-500" />
+              <CheckCircle className="h-5 w-5 text-status-success" />
               <div>
-                <p className="text-2xl font-bold text-green-600">{stats.concluidas}</p>
+                <p className="text-2xl font-bold text-status-success">{stats.concluidas}</p>
                 <p className="text-xs text-muted-foreground">Senhas alteradas</p>
               </div>
             </div>
@@ -165,9 +165,9 @@ export default function HistoricoSenhas() {
         <Card>
           <CardContent className="pt-4">
             <div className="flex items-center gap-2">
-              <Clock className="h-5 w-5 text-amber-500" />
+              <Clock className="h-5 w-5 text-status-warning" />
               <div>
-                <p className="text-2xl font-bold text-amber-600">{stats.pendentes}</p>
+                <p className="text-2xl font-bold text-status-warning">{stats.pendentes}</p>
                 <p className="text-xs text-muted-foreground">Links enviados</p>
               </div>
             </div>
@@ -176,9 +176,9 @@ export default function HistoricoSenhas() {
         <Card>
           <CardContent className="pt-4">
             <div className="flex items-center gap-2">
-              <XCircle className="h-5 w-5 text-red-500" />
+              <XCircle className="h-5 w-5 text-status-danger" />
               <div>
-                <p className="text-2xl font-bold text-red-600">{stats.falhas}</p>
+                <p className="text-2xl font-bold text-status-danger">{stats.falhas}</p>
                 <p className="text-xs text-muted-foreground">Falhas/Erros</p>
               </div>
             </div>

@@ -48,7 +48,7 @@ export function FerramentaCard({ ferramenta, onVerMais }: FerramentaCardProps) {
           {ferramenta.gratuito && (
             <Badge
               variant="outline"
-              className="bg-green-50 text-green-700 border-green-200 text-xs"
+              className="bg-status-success/15 text-status-success border-status-success/40 text-xs"
             >
               Gratuita
             </Badge>
@@ -69,7 +69,7 @@ export function FerramentaCard({ ferramenta, onVerMais }: FerramentaCardProps) {
 
         {/* Badge "Vale a pena" */}
         {ferramenta.vale_a_pena && (
-          <div className="flex items-center justify-center gap-1 text-xs text-green-600">
+          <div className="flex items-center justify-center gap-1 text-xs text-status-success">
             <CheckCircle className="w-4 h-4" />
             <span>Vale a pena!</span>
           </div>

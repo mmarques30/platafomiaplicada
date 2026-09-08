@@ -149,9 +149,9 @@ export default function DiagnosticosSkillsTab({ equipeId }: Props) {
         </CardHeader>
         <CardContent className="pt-0">
           {completos === 0 ? (
-            <div className="flex items-center gap-2 p-3 bg-yellow-500/10 rounded-lg">
-              <AlertTriangle className="h-4 w-4 text-yellow-600 shrink-0" />
-              <p className="text-sm text-yellow-600">Nenhum diagnóstico preenchido. Os membros precisam preencher seus diagnósticos para gerar a consolidação.</p>
+            <div className="flex items-center gap-2 p-3 bg-status-warning/10 rounded-lg">
+              <AlertTriangle className="h-4 w-4 text-status-warning shrink-0" />
+              <p className="text-sm text-status-warning">Nenhum diagnóstico preenchido. Os membros precisam preencher seus diagnósticos para gerar a consolidação.</p>
             </div>
           ) : !consolidado ? (
             <p className="text-sm text-muted-foreground">Clique em "Consolidar Diagnósticos" para gerar a visão unificada da equipe com IA.</p>
@@ -244,9 +244,9 @@ export default function DiagnosticosSkillsTab({ equipeId }: Props) {
                         {membro.hasInsight ? (
                           <Badge className="bg-primary/10 text-primary border-primary/20 text-xs gap-1"><Brain className="h-3 w-3" /> Processado</Badge>
                         ) : membro.completado ? (
-                          <Badge className="bg-green-500/10 text-green-600 border-green-500/20 text-xs gap-1"><CheckCircle className="h-3 w-3" /> Preenchido</Badge>
+                          <Badge className="bg-status-success/10 text-status-success border-status-success/20 text-xs gap-1"><CheckCircle className="h-3 w-3" /> Preenchido</Badge>
                         ) : (
-                          <Badge className="bg-yellow-500/10 text-yellow-600 border-yellow-500/20 text-xs gap-1"><Clock className="h-3 w-3" /> Pendente</Badge>
+                          <Badge className="bg-status-warning/10 text-status-warning border-status-warning/20 text-xs gap-1"><Clock className="h-3 w-3" /> Pendente</Badge>
                         )}
                         {expandedId === membro.userId ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                       </div>
@@ -280,9 +280,9 @@ export default function DiagnosticosSkillsTab({ equipeId }: Props) {
                                     {versao.hasInsight ? (
                                       <Badge className="bg-primary/10 text-primary border-primary/20 text-xs gap-1"><Brain className="h-3 w-3" /> Processado</Badge>
                                     ) : versao.completado ? (
-                                      <Badge className="bg-green-500/10 text-green-600 border-green-500/20 text-xs gap-1"><CheckCircle className="h-3 w-3" /> Preenchido</Badge>
+                                      <Badge className="bg-status-success/10 text-status-success border-status-success/20 text-xs gap-1"><CheckCircle className="h-3 w-3" /> Preenchido</Badge>
                                     ) : (
-                                      <Badge className="bg-yellow-500/10 text-yellow-600 border-yellow-500/20 text-xs gap-1"><Clock className="h-3 w-3" /> Pendente</Badge>
+                                      <Badge className="bg-status-warning/10 text-status-warning border-status-warning/20 text-xs gap-1"><Clock className="h-3 w-3" /> Pendente</Badge>
                                     )}
                                   </div>
                                   {isExpanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}

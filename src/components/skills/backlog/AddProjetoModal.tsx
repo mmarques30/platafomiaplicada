@@ -107,7 +107,7 @@ export default function AddProjetoModal({ open, onOpenChange, onAdd, isLoading }
                 type="button"
                 variant="ghost"
                 size="sm"
-                className="h-7 gap-1.5 text-xs text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+                className="h-7 gap-1.5 text-xs text-status-warning hover:text-status-warning hover:bg-status-warning/15"
                 disabled={!titulo.trim() || isGenerating}
                 onClick={handleGenerateAI}
               >

@@ -115,10 +115,10 @@ export default function Configuracoes() {
           </CardHeader>
           <CardContent className="space-y-4">
             {isInstalled ? (
-              <div className="flex items-center gap-3 p-3 bg-green-500/10 rounded-lg border border-green-500/20">
-                <CheckCircle2 className="h-5 w-5 text-green-500" />
+              <div className="flex items-center gap-3 p-3 bg-status-success/10 rounded-lg border border-status-success/20">
+                <CheckCircle2 className="h-5 w-5 text-status-success" />
                 <div>
-                  <p className="font-medium text-green-600 dark:text-green-400">
+                  <p className="font-medium text-status-success dark:text-status-success">
                     App instalado!
                   </p>
                   <p className="text-sm text-muted-foreground">

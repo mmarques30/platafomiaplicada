@@ -18,15 +18,15 @@ function StageCircle({ numero, status }: { numero: number; status: StageStatus }
 
   if (status === "concluido") {
     return (
-      <div className={cn(base, "bg-[#EAF3DE] dark:bg-[#173404] border-[#AFC040]")}>
-        <Check className="w-4 h-4 text-[#AFC040]" />
+      <div className={cn(base, "bg-[#EAF3DE] dark:bg-[#173404] border-primary")}>
+        <Check className="w-4 h-4 text-primary" />
       </div>
     );
   }
 
   if (status === "atual") {
     return (
-      <div className={cn(base, "bg-[#AFC040] border-[#AFC040] text-[#0C0F0A]")}>
+      <div className={cn(base, "bg-primary border-primary text-foreground")}>
         {numero}
       </div>
     );
@@ -44,7 +44,7 @@ function Connector({ prevStatus }: { prevStatus: StageStatus }) {
     <div
       className={cn(
         "h-0.5 flex-1 min-w-4",
-        prevStatus === "concluido" ? "bg-[#AFC040]" : "bg-border"
+        prevStatus === "concluido" ? "bg-primary" : "bg-border"
       )}
     />
   );

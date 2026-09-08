@@ -57,7 +57,7 @@ export function PlayerCard({ player }: PlayerCardProps) {
             <span className="font-semibold text-foreground">
               {player.nome_completo}
             </span>
-            <Badge variant="secondary" className="bg-amber-500/10 text-amber-600 border-amber-500/20">
+            <Badge variant="secondary" className="bg-status-warning/10 text-status-warning border-status-warning/20">
               <Award className="w-3 h-3 mr-1" />
               Player
             </Badge>

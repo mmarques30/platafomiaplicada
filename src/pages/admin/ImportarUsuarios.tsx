@@ -357,17 +357,17 @@ export default function ImportarUsuarios() {
                   </TableHeader>
                   <TableBody>
                     {parsedUsers.map((user, index) => (
-                      <TableRow key={index} className={!user.isValid ? "bg-red-50 dark:bg-red-950/20" : ""}>
+                      <TableRow key={index} className={!user.isValid ? "bg-status-danger/15 dark:bg-status-danger/20" : ""}>
                         <TableCell className="font-mono text-sm">{user.email}</TableCell>
                         <TableCell>{user.nomeCompleto}</TableCell>
                         <TableCell>
                           {user.isValid ? (
-                            <span className="text-green-600 text-sm flex items-center gap-1">
+                            <span className="text-status-success text-sm flex items-center gap-1">
                               <CheckCircle2 className="h-3 w-3" />
                               Válido
                             </span>
                           ) : (
-                            <span className="text-red-600 text-sm flex items-center gap-1">
+                            <span className="text-status-danger text-sm flex items-center gap-1">
                               <XCircle className="h-3 w-3" />
                               {user.errors.join(", ")}
                             </span>
@@ -410,17 +410,17 @@ export default function ImportarUsuarios() {
 
           {/* Resultado */}
           {result && (
-            <Card className={result.success ? "border-green-500" : "border-red-500"}>
+            <Card className={result.success ? "border-status-success" : "border-status-danger"}>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg">
                   {result.success ? (
                     <>
-                      <CheckCircle2 className="h-5 w-5 text-green-500" />
+                      <CheckCircle2 className="h-5 w-5 text-status-success" />
                       Resultado da Importação
                     </>
                   ) : (
                     <>
-                      <XCircle className="h-5 w-5 text-red-500" />
+                      <XCircle className="h-5 w-5 text-status-danger" />
                       Erro na Importação
                     </>
                   )}
@@ -433,18 +433,18 @@ export default function ImportarUsuarios() {
                     <p className="text-sm text-muted-foreground">Total</p>
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-green-600">{result.imported}</p>
+                    <p className="text-2xl font-bold text-status-success">{result.imported}</p>
                     <p className="text-sm text-muted-foreground">Importados</p>
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-red-600">{result.failed}</p>
+                    <p className="text-2xl font-bold text-status-danger">{result.failed}</p>
                     <p className="text-sm text-muted-foreground">Falhas</p>
                   </div>
                 </div>
 
                 {result.results?.success?.length > 0 && (
                   <div>
-                    <h4 className="font-semibold text-green-600 mb-2 flex items-center gap-2">
+                    <h4 className="font-semibold text-status-success mb-2 flex items-center gap-2">
                       <CheckCircle2 className="h-4 w-4" />
                       Sucesso:
                     </h4>
@@ -460,7 +460,7 @@ export default function ImportarUsuarios() {
 
                 {result.results?.errors?.length > 0 && (
                   <div>
-                    <h4 className="font-semibold text-red-600 mb-2 flex items-center gap-2">
+                    <h4 className="font-semibold text-status-danger mb-2 flex items-center gap-2">
                       <XCircle className="h-4 w-4" />
                       Erros:
                     </h4>
@@ -468,7 +468,7 @@ export default function ImportarUsuarios() {
                       {result.results.errors.map((err: any, idx: number) => (
                         <li key={idx} className="text-sm">
                           <span className="font-medium">{err.email}:</span>{" "}
-                          <span className="text-red-600">{err.error}</span>
+                          <span className="text-status-danger">{err.error}</span>
                         </li>
                       ))}
                     </ul>

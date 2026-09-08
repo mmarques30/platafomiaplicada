@@ -113,7 +113,7 @@ export function CuponsTab() {
       case 'padrao':
         return <Badge variant="default">Padrão</Badge>;
       case 'engajados':
-        return <Badge className="bg-amber-500 text-white">Engajados</Badge>;
+        return <Badge className="bg-status-warning text-white">Engajados</Badge>;
       default:
         return <Badge variant="secondary">Manual</Badge>;
     }
@@ -339,7 +339,7 @@ export function CuponsTab() {
             <AlertDialogDescription>
               Tem certeza que deseja excluir o cupom "{selectedCupom?.codigo}"?
               {(visitantesPorCupom[selectedCupom?.codigo || ''] || 0) > 0 && (
-                <span className="block mt-2 text-amber-600">
+                <span className="block mt-2 text-status-warning">
                   Atenção: {visitantesPorCupom[selectedCupom?.codigo || '']} visitante(s) estão usando este cupom.
                 </span>
               )}

@@ -20,9 +20,9 @@ export function HistoricoDrawer({ open, onOpenChange, tabela, registroId, titulo
   const getOperacaoBadge = (operacao: string) => {
     switch (operacao) {
       case 'INSERT':
-        return <Badge variant="default" className="bg-green-500">Criado</Badge>;
+        return <Badge variant="default" className="bg-status-success">Criado</Badge>;
       case 'UPDATE':
-        return <Badge variant="default" className="bg-blue-500">Atualizado</Badge>;
+        return <Badge variant="default" className="bg-status-info">Atualizado</Badge>;
       case 'DELETE':
         return <Badge variant="destructive">Deletado</Badge>;
       default:

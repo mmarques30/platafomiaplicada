@@ -30,7 +30,7 @@ export function CalendarioAulas() {
   return (
     <div className="space-y-6">
       {proximaAula && (
-        <Card className="bg-zinc-900 border-primary text-white">
+        <Card className="bg-background border-primary text-white">
           <CardHeader>
             <CardTitle className="text-white">Próxima Aula</CardTitle>
           </CardHeader>
@@ -38,7 +38,7 @@ export function CalendarioAulas() {
             <h3 className="text-xl font-semibold text-white">
               {proximaAula.tema}
             </h3>
-            <div className="flex items-center gap-4 text-zinc-300">
+            <div className="flex items-center gap-4 text-muted-foreground">
               {proximaAula.data_aula && (
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4" />
@@ -55,7 +55,7 @@ export function CalendarioAulas() {
               )}
             </div>
             {proximaAula.descricao && (
-              <p className="text-zinc-300 mt-2 whitespace-pre-line">
+              <p className="text-muted-foreground mt-2 whitespace-pre-line">
                 {proximaAula.descricao}
               </p>
             )}

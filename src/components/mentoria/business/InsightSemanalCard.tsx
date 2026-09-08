@@ -82,7 +82,7 @@ export function InsightSemanalCard() {
 
   if (isRecent && insightText) {
     return (
-      <Card className="border-l-4 border-l-[#AFC040] p-4 flex flex-col gap-2">
+      <Card className="border-l-4 border-l-[#c8e040] p-4 flex flex-col gap-2">
         <span className="uppercase text-[11px] font-semibold tracking-wider text-muted-foreground">
           Insight da Semana
         </span>

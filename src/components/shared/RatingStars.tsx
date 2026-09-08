@@ -19,7 +19,7 @@ export function RatingStars({ rating, maxRating = 5, size = "md" }: RatingStarsP
         <Star
           key={i}
           className={`${sizeClasses[size]} ${
-            i < rating ? "fill-yellow-400 text-yellow-400" : "text-muted"
+            i < rating ? "fill-status-warning text-status-warning" : "text-muted"
           }`}
         />
       ))}

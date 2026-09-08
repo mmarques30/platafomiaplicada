@@ -15,11 +15,11 @@ const statusConfig = {
   },
   em_andamento: {
     label: "Em Andamento",
-    className: "bg-amber-500/10 text-amber-600 border-amber-500/30",
+    className: "bg-status-warning/10 text-status-warning border-status-warning/30",
   },
   concluida: {
     label: "Concluída",
-    className: "bg-emerald-500/10 text-emerald-600 border-emerald-500/30",
+    className: "bg-status-success/10 text-status-success border-status-success/30",
   },
 };
 

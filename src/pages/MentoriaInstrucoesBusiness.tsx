@@ -281,7 +281,7 @@ export default function MentoriaInstrucoesBusiness() {
                       <div className={cn(
                         "h-8 w-8 rounded-full flex items-center justify-center text-sm font-bold",
                         fase.progressoFase === 100 
-                          ? "bg-emerald-500/20 text-emerald-600" 
+                          ? "bg-status-success/20 text-status-success" 
                           : "bg-primary/20 text-primary"
                       )}>
                         {fase.progressoFase === 100 ? (

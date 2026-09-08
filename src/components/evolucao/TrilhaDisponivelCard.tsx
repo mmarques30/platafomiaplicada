@@ -38,15 +38,15 @@ export function TrilhaDisponivelCard({
     switch (nivel.toLowerCase()) {
       case "iniciante":
         // Verde 500 - Claro e acolhedor
-        return "bg-[#BCC95D]/10 text-[#BCC95D] dark:text-[#C8D27B]";
+        return "bg-lime/10 text-lime dark:text-lime";
       case "intermediario":
       case "intermediário":
         // Verde 700 - Primário (cor principal da marca)
-        return "bg-[#9EB038]/10 text-[#9EB038] dark:text-[#AFC040]";
+        return "bg-primary/10 text-primary dark:text-primary";
       case "avancado":
       case "avançado":
         // Verde 900 - Escuro e profissional
-        return "bg-[#738925]/10 text-[#738925] dark:text-[#889C2D]";
+        return "bg-secondary/10 text-secondary dark:text-secondary";
       default:
         return "bg-muted";
     }

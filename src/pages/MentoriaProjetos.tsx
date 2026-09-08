@@ -117,7 +117,7 @@ export default function MentoriaProjetos() {
         <div className="flex gap-4 text-sm">
           {projeto.avaliacao_mentor && (
             <div className="flex items-center gap-1">
-              <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+              <Star className="h-4 w-4 fill-status-warning text-status-warning" />
               <span>Mentor: {projeto.avaliacao_mentor}/5</span>
             </div>
           )}
@@ -320,7 +320,7 @@ export default function MentoriaProjetos() {
                           key={i}
                           className={`h-5 w-5 ${
                             i < selectedProjeto.avaliacao_mentor
-                              ? "fill-yellow-400 text-yellow-400"
+                              ? "fill-status-warning text-status-warning"
                               : "text-muted"
                           }`}
                         />
@@ -343,7 +343,7 @@ export default function MentoriaProjetos() {
                           key={i}
                           className={`h-5 w-5 ${
                             i < selectedProjeto.avaliacao_mentorado
-                              ? "fill-yellow-400 text-yellow-400"
+                              ? "fill-status-warning text-status-warning"
                               : "text-muted"
                           }`}
                         />

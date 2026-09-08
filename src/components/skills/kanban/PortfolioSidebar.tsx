@@ -28,9 +28,9 @@ export default function PortfolioSidebar({ entregas }: PortfolioSidebarProps) {
   }, [entregas]);
 
   const tipos = [
-    { label: "Individuais", value: stats.individuais, pct: stats.pct(stats.individuais), color: "#9EB038" },
-    { label: "Colaborativos", value: stats.colaborativos, pct: stats.pct(stats.colaborativos), color: "#B8CC5A" },
-    { label: "De Sistema", value: stats.sistema, pct: stats.pct(stats.sistema), color: "#B8CC5A" },
+    { label: "Individuais", value: stats.individuais, pct: stats.pct(stats.individuais), color: "#c8e040" },
+    { label: "Colaborativos", value: stats.colaborativos, pct: stats.pct(stats.colaborativos), color: "#d5e95a" },
+    { label: "De Sistema", value: stats.sistema, pct: stats.pct(stats.sistema), color: "#d5e95a" },
   ];
 
   return (
@@ -41,7 +41,7 @@ export default function PortfolioSidebar({ entregas }: PortfolioSidebarProps) {
           <span className="text-sm font-semibold text-foreground">Progresso Geral</span>
           <div
             className="px-3 py-1 rounded-full text-sm font-bold"
-            style={{ backgroundColor: "#9EB03815", color: "#9EB038" }}
+            style={{ backgroundColor: "#9EB03815", color: "#c8e040" }}
           >
             {stats.progressoMedio}%
           </div>
@@ -50,15 +50,15 @@ export default function PortfolioSidebar({ entregas }: PortfolioSidebarProps) {
           value={stats.progressoMedio}
           className="h-2.5 rounded-full"
           indicatorClassName="rounded-full"
-          style={{ ["--progress-color" as string]: "#9EB038" }}
+          style={{ ["--progress-color" as string]: "#c8e040" }}
         />
         <div className="flex items-center gap-3 flex-wrap">
           <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: "#9EB038" }} />
+            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: "#c8e040" }} />
             <span className="text-[11px] text-muted-foreground">{stats.emProducao} concluídos</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: "#B8CC5A" }} />
+            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: "#d5e95a" }} />
             <span className="text-[11px] text-muted-foreground">{stats.emAndamento} em andamento</span>
           </div>
           <div className="flex items-center gap-1.5">

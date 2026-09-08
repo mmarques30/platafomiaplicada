@@ -46,9 +46,9 @@ export function BusinessExecutiveRoadmap() {
     <div className="space-y-6">
       {/* Banner de Preview */}
       {isPreview && (
-        <Card className="border-dashed border-2 border-amber-500/30 bg-amber-500/5">
+        <Card className="border-dashed border-2 border-status-warning/30 bg-status-warning/5">
           <CardContent className="py-4 text-center">
-            <p className="text-sm text-amber-600 dark:text-amber-400">
+            <p className="text-sm text-status-warning dark:text-status-warning">
               <Clock className="h-4 w-4 inline mr-2" />
               Pré-visualização do Roadmap — Os dados serão preenchidos após a configuração do seu contrato
             </p>

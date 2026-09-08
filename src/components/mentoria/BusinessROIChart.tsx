@@ -99,7 +99,7 @@ export function BusinessROIChart() {
     },
     roiExecutado: {
       label: "ROI Executado",
-      color: "#3b82f6",
+      color: "#4a9fe0",
     },
   };
 
@@ -118,9 +118,9 @@ export function BusinessROIChart() {
               <span className="font-semibold text-primary">{roiProjetadoAteAgora}%</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <CheckCircle2 className="h-4 w-4 text-blue-500" />
+              <CheckCircle2 className="h-4 w-4 text-status-info" />
               <span className="text-muted-foreground">Executado:</span>
-              <span className="font-semibold text-blue-500">{roiAtualExecutado}%</span>
+              <span className="font-semibold text-status-info">{roiAtualExecutado}%</span>
             </div>
           </div>
         </div>
@@ -135,8 +135,8 @@ export function BusinessROIChart() {
                   <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
                 </linearGradient>
                 <linearGradient id="colorRoiExecutado" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.4}/>
-                  <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                  <stop offset="5%" stopColor="#4a9fe0" stopOpacity={0.4}/>
+                  <stop offset="95%" stopColor="#4a9fe0" stopOpacity={0}/>
                 </linearGradient>
               </defs>
               <XAxis 
@@ -164,7 +164,7 @@ export function BusinessROIChart() {
               <Area
                 type="monotone"
                 dataKey="roiExecutado"
-                stroke="#3b82f6"
+                stroke="#4a9fe0"
                 strokeWidth={2}
                 fillOpacity={1}
                 fill="url(#colorRoiExecutado)"
@@ -181,7 +181,7 @@ export function BusinessROIChart() {
             <span>ROI Projetado</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded-full bg-blue-500" />
+            <div className="w-3 h-3 rounded-full bg-status-info" />
             <span>ROI Executado</span>
           </div>
         </div>

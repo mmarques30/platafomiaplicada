@@ -262,7 +262,7 @@ export function FerramentaModal({ open, onOpenChange, ferramenta }: FerramentaMo
 
             <div>
               <Label htmlFor="avaliacao_mari" className="flex items-center gap-2">
-                <Star className="h-4 w-4 text-yellow-500" />
+                <Star className="h-4 w-4 text-status-warning" />
                 Avaliação da Mari (1-5 estrelas)
               </Label>
               <div className="flex gap-1 py-2">
@@ -279,8 +279,8 @@ export function FerramentaModal({ open, onOpenChange, ferramenta }: FerramentaMo
                     <Star
                       className={`w-6 h-6 ${
                         star <= ratingMari
-                          ? "fill-yellow-400 text-yellow-400"
-                          : "text-muted hover:text-yellow-200"
+                          ? "fill-status-warning text-status-warning"
+                          : "text-muted hover:text-status-warning/40"
                       }`}
                     />
                   </button>
@@ -402,13 +402,13 @@ export function FerramentaModal({ open, onOpenChange, ferramenta }: FerramentaMo
                   <SelectItem value="nao_avaliado">Não Avaliado</SelectItem>
                   <SelectItem value="sim">
                     <span className="flex items-center gap-2">
-                      <CheckCircle2 className="h-4 w-4 text-green-600" />
+                      <CheckCircle2 className="h-4 w-4 text-status-success" />
                       Sim - Recomendo
                     </span>
                   </SelectItem>
                   <SelectItem value="nao">
                     <span className="flex items-center gap-2">
-                      <AlertTriangle className="h-4 w-4 text-amber-600" />
+                      <AlertTriangle className="h-4 w-4 text-status-warning" />
                       Não - Não Recomendo
                     </span>
                   </SelectItem>

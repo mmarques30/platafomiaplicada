@@ -21,8 +21,8 @@ export function BusinessKPICards({ data }: BusinessKPICardsProps) {
       value: `R$ ${data.roiEstimado.toLocaleString('pt-BR')}`,
       icon: TrendingUp,
       trend: data.roiTrend,
-      iconBg: "bg-emerald-500/10",
-      iconColor: "text-emerald-600",
+      iconBg: "bg-status-success/10",
+      iconColor: "text-status-success",
     },
     {
       label: "Ferramentas Aprendidas",
@@ -36,15 +36,15 @@ export function BusinessKPICards({ data }: BusinessKPICardsProps) {
       label: "Implementação",
       value: `${data.implementacao}%`,
       icon: Target,
-      iconBg: "bg-blue-500/10",
-      iconColor: "text-blue-600",
+      iconBg: "bg-status-info/10",
+      iconColor: "text-status-info",
     },
     {
       label: "Proficiência Equipe",
       value: `${data.proficiencia}%`,
       icon: Users,
-      iconBg: "bg-amber-500/10",
-      iconColor: "text-amber-600",
+      iconBg: "bg-status-warning/10",
+      iconColor: "text-status-warning",
     },
   ];
 
@@ -61,7 +61,7 @@ export function BusinessKPICards({ data }: BusinessKPICardsProps) {
                 <kpi.icon className={`h-5 w-5 ${kpi.iconColor}`} />
               </div>
               {kpi.trend !== undefined && (
-                <div className={`flex items-center gap-0.5 text-xs font-medium ${kpi.trend >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+                <div className={`flex items-center gap-0.5 text-xs font-medium ${kpi.trend >= 0 ? 'text-status-success' : 'text-status-danger'}`}>
                   {kpi.trend >= 0 ? (
                     <ArrowUpRight className="h-3.5 w-3.5" />
                   ) : (

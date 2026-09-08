@@ -21,10 +21,10 @@ export function PlayersList() {
   return (
     <div className="space-y-6">
       {/* Header Section - Foco na Função */}
-      <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-6">
+      <div className="bg-status-warning/10 border border-status-warning/30 rounded-lg p-6">
         <div className="space-y-4">
           <div>
-            <h2 className="text-xl font-bold text-amber-500">
+            <h2 className="text-xl font-bold text-status-warning">
               Players
             </h2>
             <p className="text-foreground/80 mt-2 leading-relaxed">
@@ -36,49 +36,49 @@ export function PlayersList() {
           
           {/* Função do Player */}
           <div className="space-y-3">
-            <h3 className="font-semibold text-sm text-amber-400 uppercase tracking-wide">
+            <h3 className="font-semibold text-sm text-status-warning uppercase tracking-wide">
               O que um Player faz:
             </h3>
             <ul className="space-y-2 text-sm text-foreground/70">
               <li className="flex items-start gap-2">
-                <span className="text-amber-500 mt-0.5">-</span>
+                <span className="text-status-warning mt-0.5">-</span>
                 <span>Responde dúvidas de outros membros da comunidade</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-amber-500 mt-0.5">-</span>
+                <span className="text-status-warning mt-0.5">-</span>
                 <span>Compartilha cases e experiências práticas</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-amber-500 mt-0.5">-</span>
+                <span className="text-status-warning mt-0.5">-</span>
                 <span>Indica novos membros interessados em IA</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-amber-500 mt-0.5">-</span>
+                <span className="text-status-warning mt-0.5">-</span>
                 <span>Participa ativamente das discussões e eventos</span>
               </li>
             </ul>
           </div>
 
           {/* Benefícios */}
-          <div className="pt-4 border-t border-amber-500/20">
-            <h3 className="font-semibold text-sm text-amber-400 uppercase tracking-wide">
+          <div className="pt-4 border-t border-status-warning/20">
+            <h3 className="font-semibold text-sm text-status-warning uppercase tracking-wide">
               Benefícios:
             </h3>
             <ul className="mt-2 space-y-1 text-sm text-foreground/70">
               <li className="flex items-start gap-2">
-                <span className="text-amber-500 mt-0.5">-</span>
+                <span className="text-status-warning mt-0.5">-</span>
                 <span>Comissão por indicações convertidas</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-amber-500 mt-0.5">-</span>
+                <span className="text-status-warning mt-0.5">-</span>
                 <span>Badge exclusivo no perfil</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-amber-500 mt-0.5">-</span>
+                <span className="text-status-warning mt-0.5">-</span>
                 <span>Acesso antecipado a novos conteúdos</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-amber-500 mt-0.5">-</span>
+                <span className="text-status-warning mt-0.5">-</span>
                 <span>Participação em grupo exclusivo de Players</span>
               </li>
             </ul>
@@ -94,8 +94,8 @@ export function PlayersList() {
           ))}
         </div>
       ) : (
-        <div className="text-center py-12 bg-amber-500/5 border border-amber-500/20 rounded-lg">
-          <h3 className="text-lg font-medium text-amber-500">
+        <div className="text-center py-12 bg-status-warning/5 border border-status-warning/20 rounded-lg">
+          <h3 className="text-lg font-medium text-status-warning">
             Ainda não temos Players
           </h3>
           <p className="text-muted-foreground mt-2">

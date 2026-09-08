@@ -14,8 +14,8 @@ import { PageContainer } from "@/components/shared/PageContainer";
 
 const STATUS_CONFIG = {
   pendente: { label: "Pendente", icon: Clock, color: "text-muted-foreground", borderColor: "border-l-muted-foreground/30" },
-  em_andamento: { label: "Em Andamento", icon: PlayCircle, color: "text-amber-600", borderColor: "border-l-amber-500" },
-  concluida: { label: "Concluída", icon: CheckCircle2, color: "text-green-600", borderColor: "border-l-green-500" },
+  em_andamento: { label: "Em Andamento", icon: PlayCircle, color: "text-status-warning", borderColor: "border-l-amber-500" },
+  concluida: { label: "Concluída", icon: CheckCircle2, color: "text-status-success", borderColor: "border-l-green-500" },
   cancelada: { label: "Cancelada", icon: AlertCircle, color: "text-destructive", borderColor: "border-l-destructive" },
 };
 
@@ -93,7 +93,7 @@ export default function MeuSistemaEtapaDetalhe() {
             )}
             {etapa.data_conclusao && (
               <span className="text-xs text-muted-foreground flex items-center gap-1">
-                <CheckCircle2 className="h-3 w-3 text-green-600" />
+                <CheckCircle2 className="h-3 w-3 text-status-success" />
                 Concluída: {format(parseISO(etapa.data_conclusao), "dd MMM yyyy", { locale: ptBR })}
               </span>
             )}

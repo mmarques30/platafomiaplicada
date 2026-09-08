@@ -38,10 +38,10 @@ export default function OnboardingWelcome() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0D0D0D] flex items-center justify-center px-4 relative overflow-hidden">
+    <div className="min-h-screen bg-background flex items-center justify-center px-4 relative overflow-hidden">
       {/* Glow background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#9EB038]/10 rounded-full blur-[120px]" />
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[120px]" />
       </div>
 
       <motion.div
@@ -55,7 +55,7 @@ export default function OnboardingWelcome() {
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="mx-auto w-24 h-24 rounded-full bg-[#1a1c19] border-2 border-[#9EB038]/30 p-3 shadow-lg shadow-[#9EB038]/10"
+          className="mx-auto w-24 h-24 rounded-full bg-background border-2 border-primary/30 p-3 shadow-lg shadow-primary/10"
         >
           <img src={logoMariana} alt="MarIAna" className="w-full h-full object-contain" />
         </motion.div>
@@ -68,22 +68,22 @@ export default function OnboardingWelcome() {
           className="space-y-4"
         >
           <h1 className="text-2xl md:text-3xl font-bold text-white">
-            Olá, <span className="text-[#9EB038]">{nome}</span>!
+            Olá, <span className="text-primary">{nome}</span>!
           </h1>
 
           <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 text-left space-y-3">
-            <div className="flex items-center gap-2 text-[#9EB038]">
+            <div className="flex items-center gap-2 text-primary">
               <Sparkles className="w-4 h-4" />
               <span className="text-sm font-semibold uppercase tracking-wider">MarIAna</span>
             </div>
 
             <p className="text-white/90 text-base leading-relaxed">
-              Sou a <strong className="text-[#9EB038]">MarIAna</strong>, sua assistente de IA aqui na plataforma.
+              Sou a <strong className="text-primary">MarIAna</strong>, sua assistente de IA aqui na plataforma.
             </p>
 
             <p className="text-white/80 text-base leading-relaxed">
               Com base no seu perfil, recomendo começar pelo{" "}
-              <strong className="text-[#9EB038]">{env.name}</strong> — {env.description}.
+              <strong className="text-primary">{env.name}</strong> — {env.description}.
             </p>
 
             <p className="text-white/60 text-sm">
@@ -100,7 +100,7 @@ export default function OnboardingWelcome() {
         >
           <Button
             onClick={handleContinue}
-            className="h-12 px-8 bg-[#9EB038] hover:bg-[#8a9a31] text-white font-medium rounded-xl text-base gap-2"
+            className="h-12 px-8 bg-primary hover:bg-[#8a9a31] text-white font-medium rounded-xl text-base gap-2"
           >
             Começar a aplicar
             <ArrowRight className="w-4 h-4" />

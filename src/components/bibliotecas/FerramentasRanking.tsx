@@ -140,7 +140,7 @@ export function FerramentasRanking({ ferramentas, onVerMais }: FerramentasRankin
 
               {/* Avaliação Combinada */}
               <div className="flex items-center gap-1.5 mt-3">
-                <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                <Star className="w-4 h-4 text-status-warning fill-status-warning" />
                 <span className="font-semibold text-sm">
                   {ferramenta.score_ranking?.toFixed(1) || ferramenta.avaliacao_mari || 0}
                 </span>

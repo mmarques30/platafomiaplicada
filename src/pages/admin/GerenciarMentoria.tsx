@@ -395,9 +395,9 @@ export default function GerenciarMentoria() {
                       <CardHeader>
                         <div className="flex justify-between items-start">
                           <div className="flex items-center gap-3">
-                            <div className={`p-2 rounded-lg ${bonusItem.liberado ? 'bg-green-100 dark:bg-green-900/30' : 'bg-muted'}`}>
+                            <div className={`p-2 rounded-lg ${bonusItem.liberado ? 'bg-status-success/15 dark:bg-status-success/30' : 'bg-muted'}`}>
                               {bonusItem.liberado ? (
-                                <CheckCircle className="h-5 w-5 text-green-600" />
+                                <CheckCircle className="h-5 w-5 text-status-success" />
                               ) : (
                                 <Lock className="h-5 w-5 text-muted-foreground" />
                               )}

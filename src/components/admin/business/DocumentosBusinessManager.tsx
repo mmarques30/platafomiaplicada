@@ -169,8 +169,8 @@ export function DocumentosBusinessManager({ contratoId, userId, userName }: Docu
                     <CardContent className="py-3 px-4">
                       <div className="flex items-center justify-between gap-4">
                         <div className="flex items-center gap-3 flex-1 min-w-0">
-                          <div className="h-10 w-10 rounded-lg bg-blue-500/10 flex items-center justify-center flex-shrink-0">
-                            <IconComponent className="h-5 w-5 text-blue-600" />
+                          <div className="h-10 w-10 rounded-lg bg-status-info/10 flex items-center justify-center flex-shrink-0">
+                            <IconComponent className="h-5 w-5 text-status-info" />
                           </div>
                           <div className="flex-1 min-w-0">
                             <h4 className="font-medium text-sm truncate">{link.titulo}</h4>

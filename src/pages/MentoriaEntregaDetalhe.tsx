@@ -17,8 +17,8 @@ import { PageContainer } from "@/components/shared/PageContainer";
 
 const STATUS_CONFIG = {
   pendente: { label: "Pendente", icon: Clock, variant: "secondary" as const, color: "text-muted-foreground" },
-  em_andamento: { label: "Em Andamento", icon: PlayCircle, variant: "default" as const, color: "text-amber-600" },
-  concluida: { label: "Concluída", icon: CheckCircle2, variant: "outline" as const, color: "text-green-600" },
+  em_andamento: { label: "Em Andamento", icon: PlayCircle, variant: "default" as const, color: "text-status-warning" },
+  concluida: { label: "Concluída", icon: CheckCircle2, variant: "outline" as const, color: "text-status-success" },
   cancelada: { label: "Cancelada", icon: AlertCircle, variant: "destructive" as const, color: "text-destructive" },
 };
 
@@ -127,8 +127,8 @@ export default function MentoriaEntregaDetalhe() {
       {/* Status Card */}
       <Card className={cn(
         "border-l-4",
-        entrega.status === 'concluida' && "border-l-green-500 bg-green-50/30 dark:bg-green-950/10",
-        entrega.status === 'em_andamento' && "border-l-amber-500 bg-amber-50/30 dark:bg-amber-950/10",
+        entrega.status === 'concluida' && "border-l-green-500 bg-status-success/30 dark:bg-status-success/10",
+        entrega.status === 'em_andamento' && "border-l-amber-500 bg-status-warning/30 dark:bg-status-warning/10",
         entrega.status === 'pendente' && "border-l-muted-foreground/30",
         entrega.status === 'cancelada' && "border-l-destructive opacity-60"
       )}>
@@ -147,8 +147,8 @@ export default function MentoriaEntregaDetalhe() {
               >
                 <SelectTrigger className={cn(
                   "w-full",
-                  statusNormalizado === 'concluida' && "border-green-500 text-green-600",
-                  statusNormalizado === 'em_andamento' && "border-amber-500 text-amber-600"
+                  statusNormalizado === 'concluida' && "border-status-success text-status-success",
+                  statusNormalizado === 'em_andamento' && "border-status-warning text-status-warning"
                 )}>
                   <SelectValue />
                 </SelectTrigger>

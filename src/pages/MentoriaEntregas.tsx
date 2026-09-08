@@ -75,7 +75,7 @@ export default function MentoriaEntregas() {
           <ArrowLeft className="h-4 w-4 mr-2" />
           Voltar
         </Button>
-        <Card className="border-dashed border-2 border-amber-500/30 bg-amber-500/5">
+        <Card className="border-dashed border-2 border-status-warning/30 bg-status-warning/5">
           <CardContent className="py-8 text-center">
             <Package className="h-12 w-12 text-muted-foreground/50 mx-auto mb-4" />
             <p className="text-muted-foreground">

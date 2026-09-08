@@ -170,7 +170,7 @@ export function TrilhasTab() {
                       </Badge>
                     )}
                     {trilha.categoria === 'ferramentas' && (
-                      <Badge variant="outline" style={{ backgroundColor: '#F59E0B20', borderColor: '#F59E0B' }}>
+                      <Badge variant="outline" style={{ backgroundColor: '#F59E0B20', borderColor: '#e8a43c' }}>
                         FERRAMENTAS
                       </Badge>
                     )}
@@ -209,12 +209,12 @@ export function TrilhasTab() {
                         {trilha.ativo ? "Ativo" : "Inativo"}
                       </Badge>
                       {trilha.ativo && !trilha.visivel_mentorados && (
-                        <Badge variant="outline" className="bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-500/50">
+                        <Badge variant="outline" className="bg-status-warning/10 text-status-warning dark:text-status-warning border-status-warning/50">
                           Rascunho
                         </Badge>
                       )}
                       {trilha.ativo && trilha.visivel_mentorados && (
-                        <Badge variant="outline" className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/50">
+                        <Badge variant="outline" className="bg-status-success/10 text-status-success dark:text-status-success border-status-success/50">
                           Publicado
                         </Badge>
                       )}

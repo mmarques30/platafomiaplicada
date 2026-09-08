@@ -29,15 +29,15 @@ interface PromptCardProps {
 }
 
 const categoriaIcons: Record<string, { icon: LucideIcon; gradient: string }> = {
-  'Vendas': { icon: TrendingUp, gradient: 'bg-gradient-to-br from-green-400 to-green-600' },
-  'Marketing': { icon: Megaphone, gradient: 'bg-gradient-to-br from-purple-400 to-purple-600' },
-  'Automacao': { icon: Settings, gradient: 'bg-gradient-to-br from-blue-400 to-blue-600' },
-  'Comunicacao': { icon: MessageSquare, gradient: 'bg-gradient-to-br from-teal-400 to-teal-600' },
-  'Gestao de Projetos': { icon: BarChart3, gradient: 'bg-gradient-to-br from-orange-400 to-orange-600' },
-  'Produtividade': { icon: Zap, gradient: 'bg-gradient-to-br from-yellow-400 to-yellow-600' },
-  'Comunicação & Escrita': { icon: PenTool, gradient: 'bg-gradient-to-br from-pink-400 to-pink-600' },
-  'Análise de Dados': { icon: LineChart, gradient: 'bg-gradient-to-br from-indigo-400 to-indigo-600' },
-  'Apresentações': { icon: Presentation, gradient: 'bg-gradient-to-br from-red-400 to-red-600' },
+  'Vendas': { icon: TrendingUp, gradient: 'bg-gradient-to-br from-status-success to-status-success' },
+  'Marketing': { icon: Megaphone, gradient: 'bg-gradient-to-br from-secondary to-secondary' },
+  'Automacao': { icon: Settings, gradient: 'bg-gradient-to-br from-status-info to-status-info' },
+  'Comunicacao': { icon: MessageSquare, gradient: 'bg-gradient-to-br from-status-success to-status-success' },
+  'Gestao de Projetos': { icon: BarChart3, gradient: 'bg-gradient-to-br from-status-warning to-status-warning' },
+  'Produtividade': { icon: Zap, gradient: 'bg-gradient-to-br from-status-warning to-status-warning' },
+  'Comunicação & Escrita': { icon: PenTool, gradient: 'bg-gradient-to-br from-status-danger to-status-danger' },
+  'Análise de Dados': { icon: LineChart, gradient: 'bg-gradient-to-br from-status-info to-status-info' },
+  'Apresentações': { icon: Presentation, gradient: 'bg-gradient-to-br from-status-danger to-status-danger' },
 };
 
 const getIconeCategoria = (categoria: string) => {
@@ -51,13 +51,13 @@ const getGradientCategoria = (_categoria: string) => {
 const getNivelColor = (nivel: string | null) => {
   switch (nivel) {
     case 'iniciante':
-      return 'bg-green-500 text-white hover:bg-green-600';
+      return 'bg-status-success text-white hover:bg-status-success';
     case 'intermediario':
-      return 'bg-yellow-500 text-white hover:bg-yellow-600';
+      return 'bg-status-warning text-white hover:bg-status-warning';
     case 'avancado':
-      return 'bg-red-500 text-white hover:bg-red-600';
+      return 'bg-status-danger text-white hover:bg-status-danger';
     default:
-      return 'bg-gray-500 text-white';
+      return 'bg-card text-white';
   }
 };
 
