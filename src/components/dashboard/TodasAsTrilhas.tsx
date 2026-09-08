@@ -70,7 +70,7 @@ export function TodasAsTrilhas() {
         trilhasData = fallbackQuery.data;
       } else {
         if (fullQuery.error) throw fullQuery.error;
-        trilhasData = fullQuery.data;
+        trilhasData = fullQuery.data as unknown as Array<Record<string, unknown>>;
       }
 
       const { data: videosCounts, error: vError } = await supabase
