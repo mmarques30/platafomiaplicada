@@ -75,12 +75,13 @@
   :root,
   .dark {
     /* Superfícies */
-    --background: 0 0% 98%;           /* #fafafa neutro */
-    --surface: 0 0% 95%;              /* #f2f2f2 (inputs, faixas) */
+    --background: 0 0% 96%;           /* #f5f5f5 neutro, menos branco */
+    --surface: 0 0% 100%;             /* branco (inputs, faixas fora de cards) */
     --foreground: 0 0% 5%;            /* #0d0d0d cocoa */
 
-    --card: 0 0% 100%;                /* branco */
-    --card-foreground: 0 0% 5%;
+    /* Cards escuros e modernos (grafite) sobre a página clara */
+    --card: 80 10% 10%;               /* #181c14 grafite */
+    --card-foreground: 67 31% 94%;    /* creme */
 
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 5%;
@@ -158,26 +159,71 @@
     --chart-5: 36 79% 47%;
   }
 
-  /* Blocos de texto rico (markdown/prose) lidos dos tokens, sem depender
-     de prose-invert: funcionam em qualquer tema. */
-  .prose {
-    --tw-prose-body: hsl(var(--foreground) / 0.88);
-    --tw-prose-headings: hsl(var(--foreground));
-    --tw-prose-lead: hsl(var(--muted-foreground));
-    --tw-prose-links: hsl(var(--primary));
-    --tw-prose-bold: hsl(var(--foreground));
-    --tw-prose-counters: hsl(var(--muted-foreground));
-    --tw-prose-bullets: hsl(var(--primary));
-    --tw-prose-hr: hsl(var(--border));
-    --tw-prose-quotes: hsl(var(--foreground));
-    --tw-prose-quote-borders: hsl(var(--primary) / 0.4);
-    --tw-prose-captions: hsl(var(--muted-foreground));
-    --tw-prose-code: hsl(var(--foreground));
-    --tw-prose-pre-code: hsl(var(--foreground));
-    --tw-prose-pre-bg: hsl(var(--muted));
-    --tw-prose-th-borders: hsl(var(--border));
-    --tw-prose-td-borders: hsl(var(--border));
+  /* Escopo escuro dos cards: tudo que estiver dentro de um .bg-card (Card,
+     WelcomeHeader, etc.) passa a ler estes tokens — texto creme, bordas e
+     superfícies grafite, botão primário em lime. Popovers/dialogs em portal
+     ficam fora do escopo e continuam claros. */
+  .bg-card,
+  .card-dark {
+    color-scheme: dark;
+    --background: 80 10% 13%;         /* inputs e faixas dentro do card */
+    --foreground: 67 31% 94%;
+    --card: 80 10% 10%;
+    --card-foreground: 67 31% 94%;
+    --surface: 80 10% 14%;
+    --muted: 80 8% 17%;
+    --muted-foreground: 82 8% 68%;
+    --accent: 80 8% 18%;
+    --accent-foreground: 67 31% 94%;
+    --secondary: 73 30% 24%;
+    --secondary-foreground: 67 31% 94%;
+    --border: 80 8% 22%;
+    --input: 80 8% 26%;
+    --primary: 69 71% 52%;            /* lime */
+    --primary-foreground: 80 27% 4%;
+    --ring: 69 71% 52%;
+    --lime: 68 77% 63%;
+    --brand-strong: 73 50% 50%;       /* #afc040 */
+    --brand-strong-foreground: 80 27% 4%;
+    --brand-cream: 80 8% 15%;
+    --brand-cream-soft: 80 10% 13%;
+    --brand-hairline: 80 8% 22%;
+    --brand-ink: 67 31% 94%;
+    --sage: 82 8% 68%;
+    --charcoal: 67 31% 94%;
+    --status-success: 69 71% 52%;
+    --status-warning: 36 79% 57%;
+    --status-info: 206 70% 58%;
+    --status-danger: 352 71% 56%;
+    --chart-1: 69 71% 52%;
+    --chart-2: 73 50% 50%;
+    --chart-3: 82 8% 68%;
   }
+
+}
+
+
+/* Blocos de texto rico (markdown/prose) lidos dos tokens. Fora de @layer de
+   propósito: precisa vencer as cores fixas do plugin typography, inclusive
+   dentro dos cards escuros. */
+.prose {
+  --tw-prose-body: hsl(var(--foreground) / 0.88);
+  --tw-prose-headings: hsl(var(--foreground));
+  --tw-prose-lead: hsl(var(--muted-foreground));
+  --tw-prose-links: hsl(var(--primary));
+  --tw-prose-bold: hsl(var(--foreground));
+  --tw-prose-counters: hsl(var(--muted-foreground));
+  --tw-prose-bullets: hsl(var(--primary));
+  --tw-prose-hr: hsl(var(--border));
+  --tw-prose-quotes: hsl(var(--foreground));
+  --tw-prose-quote-borders: hsl(var(--primary) / 0.4);
+  --tw-prose-captions: hsl(var(--muted-foreground));
+  --tw-prose-code: hsl(var(--foreground));
+  --tw-prose-pre-code: hsl(var(--foreground));
+  --tw-prose-pre-bg: hsl(var(--muted));
+  --tw-prose-th-borders: hsl(var(--border));
+  --tw-prose-td-borders: hsl(var(--border));
+  color: hsl(var(--foreground) / 0.88);
 }
 
 @layer components {
