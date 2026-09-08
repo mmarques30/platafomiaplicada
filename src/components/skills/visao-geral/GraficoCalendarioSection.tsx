@@ -105,7 +105,7 @@ export default function GraficoCalendarioSection() {
             onSelect={setSelectedDate}
             modifiers={{ event: eventDays }}
             modifiersClassNames={{
-              event: "bg-orange-500/20 text-orange-700 dark:text-orange-400 font-semibold",
+              event: "bg-status-warning/20 text-status-warning dark:text-status-warning font-semibold",
             }}
             className="p-0 pointer-events-auto"
             classNames={{

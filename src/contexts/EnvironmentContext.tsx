@@ -46,7 +46,7 @@ export const ENVIRONMENT_CONFIG: Record<Environment, {
   academy: {
     label: "Academy",
     icon: "GraduationCap",
-    color: "hsl(73, 55%, 46%)", // #9EB038
+    color: "hsl(73, 55%, 46%)", // #c8e040
     description: "Trilhas completas + diagnóstico + evolução",
   },
   business_sistemas: {

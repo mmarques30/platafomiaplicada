@@ -34,7 +34,7 @@ export function AlertasInteligentes({ insightIA, metas }: AlertasInteligentesPro
 
   if (tarefasAtrasadas.length > 0) {
     alertas.push({
-      icon: <AlertTriangle className="h-4 w-4 text-red-500" />,
+      icon: <AlertTriangle className="h-4 w-4 text-status-danger" />,
       message: `Você tem ${tarefasAtrasadas.length} tarefa(s) atrasada(s)`,
       priority: 1,
     });
@@ -42,7 +42,7 @@ export function AlertasInteligentes({ insightIA, metas }: AlertasInteligentesPro
 
   if (tarefasVencendo.length > 0) {
     alertas.push({
-      icon: <Clock className="h-4 w-4 text-yellow-500" />,
+      icon: <Clock className="h-4 w-4 text-status-warning" />,
       message: `${tarefasVencendo.length} tarefa(s) vencem esta semana`,
       priority: 2,
     });
@@ -63,7 +63,7 @@ export function AlertasInteligentes({ insightIA, metas }: AlertasInteligentesPro
     const trilhas = insightIA.trilhas_recomendadas || [];
     if (trilhas.length > 0) {
       alertas.push({
-        icon: <BookOpen className="h-4 w-4 text-green-500" />,
+        icon: <BookOpen className="h-4 w-4 text-status-success" />,
         message: `Você tem ${trilhas.length} trilha(s) recomendada(s) pelo diagnóstico`,
         cta: { label: "Ver Trilhas", path: "/trilhas" },
         priority: 4,
@@ -75,7 +75,7 @@ export function AlertasInteligentes({ insightIA, metas }: AlertasInteligentesPro
       const pendentes = metas.filter((m) => m.status === "pendente").length;
       if (pendentes === 0 && metas.length === 0) {
         alertas.push({
-          icon: <Target className="h-4 w-4 text-blue-500" />,
+          icon: <Target className="h-4 w-4 text-status-info" />,
           message: "Crie suas primeiras tarefas baseadas nos objetivos do diagnóstico",
           priority: 5,
         });

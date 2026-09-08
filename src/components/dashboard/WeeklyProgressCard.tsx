@@ -69,7 +69,7 @@ export function WeeklyProgressCard() {
   }
 
   return (
-    <div className="card-interactive relative bg-[#1a1c19]/80 border border-[#9EB038]/20 rounded-xl p-4 md:p-5">
+    <div className="card-interactive relative bg-background/80 border border-primary/20 rounded-xl p-4 md:p-5">
       <Button
         variant="ghost"
         size="icon"
@@ -80,12 +80,12 @@ export function WeeklyProgressCard() {
       </Button>
 
       <div className="flex items-start gap-3">
-        <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[#9EB038]/10 flex items-center justify-center">
-          <Sparkles className="w-5 h-5 text-[#9EB038]" />
+        <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+          <Sparkles className="w-5 h-5 text-primary" />
         </div>
 
         <div className="space-y-1 flex-1 pr-6">
-          <p className="text-sm font-semibold text-[#9EB038] flex items-center gap-1.5">
+          <p className="text-sm font-semibold text-primary flex items-center gap-1.5">
             <TrendingUp className="w-3.5 h-3.5" />
             Resumo da semana — MarIAna
           </p>
@@ -102,7 +102,7 @@ export function WeeklyProgressCard() {
             {data.trilhaEmAndamento ? (
               <>
                 Continue com a trilha{" "}
-                <strong className="text-[#9EB038]">{data.trilhaEmAndamento}</strong>!
+                <strong className="text-primary">{data.trilhaEmAndamento}</strong>!
               </>
             ) : (
               <>Explore uma trilha nova para continuar evoluindo!</>

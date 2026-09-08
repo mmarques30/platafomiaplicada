@@ -252,14 +252,14 @@ export default function PreviewPaineisPage() {
           <div className="relative">
             {/* Indicador de Preview */}
             <div className="absolute -top-3 left-4 z-10">
-              <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-500/30">
+              <Badge variant="outline" className="bg-status-warning/10 text-status-warning border-status-warning/30">
                 <Eye className="h-3 w-3 mr-1" />
                 MODO PREVIEW
               </Badge>
             </div>
 
             {/* Container com borda de preview */}
-            <div className="border-2 border-dashed border-amber-500/30 rounded-xl p-4 pt-6 bg-card/50">
+            <div className="border-2 border-dashed border-status-warning/30 rounded-xl p-4 pt-6 bg-card/50">
               <DiagnosticoAcademyPanel 
                 diagnostico={getDiagnosticoData("academy")}
               />
@@ -281,14 +281,14 @@ export default function PreviewPaineisPage() {
           <div className="relative">
             {/* Indicador de Preview */}
             <div className="absolute -top-3 left-4 z-20">
-              <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-500/30">
+              <Badge variant="outline" className="bg-status-warning/10 text-status-warning border-status-warning/30">
                 <Eye className="h-3 w-3 mr-1" />
                 MODO PREVIEW
               </Badge>
             </div>
 
             {/* Container com borda de preview - usa o BusinessDashboard real */}
-            <div className="border-2 border-dashed border-amber-500/30 rounded-xl overflow-hidden">
+            <div className="border-2 border-dashed border-status-warning/30 rounded-xl overflow-hidden">
               <BusinessDashboard 
                 diagnostico={getDiagnosticoData("business")}
               />

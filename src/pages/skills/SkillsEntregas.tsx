@@ -16,18 +16,18 @@ import { useQuery } from "@tanstack/react-query";
 import { EntregaSkillsEditModal } from "@/components/skills/EntregaSkillsEditModal";
 
 const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
-  pendente: { label: "Pendente", color: "bg-yellow-500/10 text-yellow-700 border-yellow-500/30" },
-  em_andamento: { label: "Em Andamento", color: "bg-blue-500/10 text-blue-700 border-blue-500/30" },
-  aguardando_validacao: { label: "Aguardando Validação", color: "bg-orange-500/10 text-orange-700 border-orange-500/30" },
-  aprovada: { label: "Aprovada", color: "bg-emerald-500/10 text-emerald-700 border-emerald-500/30" },
-  concluido: { label: "Concluído", color: "bg-green-500/10 text-green-700 border-green-500/30" },
-  bloqueado: { label: "Bloqueado", color: "bg-red-500/10 text-red-700 border-red-500/30" },
+  pendente: { label: "Pendente", color: "bg-status-warning/10 text-status-warning border-status-warning/30" },
+  em_andamento: { label: "Em Andamento", color: "bg-status-info/10 text-status-info border-status-info/30" },
+  aguardando_validacao: { label: "Aguardando Validação", color: "bg-status-warning/10 text-status-warning border-status-warning/30" },
+  aprovada: { label: "Aprovada", color: "bg-status-success/10 text-status-success border-status-success/30" },
+  concluido: { label: "Concluído", color: "bg-status-success/10 text-status-success border-status-success/30" },
+  bloqueado: { label: "Bloqueado", color: "bg-status-danger/10 text-status-danger border-status-danger/30" },
 };
 
 const prioridadeColors: Record<string, string> = {
-  P1: "bg-red-500/10 text-red-700",
-  P2: "bg-yellow-500/10 text-yellow-700",
-  P3: "bg-green-500/10 text-green-700",
+  P1: "bg-status-danger/10 text-status-danger",
+  P2: "bg-status-warning/10 text-status-warning",
+  P3: "bg-status-success/10 text-status-success",
 };
 
 const ARCHIVED_PROJECT_STATUSES = ["nao_aprovado", "descartado"];
@@ -373,7 +373,7 @@ export default function SkillsEntregas() {
                       <div className="flex items-center gap-1">
                         {item.projetoTitulo || "—"}
                         {isArchived && (
-                          <Badge variant="outline" className="text-[10px] bg-red-500/10 text-red-600 border-red-500/30 ml-1">
+                          <Badge variant="outline" className="text-[10px] bg-status-danger/10 text-status-danger border-status-danger/30 ml-1">
                             Arquivado
                           </Badge>
                         )}
@@ -410,7 +410,7 @@ export default function SkillsEntregas() {
                       )}
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline" className={`text-xs ${item.origem === "ia" ? "bg-purple-500/10 text-purple-700 border-purple-500/30" : "bg-sky-500/10 text-sky-700 border-sky-500/30"}`}>
+                      <Badge variant="outline" className={`text-xs ${item.origem === "ia" ? "bg-secondary/10 text-secondary border-secondary/30" : "bg-status-info/10 text-status-info border-status-info/30"}`}>
                         {item.origem === "ia" ? <><Bot className="h-3 w-3 mr-1" />IA</> : <><Users className="h-3 w-3 mr-1" />Manual</>}
                       </Badge>
                     </TableCell>

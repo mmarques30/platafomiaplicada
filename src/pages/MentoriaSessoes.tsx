@@ -164,7 +164,7 @@ export default function MentoriaSessoes() {
                       </Badge>
                     )}
                     {sessao.insight_resumo && (
-                      <Badge variant="secondary" className="text-xs gap-1 bg-[#2CBBA6]/10 text-[#2CBBA6] border-[#2CBBA6]/30">
+                      <Badge variant="secondary" className="text-xs gap-1 bg-status-info/10 text-status-info border-status-info/30">
                         <Sparkles className="h-3 w-3" />
                         Resumo
                       </Badge>
@@ -246,8 +246,8 @@ export default function MentoriaSessoes() {
 
               {selectedSessao?.insight_resumo && (
                 <div>
-                  <div className="rounded-lg border-2 border-[#2CBBA6] p-4">
-                    <span className="text-xs font-bold tracking-wider text-[#2CBBA6] uppercase">Resumo da Sessão</span>
+                  <div className="rounded-lg border-2 border-status-info p-4">
+                    <span className="text-xs font-bold tracking-wider text-status-info uppercase">Resumo da Sessão</span>
                     <p className="whitespace-pre-wrap text-sm mt-2">{selectedSessao.insight_resumo}</p>
                   </div>
                 </div>

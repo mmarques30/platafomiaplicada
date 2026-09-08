@@ -103,7 +103,7 @@ export function PendenciasOnboarding() {
   const progressPercent = (completedCount / totalCount) * 100;
 
   return (
-    <div className="bg-[#2E2E2E] border border-white/10 rounded-lg sm:rounded-xl overflow-hidden">
+    <div className="bg-background border border-white/10 rounded-lg sm:rounded-xl overflow-hidden">
       {/* Header compacto - sempre visível */}
       <div 
         className="flex items-center justify-between px-3 sm:px-4 py-2.5 sm:py-3 cursor-pointer hover:bg-white/5 transition-colors"
@@ -111,13 +111,13 @@ export function PendenciasOnboarding() {
       >
         {/* Icone + Titulo */}
         <div className="flex items-center gap-2 sm:gap-3">
-          <Zap className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-yellow-500" />
+          <Zap className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-status-warning" />
           <span className="text-xs sm:text-sm font-medium text-white">Complete seu perfil</span>
         </div>
         
         {/* Progress bar inline */}
         <div className="hidden sm:flex items-center gap-3 flex-1 max-w-32 mx-4">
-          <Progress value={progressPercent} className="h-1.5 flex-1" indicatorClassName="bg-yellow-500" />
+          <Progress value={progressPercent} className="h-1.5 flex-1" indicatorClassName="bg-status-warning" />
         </div>
         
         {/* Contador */}
@@ -176,7 +176,7 @@ export function PendenciasOnboarding() {
                   ) : (
                     <Link
                       to={item.link}
-                      className="flex items-center gap-0.5 sm:gap-1 text-[10px] sm:text-xs font-medium text-yellow-500 hover:text-yellow-400 transition-colors whitespace-nowrap"
+                      className="flex items-center gap-0.5 sm:gap-1 text-[10px] sm:text-xs font-medium text-status-warning hover:text-status-warning transition-colors whitespace-nowrap"
                     >
                       Preencher
                       <ChevronRight className="h-2.5 w-2.5 sm:h-3 sm:w-3" />

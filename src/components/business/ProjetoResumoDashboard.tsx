@@ -73,16 +73,16 @@ interface Props {
 }
 
 const tipoConfig: Record<string, { bg: string; text: string; dot: string }> = {
-  Arquivo: { bg: "bg-sky-500/10", text: "text-sky-600 dark:text-sky-400", dot: "bg-sky-500" },
-  Anotação: { bg: "bg-amber-500/10", text: "text-amber-600 dark:text-amber-400", dot: "bg-amber-500" },
-  Link: { bg: "bg-emerald-500/10", text: "text-emerald-600 dark:text-emerald-400", dot: "bg-emerald-500" },
-  Report: { bg: "bg-violet-500/10", text: "text-violet-600 dark:text-violet-400", dot: "bg-violet-500" },
+  Arquivo: { bg: "bg-status-info/10", text: "text-status-info dark:text-status-info", dot: "bg-status-info" },
+  Anotação: { bg: "bg-status-warning/10", text: "text-status-warning dark:text-status-warning", dot: "bg-status-warning" },
+  Link: { bg: "bg-status-success/10", text: "text-status-success dark:text-status-success", dot: "bg-status-success" },
+  Report: { bg: "bg-secondary/10", text: "text-secondary dark:text-secondary", dot: "bg-secondary" },
 };
 
 const insightStyles: Record<Tipo, { bg: string; icon: React.ComponentType<{ className?: string }>; iconColor: string }> = {
-  success: { bg: "bg-emerald-500/5 hover:bg-emerald-500/10", icon: CheckCircle2, iconColor: "text-emerald-500" },
-  warning: { bg: "bg-amber-500/5 hover:bg-amber-500/10", icon: AlertCircle, iconColor: "text-amber-500" },
-  info: { bg: "bg-sky-500/5 hover:bg-sky-500/10", icon: Info, iconColor: "text-sky-500" },
+  success: { bg: "bg-status-success/5 hover:bg-status-success/10", icon: CheckCircle2, iconColor: "text-status-success" },
+  warning: { bg: "bg-status-warning/5 hover:bg-status-warning/10", icon: AlertCircle, iconColor: "text-status-warning" },
+  info: { bg: "bg-status-info/5 hover:bg-status-info/10", icon: Info, iconColor: "text-status-info" },
 };
 
 export function ProjetoResumoDashboard({
@@ -148,20 +148,20 @@ export function ProjetoResumoDashboard({
           icon={Activity}
           accent={
             saudeProjeto.label === "No prazo"
-              ? "text-emerald-500"
+              ? "text-status-success"
               : saudeProjeto.label === "Atrasado"
               ? "text-destructive"
               : saudeProjeto.label === "Atenção"
-              ? "text-amber-500"
+              ? "text-status-warning"
               : "text-muted-foreground"
           }
           accentBg={
             saudeProjeto.label === "No prazo"
-              ? "bg-emerald-500/10"
+              ? "bg-status-success/10"
               : saudeProjeto.label === "Atrasado"
               ? "bg-destructive/10"
               : saudeProjeto.label === "Atenção"
-              ? "bg-amber-500/10"
+              ? "bg-status-warning/10"
               : "bg-muted"
           }
           valueClass="text-base"
@@ -247,9 +247,9 @@ export function ProjetoResumoDashboard({
                       delta === null
                         ? "text-muted-foreground"
                         : delta >= 0
-                        ? "text-emerald-500"
+                        ? "text-status-success"
                         : delta >= -15
-                        ? "text-amber-500"
+                        ? "text-status-warning"
                         : "text-destructive"
                     }`}
                   >
@@ -406,8 +406,8 @@ export function ProjetoResumoDashboard({
               </div>
               {insights.length > 0 && (
                 <span className="text-[10px] text-muted-foreground">
-                  <span className="text-emerald-500 font-semibold">{insightScore.ok}</span> OK ·{" "}
-                  <span className="text-amber-500 font-semibold">{insightScore.alertas}</span> alertas
+                  <span className="text-status-success font-semibold">{insightScore.ok}</span> OK ·{" "}
+                  <span className="text-status-warning font-semibold">{insightScore.alertas}</span> alertas
                 </span>
               )}
             </div>

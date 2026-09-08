@@ -33,8 +33,8 @@ export function RankingComunidade({ ranking }: RankingComunidadeProps) {
 
   const getBorderColor = (posicao: number) => {
     if (posicao === 1) return "border-primary";
-    if (posicao === 2) return "border-blue-500";
-    if (posicao === 3) return "border-yellow-500";
+    if (posicao === 2) return "border-status-info";
+    if (posicao === 3) return "border-status-warning";
     return "border-border";
   };
 
@@ -68,7 +68,7 @@ export function RankingComunidade({ ranking }: RankingComunidadeProps) {
                       </Avatar>
                       {posicao === 1 && (
                         <div className="absolute -bottom-1 -right-1 bg-background rounded-full p-1">
-                          <Trophy className="h-5 w-5 text-yellow-500" />
+                          <Trophy className="h-5 w-5 text-status-warning" />
                         </div>
                       )}
                     </div>

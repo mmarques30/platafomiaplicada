@@ -44,9 +44,9 @@ export function DuvidasMentorado() {
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
                         {duvida.status === "respondida" ? (
-                          <CheckCircle2 className="h-4 w-4 text-green-600" />
+                          <CheckCircle2 className="h-4 w-4 text-status-success" />
                         ) : (
-                          <Clock className="h-4 w-4 text-yellow-600" />
+                          <Clock className="h-4 w-4 text-status-warning" />
                         )}
                         <h4 className="font-medium text-sm">{duvida.titulo}</h4>
                       </div>

@@ -53,7 +53,7 @@ export function MarIAnaFloatingButton() {
         <button
           data-tour="mariana-button"
           onClick={handleOpenManual}
-          className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50 w-14 h-14 rounded-full shadow-lg hover:scale-105 transition-transform duration-150 overflow-hidden ring-2 ring-[#AFC040]/50"
+          className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50 w-14 h-14 rounded-full shadow-lg hover:scale-105 transition-transform duration-150 overflow-hidden ring-2 ring-primary/50"
         >
           <img
             src={mariAvatar}

@@ -28,10 +28,10 @@ const TIPO_LABELS: Record<string, string> = {
 };
 
 const PRIORIDADE_CONFIG: Record<string, { label: string; className: string }> = {
-  baixa: { label: 'Baixa', className: 'bg-gray-100 text-gray-700' },
-  media: { label: 'Média', className: 'bg-blue-100 text-blue-700' },
-  alta: { label: 'Alta', className: 'bg-orange-100 text-orange-700' },
-  urgente: { label: 'Urgente', className: 'bg-red-100 text-red-700' },
+  baixa: { label: 'Baixa', className: 'bg-muted text-foreground' },
+  media: { label: 'Média', className: 'bg-status-info/15 text-status-info' },
+  alta: { label: 'Alta', className: 'bg-status-warning/15 text-status-warning' },
+  urgente: { label: 'Urgente', className: 'bg-status-danger/15 text-status-danger' },
 };
 
 const PendenciasValidacao: React.FC = () => {
@@ -64,9 +64,9 @@ const PendenciasValidacao: React.FC = () => {
     const atrasado = isPast(prazoDate);
 
     if (atrasado) {
-      return { text: `Atrasado (${format(prazoDate, "dd/MM", { locale: ptBR })})`, className: 'text-red-600' };
+      return { text: `Atrasado (${format(prazoDate, "dd/MM", { locale: ptBR })})`, className: 'text-status-danger' };
     } else if (diasRestantes <= 2) {
-      return { text: `Em ${diasRestantes} dia${diasRestantes !== 1 ? 's' : ''}`, className: 'text-orange-600' };
+      return { text: `Em ${diasRestantes} dia${diasRestantes !== 1 ? 's' : ''}`, className: 'text-status-warning' };
     } else {
       return { text: format(prazoDate, "dd/MM/yyyy", { locale: ptBR }), className: 'text-muted-foreground' };
     }
@@ -79,16 +79,16 @@ const PendenciasValidacao: React.FC = () => {
     const isRevisao = task.status === 'revisao_solicitada';
 
     return (
-      <Card key={task.id} className={`mb-4 ${isRevisao ? 'border-orange-300 bg-orange-50/50' : ''}`}>
+      <Card key={task.id} className={`mb-4 ${isRevisao ? 'border-status-warning/40 bg-status-warning/50' : ''}`}>
         <CardContent className="p-4">
           <div className="space-y-3">
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-2">
                   {isRevisao ? (
-                    <RotateCcw className="h-4 w-4 text-orange-600" />
+                    <RotateCcw className="h-4 w-4 text-status-warning" />
                   ) : (
-                    <AlertTriangle className="h-4 w-4 text-yellow-600" />
+                    <AlertTriangle className="h-4 w-4 text-status-warning" />
                   )}
                   <h4 className="font-medium">{task.titulo}</h4>
                 </div>
@@ -105,7 +105,7 @@ const PendenciasValidacao: React.FC = () => {
                     </span>
                   )}
                   {isRevisao && (
-                    <Badge variant="outline" className="border-orange-300 text-orange-700">
+                    <Badge variant="outline" className="border-status-warning/40 text-status-warning">
                       Revisão Solicitada
                     </Badge>
                   )}
@@ -201,7 +201,7 @@ const PendenciasValidacao: React.FC = () => {
             )}
 
             {!showActions && task.resposta_mentorado && (
-              <div className="p-3 bg-green-50 rounded-lg border border-green-200">
+              <div className="p-3 bg-status-success/15 rounded-lg border border-status-success/40">
                 <p className="text-xs font-medium mb-1">Sua resposta:</p>
                 <p className="text-sm">{task.resposta_mentorado}</p>
               </div>
@@ -226,7 +226,7 @@ const PendenciasValidacao: React.FC = () => {
     return (
       <Card>
         <CardContent className="py-8 text-center text-muted-foreground">
-          <CheckCircle2 className="h-12 w-12 mx-auto mb-3 text-green-500" />
+          <CheckCircle2 className="h-12 w-12 mx-auto mb-3 text-status-success" />
           <p className="font-medium">Nenhuma pendência de validação</p>
           <p className="text-sm">Você está em dia!</p>
         </CardContent>
@@ -240,7 +240,7 @@ const PendenciasValidacao: React.FC = () => {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
-              <AlertTriangle className="h-5 w-5 text-yellow-600" />
+              <AlertTriangle className="h-5 w-5 text-status-warning" />
               Pendências de Validação
               <Badge variant="destructive">{pendentes.length}</Badge>
             </CardTitle>
@@ -255,7 +255,7 @@ const PendenciasValidacao: React.FC = () => {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
-              <Clock className="h-5 w-5 text-blue-600" />
+              <Clock className="h-5 w-5 text-status-info" />
               Aguardando Aprovação
               <Badge variant="secondary">{emAnalise.length}</Badge>
             </CardTitle>
@@ -270,7 +270,7 @@ const PendenciasValidacao: React.FC = () => {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
-              <CheckCircle2 className="h-5 w-5 text-green-600" />
+              <CheckCircle2 className="h-5 w-5 text-status-success" />
               Concluídas
               <Badge variant="outline">{concluidas.length}</Badge>
             </CardTitle>

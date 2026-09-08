@@ -367,7 +367,7 @@ export function VideoModal({ open, onOpenChange, video, defaultModuloId }: Video
                 className="cursor-pointer"
               />
               {thumbnailFile && (
-                <p className="text-sm font-medium text-green-600 dark:text-green-400">
+                <p className="text-sm font-medium text-status-success dark:text-status-success">
                   Selecionado: {thumbnailFile.name} — {(thumbnailFile.size / (1024 * 1024)).toFixed(2)}MB
                 </p>
               )}

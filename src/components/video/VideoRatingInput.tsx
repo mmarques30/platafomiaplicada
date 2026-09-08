@@ -37,7 +37,7 @@ export function VideoRatingInput({ rating, onRatingChange, readonly = false }: V
             <Star
               className={`w-5 h-5 ${
                 isFilled
-                  ? "fill-yellow-400 text-yellow-400"
+                  ? "fill-status-warning text-status-warning"
                   : "text-muted-foreground"
               }`}
             />

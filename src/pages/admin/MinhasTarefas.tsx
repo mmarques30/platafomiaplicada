@@ -34,9 +34,9 @@ export default function MinhasTarefas() {
 
   const getStatusBadge = (status: string) => {
     const config = {
-      pendente: { color: "text-yellow-600", bg: "bg-yellow-50", label: "Pendente", icon: AlertTriangle },
-      em_andamento: { color: "text-blue-600", bg: "bg-blue-50", label: "Em Andamento", icon: Clock },
-      concluida: { color: "text-green-600", bg: "bg-green-50", label: "Concluída", icon: CheckCircle2 },
+      pendente: { color: "text-status-warning", bg: "bg-status-warning/15", label: "Pendente", icon: AlertTriangle },
+      em_andamento: { color: "text-status-info", bg: "bg-status-info/15", label: "Em Andamento", icon: Clock },
+      concluida: { color: "text-status-success", bg: "bg-status-success/15", label: "Concluída", icon: CheckCircle2 },
     }[status] || { color: "text-muted-foreground", bg: "bg-muted", label: status, icon: AlertCircle };
     
     const Icon = config.icon;
@@ -50,11 +50,11 @@ export default function MinhasTarefas() {
 
   const getPrioridadeBadge = (prioridade: string) => {
     const config = {
-      critica: { icon: AlertCircle, color: "text-red-600", bg: "bg-red-50", label: "Crítica" },
-      alta: { icon: Flame, color: "text-orange-600", bg: "bg-orange-50", label: "Alta" },
-      media: { icon: AlertTriangle, color: "text-yellow-600", bg: "bg-yellow-50", label: "Média" },
-      baixa: { icon: Clock, color: "text-blue-600", bg: "bg-blue-50", label: "Baixa" },
-    }[prioridade] || { icon: Clock, color: "text-gray-600", bg: "bg-gray-50", label: prioridade };
+      critica: { icon: AlertCircle, color: "text-status-danger", bg: "bg-status-danger/15", label: "Crítica" },
+      alta: { icon: Flame, color: "text-status-warning", bg: "bg-status-warning/15", label: "Alta" },
+      media: { icon: AlertTriangle, color: "text-status-warning", bg: "bg-status-warning/15", label: "Média" },
+      baixa: { icon: Clock, color: "text-status-info", bg: "bg-status-info/15", label: "Baixa" },
+    }[prioridade] || { icon: Clock, color: "text-muted-foreground", bg: "bg-muted", label: prioridade };
 
     const Icon = config.icon;
     return (
@@ -67,9 +67,9 @@ export default function MinhasTarefas() {
 
   const getDiasRestantes = (prazo: string) => {
     const dias = differenceInDays(new Date(prazo), new Date());
-    if (dias < 0) return <span className="text-red-600 font-semibold text-xs">Atrasada ({Math.abs(dias)}d)</span>;
-    if (dias === 0) return <span className="text-orange-600 font-semibold text-xs">Vence hoje!</span>;
-    if (dias <= 3) return <span className="text-yellow-600 text-xs">Vence em {dias}d</span>;
+    if (dias < 0) return <span className="text-status-danger font-semibold text-xs">Atrasada ({Math.abs(dias)}d)</span>;
+    if (dias === 0) return <span className="text-status-warning font-semibold text-xs">Vence hoje!</span>;
+    if (dias <= 3) return <span className="text-status-warning text-xs">Vence em {dias}d</span>;
     return <span className="text-muted-foreground text-xs">Vence em {dias}d</span>;
   };
 
@@ -83,51 +83,51 @@ export default function MinhasTarefas() {
 
       {/* Cards de estatísticas */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className={`${adminTheme.card} cursor-pointer ${filtroStatus === 'pendente' ? 'ring-2 ring-yellow-600' : ''}`} onClick={() => setFiltroStatus('pendente')}>
+        <Card className={`${adminTheme.card} cursor-pointer ${filtroStatus === 'pendente' ? 'ring-2 ring-status-warning' : ''}`} onClick={() => setFiltroStatus('pendente')}>
           <CardHeader className="pb-2 pt-3">
             <CardTitle className="text-xs font-medium flex items-center gap-2 text-muted-foreground">
-              <AlertTriangle className="h-3.5 w-3.5 text-yellow-600" />
+              <AlertTriangle className="h-3.5 w-3.5 text-status-warning" />
               Pendentes
             </CardTitle>
           </CardHeader>
           <CardContent className="pb-3">
-            <div className="text-2xl font-bold text-yellow-600">{pendentes.length}</div>
+            <div className="text-2xl font-bold text-status-warning">{pendentes.length}</div>
           </CardContent>
         </Card>
 
         <Card className={`${adminTheme.card} cursor-pointer`} onClick={() => setFiltroStatus('pendente')}>
           <CardHeader className="pb-2 pt-3">
             <CardTitle className="text-xs font-medium flex items-center gap-2 text-muted-foreground">
-              <AlertCircle className="h-3.5 w-3.5 text-red-600" />
+              <AlertCircle className="h-3.5 w-3.5 text-status-danger" />
               Atrasadas
             </CardTitle>
           </CardHeader>
           <CardContent className="pb-3">
-            <div className="text-2xl font-bold text-red-600">{atrasadas.length}</div>
+            <div className="text-2xl font-bold text-status-danger">{atrasadas.length}</div>
           </CardContent>
         </Card>
 
-        <Card className={`${adminTheme.card} cursor-pointer ${filtroStatus === 'em_andamento' ? 'ring-2 ring-blue-600' : ''}`} onClick={() => setFiltroStatus('em_andamento')}>
+        <Card className={`${adminTheme.card} cursor-pointer ${filtroStatus === 'em_andamento' ? 'ring-2 ring-status-info' : ''}`} onClick={() => setFiltroStatus('em_andamento')}>
           <CardHeader className="pb-2 pt-3">
             <CardTitle className="text-xs font-medium flex items-center gap-2 text-muted-foreground">
-              <Clock className="h-3.5 w-3.5 text-blue-600" />
+              <Clock className="h-3.5 w-3.5 text-status-info" />
               Em Andamento
             </CardTitle>
           </CardHeader>
           <CardContent className="pb-3">
-            <div className="text-2xl font-bold text-blue-600">{emAndamento.length}</div>
+            <div className="text-2xl font-bold text-status-info">{emAndamento.length}</div>
           </CardContent>
         </Card>
 
-        <Card className={`${adminTheme.card} cursor-pointer ${filtroStatus === 'concluida' ? 'ring-2 ring-green-600' : ''}`} onClick={() => setFiltroStatus('concluida')}>
+        <Card className={`${adminTheme.card} cursor-pointer ${filtroStatus === 'concluida' ? 'ring-2 ring-status-success' : ''}`} onClick={() => setFiltroStatus('concluida')}>
           <CardHeader className="pb-2 pt-3">
             <CardTitle className="text-xs font-medium flex items-center gap-2 text-muted-foreground">
-              <CheckCircle2 className="h-3.5 w-3.5 text-green-600" />
+              <CheckCircle2 className="h-3.5 w-3.5 text-status-success" />
               Concluídas
             </CardTitle>
           </CardHeader>
           <CardContent className="pb-3">
-            <div className="text-2xl font-bold text-green-600">{concluidas.length}</div>
+            <div className="text-2xl font-bold text-status-success">{concluidas.length}</div>
           </CardContent>
         </Card>
       </div>

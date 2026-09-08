@@ -244,9 +244,9 @@ export function UsuariosTab({ data }: UsuariosTabProps) {
           </CardHeader>
           <CardContent className="space-y-3">
             {[
-              { label: "Pendentes", color: "bg-yellow-500", count: data.mentoria.tarefasPorStatus.pendente },
-              { label: "Em Andamento", color: "bg-blue-500", count: data.mentoria.tarefasPorStatus.em_andamento },
-              { label: "Concluídas", color: "bg-green-500", count: data.mentoria.tarefasPorStatus.concluida },
+              { label: "Pendentes", color: "bg-status-warning", count: data.mentoria.tarefasPorStatus.pendente },
+              { label: "Em Andamento", color: "bg-status-info", count: data.mentoria.tarefasPorStatus.em_andamento },
+              { label: "Concluídas", color: "bg-status-success", count: data.mentoria.tarefasPorStatus.concluida },
             ].map((item) => (
               <div key={item.label} className="flex items-center justify-between">
                 <div className="flex items-center gap-2">

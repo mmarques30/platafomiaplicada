@@ -72,7 +72,7 @@ const Section = ({ title, items, isBusiness = false }: SectionProps) => {
         {items.map((line, index) => (
           <div key={index} className="flex items-start gap-3">
             <span className={cn("mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0", 
-              isBusiness ? "bg-violet-400" : "bg-aplicada-green-900"
+              isBusiness ? "bg-secondary" : "bg-aplicada-green-900"
             )} />
             <p className={cn("flex-1 leading-relaxed", theme.textSecondary)}>{line}</p>
           </div>

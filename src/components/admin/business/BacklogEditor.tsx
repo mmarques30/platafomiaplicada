@@ -153,18 +153,18 @@ export function BacklogEditor({ initialItems = [], onItemsChange }: BacklogEdito
 
   const getCategoriaBadge = (categoria: string) => {
     const config: Record<string, string> = {
-      'Pós-MVP': 'bg-blue-500/10 text-blue-700 border-blue-500/30',
-      'Melhorias Futuras': 'bg-purple-500/10 text-purple-700 border-purple-500/30',
-      'Débito Técnico': 'bg-orange-500/10 text-orange-700 border-orange-500/30'
+      'Pós-MVP': 'bg-status-info/10 text-status-info border-status-info/30',
+      'Melhorias Futuras': 'bg-secondary/10 text-secondary border-secondary/30',
+      'Débito Técnico': 'bg-status-warning/10 text-status-warning border-status-warning/30'
     };
     return config[categoria] || config['Pós-MVP'];
   };
 
   const getPrioridadeBadge = (prioridade: string) => {
     const config: Record<string, { label: string; className: string }> = {
-      'alta': { label: 'Alta', className: 'bg-red-500/10 text-red-700 border-red-500/30' },
-      'media': { label: 'Média', className: 'bg-yellow-500/10 text-yellow-700 border-yellow-500/30' },
-      'baixa': { label: 'Baixa', className: 'bg-gray-500/10 text-gray-600 border-gray-500/30' }
+      'alta': { label: 'Alta', className: 'bg-status-danger/10 text-status-danger border-status-danger/30' },
+      'media': { label: 'Média', className: 'bg-status-warning/10 text-status-warning border-status-warning/30' },
+      'baixa': { label: 'Baixa', className: 'bg-card/10 text-muted-foreground border-foreground/30/30' }
     };
     const c = config[prioridade] || config['media'];
     return c;
@@ -255,7 +255,7 @@ Exemplos:
             Backlog ({items.filter(i => i.selecionado).length}/{items.length})
           </p>
           {countAuto > 0 && (
-            <Badge variant="outline" className="text-xs bg-emerald-500/10 text-emerald-700 border-emerald-500/30">
+            <Badge variant="outline" className="text-xs bg-status-success/10 text-status-success border-status-success/30">
               <Sparkles className="h-3 w-3 mr-1" />
               {countAuto} extraídos
             </Badge>
@@ -365,7 +365,7 @@ Exemplos:
                   </Select>
 
                   {item.origem === 'auto' && (
-                    <Badge variant="outline" className="text-xs bg-emerald-500/10 text-emerald-700 border-emerald-500/30">
+                    <Badge variant="outline" className="text-xs bg-status-success/10 text-status-success border-status-success/30">
                       <Sparkles className="h-3 w-3 mr-1" />
                       Extraído
                     </Badge>

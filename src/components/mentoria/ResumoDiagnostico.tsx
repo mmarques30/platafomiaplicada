@@ -279,20 +279,20 @@ export function ResumoDiagnostico({ formulario }: ResumoDiagnosticoProps) {
               <AccordionContent className="pb-4">
                 <div className="space-y-3">
                   {formulario.desafio_1 && (
-                    <div className="flex items-start gap-3 bg-amber-500/10 rounded-lg p-4 border-l-4 border-amber-500">
-                      <Badge className="bg-amber-500/20 text-amber-700 border-amber-500/30 shrink-0">1</Badge>
+                    <div className="flex items-start gap-3 bg-status-warning/10 rounded-lg p-4 border-l-4 border-status-warning">
+                      <Badge className="bg-status-warning/20 text-status-warning border-status-warning/30 shrink-0">1</Badge>
                       <span className="text-foreground">{formulario.desafio_1}</span>
                     </div>
                   )}
                   {formulario.desafio_2 && (
-                    <div className="flex items-start gap-3 bg-amber-500/10 rounded-lg p-4 border-l-4 border-amber-500">
-                      <Badge className="bg-amber-500/20 text-amber-700 border-amber-500/30 shrink-0">2</Badge>
+                    <div className="flex items-start gap-3 bg-status-warning/10 rounded-lg p-4 border-l-4 border-status-warning">
+                      <Badge className="bg-status-warning/20 text-status-warning border-status-warning/30 shrink-0">2</Badge>
                       <span className="text-foreground">{formulario.desafio_2}</span>
                     </div>
                   )}
                   {formulario.desafio_3 && (
-                    <div className="flex items-start gap-3 bg-amber-500/10 rounded-lg p-4 border-l-4 border-amber-500">
-                      <Badge className="bg-amber-500/20 text-amber-700 border-amber-500/30 shrink-0">3</Badge>
+                    <div className="flex items-start gap-3 bg-status-warning/10 rounded-lg p-4 border-l-4 border-status-warning">
+                      <Badge className="bg-status-warning/20 text-status-warning border-status-warning/30 shrink-0">3</Badge>
                       <span className="text-foreground">{formulario.desafio_3}</span>
                     </div>
                   )}

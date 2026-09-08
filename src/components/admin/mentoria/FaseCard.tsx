@@ -37,9 +37,9 @@ export const FaseCard = ({ fase, onEdit, readonly = false }: FaseCardProps) => {
       case "concluida":
         return {
           icon: <CheckCircle2 className="h-5 w-5" />,
-          color: "text-green-500",
-          bgColor: "bg-green-500/10",
-          borderColor: "border-green-500/30",
+          color: "text-status-success",
+          bgColor: "bg-status-success/10",
+          borderColor: "border-status-success/30",
           badge: "default" as const,
           label: "Concluída"
         };
@@ -55,18 +55,18 @@ export const FaseCard = ({ fase, onEdit, readonly = false }: FaseCardProps) => {
       case "bloqueada":
         return {
           icon: <AlertCircle className="h-5 w-5" />,
-          color: "text-red-500",
-          bgColor: "bg-red-500/10",
-          borderColor: "border-red-500/30",
+          color: "text-status-danger",
+          bgColor: "bg-status-danger/10",
+          borderColor: "border-status-danger/30",
           badge: "destructive" as const,
           label: "Bloqueada"
         };
       default:
         return {
           icon: <Clock className="h-5 w-5" />,
-          color: "text-amber-500",
-          bgColor: "bg-amber-500/10",
-          borderColor: "border-amber-500/30",
+          color: "text-status-warning",
+          bgColor: "bg-status-warning/10",
+          borderColor: "border-status-warning/30",
           badge: "outline" as const,
           label: "Pendente"
         };
@@ -191,9 +191,9 @@ export const FaseCard = ({ fase, onEdit, readonly = false }: FaseCardProps) => {
                   </Badge>
                 </div>
                 {fase.sessao.feedback_entregas && (
-                  <div className="mt-2 p-2 bg-blue-50 dark:bg-blue-950/30 rounded text-xs">
-                    <strong className="text-blue-700 dark:text-blue-300">Feedback:</strong>
-                    <p className="text-blue-600 dark:text-blue-200 mt-1">{fase.sessao.feedback_entregas}</p>
+                  <div className="mt-2 p-2 bg-status-info/15 dark:bg-status-info/30 rounded text-xs">
+                    <strong className="text-status-info dark:text-status-info">Feedback:</strong>
+                    <p className="text-status-info dark:text-status-info/40 mt-1">{fase.sessao.feedback_entregas}</p>
                   </div>
                 )}
               </div>
@@ -225,7 +225,7 @@ export const FaseCard = ({ fase, onEdit, readonly = false }: FaseCardProps) => {
                       <CheckCircle2 
                         className={cn(
                           "h-3.5 w-3.5",
-                          tarefa.status === "concluida" ? "text-green-500" : "text-muted-foreground"
+                          tarefa.status === "concluida" ? "text-status-success" : "text-muted-foreground"
                         )} 
                       />
                       <span className={tarefa.status === "concluida" ? "line-through text-muted-foreground" : ""}>
@@ -244,12 +244,12 @@ export const FaseCard = ({ fase, onEdit, readonly = false }: FaseCardProps) => {
 
             {/* Observações */}
             {fase.observacoes && (
-              <div className="p-3 bg-amber-50 dark:bg-amber-950/30 rounded-lg">
-                <div className="flex items-center gap-2 text-sm font-medium text-amber-700 dark:text-amber-300">
+              <div className="p-3 bg-status-warning/15 dark:bg-status-warning/30 rounded-lg">
+                <div className="flex items-center gap-2 text-sm font-medium text-status-warning dark:text-status-warning">
                   <MessageSquare className="h-4 w-4" />
                   Observações do Mentor
                 </div>
-                <p className="text-xs text-amber-600 dark:text-amber-200 mt-1 pl-6">
+                <p className="text-xs text-status-warning dark:text-status-warning/40 mt-1 pl-6">
                   {fase.observacoes}
                 </p>
               </div>

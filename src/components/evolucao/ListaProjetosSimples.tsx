@@ -19,11 +19,11 @@ export function ListaProjetosSimples() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'planejamento':
-        return <Badge variant="outline" className="border-blue-500/30 text-blue-500">Planejamento</Badge>;
+        return <Badge variant="outline" className="border-status-info/30 text-status-info">Planejamento</Badge>;
       case 'em_andamento':
-        return <Badge variant="outline" className="border-orange-500/30 text-orange-500">Em Andamento</Badge>;
+        return <Badge variant="outline" className="border-status-warning/30 text-status-warning">Em Andamento</Badge>;
       case 'concluido':
-        return <Badge variant="outline" className="border-green-500/30 text-green-500">Concluído</Badge>;
+        return <Badge variant="outline" className="border-status-success/30 text-status-success">Concluído</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
     }
@@ -51,9 +51,9 @@ export function ListaProjetosSimples() {
       <CardContent>
         {!projetos || projetos.length === 0 ? (
           <div className="text-center py-12">
-            <FolderKanban className="h-16 w-16 mx-auto mb-4 text-zinc-500 opacity-50" />
+            <FolderKanban className="h-16 w-16 mx-auto mb-4 text-muted-foreground opacity-50" />
             <h3 className="text-lg font-semibold mb-2 text-white">Nenhum projeto ainda</h3>
-            <p className="text-sm text-zinc-400 mb-4">
+            <p className="text-sm text-muted-foreground mb-4">
               Crie seu primeiro projeto para começar a aplicar seus conhecimentos
             </p>
             <Button onClick={() => navigate("/mentoria/projetos")}>
@@ -66,7 +66,7 @@ export function ListaProjetosSimples() {
             {projetos.map((projeto) => (
               <div
                 key={projeto.id}
-                className="p-4 border border-aplicada-green-900/20 bg-zinc-800/30 hover:bg-zinc-800/50 hover:border-primary/20 rounded-lg transition-all cursor-pointer"
+                className="p-4 border border-aplicada-green-900/20 bg-background/30 hover:bg-background/50 hover:border-primary/20 rounded-lg transition-all cursor-pointer"
                 onClick={() => navigate("/mentoria/projetos")}
               >
                 <div className="flex items-start justify-between gap-4">
@@ -76,13 +76,13 @@ export function ListaProjetosSimples() {
                       {getStatusBadge(projeto.status)}
                     </div>
                     
-                    <div className="flex items-start gap-2 text-sm text-zinc-400">
+                    <div className="flex items-start gap-2 text-sm text-muted-foreground">
                       <Target className="h-4 w-4 mt-0.5 flex-shrink-0 text-primary/60" />
                       <p className="line-clamp-2">{projeto.objetivo_projeto}</p>
                     </div>
 
                     {projeto.data_entrega && (
-                      <div className="flex items-center gap-1 text-xs text-zinc-500">
+                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
                         <Calendar className="h-3 w-3" />
                         <span>
                           Prazo: {format(new Date(projeto.data_entrega), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}

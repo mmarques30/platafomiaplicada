@@ -203,14 +203,14 @@ export function PostCard({ post, onLike, onDelete }: PostCardProps) {
               className={cn(
                 "flex items-center gap-2 px-3 py-1.5 rounded-full transition-colors text-sm mt-2",
                 post.user_has_liked
-                  ? "text-red-500 bg-red-500/10"
-                  : "text-muted-foreground hover:text-red-500 hover:bg-red-500/10"
+                  ? "text-status-danger bg-status-danger/10"
+                  : "text-muted-foreground hover:text-status-danger hover:bg-status-danger/10"
               )}
             >
               <Heart
                 className={cn(
                   "h-[18px] w-[18px]",
-                  post.user_has_liked && "fill-red-500"
+                  post.user_has_liked && "fill-status-danger"
                 )}
               />
               <span>{post.likes_count || "Curtir"}</span>

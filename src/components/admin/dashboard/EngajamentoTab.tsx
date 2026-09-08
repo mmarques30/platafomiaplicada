@@ -45,7 +45,7 @@ export function EngajamentoTab() {
 
   const getTrendIcon = (trend: 'up' | 'down' | 'stable') => {
     switch (trend) {
-      case 'up': return <TrendingUp className="h-4 w-4 text-emerald-500" />;
+      case 'up': return <TrendingUp className="h-4 w-4 text-status-success" />;
       case 'down': return <TrendingDown className="h-4 w-4 text-destructive" />;
       default: return <Minus className="h-4 w-4 text-muted-foreground" />;
     }
@@ -249,7 +249,7 @@ export function EngajamentoTab() {
                       <TableCell className="text-right">
                         <span className="flex items-center justify-end gap-1">
                           {(ferramenta.avaliacao_comunidade || 0).toFixed(1)}
-                          <Star className="h-3 w-3 text-yellow-500 fill-yellow-500" />
+                          <Star className="h-3 w-3 text-status-warning fill-status-warning" />
                         </span>
                       </TableCell>
                       <TableCell className="text-right">{ferramenta.total_avaliacoes_comunidade || 0}</TableCell>

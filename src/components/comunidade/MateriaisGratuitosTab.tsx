@@ -26,16 +26,16 @@ const categoriaLabel = (cat: string) =>
 // Cor por tipo de material — tons harmônicos dentro da paleta da marca
 // (verdes/oliva/terra). Cada categoria ganha uma identidade sutil.
 const categoriaColor: Record<string, string> = {
-  guias: "#5C6F1D",          // verde-brand escuro
+  guias: "#7a8f30",          // verde-brand escuro
   templates: "#7C8E2F",      // verde médio
-  prompts: "#9EB038",        // verde claro (símbolo)
+  prompts: "#c8e040",        // verde claro (símbolo)
   ferramentas: "#4A5A17",    // verde profundo
   checklists: "#8A7B2E",     // oliva/dourado
   ebooks: "#6B7F3A",         // musgo
   newsletter: "#A8924B",     // terra/areia
   materiais_aula: "#7C8E2F",
 };
-const corDe = (cat: string) => categoriaColor[cat] || "#5C6F1D";
+const corDe = (cat: string) => categoriaColor[cat] || "#7a8f30";
 const rgba = (hex: string, a: number) => {
   const n = parseInt(hex.slice(1), 16);
   return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${a})`;

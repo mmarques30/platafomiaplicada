@@ -201,8 +201,8 @@ export default function CandidatarMentoria() {
         
         <Card className="max-w-2xl w-full p-8 text-center relative z-10">
           <div className="mb-6 flex justify-center">
-            <div className="w-20 h-20 rounded-full bg-[#9EB038]/20 flex items-center justify-center">
-              <CheckCircle2 className="w-12 h-12 text-[#9EB038]" />
+            <div className="w-20 h-20 rounded-full bg-primary/20 flex items-center justify-center">
+              <CheckCircle2 className="w-12 h-12 text-primary" />
             </div>
           </div>
           
@@ -218,14 +218,14 @@ export default function CandidatarMentoria() {
             
             <div className="space-y-3 text-foreground">
               <div className="flex items-start gap-3">
-                <span className="text-[#9EB038] font-bold">✓</span>
+                <span className="text-primary font-bold">✓</span>
                 <p>
                   <strong>Se você for selecionado:</strong> Recebe link para agendar 
                   diagnóstico gratuito de 1h
                 </p>
               </div>
               <div className="flex items-start gap-3">
-                <span className="text-[#9EB038] font-bold">→</span>
+                <span className="text-primary font-bold">→</span>
                 <p>
                   <strong>Se ainda não for o momento:</strong> Continua tendo acesso 
                   às aulas gratuitas e comunidade
@@ -240,7 +240,7 @@ export default function CandidatarMentoria() {
           
           <Button
             onClick={() => navigate("/servicos")}
-            className="bg-[#2F302B] hover:bg-[#3D3E39]"
+            className="bg-background hover:bg-[#3D3E39]"
           >
             Voltar para Serviços
           </Button>
@@ -266,7 +266,7 @@ export default function CandidatarMentoria() {
         <div className="text-center mb-8">
           <img src={logoSimbol} alt="IAplicada" className="h-16 mx-auto mb-4" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
           <h1 className="text-3xl font-bold text-foreground mb-2">
-            Candidatura <span className="text-[#9EB038]">Mentoria Club</span>
+            Candidatura <span className="text-primary">Mentoria Club</span>
           </h1>
           <p className="text-muted-foreground">
             Preencha o formulário para ser considerado
@@ -399,7 +399,7 @@ export default function CandidatarMentoria() {
                       step={1}
                       onValueChange={(v) => setValue("nivel_ia", v[0])}
                     />
-                    <div className="text-center mt-2 text-2xl font-bold text-[#9EB038]">
+                    <div className="text-center mt-2 text-2xl font-bold text-primary">
                       {watch("nivel_ia") || 5}/10
                     </div>
                   </div>
@@ -558,7 +558,7 @@ export default function CandidatarMentoria() {
                       step={1}
                       onValueChange={(v) => setValue("urgencia_dominar_ia", v[0])}
                     />
-                    <div className="text-center mt-2 text-2xl font-bold text-[#9EB038]">
+                    <div className="text-center mt-2 text-2xl font-bold text-primary">
                       {watch("urgencia_dominar_ia") || 7}/10
                     </div>
                   </div>
@@ -639,7 +639,7 @@ export default function CandidatarMentoria() {
                     rows={3}
                   />
                 </div>
-                <div className="bg-[#9EB038]/10 rounded-lg p-6 border-2 border-[#9EB038]">
+                <div className="bg-primary/10 rounded-lg p-6 border-2 border-primary">
                   <Label className="text-lg font-bold">
                     Você tem de R$4.000 a R$10.000 disponíveis para investir em uma formação que vai acelerar sua carreira?
                   </Label>
@@ -699,7 +699,7 @@ export default function CandidatarMentoria() {
                 <Button
                   type="button"
                   onClick={handleNextStep}
-                  className="ml-auto bg-[#9EB038] hover:bg-[#C5D63D] text-[#2F302B]"
+                  className="ml-auto bg-primary hover:bg-[#C5D63D] text-foreground"
                 >
                   Próximo
                   <ChevronRight className="ml-2 h-4 w-4" />
@@ -708,7 +708,7 @@ export default function CandidatarMentoria() {
                 <Button
                   type="submit"
                   disabled={isPending}
-                  className="ml-auto bg-[#2F302B] hover:bg-[#3D3E39]"
+                  className="ml-auto bg-background hover:bg-[#3D3E39]"
                 >
                   {isPending ? "Enviando..." : "Enviar Candidatura"}
                   <CheckCircle2 className="ml-2 h-4 w-4" />

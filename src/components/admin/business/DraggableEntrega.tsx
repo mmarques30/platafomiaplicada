@@ -135,12 +135,12 @@ export function DraggableEntrega({
       ref={setNodeRef}
       style={style}
       className={`border rounded-lg bg-background transition-shadow ${isDragging ? 'shadow-lg ring-2 ring-primary/30' : ''} ${
-        isConjuntas ? 'border-blue-500/40 bg-blue-500/5' : ''
+        isConjuntas ? 'border-status-info/40 bg-status-info/5' : ''
       }`}
     >
       {/* Header da Entrega */}
       <div className={`flex items-center gap-2 p-3 ${
-        isConjuntas ? 'hover:bg-blue-500/10' : 'hover:bg-muted/30'
+        isConjuntas ? 'hover:bg-status-info/10' : 'hover:bg-muted/30'
       }`}>
         <button
           {...attributes}
@@ -163,12 +163,12 @@ export function DraggableEntrega({
             <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
           )}
           {isConjuntas ? (
-            <Users className="h-4 w-4 text-blue-600 shrink-0" />
+            <Users className="h-4 w-4 text-status-info shrink-0" />
           ) : (
-            <Package className="h-4 w-4 text-emerald-600 shrink-0" />
+            <Package className="h-4 w-4 text-status-success shrink-0" />
           )}
           <div className="flex-1 min-w-0">
-            <p className={`text-sm font-medium truncate ${isConjuntas ? 'text-blue-700' : ''}`}>
+            <p className={`text-sm font-medium truncate ${isConjuntas ? 'text-status-info' : ''}`}>
               {isConjuntas ? entrega.titulo : `Entrega ${entrega.numero_entrega}: ${entrega.titulo}`}
             </p>
             {instrucoesDaEntrega.length > 0 && (
@@ -179,7 +179,7 @@ export function DraggableEntrega({
           </div>
         </div>
         {isConjuntas && (
-          <Badge variant="outline" className="text-xs bg-blue-500/10 text-blue-700 border-blue-500/30">
+          <Badge variant="outline" className="text-xs bg-status-info/10 text-status-info border-status-info/30">
             <Users className="h-3 w-3 mr-1" />
             Conjunta
           </Badge>

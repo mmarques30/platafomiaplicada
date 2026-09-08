@@ -315,17 +315,17 @@ export function DocumentosUploadSection({
 
   const getStatusIcon = (doc: DocumentoBusiness) => {
     if (doc.processado) {
-      return <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />;
+      return <CheckCircle2 className="h-3.5 w-3.5 text-status-success" />;
     }
     return <Clock className="h-3.5 w-3.5 text-muted-foreground" />;
   };
 
   const getTipoBadge = (tipo: string) => {
     const tipoMap: Record<string, { label: string; className: string }> = {
-      'proposta': { label: 'Proposta', className: 'bg-blue-500/10 text-blue-700 border-blue-500/30' },
-      'transcricao': { label: 'Transcrição', className: 'bg-purple-500/10 text-purple-700 border-purple-500/30' },
+      'proposta': { label: 'Proposta', className: 'bg-status-info/10 text-status-info border-status-info/30' },
+      'transcricao': { label: 'Transcrição', className: 'bg-secondary/10 text-secondary border-secondary/30' },
       'anexo': { label: 'Anexo', className: 'bg-muted text-muted-foreground' },
-      'solucao': { label: 'Solução', className: 'bg-emerald-500/10 text-emerald-700 border-emerald-500/30' },
+      'solucao': { label: 'Solução', className: 'bg-status-success/10 text-status-success border-status-success/30' },
       'outro': { label: 'Outro', className: 'bg-muted text-muted-foreground' },
     };
     const config = tipoMap[tipo] || tipoMap['outro'];
@@ -354,8 +354,8 @@ export function DocumentosUploadSection({
           <CollapsibleContent>
             <CardContent className="pt-0 pb-4 space-y-4">
               {/* Guia de formato ideal */}
-              <Alert className="border-blue-500/30 bg-blue-500/5">
-                <Info className="h-4 w-4 text-blue-600" />
+              <Alert className="border-status-info/30 bg-status-info/5">
+                <Info className="h-4 w-4 text-status-info" />
                 <AlertTitle className="text-xs font-semibold">Formato recomendado para melhor extração</AlertTitle>
                 <AlertDescription className="text-xs space-y-1.5 mt-1.5">
                   <p>Para entregas geradas com hierarquia perfeita, use <strong>Markdown (.md)</strong> ou texto com marcadores:</p>
@@ -446,14 +446,14 @@ FASE 2: ...`}</pre>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="nova" id="modo-nova" />
                     <Label htmlFor="modo-nova" className="text-xs flex items-center gap-1.5 cursor-pointer">
-                      <Plus className="h-3.5 w-3.5 text-emerald-600" />
+                      <Plus className="h-3.5 w-3.5 text-status-success" />
                       Nova Importação
                     </Label>
                   </div>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="atualizar" id="modo-atualizar" />
                     <Label htmlFor="modo-atualizar" className="text-xs flex items-center gap-1.5 cursor-pointer">
-                      <RefreshCw className="h-3.5 w-3.5 text-blue-600" />
+                      <RefreshCw className="h-3.5 w-3.5 text-status-info" />
                       Atualizar Existentes
                     </Label>
                   </div>

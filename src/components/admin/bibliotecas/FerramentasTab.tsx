@@ -135,14 +135,14 @@ export function FerramentasTab() {
               <TableCell>{ferramenta.categoria}</TableCell>
               <TableCell>
                 <div className="flex items-center gap-1">
-                  <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                  <Star className="w-4 h-4 text-status-warning fill-status-warning" />
                   <span className="font-semibold">{ferramenta.avaliacao_mari || ferramenta.avaliacao || 0}</span>
                   <span className="text-xs text-muted-foreground">/5</span>
                 </div>
               </TableCell>
               <TableCell>
                 <div className="flex items-center gap-1">
-                  <Users className="w-4 h-4 text-blue-500" />
+                  <Users className="w-4 h-4 text-status-info" />
                   <span className="font-semibold">{ferramenta.avaliacao_comunidade?.toFixed(1) || "0.0"}</span>
                   <span className="text-xs text-muted-foreground">({ferramenta.total_avaliacoes_comunidade || 0})</span>
                 </div>

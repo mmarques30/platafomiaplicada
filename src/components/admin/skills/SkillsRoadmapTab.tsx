@@ -71,8 +71,8 @@ export default function SkillsRoadmapTab({ equipeId }: Props) {
 
   const statusBadge = (status: string) => {
     switch (status) {
-      case "concluido": return <Badge className="bg-emerald-100 text-emerald-700 border-transparent">Concluída</Badge>;
-      case "em_andamento": return <Badge className="bg-amber-100 text-amber-700 border-transparent">Em andamento</Badge>;
+      case "concluido": return <Badge className="bg-status-success/15 text-status-success border-transparent">Concluída</Badge>;
+      case "em_andamento": return <Badge className="bg-status-warning/15 text-status-warning border-transparent">Em andamento</Badge>;
       default: return <Badge variant="outline">Pendente</Badge>;
     }
   };

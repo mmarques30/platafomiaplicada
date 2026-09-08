@@ -184,17 +184,17 @@ export function VideosTab() {
                         {video.ativo ? "Ativo" : "Inativo"}
                       </Badge>
                       {video.ativo && !video.visivel_mentorados && (
-                        <Badge variant="outline" className="bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-500/50">
+                        <Badge variant="outline" className="bg-status-warning/10 text-status-warning dark:text-status-warning border-status-warning/50">
                           Rascunho
                         </Badge>
                       )}
                       {video.ativo && video.visivel_mentorados && (
-                        <Badge variant="outline" className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/50">
+                        <Badge variant="outline" className="bg-status-success/10 text-status-success dark:text-status-success border-status-success/50">
                           Publicado
                         </Badge>
                       )}
                       {video.visivel_visitantes && (
-                        <Badge variant="outline" className="bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/50">
+                        <Badge variant="outline" className="bg-status-info/10 text-status-info dark:text-status-info border-status-info/50">
                           👁️ Visitantes
                         </Badge>
                       )}

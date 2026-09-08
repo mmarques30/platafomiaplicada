@@ -301,11 +301,11 @@ export function GeracaoEntregasModal({
   const getAcaoBadge = (acao: string) => {
     switch (acao) {
       case 'nova':
-        return <Badge variant="outline" className="text-xs bg-emerald-500/10 text-emerald-700 border-emerald-500/30">+ Nova</Badge>;
+        return <Badge variant="outline" className="text-xs bg-status-success/10 text-status-success border-status-success/30">+ Nova</Badge>;
       case 'atualizar':
-        return <Badge variant="outline" className="text-xs bg-blue-500/10 text-blue-700 border-blue-500/30">↺ Atualizar</Badge>;
+        return <Badge variant="outline" className="text-xs bg-status-info/10 text-status-info border-status-info/30">↺ Atualizar</Badge>;
       case 'concluida':
-        return <Badge variant="outline" className="text-xs bg-gray-500/10 text-gray-500 border-gray-500/30">✓ Concluída</Badge>;
+        return <Badge variant="outline" className="text-xs bg-card/10 text-muted-foreground border-foreground/30/30">✓ Concluída</Badge>;
       case 'existente':
         return <Badge variant="outline" className="text-xs bg-muted text-muted-foreground">Existente</Badge>;
       default:
@@ -437,10 +437,10 @@ export function GeracaoEntregasModal({
 
   const getPrioridadeBadge = (prioridade: string) => {
     const config: Record<string, { label: string; className: string }> = {
-      'urgente': { label: 'Urgente', className: 'bg-red-500/10 text-red-700 border-red-500/30' },
-      'alta': { label: 'Alta', className: 'bg-orange-500/10 text-orange-700 border-orange-500/30' },
-      'media': { label: 'Média', className: 'bg-blue-500/10 text-blue-700 border-blue-500/30' },
-      'baixa': { label: 'Baixa', className: 'bg-gray-500/10 text-gray-600 border-gray-500/30' },
+      'urgente': { label: 'Urgente', className: 'bg-status-danger/10 text-status-danger border-status-danger/30' },
+      'alta': { label: 'Alta', className: 'bg-status-warning/10 text-status-warning border-status-warning/30' },
+      'media': { label: 'Média', className: 'bg-status-info/10 text-status-info border-status-info/30' },
+      'baixa': { label: 'Baixa', className: 'bg-card/10 text-muted-foreground border-foreground/30/30' },
     };
     const c = config[prioridade] || config['media'];
     return <Badge variant="outline" className={`text-xs ${c.className}`}>{c.label}</Badge>;
@@ -458,9 +458,9 @@ export function GeracaoEntregasModal({
 
   const getResponsavelBadge = (responsavel: string) => {
     const config: Record<string, { label: string; className: string }> = {
-      'voce': { label: 'Você', className: 'bg-emerald-500/10 text-emerald-700 border-emerald-500/30' },
-      'mentor': { label: 'Mentor', className: 'bg-purple-500/10 text-purple-700 border-purple-500/30' },
-      'conjunto': { label: 'Conjunto', className: 'bg-blue-500/10 text-blue-700 border-blue-500/30' },
+      'voce': { label: 'Você', className: 'bg-status-success/10 text-status-success border-status-success/30' },
+      'mentor': { label: 'Mentor', className: 'bg-secondary/10 text-secondary border-secondary/30' },
+      'conjunto': { label: 'Conjunto', className: 'bg-status-info/10 text-status-info border-status-info/30' },
     };
     const c = config[responsavel] || config['voce'];
     return <Badge variant="outline" className={`text-xs ${c.className}`}>{c.label}</Badge>;
@@ -821,25 +821,25 @@ export function GeracaoEntregasModal({
   const getCoresFase = (numero: number) => {
     const cores: Record<number, { bg: string; border: string; text: string; icon: string; headerBg: string }> = {
       1: { 
-        bg: 'bg-purple-500/5', 
-        border: 'border-purple-500/30', 
-        text: 'text-purple-700', 
-        icon: 'text-purple-600',
-        headerBg: 'bg-purple-500/10 hover:bg-purple-500/15'
+        bg: 'bg-secondary/5', 
+        border: 'border-secondary/30', 
+        text: 'text-secondary', 
+        icon: 'text-secondary',
+        headerBg: 'bg-secondary/10 hover:bg-secondary/15'
       },
       2: { 
-        bg: 'bg-amber-500/5', 
-        border: 'border-amber-500/30', 
-        text: 'text-amber-700', 
-        icon: 'text-amber-600',
-        headerBg: 'bg-amber-500/10 hover:bg-amber-500/15'
+        bg: 'bg-status-warning/5', 
+        border: 'border-status-warning/30', 
+        text: 'text-status-warning', 
+        icon: 'text-status-warning',
+        headerBg: 'bg-status-warning/10 hover:bg-status-warning/15'
       },
       3: { 
-        bg: 'bg-blue-500/5', 
-        border: 'border-blue-500/30', 
-        text: 'text-blue-700', 
-        icon: 'text-blue-600',
-        headerBg: 'bg-blue-500/10 hover:bg-blue-500/15'
+        bg: 'bg-status-info/5', 
+        border: 'border-status-info/30', 
+        text: 'text-status-info', 
+        icon: 'text-status-info',
+        headerBg: 'bg-status-info/10 hover:bg-status-info/15'
       },
     };
     return cores[numero] || cores[1];
@@ -890,11 +890,11 @@ export function GeracaoEntregasModal({
   
   // Cor da barra de progresso por fase
   const getProgressColor = (faseNumero: number, porcentagem: number) => {
-    if (porcentagem === 100) return 'bg-emerald-500';
+    if (porcentagem === 100) return 'bg-status-success';
     const coresFase: Record<number, string> = {
-      1: 'bg-purple-500',
-      2: 'bg-amber-500',
-      3: 'bg-blue-500'
+      1: 'bg-secondary',
+      2: 'bg-status-warning',
+      3: 'bg-status-info'
     };
     return coresFase[faseNumero] || 'bg-muted-foreground/50';
   };
@@ -911,11 +911,11 @@ export function GeracaoEntregasModal({
     <div className="space-y-4">
       {/* MVP - Entregas sem etapa */}
       {entregasMVP.length > 0 && (
-        <div className="border rounded-lg overflow-hidden border-emerald-500/30">
-          <div className="flex items-center gap-3 p-3 bg-emerald-500/10">
-            <Sparkles className="h-4 w-4 text-emerald-600" />
+        <div className="border rounded-lg overflow-hidden border-status-success/30">
+          <div className="flex items-center gap-3 p-3 bg-status-success/10">
+            <Sparkles className="h-4 w-4 text-status-success" />
             <div className="flex-1">
-              <p className="font-medium text-emerald-700">MVP - Escopo Acordado</p>
+              <p className="font-medium text-status-success">MVP - Escopo Acordado</p>
               <p className="text-xs text-muted-foreground">Entregas prioritárias do primeiro release</p>
             </div>
             <Badge variant="secondary" className="text-xs">
@@ -932,7 +932,7 @@ export function GeracaoEntregasModal({
                   checked={entrega.selecionada}
                   onCheckedChange={() => toggleEntregaSelecionada(entrega.numero_entrega)}
                 />
-                <Package className="h-4 w-4 text-emerald-600" />
+                <Package className="h-4 w-4 text-status-success" />
                 <div className="flex-1">
                   <p className="text-sm font-medium">{entrega.titulo}</p>
                 </div>
@@ -1010,7 +1010,7 @@ export function GeracaoEntregasModal({
             <div className="border rounded-lg bg-background shadow-xl p-3 opacity-90">
               <div className="flex items-center gap-2">
                 <GripVertical className="h-4 w-4 text-muted-foreground" />
-                <Package className="h-4 w-4 text-emerald-600" />
+                <Package className="h-4 w-4 text-status-success" />
                 <span className="text-sm font-medium">
                   Entrega {activeEntrega.numero_entrega}: {activeEntrega.titulo}
                 </span>
@@ -1063,12 +1063,12 @@ export function GeracaoEntregasModal({
             <Sparkles className="h-5 w-5 text-primary" />
             Estrutura Gerada pela IA
             {modoImportacao === 'atualizar' ? (
-              <Badge variant="secondary" className="ml-2 text-xs bg-blue-500/10 text-blue-700 border-blue-500/30">
+              <Badge variant="secondary" className="ml-2 text-xs bg-status-info/10 text-status-info border-status-info/30">
                 <RefreshCw className="h-3 w-3 mr-1" />
                 Modo Atualização
               </Badge>
             ) : (
-              <Badge variant="secondary" className="ml-2 text-xs bg-emerald-500/10 text-emerald-700 border-emerald-500/30">
+              <Badge variant="secondary" className="ml-2 text-xs bg-status-success/10 text-status-success border-status-success/30">
                 <Plus className="h-3 w-3 mr-1" />
                 Nova Importação
               </Badge>

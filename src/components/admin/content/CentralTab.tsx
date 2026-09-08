@@ -184,12 +184,12 @@ export function CentralTab() {
                   </TableCell>
                   <TableCell className="text-center">
                     {conteudo.destaque && (
-                      <Star className="h-4 w-4 text-yellow-500 fill-yellow-500 mx-auto" />
+                      <Star className="h-4 w-4 text-status-warning fill-status-warning mx-auto" />
                     )}
                   </TableCell>
                   <TableCell className="text-center">
                     {conteudo.visivel_gratuitos && (
-                      <Eye className="h-4 w-4 text-green-500 mx-auto" />
+                      <Eye className="h-4 w-4 text-status-success mx-auto" />
                     )}
                   </TableCell>
                   <TableCell>

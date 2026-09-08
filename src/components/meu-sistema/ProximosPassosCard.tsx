@@ -13,14 +13,14 @@ interface ProximosPassosCardProps {
 const statusMap: Record<string, { label: string; class: string }> = {
   pendente: { label: "Pendente", class: "bg-muted text-muted-foreground" },
   em_andamento: { label: "Em andamento", class: "bg-primary/10 text-primary" },
-  concluida: { label: "Concluída", class: "bg-green-100 text-green-700" },
+  concluida: { label: "Concluída", class: "bg-status-success/15 text-status-success" },
   cancelada: { label: "Cancelada", class: "bg-destructive/10 text-destructive" },
 };
 
 const prioridadeMap: Record<string, { label: string; class: string }> = {
   baixa: { label: "Baixa", class: "bg-muted text-muted-foreground" },
-  media: { label: "Média", class: "bg-yellow-100 text-yellow-700" },
-  alta: { label: "Alta", class: "bg-orange-100 text-orange-700" },
+  media: { label: "Média", class: "bg-status-warning/15 text-status-warning" },
+  alta: { label: "Alta", class: "bg-status-warning/15 text-status-warning" },
   critica: { label: "Crítica", class: "bg-destructive/10 text-destructive" },
 };
 

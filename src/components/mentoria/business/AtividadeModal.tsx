@@ -58,61 +58,61 @@ export function AtividadeModal({ open, onOpenChange, onSave, isLoading }: Ativid
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-slate-900 border-white/10 text-slate-100 sm:max-w-md">
+      <DialogContent className="bg-background border-white/10 text-muted-foreground sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-slate-100">Nova Atividade</DialogTitle>
-          <DialogDescription className="text-slate-400">
+          <DialogTitle className="text-muted-foreground">Nova Atividade</DialogTitle>
+          <DialogDescription className="text-muted-foreground">
             Adicione uma nova atividade para este projeto.
           </DialogDescription>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="titulo" className="text-slate-300">Título *</Label>
+            <Label htmlFor="titulo" className="text-muted-foreground">Título *</Label>
             <Input
               id="titulo"
               value={titulo}
               onChange={(e) => setTitulo(e.target.value)}
               placeholder="Ex: Configurar integração com API"
-              className="bg-white/5 border-white/10 text-slate-100 placeholder:text-slate-500"
+              className="bg-white/5 border-white/10 text-muted-foreground placeholder:text-muted-foreground"
               required
             />
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="descricao" className="text-slate-300">Descrição</Label>
+            <Label htmlFor="descricao" className="text-muted-foreground">Descrição</Label>
             <Textarea
               id="descricao"
               value={descricao}
               onChange={(e) => setDescricao(e.target.value)}
               placeholder="Descreva os detalhes da atividade..."
-              className="bg-white/5 border-white/10 text-slate-100 placeholder:text-slate-500 min-h-[80px]"
+              className="bg-white/5 border-white/10 text-muted-foreground placeholder:text-muted-foreground min-h-[80px]"
             />
           </div>
           
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="prazo" className="text-slate-300">Prazo</Label>
+              <Label htmlFor="prazo" className="text-muted-foreground">Prazo</Label>
               <Input
                 id="prazo"
                 type="date"
                 value={prazo}
                 onChange={(e) => setPrazo(e.target.value)}
-                className="bg-white/5 border-white/10 text-slate-100"
+                className="bg-white/5 border-white/10 text-muted-foreground"
               />
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="prioridade" className="text-slate-300">Prioridade</Label>
+              <Label htmlFor="prioridade" className="text-muted-foreground">Prioridade</Label>
               <Select value={prioridade} onValueChange={setPrioridade}>
-                <SelectTrigger className="bg-white/5 border-white/10 text-slate-100">
+                <SelectTrigger className="bg-white/5 border-white/10 text-muted-foreground">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-slate-800 border-white/10">
-                  <SelectItem value="baixa" className="text-slate-100">Baixa</SelectItem>
-                  <SelectItem value="media" className="text-slate-100">Média</SelectItem>
-                  <SelectItem value="alta" className="text-slate-100">Alta</SelectItem>
-                  <SelectItem value="urgente" className="text-slate-100">Urgente</SelectItem>
+                <SelectContent className="bg-background border-white/10">
+                  <SelectItem value="baixa" className="text-muted-foreground">Baixa</SelectItem>
+                  <SelectItem value="media" className="text-muted-foreground">Média</SelectItem>
+                  <SelectItem value="alta" className="text-muted-foreground">Alta</SelectItem>
+                  <SelectItem value="urgente" className="text-muted-foreground">Urgente</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -123,14 +123,14 @@ export function AtividadeModal({ open, onOpenChange, onSave, isLoading }: Ativid
               type="button"
               variant="ghost"
               onClick={() => onOpenChange(false)}
-              className="text-slate-400 hover:text-slate-300 hover:bg-white/5"
+              className="text-muted-foreground hover:text-muted-foreground hover:bg-white/5"
             >
               Cancelar
             </Button>
             <Button
               type="submit"
               disabled={!titulo.trim() || isLoading}
-              className="bg-violet-600 hover:bg-violet-700 text-white"
+              className="bg-secondary hover:bg-secondary text-white"
             >
               {isLoading ? (
                 <>

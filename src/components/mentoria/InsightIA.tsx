@@ -441,15 +441,15 @@ export function InsightIA({ formulario, onInsightGerado }: InsightIAProps) {
               <AccordionItem value="desafios" className="border border-brand-hairline rounded-lg px-4 bg-brand-cream-soft">
                 <AccordionTrigger className="hover:no-underline py-3">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-amber-500/20">
-                      <AlertTriangle className="h-4 w-4 text-amber-500" />
+                    <div className="p-2 rounded-lg bg-status-warning/20">
+                      <AlertTriangle className="h-4 w-4 text-status-warning" />
                     </div>
                     <span className="font-medium text-sm text-foreground">Pontos de Atenção</span>
                   </div>
                 </AccordionTrigger>
                 <AccordionContent className="pt-2 pb-4">
-                  <div className="p-3 bg-amber-900/20 border border-amber-700/30 rounded-lg">
-                    <p className="text-sm text-amber-200">
+                  <div className="p-3 bg-status-warning/20 border border-status-warning/30 rounded-lg">
+                    <p className="text-sm text-status-warning/40">
                       {insight.alerta_desafios}
                     </p>
                   </div>

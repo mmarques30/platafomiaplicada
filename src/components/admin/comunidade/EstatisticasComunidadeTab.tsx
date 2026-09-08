@@ -158,25 +158,25 @@ export function EstatisticasComunidadeTab() {
       title: "Visitantes Cadastrados",
       value: stats?.totalVisitantes || 0,
       icon: Users,
-      color: "text-blue-500",
+      color: "text-status-info",
     },
     {
       title: "Visitantes Ativos (7 dias)",
       value: stats?.activeVisitantes || 0,
       icon: Activity,
-      color: "text-green-500",
+      color: "text-status-success",
     },
     {
       title: "Posts esta Semana",
       value: stats?.postsThisWeek || 0,
       icon: MessageSquare,
-      color: "text-purple-500",
+      color: "text-secondary",
     },
     {
       title: "Taxa Engajamento",
       value: stats?.engagementRate?.toFixed(2) || "0",
       icon: TrendingUp,
-      color: "text-orange-500",
+      color: "text-status-warning",
       suffix: "/ visitante",
     },
   ];
@@ -219,7 +219,7 @@ export function EstatisticasComunidadeTab() {
         <Card className="bg-card border-border">
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
-              <Trophy className="h-4 w-4 text-yellow-500" />
+              <Trophy className="h-4 w-4 text-status-warning" />
               Top 5 Engajamento (Visitantes)
             </CardTitle>
           </CardHeader>
@@ -272,7 +272,7 @@ export function EstatisticasComunidadeTab() {
         <Card className="bg-card border-border">
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
-              <Heart className="h-4 w-4 text-red-500" />
+              <Heart className="h-4 w-4 text-status-danger" />
               Top 5 Posts Mais Populares
             </CardTitle>
           </CardHeader>
@@ -308,7 +308,7 @@ export function EstatisticasComunidadeTab() {
                       </p>
                     </div>
                     <div className="text-right">
-                      <span className="text-sm font-semibold text-red-500">
+                      <span className="text-sm font-semibold text-status-danger">
                         {post.likes_count || 0} ❤️
                       </span>
                       <p className="text-xs text-muted-foreground">
@@ -332,7 +332,7 @@ export function EstatisticasComunidadeTab() {
         <Card className="bg-card border-border">
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
-              <Eye className="h-4 w-4 text-emerald-500" />
+              <Eye className="h-4 w-4 text-status-success" />
               Top 5 Conteúdos Mais Acessados
             </CardTitle>
           </CardHeader>
@@ -355,9 +355,9 @@ export function EstatisticasComunidadeTab() {
                     </span>
                     <div className="flex items-center justify-center h-8 w-8 rounded-full bg-muted">
                       {content.type === 'video' ? (
-                        <Video className="h-4 w-4 text-purple-500" />
+                        <Video className="h-4 w-4 text-secondary" />
                       ) : (
-                        <FileText className="h-4 w-4 text-blue-500" />
+                        <FileText className="h-4 w-4 text-status-info" />
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -368,7 +368,7 @@ export function EstatisticasComunidadeTab() {
                         {content.type === 'video' ? 'Vídeo' : 'Material'}
                       </p>
                     </div>
-                    <span className="text-sm font-semibold text-emerald-500">
+                    <span className="text-sm font-semibold text-status-success">
                       {content.count} acessos
                     </span>
                   </div>
@@ -386,7 +386,7 @@ export function EstatisticasComunidadeTab() {
         <Card className="bg-card border-border">
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
-              <FolderOpen className="h-4 w-4 text-blue-500" />
+              <FolderOpen className="h-4 w-4 text-status-info" />
               Posts por Categoria
             </CardTitle>
           </CardHeader>

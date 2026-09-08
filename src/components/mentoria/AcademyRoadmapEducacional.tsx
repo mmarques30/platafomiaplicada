@@ -96,8 +96,8 @@ export function AcademyRoadmapEducacional() {
           <Card
             key={stage.num}
             className={`relative border-border/50 bg-card transition-all ${
-              isAtual ? "ring-1 ring-amber-500/40" : ""
-            } ${isConcluido ? "ring-1 ring-emerald-500/30" : ""}`}
+              isAtual ? "ring-1 ring-status-warning/40" : ""
+            } ${isConcluido ? "ring-1 ring-status-success/30" : ""}`}
           >
             <CardContent className="flex flex-col items-center gap-3 p-6 text-center">
               <span className="text-[11px] uppercase tracking-wider text-muted-foreground">
@@ -107,9 +107,9 @@ export function AcademyRoadmapEducacional() {
               <Icon
                 className={`h-8 w-8 ${
                   isConcluido
-                    ? "text-emerald-500"
+                    ? "text-status-success"
                     : isAtual
-                    ? "text-amber-400"
+                    ? "text-status-warning"
                     : "text-muted-foreground"
                 }`}
               />
@@ -119,9 +119,9 @@ export function AcademyRoadmapEducacional() {
               <Badge
                 className={
                   isConcluido
-                    ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
+                    ? "bg-status-success/20 text-status-success border-status-success/30"
                     : isAtual
-                    ? "bg-amber-500/20 text-amber-400 border-amber-500/30"
+                    ? "bg-status-warning/20 text-status-warning border-status-warning/30"
                     : "bg-muted text-muted-foreground border-border"
                 }
               >

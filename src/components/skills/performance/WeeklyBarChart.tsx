@@ -25,7 +25,7 @@ interface WeeklyBarChartProps {
 export default function WeeklyBarChart({ ranking, entregas, projetos = [] }: WeeklyBarChartProps) {
   return (
     <Card className="bg-card border-border overflow-hidden">
-      <CardHeader className="bg-[#9EB038]/25 rounded-t-xl">
+      <CardHeader className="bg-primary/25 rounded-t-xl">
         <CardTitle>Evolução de Maturidade</CardTitle>
         <CardDescription>
           {`${projetos.length} projetos · ${entregas.length} entregas`}
@@ -51,7 +51,7 @@ export default function WeeklyBarChart({ ranking, entregas, projetos = [] }: Wee
                   </div>
                   <div className="bg-muted rounded-full h-3 w-full">
                     <div
-                      className="bg-[#9EB038] rounded-full h-3 transition-all"
+                      className="bg-primary rounded-full h-3 transition-all"
                       style={{ width: `${pct}%` }}
                     />
                   </div>

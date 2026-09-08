@@ -64,7 +64,7 @@ export function BusinessTarefasCard() {
     
     if (dias <= 3) {
       return (
-        <Badge variant="secondary" className="text-xs bg-yellow-500/20 text-yellow-600 dark:text-yellow-400">
+        <Badge variant="secondary" className="text-xs bg-status-warning/20 text-status-warning dark:text-status-warning">
           <Clock className="h-3 w-3 mr-1" />
           {dias}d
         </Badge>

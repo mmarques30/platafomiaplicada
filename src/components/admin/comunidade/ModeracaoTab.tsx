@@ -129,7 +129,7 @@ export function ModeracaoTab() {
                     variant="ghost"
                     size="sm"
                     onClick={() => deletePost(post.id)}
-                    className="text-red-500 hover:text-red-600"
+                    className="text-status-danger hover:text-status-danger"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
@@ -181,7 +181,7 @@ function CommentsSection({ postId }: { postId: string }) {
             variant="ghost"
             size="sm"
             onClick={() => deleteComment(comment.id)}
-            className="text-red-500 hover:text-red-600 shrink-0"
+            className="text-status-danger hover:text-status-danger shrink-0"
           >
             <Trash2 className="h-3 w-3" />
           </Button>

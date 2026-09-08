@@ -79,15 +79,15 @@ export default function MentoriaRecursos() {
               {bonusLiberados.map((bonusItem) => {
                 const arquivos = getArquivoUrls(bonusItem.arquivo_url);
                 return (
-                  <Card key={bonusItem.id} className="border-green-200 dark:border-green-800 bg-green-50/50 dark:bg-green-900/10">
+                  <Card key={bonusItem.id} className="border-status-success/40 dark:border-status-success bg-status-success/50 dark:bg-status-success/10">
                     <CardHeader>
                       <div className="flex items-start gap-3">
-                        <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
-                          <Gift className="h-5 w-5 text-green-600" />
+                        <div className="p-2 bg-status-success/15 dark:bg-status-success/30 rounded-lg">
+                          <Gift className="h-5 w-5 text-status-success" />
                         </div>
                         <div className="flex-1">
                           <CardTitle className="text-lg">{bonusItem.nome}</CardTitle>
-                          <Badge variant="default" className="mt-1 bg-green-600">
+                          <Badge variant="default" className="mt-1 bg-status-success">
                             Liberado
                           </Badge>
                         </div>
@@ -128,7 +128,7 @@ export default function MentoriaRecursos() {
                             onClick={() => handleCopyComando(bonusItem.comando_uso!, bonusItem.id)}
                           >
                             {copiedId === bonusItem.id ? (
-                              <Check className="h-4 w-4 text-green-600" />
+                              <Check className="h-4 w-4 text-status-success" />
                             ) : (
                               <Copy className="h-4 w-4" />
                             )}

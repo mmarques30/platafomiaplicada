@@ -97,7 +97,7 @@ export function ProjetosIAAdmin({ userId }: ProjetosIAAdminProps) {
                 </div>
                 <div className="flex gap-2">
                   {hasExistingFeedback && (
-                    <Badge variant="secondary" className="bg-green-500/10 text-green-600">
+                    <Badge variant="secondary" className="bg-status-success/10 text-status-success">
                       <MessageSquare className="h-3 w-3 mr-1" />
                       Com feedback
                     </Badge>

@@ -28,28 +28,28 @@ export default function PortfolioOverview({ entregas, projetos }: PortfolioOverv
       value: stats.totalProjetos,
       subtitle: "projetos no backlog",
       icon: FolderKanban,
-      color: "#9EB038",
+      color: "#c8e040",
     },
     {
       label: "Total de Entregas",
       value: stats.totalEntregas,
       subtitle: "entregas cadastradas",
       icon: CheckCircle2,
-      color: "#9EB038",
+      color: "#c8e040",
     },
     {
       label: "Em Andamento",
       value: stats.emAndamento,
       subtitle: "em desenvolvimento",
       icon: Clock,
-      color: "#B8CC5A",
+      color: "#d5e95a",
     },
     {
       label: "Economia Total",
       value: `${stats.economiaTotal}h`,
       subtitle: "por semana estimadas",
       icon: TrendingUp,
-      color: "#9EB038",
+      color: "#c8e040",
     },
   ];
 

@@ -171,7 +171,7 @@ export function DroppableFase({
                 FASE {etapa.numero}: {etapa.titulo.toUpperCase()}
               </p>
               {isPrioritaria && (
-                <Badge variant="outline" className="text-xs bg-amber-500/20 text-amber-700 border-amber-500/40">
+                <Badge variant="outline" className="text-xs bg-status-warning/20 text-status-warning border-status-warning/40">
                   <Zap className="h-3 w-3 mr-1" />
                   Prioridade
                 </Badge>
@@ -181,7 +181,7 @@ export function DroppableFase({
               {totais.entregasConcluidas}/{totais.entregas} entregas • {totais.instrucoesConcluidas}/{totais.instrucoes} instruções • {totais.tasks} tasks
             </p>
           </div>
-          <span className={`text-sm font-semibold ${totais.porcentagem === 100 ? 'text-emerald-600' : cores.text}`}>
+          <span className={`text-sm font-semibold ${totais.porcentagem === 100 ? 'text-status-success' : cores.text}`}>
             {totais.porcentagem}%
           </span>
           {getAcaoBadge(getAcaoItem('etapa', etapa.titulo))}

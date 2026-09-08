@@ -19,9 +19,9 @@ export function BusinessRoadmap({ sessoes }: BusinessRoadmapProps) {
   const getStatusIcon = (status?: string) => {
     switch (status) {
       case 'realizada':
-        return <CheckCircle2 className="h-5 w-5 text-emerald-600" />;
+        return <CheckCircle2 className="h-5 w-5 text-status-success" />;
       case 'agendada':
-        return <Clock className="h-5 w-5 text-amber-600" />;
+        return <Clock className="h-5 w-5 text-status-warning" />;
       default:
         return <Circle className="h-5 w-5 text-muted-foreground" />;
     }
@@ -78,9 +78,9 @@ export function BusinessRoadmap({ sessoes }: BusinessRoadmapProps) {
                         w-12 h-12 rounded-full flex items-center justify-center
                         border-2 transition-all duration-300
                         ${isCompleted 
-                          ? 'bg-emerald-500/10 border-emerald-500' 
+                          ? 'bg-status-success/10 border-status-success' 
                           : isCurrent
-                            ? 'bg-amber-500/10 border-amber-500'
+                            ? 'bg-status-warning/10 border-status-warning'
                             : 'bg-muted border-border'
                         }
                       `}
@@ -92,9 +92,9 @@ export function BusinessRoadmap({ sessoes }: BusinessRoadmapProps) {
                     <div className="mt-3 text-center w-full px-1">
                       <p className={`text-sm font-medium text-center leading-tight ${
                         isCompleted 
-                          ? 'text-emerald-600' 
+                          ? 'text-status-success' 
                           : isCurrent 
-                            ? 'text-amber-600'
+                            ? 'text-status-warning'
                             : 'text-muted-foreground'
                       }`}>
                         {fase.titulo}

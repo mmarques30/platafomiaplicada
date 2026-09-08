@@ -72,15 +72,15 @@ export function VisitorExpirationNotice() {
       icon: Clock,
       title: "Restam apenas 3 dias de acesso gratuito",
       description: `O tempo está passando! Aproveite ${desconto} de desconto exclusivo no Academy antes que seu acesso expire.`,
-      bgClass: "bg-amber-600/95",
-      borderClass: "border-amber-400",
+      bgClass: "bg-status-warning/95",
+      borderClass: "border-status-warning/40",
     },
     "1_dia": {
       icon: AlertTriangle,
       title: "Último dia de acesso gratuito",
       description: `Esta é sua última chance de garantir ${desconto} de desconto no Academy. Amanhã seu acesso será encerrado.`,
-      bgClass: "bg-red-600/95",
-      borderClass: "border-red-400",
+      bgClass: "bg-status-danger/95",
+      borderClass: "border-status-danger/40",
     },
   };
 

@@ -126,7 +126,7 @@ export function PostComments({ postId }: PostCommentsProps) {
                         variant="ghost"
                         size="sm"
                         onClick={() => deleteComment(comment.id)}
-                        className="h-6 w-6 p-0 text-muted-foreground hover:text-red-500"
+                        className="h-6 w-6 p-0 text-muted-foreground hover:text-status-danger"
                       >
                         <Trash2 className="h-3 w-3" />
                       </Button>

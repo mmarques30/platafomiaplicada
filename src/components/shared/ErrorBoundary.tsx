@@ -36,23 +36,23 @@ export class ErrorBoundary extends Component<Props, State> {
 
       return (
         <div className="flex flex-col items-center justify-center min-h-[50vh] p-8 text-center">
-          <div className="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-lg p-6 max-w-md">
-            <h2 className="text-lg font-semibold text-red-800 dark:text-red-200 mb-2">
+          <div className="bg-status-danger/15 dark:bg-status-danger/20 border border-status-danger/40 dark:border-status-danger rounded-lg p-6 max-w-md">
+            <h2 className="text-lg font-semibold text-status-danger dark:text-status-danger/40 mb-2">
               Algo deu errado
             </h2>
-            <p className="text-sm text-red-600 dark:text-red-300 mb-4">
+            <p className="text-sm text-status-danger dark:text-status-danger mb-4">
               Ocorreu um erro inesperado. Tente recarregar a pagina.
             </p>
             <div className="flex gap-2 justify-center">
               <button
                 onClick={this.handleReset}
-                className="px-4 py-2 text-sm font-medium rounded-md bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors"
+                className="px-4 py-2 text-sm font-medium rounded-md bg-status-danger/15 dark:bg-status-danger/30 text-status-danger dark:text-status-danger hover:bg-status-danger/15 dark:hover:bg-status-danger/50 transition-colors"
               >
                 Tentar novamente
               </button>
               <button
                 onClick={() => window.location.reload()}
-                className="px-4 py-2 text-sm font-medium rounded-md bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                className="px-4 py-2 text-sm font-medium rounded-md bg-muted dark:bg-background text-foreground dark:text-muted-foreground hover:bg-muted dark:hover:bg-card transition-colors"
               >
                 Recarregar pagina
               </button>

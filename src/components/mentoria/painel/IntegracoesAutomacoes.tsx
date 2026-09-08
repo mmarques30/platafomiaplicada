@@ -58,7 +58,7 @@ export const IntegracoesAutomacoes = ({ diagnostico, isBusiness = false }: Props
               className={cn(
                 "text-left font-semibold px-4 py-3 rounded-xl transition-colors",
                 isBusiness 
-                  ? "bg-white/5 hover:bg-white/8 text-slate-100 data-[state=open]:rounded-b-none" 
+                  ? "bg-white/5 hover:bg-white/8 text-muted-foreground data-[state=open]:rounded-b-none" 
                   : "bg-card hover:bg-muted text-card-foreground data-[state=open]:rounded-b-none"
               )}
             >
@@ -75,7 +75,7 @@ export const IntegracoesAutomacoes = ({ diagnostico, isBusiness = false }: Props
                   <div key={index} className="flex items-start gap-3">
                     <span className={cn(
                       "mt-2 w-1.5 h-1.5 rounded-full flex-shrink-0",
-                      isBusiness ? "bg-violet-400" : "bg-aplicada-green-900"
+                      isBusiness ? "bg-secondary" : "bg-aplicada-green-900"
                     )} />
                     <p className={cn("flex-1 leading-relaxed", theme.textSecondary)}>
                       {item}

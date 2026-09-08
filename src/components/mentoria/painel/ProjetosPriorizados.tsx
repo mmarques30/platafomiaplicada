@@ -24,9 +24,9 @@ export const ProjetosPriorizados = ({ projetos, isBusiness = false }: Props) => 
 
   const getComplexityBadge = (index: number) => {
     if (isBusiness) {
-      if (index === 0) return <Badge className="bg-red-500/20 text-red-300 border-red-500/30 hover:bg-red-500/30">Alta</Badge>;
-      if (index <= 2) return <Badge className="bg-amber-500/20 text-amber-300 border-amber-500/30 hover:bg-amber-500/30">Média</Badge>;
-      return <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/30 hover:bg-emerald-500/30">Baixa</Badge>;
+      if (index === 0) return <Badge className="bg-status-danger/20 text-status-danger border-status-danger/30 hover:bg-status-danger/30">Alta</Badge>;
+      if (index <= 2) return <Badge className="bg-status-warning/20 text-status-warning border-status-warning/30 hover:bg-status-warning/30">Média</Badge>;
+      return <Badge className="bg-status-success/20 text-status-success border-status-success/30 hover:bg-status-success/30">Baixa</Badge>;
     }
     if (index === 0) return <Badge variant="complexity-high">Alta</Badge>;
     if (index <= 2) return <Badge variant="complexity-medium">Média</Badge>;
@@ -55,23 +55,23 @@ export const ProjetosPriorizados = ({ projetos, isBusiness = false }: Props) => 
               )}>
                 <TableHead className={cn(
                   "font-bold",
-                  isBusiness ? "text-slate-200" : "text-primary-foreground"
+                  isBusiness ? "text-muted-foreground" : "text-primary-foreground"
                 )}>#</TableHead>
                 <TableHead className={cn(
                   "font-bold",
-                  isBusiness ? "text-slate-200" : "text-primary-foreground"
+                  isBusiness ? "text-muted-foreground" : "text-primary-foreground"
                 )}>Projeto</TableHead>
                 <TableHead className={cn(
                   "font-bold",
-                  isBusiness ? "text-slate-200" : "text-primary-foreground"
+                  isBusiness ? "text-muted-foreground" : "text-primary-foreground"
                 )}>Objetivo</TableHead>
                 <TableHead className={cn(
                   "font-bold",
-                  isBusiness ? "text-slate-200" : "text-primary-foreground"
+                  isBusiness ? "text-muted-foreground" : "text-primary-foreground"
                 )}>Complexidade</TableHead>
                 <TableHead className={cn(
                   "font-bold",
-                  isBusiness ? "text-slate-200" : "text-primary-foreground"
+                  isBusiness ? "text-muted-foreground" : "text-primary-foreground"
                 )}>Prazo</TableHead>
               </TableRow>
             </TableHeader>
@@ -125,7 +125,7 @@ export const ProjetosPriorizados = ({ projetos, isBusiness = false }: Props) => 
             <div className="flex items-start gap-3 mb-3">
               <span className={cn(
                 "flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold",
-                isBusiness ? "bg-violet-500/30 text-violet-300" : "bg-aplicada-green-900 text-white"
+                isBusiness ? "bg-secondary/30 text-secondary" : "bg-aplicada-green-900 text-white"
               )}>
                 {index + 1}
               </span>
@@ -159,7 +159,7 @@ export const ProjetosPriorizados = ({ projetos, isBusiness = false }: Props) => 
       <div className={cn(
         "mt-6 rounded-xl border p-6",
         isBusiness 
-          ? "bg-gradient-to-r from-violet-500/15 to-transparent border-white/10" 
+          ? "bg-gradient-to-r from-secondary/15 to-transparent border-white/10" 
           : "bg-muted border-border"
       )}>
         <h3 className={cn("text-lg font-bold mb-2", theme.textPrimary)}>
@@ -167,7 +167,7 @@ export const ProjetosPriorizados = ({ projetos, isBusiness = false }: Props) => 
         </h3>
         <p className={cn(
           "text-2xl font-bold",
-          isBusiness ? "text-violet-400" : "text-aplicada-green-900"
+          isBusiness ? "text-secondary" : "text-aplicada-green-900"
         )}>
           {projetos.length} projeto{projetos.length !== 1 ? 's' : ''} priorizados
         </p>

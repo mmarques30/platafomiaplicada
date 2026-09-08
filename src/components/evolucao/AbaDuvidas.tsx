@@ -16,11 +16,11 @@ export function AbaDuvidas() {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "respondida":
-        return <CheckCircle2 className="h-4 w-4 text-green-600" />;
+        return <CheckCircle2 className="h-4 w-4 text-status-success" />;
       case "em_analise":
-        return <AlertCircle className="h-4 w-4 text-blue-600" />;
+        return <AlertCircle className="h-4 w-4 text-status-info" />;
       default:
-        return <Clock className="h-4 w-4 text-yellow-600" />;
+        return <Clock className="h-4 w-4 text-status-warning" />;
     }
   };
 
@@ -107,7 +107,7 @@ export function AbaDuvidas() {
                 {duvida.resposta_mentor && (
                   <div className="border-l-4 border-primary pl-4 py-2 bg-muted/30">
                     <h4 className="text-sm font-medium mb-2 flex items-center gap-2">
-                      <CheckCircle2 className="h-4 w-4 text-green-600" />
+                      <CheckCircle2 className="h-4 w-4 text-status-success" />
                       Resposta do Mentor:
                     </h4>
                     <p className="text-sm text-foreground">{duvida.resposta_mentor}</p>

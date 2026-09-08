@@ -67,7 +67,7 @@ export const PontosAtencao = ({ nome, diagnostico, isBusiness = false }: Props) 
                 <div key={itemIndex} className="flex items-start gap-2 text-sm">
                   <span className={cn(
                     "mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0",
-                    isBusiness ? "bg-violet-400" : "bg-aplicada-green-900"
+                    isBusiness ? "bg-secondary" : "bg-aplicada-green-900"
                   )} />
                   <p className={cn("flex-1 leading-relaxed", theme.textSecondary)}>
                     {item}

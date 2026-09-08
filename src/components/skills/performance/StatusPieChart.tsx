@@ -14,13 +14,13 @@ interface StatusPieChartProps {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  concluido: "#9EB038",
-  aprovada: "#9EB038",
-  em_andamento: "#F59E0B",
-  atrasado: "#EF4444",
-  pendente: "#3B82F6",
+  concluido: "#c8e040",
+  aprovada: "#c8e040",
+  em_andamento: "#e8a43c",
+  atrasado: "#db2b42",
+  pendente: "#4a9fe0",
   levantado: "#6366F1",
-  priorizado: "#D4E68A",
+  priorizado: "#d5e95a",
   nao_aprovado: "#94A3B8",
 };
 
@@ -36,12 +36,12 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 const chartConfig: ChartConfig = {
-  concluido: { label: "Concluído", color: "#9EB038" },
-  em_andamento: { label: "Em andamento", color: "#F59E0B" },
-  atrasado: { label: "Atrasado", color: "#EF4444" },
-  pendente: { label: "Pendente", color: "#3B82F6" },
+  concluido: { label: "Concluído", color: "#c8e040" },
+  em_andamento: { label: "Em andamento", color: "#e8a43c" },
+  atrasado: { label: "Atrasado", color: "#db2b42" },
+  pendente: { label: "Pendente", color: "#4a9fe0" },
   levantado: { label: "Levantado", color: "#6366F1" },
-  priorizado: { label: "Priorizado", color: "#D4E68A" },
+  priorizado: { label: "Priorizado", color: "#d5e95a" },
   nao_aprovado: { label: "Não aprovado", color: "#94A3B8" },
 };
 
@@ -63,7 +63,7 @@ export default function StatusPieChart({ entregas, projetos = [] }: StatusPieCha
   }, [allItems]);
 
   return (
-    <Card className="border-border bg-card border-l-4 border-l-[#9EB038]">
+    <Card className="border-border bg-card border-l-4 border-l-[#c8e040]">
       <CardHeader>
         <CardTitle>Distribuição por Status</CardTitle>
         <CardDescription>Projetos e entregas combinados</CardDescription>

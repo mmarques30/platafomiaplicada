@@ -9,8 +9,8 @@ import { ptBR } from "date-fns/locale";
 
 const STATUS_CONFIG = {
   pendente: { label: "Pendente", icon: Circle, color: "text-muted-foreground" },
-  em_andamento: { label: "Em Andamento", icon: Clock, color: "text-amber-600" },
-  concluida: { label: "Concluída", icon: CheckCircle2, color: "text-green-600" },
+  em_andamento: { label: "Em Andamento", icon: Clock, color: "text-status-warning" },
+  concluida: { label: "Concluída", icon: CheckCircle2, color: "text-status-success" },
 };
 
 export default function SkillsRoadmap() {
@@ -102,7 +102,7 @@ export default function SkillsRoadmap() {
                   {/* Número da fase */}
                   <div className={`w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold ${
                     fase.status === 'concluida' 
-                      ? 'bg-green-100 text-green-700'
+                      ? 'bg-status-success/15 text-status-success'
                       : fase.status === 'em_andamento'
                       ? 'bg-primary text-primary-foreground'
                       : 'bg-muted text-muted-foreground'
@@ -127,7 +127,7 @@ export default function SkillsRoadmap() {
                         <StatusIcon className={`h-5 w-5 ${statusColor}`} />
                         <Badge 
                           variant="outline"
-                          className={fase.status === 'concluida' ? 'bg-green-50' : ''}
+                          className={fase.status === 'concluida' ? 'bg-status-success/15' : ''}
                         >
                           {STATUS_CONFIG[fase.status as keyof typeof STATUS_CONFIG]?.label}
                         </Badge>

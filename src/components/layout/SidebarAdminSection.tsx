@@ -33,7 +33,7 @@ export function SidebarAdminSection({
             <SidebarMenuItem>
               <SidebarMenuButton
                 onClick={resetView}
-                className="group relative rounded-lg transition-all duration-200 font-medium pl-4 py-2.5 text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+                className="group relative rounded-lg transition-all duration-200 font-medium pl-4 py-2.5 text-status-warning hover:text-status-warning hover:bg-status-warning/15"
               >
                 <EyeOff className="h-4 w-4 shrink-0" strokeWidth={1.5} />
                 {!collapsed && <span className="text-sm">Sair da Simulação</span>}

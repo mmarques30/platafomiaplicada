@@ -36,9 +36,9 @@ export function GerenciarDuvidas({ userId }: GerenciarDuvidasProps) {
     const horasRestantes = differenceInHours(new Date(prazo_sla), new Date());
     
     if (horasRestantes < 0) {
-      return { text: `ATRASADA ${Math.abs(horasRestantes)}h`, color: "text-red-600", icon: AlertCircle };
+      return { text: `ATRASADA ${Math.abs(horasRestantes)}h`, color: "text-status-danger", icon: AlertCircle };
     } else if (horasRestantes < 6) {
-      return { text: `${horasRestantes}h restantes`, color: "text-yellow-600", icon: Clock };
+      return { text: `${horasRestantes}h restantes`, color: "text-status-warning", icon: Clock };
     } else {
       return { text: `${horasRestantes}h`, color: "text-muted-foreground", icon: Clock };
     }
@@ -122,7 +122,7 @@ export function GerenciarDuvidas({ userId }: GerenciarDuvidasProps) {
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <CardTitle className="text-base">{duvida.titulo}</CardTitle>
-                      <Badge variant="outline" className="bg-green-100 text-green-800">
+                      <Badge variant="outline" className="bg-status-success/15 text-status-success">
                         Respondida
                       </Badge>
                     </div>

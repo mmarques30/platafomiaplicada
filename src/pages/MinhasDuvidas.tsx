@@ -18,30 +18,30 @@ export default function MinhasDuvidas() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "respondida":
-        return "bg-green-100 text-green-800";
+        return "bg-status-success/15 text-status-success";
       case "em_analise":
-        return "bg-blue-100 text-blue-800";
+        return "bg-status-info/15 text-status-info";
       case "pendente":
-        return "bg-yellow-100 text-yellow-800";
+        return "bg-status-warning/15 text-status-warning";
       case "fechada":
-        return "bg-gray-100 text-gray-800";
+        return "bg-muted text-foreground";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-muted text-foreground";
     }
   };
 
   const getPrioridadeColor = (prioridade: string) => {
     switch (prioridade) {
       case "urgente":
-        return "bg-red-100 text-red-800";
+        return "bg-status-danger/15 text-status-danger";
       case "alta":
-        return "bg-orange-100 text-orange-800";
+        return "bg-status-warning/15 text-status-warning";
       case "normal":
-        return "bg-blue-100 text-blue-800";
+        return "bg-status-info/15 text-status-info";
       case "baixa":
-        return "bg-gray-100 text-gray-800";
+        return "bg-muted text-foreground";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-muted text-foreground";
     }
   };
 
@@ -51,9 +51,9 @@ export default function MinhasDuvidas() {
     const horasRestantes = differenceInHours(new Date(prazo_sla), new Date());
 
     if (horasRestantes < 0) {
-      return { text: `Atrasada ${Math.abs(horasRestantes)}h`, color: "text-red-600", icon: AlertCircle };
+      return { text: `Atrasada ${Math.abs(horasRestantes)}h`, color: "text-status-danger", icon: AlertCircle };
     } else if (horasRestantes < 6) {
-      return { text: `${horasRestantes}h restantes`, color: "text-yellow-600", icon: Clock };
+      return { text: `${horasRestantes}h restantes`, color: "text-status-warning", icon: Clock };
     } else {
       return { text: `SLA: ${horasRestantes}h`, color: "text-muted-foreground", icon: Clock };
     }
@@ -153,7 +153,7 @@ export default function MinhasDuvidas() {
                         <Separator />
                         <div className="bg-primary/5 p-4 rounded-lg">
                           <h4 className="font-medium mb-2 flex items-center gap-2">
-                            <CheckCircle2 className="h-4 w-4 text-green-600" />
+                            <CheckCircle2 className="h-4 w-4 text-status-success" />
                             Resposta do Mentor:
                           </h4>
                           <p className="text-sm whitespace-pre-wrap">{duvida.resposta_mentor}</p>

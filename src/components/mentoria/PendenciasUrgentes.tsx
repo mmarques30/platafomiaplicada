@@ -35,7 +35,7 @@ export function PendenciasUrgentes() {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <AlertTriangle className="h-5 w-5 text-yellow-600" />
+          <AlertTriangle className="h-5 w-5 text-status-warning" />
           Pendências Urgentes ({totalPendencias})
         </CardTitle>
       </CardHeader>

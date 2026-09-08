@@ -333,7 +333,7 @@ export default function BonusModal({
                             <div 
                               key={u.user_id} 
                               className={`flex items-center justify-between p-2 rounded-lg border ${
-                                u.liberado ? 'bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800' : 'bg-muted/50'
+                                u.liberado ? 'bg-status-success/15 dark:bg-status-success/20 border-status-success/40 dark:border-status-success' : 'bg-muted/50'
                               }`}
                             >
                               <span className="text-sm font-medium">{userName}</span>
@@ -380,7 +380,7 @@ export default function BonusModal({
                       <Badge variant="outline">
                         {usuariosElegiveis.length} usuário(s)
                       </Badge>
-                      <Badge variant="default" className="bg-green-600">
+                      <Badge variant="default" className="bg-status-success">
                         {usuariosElegiveis.filter(u => u.liberado).length} liberado(s)
                       </Badge>
                     </div>
@@ -499,8 +499,8 @@ export default function BonusModal({
           )}
 
           {publicoAlvo === 'usuarios_especificos' && (
-            <div className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
-              <p className="text-sm text-blue-700 dark:text-blue-300">
+            <div className="p-4 bg-status-info/15 dark:bg-status-info/20 rounded-lg border border-status-info/40 dark:border-status-info">
+              <p className="text-sm text-status-info dark:text-status-info">
                 A liberação é individual para cada usuário. Use os botões "Liberar" ao lado de cada nome.
               </p>
             </div>

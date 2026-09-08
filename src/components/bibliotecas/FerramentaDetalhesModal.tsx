@@ -56,7 +56,7 @@ export function FerramentaDetalhesModal({ ferramenta, onClose }: FerramentaDetal
               <DialogTitle className="text-2xl">{nome}</DialogTitle>
               <div className="flex gap-2 mt-2 flex-wrap">
                 <Badge variant="secondary">{categoria}</Badge>
-                {gratuito && <Badge variant="outline" className="bg-green-500/10 text-green-700 border-green-500/20">Gratuita</Badge>}
+                {gratuito && <Badge variant="outline" className="bg-status-success/10 text-status-success border-status-success/20">Gratuita</Badge>}
               </div>
             </div>
           </div>
@@ -93,7 +93,7 @@ export function FerramentaDetalhesModal({ ferramenta, onClose }: FerramentaDetal
                     key={star}
                     className={`w-5 h-5 ${
                       star <= Math.round(stats.avaliacao_comunidade || 0)
-                        ? "fill-yellow-400 text-yellow-400"
+                        ? "fill-status-warning text-status-warning"
                         : "text-muted"
                     }`}
                   />
@@ -137,8 +137,8 @@ export function FerramentaDetalhesModal({ ferramenta, onClose }: FerramentaDetal
                       <Star
                         className={`w-6 h-6 cursor-pointer ${
                           star <= currentRating
-                            ? "fill-yellow-400 text-yellow-400"
-                            : "text-muted hover:text-yellow-400"
+                            ? "fill-status-warning text-status-warning"
+                            : "text-muted hover:text-status-warning"
                         }`}
                       />
                     </button>
@@ -176,19 +176,19 @@ export function FerramentaDetalhesModal({ ferramenta, onClose }: FerramentaDetal
         {vale_a_pena !== null && justificativa && (
           <div className={`p-4 rounded-lg mb-6 border ${
             vale_a_pena 
-              ? 'bg-green-500/10 border-green-500/20' 
-              : 'bg-red-500/10 border-red-500/20'
+              ? 'bg-status-success/10 border-status-success/20' 
+              : 'bg-status-danger/10 border-status-danger/20'
           }`}>
             <div className="flex items-center gap-2 mb-2">
               {vale_a_pena ? (
                 <>
-                  <CheckCircle className="w-5 h-5 text-green-600" />
-                  <h3 className="font-semibold text-green-900 dark:text-green-100">Vale a pena!</h3>
+                  <CheckCircle className="w-5 h-5 text-status-success" />
+                  <h3 className="font-semibold text-status-success dark:text-status-success/40">Vale a pena!</h3>
                 </>
               ) : (
                 <>
-                  <AlertCircle className="w-5 h-5 text-red-600" />
-                  <h3 className="font-semibold text-red-900 dark:text-red-100">Não recomendado</h3>
+                  <AlertCircle className="w-5 h-5 text-status-danger" />
+                  <h3 className="font-semibold text-status-danger dark:text-status-danger/40">Não recomendado</h3>
                 </>
               )}
             </div>

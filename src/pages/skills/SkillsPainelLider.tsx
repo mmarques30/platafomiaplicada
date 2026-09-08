@@ -7,8 +7,8 @@ import { format, differenceInDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 // Brand colors
-const brandGreen = '#738925';
-const brandBlack = '#0D0D0D';
+const brandGreen = '#7a8f30';
+const brandBlack = '#0c0e08';
 const brandBeigeLight = '#F5F5DC';
 
 // Pill-style section header
@@ -17,19 +17,19 @@ const SectionHeader = ({ title, subtitle }: { title: string; subtitle: string })
     className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-4"
     style={{ backgroundColor: brandBeigeLight }}
   >
-    <span className="font-semibold text-gray-900">{title}</span>
-    <span className="text-gray-500 text-sm">{subtitle}</span>
+    <span className="font-semibold text-foreground">{title}</span>
+    <span className="text-muted-foreground text-sm">{subtitle}</span>
   </div>
 );
 
 const getStatusBadge = (status: string) => {
   switch (status) {
     case 'em_dia':
-      return <span className="text-xs px-2 py-0.5 rounded bg-green-100 text-green-800">Em dia</span>;
+      return <span className="text-xs px-2 py-0.5 rounded bg-status-success/15 text-status-success">Em dia</span>;
     case 'atencao':
-      return <span className="text-xs px-2 py-0.5 rounded bg-yellow-100 text-yellow-800">Atenção</span>;
+      return <span className="text-xs px-2 py-0.5 rounded bg-status-warning/15 text-status-warning">Atenção</span>;
     case 'atrasado':
-      return <span className="text-xs px-2 py-0.5 rounded bg-red-100 text-red-800">Atrasado</span>;
+      return <span className="text-xs px-2 py-0.5 rounded bg-status-danger/15 text-status-danger">Atrasado</span>;
     default:
       return null;
   }
@@ -38,26 +38,26 @@ const getStatusBadge = (status: string) => {
 const getEntregaStatusBadge = (status: string) => {
   switch (status) {
     case 'aprovada':
-      return <span className="text-xs px-2 py-0.5 rounded bg-green-100 text-green-800">Concluída</span>;
+      return <span className="text-xs px-2 py-0.5 rounded bg-status-success/15 text-status-success">Concluída</span>;
     case 'em_andamento':
-      return <span className="text-xs px-2 py-0.5 rounded bg-yellow-100 text-yellow-800">Em andamento</span>;
+      return <span className="text-xs px-2 py-0.5 rounded bg-status-warning/15 text-status-warning">Em andamento</span>;
     case 'aguardando_validacao':
-      return <span className="text-xs px-2 py-0.5 rounded bg-blue-100 text-blue-800">Aguardando validação</span>;
+      return <span className="text-xs px-2 py-0.5 rounded bg-status-info/15 text-status-info">Aguardando validação</span>;
     case 'pendente':
-      return <span className="text-xs px-2 py-0.5 rounded bg-gray-100 text-gray-800">Pendente</span>;
+      return <span className="text-xs px-2 py-0.5 rounded bg-muted text-foreground">Pendente</span>;
     default:
-      return <span className="text-xs px-2 py-0.5 rounded bg-gray-100 text-gray-800">{status}</span>;
+      return <span className="text-xs px-2 py-0.5 rounded bg-muted text-foreground">{status}</span>;
   }
 };
 
 const getMemberCardClasses = (status: string) => {
   switch (status) {
     case 'atrasado':
-      return 'bg-red-50 p-4 rounded-lg border border-red-300';
+      return 'bg-status-danger/15 p-4 rounded-lg border border-status-danger/40';
     case 'atencao':
-      return 'bg-white p-4 rounded-lg border border-yellow-300';
+      return 'bg-white p-4 rounded-lg border border-status-warning/40';
     default:
-      return 'bg-white p-4 rounded-lg border border-gray-200';
+      return 'bg-white p-4 rounded-lg border border-border';
   }
 };
 
@@ -166,12 +166,12 @@ export default function SkillsPainelLider() {
         <div className="bg-white p-4 rounded-lg border-l-4" style={{ borderColor: brandGreen }}>
           <div className="flex items-center gap-2 mb-2">
             <Users className="w-5 h-5" style={{ color: brandGreen }} />
-            <p className="text-xs text-gray-600">Equipe Ativa</p>
+            <p className="text-xs text-muted-foreground">Equipe Ativa</p>
           </div>
           <p className="text-2xl font-bold" style={{ color: brandGreen }}>
             {membrosAtivos} de {totalMembros}
           </p>
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs text-muted-foreground mt-1">
             {totalMembros - membrosAtivos > 0 ? `${totalMembros - membrosAtivos} precisa(m) de atenção` : 'Todos em dia'}
           </p>
         </div>
@@ -179,23 +179,23 @@ export default function SkillsPainelLider() {
         <div className="bg-white p-4 rounded-lg border-l-4" style={{ borderColor: brandGreen }}>
           <div className="flex items-center gap-2 mb-2">
             <Clock className="w-5 h-5" style={{ color: brandGreen }} />
-            <p className="text-xs text-gray-600">Horas Economizadas</p>
+            <p className="text-xs text-muted-foreground">Horas Economizadas</p>
           </div>
           <p className="text-2xl font-bold" style={{ color: brandGreen }}>
             {metricas?.horasEconomizadas || horasEconomizadasTotal || 0}h/sem
           </p>
-          <p className="text-xs text-gray-500 mt-1">Potencial calculado</p>
+          <p className="text-xs text-muted-foreground mt-1">Potencial calculado</p>
         </div>
 
         <div className="bg-white p-4 rounded-lg border-l-4" style={{ borderColor: brandGreen }}>
           <div className="flex items-center gap-2 mb-2">
             <CheckCircle className="w-5 h-5" style={{ color: brandGreen }} />
-            <p className="text-xs text-gray-600">Entregas Concluídas</p>
+            <p className="text-xs text-muted-foreground">Entregas Concluídas</p>
           </div>
           <p className="text-2xl font-bold" style={{ color: brandGreen }}>
             {entregasAprovadasCalc} de {totalEntregasCalc}
           </p>
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs text-muted-foreground mt-1">
             {metricas?.entregasParaValidar || entregasParaValidar?.length || 0} aguardando validação
           </p>
         </div>
@@ -203,10 +203,10 @@ export default function SkillsPainelLider() {
         <div className="bg-white p-4 rounded-lg border-l-4" style={{ borderColor: brandGreen }}>
           <div className="flex items-center gap-2 mb-2">
             <TrendingUp className="w-5 h-5" style={{ color: brandGreen }} />
-            <p className="text-xs text-gray-600">Progresso Geral</p>
+            <p className="text-xs text-muted-foreground">Progresso Geral</p>
           </div>
           <p className="text-2xl font-bold" style={{ color: brandGreen }}>{progressoGeral}%</p>
-          <p className="text-xs text-gray-500 mt-1">Semana {semanaAtual} de 12</p>
+          <p className="text-xs text-muted-foreground mt-1">Semana {semanaAtual} de 12</p>
         </div>
       </div>
 
@@ -214,14 +214,14 @@ export default function SkillsPainelLider() {
       <div>
         <SectionHeader title="Cronograma" subtitle="Progresso nas 12 semanas" />
 
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
+        <div className="bg-white p-6 rounded-lg border border-border">
           <div className="flex items-center justify-between mb-4">
-            <span className="text-sm font-medium text-gray-700">Semana 1</span>
+            <span className="text-sm font-medium text-foreground">Semana 1</span>
             <span className="text-sm font-bold" style={{ color: brandGreen }}>Semana {semanaAtual} - VOCÊ ESTÁ AQUI</span>
-            <span className="text-sm font-medium text-gray-700">Semana 12</span>
+            <span className="text-sm font-medium text-foreground">Semana 12</span>
           </div>
           
-          <div className="w-full bg-gray-200 rounded-full h-4 relative">
+          <div className="w-full bg-muted rounded-full h-4 relative">
             <div 
               className="h-4 rounded-full" 
               style={{ backgroundColor: brandGreen, width: `${(semanaAtual / 12) * 100}%` }} 
@@ -237,7 +237,7 @@ export default function SkillsPainelLider() {
             </div>
           </div>
 
-          <div className="flex justify-between mt-4 text-xs text-gray-600">
+          <div className="flex justify-between mt-4 text-xs text-muted-foreground">
             {fases && fases.length > 0 ? (
               fases.map((fase: any, index: number) => {
                 const faseAtual = semanaAtual >= (index * 4 + 1) && semanaAtual <= ((index + 1) * 4);
@@ -245,12 +245,12 @@ export default function SkillsPainelLider() {
                 
                 return (
                   <div key={fase.id} className="text-center">
-                    <p className={`font-semibold ${faseAtual ? '' : faseConcluida ? 'text-green-600' : 'text-gray-400'}`}
+                    <p className={`font-semibold ${faseAtual ? '' : faseConcluida ? 'text-status-success' : 'text-muted-foreground'}`}
                        style={faseAtual ? { color: brandGreen } : {}}>
                       {fase.nome_fase}
                     </p>
                     <p>Sem {index * 4 + 1}-{(index + 1) * 4}</p>
-                    <p className={faseAtual ? '' : faseConcluida ? 'text-green-600' : 'text-gray-400'}
+                    <p className={faseAtual ? '' : faseConcluida ? 'text-status-success' : 'text-muted-foreground'}
                        style={faseAtual ? { color: brandGreen } : {}}>
                       {faseConcluida ? 'Concluído' : faseAtual ? 'Em andamento' : 'Pendente'}
                     </p>
@@ -260,34 +260,34 @@ export default function SkillsPainelLider() {
             ) : (
               <>
                 <div className="text-center">
-                  <p className={`font-semibold ${semanaAtual <= 4 ? '' : 'text-green-600'}`}
+                  <p className={`font-semibold ${semanaAtual <= 4 ? '' : 'text-status-success'}`}
                      style={semanaAtual <= 4 ? { color: brandGreen } : {}}>
                     Fundação
                   </p>
                   <p>Sem 1-4</p>
-                  <p className={semanaAtual > 4 ? 'text-green-600' : ''}
+                  <p className={semanaAtual > 4 ? 'text-status-success' : ''}
                      style={semanaAtual <= 4 ? { color: brandGreen } : {}}>
                     {semanaAtual > 4 ? 'Concluído' : 'Em andamento'}
                   </p>
                 </div>
                 <div className="text-center">
-                  <p className={`font-semibold ${semanaAtual > 4 && semanaAtual <= 8 ? '' : semanaAtual > 8 ? 'text-green-600' : 'text-gray-400'}`}
+                  <p className={`font-semibold ${semanaAtual > 4 && semanaAtual <= 8 ? '' : semanaAtual > 8 ? 'text-status-success' : 'text-muted-foreground'}`}
                      style={semanaAtual > 4 && semanaAtual <= 8 ? { color: brandGreen } : {}}>
                     Expansão
                   </p>
                   <p>Sem 5-8</p>
-                  <p className={semanaAtual > 8 ? 'text-green-600' : semanaAtual > 4 && semanaAtual <= 8 ? '' : 'text-gray-400'}
+                  <p className={semanaAtual > 8 ? 'text-status-success' : semanaAtual > 4 && semanaAtual <= 8 ? '' : 'text-muted-foreground'}
                      style={semanaAtual > 4 && semanaAtual <= 8 ? { color: brandGreen } : {}}>
                     {semanaAtual > 8 ? 'Concluído' : semanaAtual > 4 ? 'Em andamento' : 'Pendente'}
                   </p>
                 </div>
                 <div className="text-center">
-                  <p className={`font-semibold ${semanaAtual > 8 ? '' : 'text-gray-400'}`}
+                  <p className={`font-semibold ${semanaAtual > 8 ? '' : 'text-muted-foreground'}`}
                      style={semanaAtual > 8 ? { color: brandGreen } : {}}>
                     Consolidação
                   </p>
                   <p>Sem 9-12</p>
-                  <p className={semanaAtual > 8 ? '' : 'text-gray-400'}
+                  <p className={semanaAtual > 8 ? '' : 'text-muted-foreground'}
                      style={semanaAtual > 8 ? { color: brandGreen } : {}}>
                     {semanaAtual > 8 ? 'Em andamento' : 'Pendente'}
                   </p>
@@ -303,10 +303,10 @@ export default function SkillsPainelLider() {
         <SectionHeader title="Equipe" subtitle="Acompanhamento individual" />
 
         {membrosProcessados.length === 0 ? (
-          <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
-            <Users className="w-12 h-12 mx-auto text-gray-400 mb-4" />
-            <p className="text-gray-600">Nenhum membro na equipe ainda.</p>
-            <p className="text-sm text-gray-500 mt-1">Adicione membros para acompanhar o progresso.</p>
+          <div className="bg-white rounded-lg border border-border p-8 text-center">
+            <Users className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+            <p className="text-muted-foreground">Nenhum membro na equipe ainda.</p>
+            <p className="text-sm text-muted-foreground mt-1">Adicione membros para acompanhar o progresso.</p>
           </div>
         ) : (
           <div className="grid md:grid-cols-2 gap-4">
@@ -329,8 +329,8 @@ export default function SkillsPainelLider() {
                       </div>
                     )}
                     <div>
-                      <p className="font-semibold text-gray-900">{membro.nome}</p>
-                      <p className="text-xs text-gray-600">{membro.cargo || 'Sem cargo definido'}</p>
+                      <p className="font-semibold text-foreground">{membro.nome}</p>
+                      <p className="text-xs text-muted-foreground">{membro.cargo || 'Sem cargo definido'}</p>
                     </div>
                   </div>
                   {getStatusBadge(membro.status)}
@@ -338,10 +338,10 @@ export default function SkillsPainelLider() {
 
                 <div className="space-y-3">
                   <div>
-                    <div className="flex items-center justify-between text-xs text-gray-600 mb-1">
+                    <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
                       <span>Diagnóstico: {membro.diagnostico_completo ? 'Completo' : 'Pendente'}</span>
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div className="w-full bg-muted rounded-full h-2">
                       <div 
                         className="h-2 rounded-full" 
                         style={{ backgroundColor: brandGreen, width: membro.diagnostico_completo ? '100%' : '0%' }} 
@@ -350,7 +350,7 @@ export default function SkillsPainelLider() {
                   </div>
 
                   <div className="flex items-center justify-between text-xs">
-                    <span className="text-gray-600">Entregas: {membro.entregas_concluidas}/{membro.total_entregas}</span>
+                    <span className="text-muted-foreground">Entregas: {membro.entregas_concluidas}/{membro.total_entregas}</span>
                     <span className="font-semibold" style={{ color: brandGreen }}>
                       {membro.papel === 'lider' ? 'Líder' : 'Membro'}
                     </span>
@@ -367,13 +367,13 @@ export default function SkillsPainelLider() {
         <SectionHeader title="Entregas" subtitle="Status dos projetos da equipe" />
 
         {totalEntregas === 0 ? (
-          <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
-            <CheckCircle className="w-12 h-12 mx-auto text-gray-400 mb-4" />
-            <p className="text-gray-600">Nenhuma entrega cadastrada ainda.</p>
-            <p className="text-sm text-gray-500 mt-1">As entregas aparecerão aqui conforme forem criadas.</p>
+          <div className="bg-white rounded-lg border border-border p-8 text-center">
+            <CheckCircle className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+            <p className="text-muted-foreground">Nenhuma entrega cadastrada ainda.</p>
+            <p className="text-sm text-muted-foreground mt-1">As entregas aparecerão aqui conforme forem criadas.</p>
           </div>
         ) : (
-          <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          <div className="bg-white rounded-lg border border-border overflow-hidden">
             <Table>
               <TableHeader>
                 <TableRow style={{ backgroundColor: brandBlack }}>
@@ -387,12 +387,12 @@ export default function SkillsPainelLider() {
                 {alertasAtraso?.map((entrega: any) => (
                   <TableRow 
                     key={entrega.id} 
-                    className="bg-red-50"
+                    className="bg-status-danger/15"
                   >
                     <TableCell className="font-medium">{entrega.titulo}</TableCell>
                     <TableCell>{entrega.responsavel?.nome || 'Não atribuído'}</TableCell>
                     <TableCell>{getEntregaStatusBadge(entrega.status)}</TableCell>
-                    <TableCell className="text-red-600 font-semibold">
+                    <TableCell className="text-status-danger font-semibold">
                       {entrega.prazo ? format(new Date(entrega.prazo), "dd/MM", { locale: ptBR }) : '-'}
                     </TableCell>
                   </TableRow>
@@ -414,24 +414,24 @@ export default function SkillsPainelLider() {
                 key={index} 
                 className={`rounded-lg p-4 ${
                   alerta.tipo === 'error' 
-                    ? 'bg-red-50 border border-red-200' 
-                    : 'bg-yellow-50 border border-yellow-200'
+                    ? 'bg-status-danger/15 border border-status-danger/40' 
+                    : 'bg-status-warning/15 border border-status-warning/40'
                 }`}
               >
                 <div className="flex items-start gap-3">
                   <AlertCircle 
                     className={`w-5 h-5 flex-shrink-0 mt-0.5 ${
-                      alerta.tipo === 'error' ? 'text-red-600' : 'text-yellow-600'
+                      alerta.tipo === 'error' ? 'text-status-danger' : 'text-status-warning'
                     }`} 
                   />
                   <div>
                     <p className={`font-semibold text-sm ${
-                      alerta.tipo === 'error' ? 'text-red-800' : 'text-yellow-800'
+                      alerta.tipo === 'error' ? 'text-status-danger' : 'text-status-warning'
                     }`}>
                       {alerta.titulo}
                     </p>
                     <p className={`text-sm ${
-                      alerta.tipo === 'error' ? 'text-red-700' : 'text-yellow-700'
+                      alerta.tipo === 'error' ? 'text-status-danger' : 'text-status-warning'
                     }`}>
                       {alerta.descricao}
                     </p>

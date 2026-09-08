@@ -92,7 +92,7 @@ export function GoogleLoginVerificationModal({ open, onOpenChange }: GoogleLogin
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md bg-zinc-900 border-white/10">
+      <DialogContent className="sm:max-w-md bg-background border-white/10">
         <DialogHeader>
           <DialogTitle className="text-white">Entrar com Google</DialogTitle>
           <DialogDescription className="text-white/60">
@@ -114,16 +114,16 @@ export function GoogleLoginVerificationModal({ open, onOpenChange }: GoogleLogin
                 setError(null);
               }}
               placeholder="seu@email.com"
-              className="bg-zinc-800/80 border-white/10 text-white placeholder:text-white/40 h-12 rounded-lg focus:border-primary focus:ring-primary/30"
+              className="bg-background/80 border-white/10 text-white placeholder:text-white/40 h-12 rounded-lg focus:border-primary focus:ring-primary/30"
               disabled={isVerifying || isRedirecting}
               autoComplete="email"
             />
           </div>
 
           {error && (
-            <Alert variant="destructive" className="bg-red-900/20 border-red-500/30">
+            <Alert variant="destructive" className="bg-status-danger/20 border-status-danger/30">
               <AlertCircle className="h-4 w-4" />
-              <AlertDescription className="text-red-200">
+              <AlertDescription className="text-status-danger/40">
                 {error}
               </AlertDescription>
             </Alert>
@@ -135,7 +135,7 @@ export function GoogleLoginVerificationModal({ open, onOpenChange }: GoogleLogin
               variant="outline"
               onClick={handleClose}
               disabled={isVerifying || isRedirecting}
-              className="flex-1 bg-zinc-800 border-white/10 text-white hover:bg-zinc-700"
+              className="flex-1 bg-background border-white/10 text-white hover:bg-card"
             >
               Cancelar
             </Button>

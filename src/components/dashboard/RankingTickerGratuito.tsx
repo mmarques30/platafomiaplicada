@@ -76,7 +76,7 @@ function StatItem({ icon: Icon, label, value, highlight }: StatItemProps) {
       <span className="text-xs font-medium truncate max-w-[100px] sm:max-w-[120px]">
         {label}
       </span>
-      <span className={`text-xs font-bold ${highlight ? 'text-green-600' : 'text-foreground'}`}>
+      <span className={`text-xs font-bold ${highlight ? 'text-status-success' : 'text-foreground'}`}>
         {value}
       </span>
     </div>

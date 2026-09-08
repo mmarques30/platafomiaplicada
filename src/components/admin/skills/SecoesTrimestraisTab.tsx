@@ -23,7 +23,7 @@ export default function SecoesTrimestraisTab({ equipeId }: Props) {
                   <Badge variant="outline" className="text-xs">{t.label}</Badge>
                   {t.titulo}
                 </CardTitle>
-                <Badge className="bg-yellow-500/10 text-yellow-600 border-yellow-500/20 text-xs gap-1">
+                <Badge className="bg-status-warning/10 text-status-warning border-status-warning/20 text-xs gap-1">
                   <Clock className="h-3 w-3" /> Planejado
                 </Badge>
               </div>

@@ -65,7 +65,7 @@ export function ProdutosTab() {
                 <div className="flex items-center gap-2 mb-1">
                   <h3 className="text-xl font-bold">{produto.nome}</h3>
                   {produto.is_consultoria && (
-                    <Badge className="bg-emerald-500 text-white">Consultoria</Badge>
+                    <Badge className="bg-status-success text-white">Consultoria</Badge>
                   )}
                 </div>
                 <p className="text-sm text-muted-foreground">{produto.formato}</p>

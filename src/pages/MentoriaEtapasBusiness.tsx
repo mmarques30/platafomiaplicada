@@ -17,8 +17,8 @@ import { MentoriaPageHeader } from "@/components/mentoria/MentoriaPageHeader";
 
 const statusConfig = {
   pendente: { label: "Pendente", className: "bg-muted text-muted-foreground" },
-  em_andamento: { label: "Em Andamento", className: "bg-amber-500/20 text-amber-600" },
-  concluida: { label: "Concluída", className: "bg-emerald-500/20 text-emerald-600" },
+  em_andamento: { label: "Em Andamento", className: "bg-status-warning/20 text-status-warning" },
+  concluida: { label: "Concluída", className: "bg-status-success/20 text-status-success" },
 };
 
 export default function MentoriaEtapasBusiness() {
@@ -99,9 +99,9 @@ export default function MentoriaEtapasBusiness() {
                 className={cn(
                   "relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold",
                   isConcluida
-                    ? "bg-emerald-500/20 text-emerald-500"
+                    ? "bg-status-success/20 text-status-success"
                     : isAtual
-                    ? "bg-amber-500/20 text-amber-500 ring-2 ring-amber-500/40 animate-pulse"
+                    ? "bg-status-warning/20 text-status-warning ring-2 ring-status-warning/40 animate-pulse"
                     : "bg-muted text-muted-foreground"
                 )}
               >
@@ -119,7 +119,7 @@ export default function MentoriaEtapasBusiness() {
                       {etapa.titulo}
                     </h3>
                     {isAtual && (
-                      <span className="text-[10px] uppercase tracking-wider text-amber-500 font-semibold whitespace-nowrap">
+                      <span className="text-[10px] uppercase tracking-wider text-status-warning font-semibold whitespace-nowrap">
                         você está aqui
                       </span>
                     )}

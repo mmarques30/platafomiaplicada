@@ -154,9 +154,9 @@ export function PromptsTab() {
                 {prompt.nivel_complexidade ? (
                   <Badge 
                     className={
-                      prompt.nivel_complexidade === 'iniciante' ? 'bg-green-500 text-white' :
-                      prompt.nivel_complexidade === 'intermediario' ? 'bg-yellow-500 text-white' :
-                      'bg-red-500 text-white'
+                      prompt.nivel_complexidade === 'iniciante' ? 'bg-status-success text-white' :
+                      prompt.nivel_complexidade === 'intermediario' ? 'bg-status-warning text-white' :
+                      'bg-status-danger text-white'
                     }
                   >
                     {prompt.nivel_complexidade === 'iniciante' ? '🟢 Iniciante' :

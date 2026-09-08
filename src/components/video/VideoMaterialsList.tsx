@@ -23,17 +23,17 @@ const getFileIcon = (url: string, tipo?: string) => {
   const ext = getFileExtension(url);
   switch (ext) {
     case 'pdf':
-      return { icon: FileText, color: "text-red-500", bg: "bg-red-50 dark:bg-red-950/30" };
+      return { icon: FileText, color: "text-status-danger", bg: "bg-status-danger/15 dark:bg-status-danger/30" };
     case 'xlsx':
     case 'xls':
     case 'csv':
-      return { icon: Table, color: "text-green-600", bg: "bg-green-50 dark:bg-green-950/30" };
+      return { icon: Table, color: "text-status-success", bg: "bg-status-success/15 dark:bg-status-success/30" };
     case 'doc':
     case 'docx':
-      return { icon: FileText, color: "text-blue-500", bg: "bg-blue-50 dark:bg-blue-950/30" };
+      return { icon: FileText, color: "text-status-info", bg: "bg-status-info/15 dark:bg-status-info/30" };
     case 'html':
     case 'xml':
-      return { icon: FileCode, color: "text-orange-500", bg: "bg-orange-50 dark:bg-orange-950/30" };
+      return { icon: FileCode, color: "text-status-warning", bg: "bg-status-warning/15 dark:bg-status-warning/30" };
     default:
       return { icon: File, color: "text-muted-foreground", bg: "bg-muted/50" };
   }

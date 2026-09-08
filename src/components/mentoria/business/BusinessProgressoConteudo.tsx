@@ -55,11 +55,11 @@ export function BusinessProgressoConteudo() {
   const getActivityIcon = (tipo: string) => {
     switch (tipo) {
       case "video":
-        return <Video className="h-4 w-4 text-blue-500" />;
+        return <Video className="h-4 w-4 text-status-info" />;
       case "prompt":
-        return <FileText className="h-4 w-4 text-green-500" />;
+        return <FileText className="h-4 w-4 text-status-success" />;
       case "acesso":
-        return <MousePointerClick className="h-4 w-4 text-purple-500" />;
+        return <MousePointerClick className="h-4 w-4 text-secondary" />;
       default:
         return <Activity className="h-4 w-4 text-muted-foreground" />;
     }
@@ -70,7 +70,7 @@ export function BusinessProgressoConteudo() {
       {/* Cards de Métricas */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Videos */}
-        <Card className="border-primary/20 bg-gradient-to-br from-blue-500/5 to-transparent">
+        <Card className="border-primary/20 bg-gradient-to-br from-status-info/5 to-transparent">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
               Vídeos Assistidos
@@ -99,7 +99,7 @@ export function BusinessProgressoConteudo() {
         </Card>
 
         {/* Prompts */}
-        <Card className="border-primary/20 bg-gradient-to-br from-green-500/5 to-transparent">
+        <Card className="border-primary/20 bg-gradient-to-br from-status-success/5 to-transparent">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
               Prompts Consumidos
@@ -126,7 +126,7 @@ export function BusinessProgressoConteudo() {
         </Card>
 
         {/* Interações */}
-        <Card className="border-primary/20 bg-gradient-to-br from-purple-500/5 to-transparent">
+        <Card className="border-primary/20 bg-gradient-to-br from-secondary/5 to-transparent">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
               Interações

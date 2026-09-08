@@ -98,7 +98,7 @@ export default function RedefinirSenha() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#151515] p-6">
         <div className="w-full max-w-md text-center space-y-6 bg-[#1a1a1a] p-8 rounded-2xl border border-white/10">
-          <AlertTriangle className="h-16 w-16 text-red-500 mx-auto" />
+          <AlertTriangle className="h-16 w-16 text-status-danger mx-auto" />
           <div className="space-y-2">
             <h1 className="text-2xl font-bold text-white">Link inválido ou expirado</h1>
             <p className="text-white/60">
@@ -108,7 +108,7 @@ export default function RedefinirSenha() {
           </div>
           <Button
             onClick={() => navigate("/auth")}
-            className="w-full bg-[#9EB038] hover:bg-[#8a9a31] text-white"
+            className="w-full bg-primary hover:bg-[#8a9a31] text-white"
           >
             Voltar para o login
           </Button>
@@ -122,14 +122,14 @@ export default function RedefinirSenha() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#151515] p-6">
         <div className="w-full max-w-md text-center space-y-6 bg-[#1a1a1a] p-8 rounded-2xl border border-white/10">
-          <CheckCircle className="h-16 w-16 text-[#9EB038] mx-auto" />
+          <CheckCircle className="h-16 w-16 text-primary mx-auto" />
           <div className="space-y-2">
             <h1 className="text-2xl font-bold text-white">Senha alterada!</h1>
             <p className="text-white/60">
               Sua senha foi redefinida com sucesso. Você será redirecionado para fazer login.
             </p>
           </div>
-          <Loader2 className="h-6 w-6 animate-spin text-[#9EB038] mx-auto" />
+          <Loader2 className="h-6 w-6 animate-spin text-primary mx-auto" />
         </div>
       </div>
     );
@@ -139,7 +139,7 @@ export default function RedefinirSenha() {
     <div className="min-h-screen flex items-center justify-center bg-[#151515] p-6">
       <div className="w-full max-w-md space-y-6 bg-[#1a1a1a] p-8 rounded-2xl border border-white/10">
         <div className="text-center space-y-2">
-          <Lock className="h-12 w-12 text-[#9EB038] mx-auto" />
+          <Lock className="h-12 w-12 text-primary mx-auto" />
           <h1 className="text-2xl font-bold text-white">Criar nova senha</h1>
           {email && (
             <p className="text-white/60 text-sm">
@@ -159,7 +159,7 @@ export default function RedefinirSenha() {
               value={novaSenha}
               onChange={(e) => setNovaSenha(e.target.value)}
               required
-              className="bg-white/5 border-white/10 text-white placeholder:text-white/40 h-12 rounded-lg focus:border-[#9EB038] focus:ring-[#9EB038]/20"
+              className="bg-white/5 border-white/10 text-white placeholder:text-white/40 h-12 rounded-lg focus:border-primary focus:ring-primary/20"
             />
           </div>
 
@@ -173,7 +173,7 @@ export default function RedefinirSenha() {
               value={confirmarSenha}
               onChange={(e) => setConfirmarSenha(e.target.value)}
               required
-              className="bg-white/5 border-white/10 text-white placeholder:text-white/40 h-12 rounded-lg focus:border-[#9EB038] focus:ring-[#9EB038]/20"
+              className="bg-white/5 border-white/10 text-white placeholder:text-white/40 h-12 rounded-lg focus:border-primary focus:ring-primary/20"
             />
           </div>
 
@@ -189,7 +189,7 @@ export default function RedefinirSenha() {
           <Button
             type="submit"
             disabled={!senhaValida || isLoading}
-            className="w-full h-12 bg-[#9EB038] hover:bg-[#8a9a31] text-white font-medium rounded-lg transition-all disabled:opacity-50"
+            className="w-full h-12 bg-primary hover:bg-[#8a9a31] text-white font-medium rounded-lg transition-all disabled:opacity-50"
           >
             {isLoading ? (
               <>
@@ -214,7 +214,7 @@ function RequisitoItem({ atendido, texto }: { atendido: boolean; texto: string }
   return (
     <div className="flex items-center gap-2 text-sm">
       {atendido ? (
-        <Check className="h-4 w-4 text-[#9EB038]" />
+        <Check className="h-4 w-4 text-primary" />
       ) : (
         <X className="h-4 w-4 text-white/30" />
       )}

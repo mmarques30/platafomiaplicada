@@ -13,7 +13,7 @@ export function GoogleLoginButton({ onClick, disabled, isLoading }: GoogleLoginB
       variant="outline"
       onClick={onClick}
       disabled={disabled || isLoading}
-      className="w-full h-12 bg-zinc-800/80 border-white/10 text-white hover:bg-zinc-700/80 hover:border-white/20 rounded-lg transition-all flex items-center justify-center gap-3"
+      className="w-full h-12 bg-background/80 border-white/10 text-white hover:bg-card/80 hover:border-white/20 rounded-lg transition-all flex items-center justify-center gap-3"
     >
       {isLoading ? (
         <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />

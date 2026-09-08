@@ -82,7 +82,7 @@ export function JornadasTab() {
                         <p className="font-semibold mb-1">{etapa.produto}</p>
                         <p className="text-sm text-primary font-medium">{etapa.valor}</p>
                         {etapa.economia && (
-                          <p className="text-xs text-green-600 mt-1">
+                          <p className="text-xs text-status-success mt-1">
                             {etapa.economia}
                           </p>
                         )}

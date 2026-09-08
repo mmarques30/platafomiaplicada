@@ -120,13 +120,13 @@ export function AulaSemanalModal({ open, onOpenChange, aula }: AulaSemanalModalP
                 </SelectItem>
                 <SelectItem value="qa">
                   <span className="flex items-center gap-2">
-                    <span className="w-3 h-3 rounded-full bg-blue-500" />
+                    <span className="w-3 h-3 rounded-full bg-status-info" />
                     Q&A
                   </span>
                 </SelectItem>
                 <SelectItem value="live_youtube">
                   <span className="flex items-center gap-2">
-                    <span className="w-3 h-3 rounded-full bg-red-500" />
+                    <span className="w-3 h-3 rounded-full bg-status-danger" />
                     Live YouTube
                   </span>
                 </SelectItem>

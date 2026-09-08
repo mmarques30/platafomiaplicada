@@ -64,8 +64,8 @@ export default function InsightIAPreview({ insightIA, economiaHoras, economiaVal
             </div>
           )}
           {valorEconomia && (
-            <div className="p-3 bg-green-500/5 border border-green-500/10 rounded-lg flex items-center gap-3">
-              <div className="p-2 bg-green-500/10 rounded-lg"><DollarSign className="h-4 w-4 text-green-600" /></div>
+            <div className="p-3 bg-status-success/5 border border-status-success/10 rounded-lg flex items-center gap-3">
+              <div className="p-2 bg-status-success/10 rounded-lg"><DollarSign className="h-4 w-4 text-status-success" /></div>
               <div>
                 <p className="text-xs text-muted-foreground">Valor mensal</p>
                 <p className="text-lg font-bold">R$ {Number(valorEconomia).toLocaleString("pt-BR")}</p>
@@ -89,7 +89,7 @@ export default function InsightIAPreview({ insightIA, economiaHoras, economiaVal
                   <p className="text-sm font-medium">{proc.nome || proc.name || proc.processo || `Processo ${i + 1}`}</p>
                   <div className="flex gap-1.5">
                     {proc.frequencia && <Badge variant="outline" className="text-[10px] px-1.5">{proc.frequencia}</Badge>}
-                    {proc.impacto && <Badge className={`text-[10px] px-1.5 ${proc.impacto === "alto" || proc.impacto === "high" ? "bg-red-500/10 text-red-600 border-red-500/20" : proc.impacto === "medio" || proc.impacto === "medium" ? "bg-yellow-500/10 text-yellow-600 border-yellow-500/20" : "bg-green-500/10 text-green-600 border-green-500/20"}`}>{proc.impacto}</Badge>}
+                    {proc.impacto && <Badge className={`text-[10px] px-1.5 ${proc.impacto === "alto" || proc.impacto === "high" ? "bg-status-danger/10 text-status-danger border-status-danger/20" : proc.impacto === "medio" || proc.impacto === "medium" ? "bg-status-warning/10 text-status-warning border-status-warning/20" : "bg-status-success/10 text-status-success border-status-success/20"}`}>{proc.impacto}</Badge>}
                   </div>
                 </div>
                 {proc.tempo && <p className="text-xs text-muted-foreground mb-1">⏱ {proc.tempo}</p>}
@@ -162,7 +162,7 @@ export default function InsightIAPreview({ insightIA, economiaHoras, economiaVal
                 </div>
                 <div className="flex items-center gap-1.5 shrink-0 ml-2">
                   {mod.prioridade && (
-                    <Badge className={`text-[10px] px-1.5 ${mod.prioridade === "alta" || mod.prioridade === "high" ? "bg-red-500/10 text-red-600 border-red-500/20" : mod.prioridade === "media" || mod.prioridade === "medium" ? "bg-yellow-500/10 text-yellow-600 border-yellow-500/20" : "bg-green-500/10 text-green-600 border-green-500/20"}`}>
+                    <Badge className={`text-[10px] px-1.5 ${mod.prioridade === "alta" || mod.prioridade === "high" ? "bg-status-danger/10 text-status-danger border-status-danger/20" : mod.prioridade === "media" || mod.prioridade === "medium" ? "bg-status-warning/10 text-status-warning border-status-warning/20" : "bg-status-success/10 text-status-success border-status-success/20"}`}>
                       {mod.prioridade}
                     </Badge>
                   )}

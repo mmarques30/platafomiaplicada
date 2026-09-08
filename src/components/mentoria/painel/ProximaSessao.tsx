@@ -75,7 +75,7 @@ export const ProximaSessao = ({ sessao, isBusiness = false }: Props) => {
               <div key={index} className="flex items-start gap-2 text-sm">
                 <span className={cn(
                   "mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0",
-                  isBusiness ? "bg-violet-400" : "bg-aplicada-green-900"
+                  isBusiness ? "bg-secondary" : "bg-aplicada-green-900"
                 )} />
                 <p className={theme.textSecondary}>{item}</p>
               </div>
@@ -96,7 +96,7 @@ export const ProximaSessao = ({ sessao, isBusiness = false }: Props) => {
               <div key={index} className="flex items-start gap-2 text-sm">
                 <span className={cn(
                   "mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0",
-                  isBusiness ? "bg-violet-400" : "bg-aplicada-green-900"
+                  isBusiness ? "bg-secondary" : "bg-aplicada-green-900"
                 )} />
                 <p className={cn("flex-1", theme.textSecondary)}>{item}</p>
               </div>
@@ -107,7 +107,7 @@ export const ProximaSessao = ({ sessao, isBusiness = false }: Props) => {
         <div className={cn(
           "p-4 rounded-xl border",
           isBusiness 
-            ? "bg-gradient-to-r from-violet-500/15 to-transparent border-white/10" 
+            ? "bg-gradient-to-r from-secondary/15 to-transparent border-white/10" 
             : "bg-muted border-border"
         )}>
           <h4 className={cn("font-semibold mb-2", theme.textPrimary)}>

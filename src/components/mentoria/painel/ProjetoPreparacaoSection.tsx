@@ -67,7 +67,7 @@ export const ProjetoPreparacaoSection = ({ projeto, userId, isBusiness = false }
               variant="outline" 
               className={cn(
                 "capitalize",
-                isBusiness && "border-white/20 text-slate-300"
+                isBusiness && "border-white/20 text-muted-foreground"
               )}
             >
               {STATUS_LABELS[projeto.status] || projeto.status}
@@ -87,7 +87,7 @@ export const ProjetoPreparacaoSection = ({ projeto, userId, isBusiness = false }
           {(trilhasDisponiveis.length > 0 || modulosDisponiveis.length > 0) && (
             <div className={cn(
               "flex items-center gap-1",
-              isBusiness ? "text-emerald-400" : "text-green-700"
+              isBusiness ? "text-status-success" : "text-status-success"
             )}>
               <BookOpen className="h-4 w-4" />
               <span>{trilhasDisponiveis.length} trilha(s), {modulosDisponiveis.length} módulo(s) disponíveis</span>
@@ -96,7 +96,7 @@ export const ProjetoPreparacaoSection = ({ projeto, userId, isBusiness = false }
           {(trilhasEmBreve.length > 0 || modulosEmBreve.length > 0) && (
             <div className={cn(
               "flex items-center gap-1",
-              isBusiness ? "text-amber-400" : "text-amber-700"
+              isBusiness ? "text-status-warning" : "text-status-warning"
             )}>
               <Clock className="h-4 w-4" />
               <span>{trilhasEmBreve.length + modulosEmBreve.length} conteúdo(s) em breve</span>

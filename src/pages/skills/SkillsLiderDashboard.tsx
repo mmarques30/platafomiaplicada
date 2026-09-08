@@ -124,7 +124,7 @@ export default function SkillsLiderDashboard() {
           <p className="text-sm text-muted-foreground mt-1 ml-1">{empresaNome}</p>
         )}
         {isAdmin && !equipeId && (
-          <div className="mt-3 px-4 py-2 rounded-lg bg-amber-50 border border-amber-200 text-sm text-amber-800">
+          <div className="mt-3 px-4 py-2 rounded-lg bg-status-warning/15 border border-status-warning/40 text-sm text-status-warning">
             Modo administrador: nenhuma equipe Skills cadastrada. Cadastre uma equipe no painel administrativo para visualizar dados reais.
           </div>
         )}
@@ -221,7 +221,7 @@ export default function SkillsLiderDashboard() {
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">ROI Acumulado</p>
                 <p className={cn(
                   "text-2xl font-bold mt-1",
-                  roiAcumulado >= 100 ? "text-green-600" : roiAcumulado > 0 ? "text-foreground" : "text-muted-foreground"
+                  roiAcumulado >= 100 ? "text-status-success" : roiAcumulado > 0 ? "text-foreground" : "text-muted-foreground"
                 )}>
                   {roiAcumulado.toFixed(0)}%
                 </p>
@@ -421,9 +421,9 @@ export default function SkillsLiderDashboard() {
                           variant={r.posicao <= 3 ? "default" : "secondary"}
                           className={cn(
                             "w-8 justify-center text-xs",
-                            r.posicao === 1 && "bg-yellow-500 text-yellow-950 hover:bg-yellow-500",
-                            r.posicao === 2 && "bg-gray-400 text-gray-950 hover:bg-gray-400",
-                            r.posicao === 3 && "bg-amber-600 text-amber-950 hover:bg-amber-600"
+                            r.posicao === 1 && "bg-status-warning text-status-warning hover:bg-status-warning",
+                            r.posicao === 2 && "bg-surface text-foreground hover:bg-surface",
+                            r.posicao === 3 && "bg-status-warning text-status-warning hover:bg-status-warning"
                           )}
                         >
                           {r.posicao}
@@ -446,7 +446,7 @@ export default function SkillsLiderDashboard() {
                       <TableCell className="text-center text-sm">{r.horasEconomizadas}h</TableCell>
                       <TableCell className="text-center">
                         <div className="flex items-center justify-center gap-1 text-sm">
-                          <Star className="h-3 w-3 text-yellow-500 fill-yellow-500" />
+                          <Star className="h-3 w-3 text-status-warning fill-status-warning" />
                           {r.performanceMedia.toFixed(1)}
                         </div>
                       </TableCell>
@@ -506,15 +506,15 @@ export default function SkillsLiderDashboard() {
 
             <div className={cn(
               "text-center p-4 rounded-lg",
-              roiAcumulado >= 100 ? "bg-green-500/15" : roiAcumulado >= 50 ? "bg-yellow-500/15" : "bg-muted/40"
+              roiAcumulado >= 100 ? "bg-status-success/15" : roiAcumulado >= 50 ? "bg-status-warning/15" : "bg-muted/40"
             )}>
               <TrendingUp className={cn(
                 "h-5 w-5 mx-auto mb-2",
-                roiAcumulado >= 100 ? "text-green-600" : roiAcumulado >= 50 ? "text-yellow-600" : "text-primary"
+                roiAcumulado >= 100 ? "text-status-success" : roiAcumulado >= 50 ? "text-status-warning" : "text-primary"
               )} />
               <p className={cn(
                 "text-xl font-bold",
-                roiAcumulado >= 100 ? "text-green-600" : roiAcumulado >= 50 ? "text-yellow-600" : ""
+                roiAcumulado >= 100 ? "text-status-success" : roiAcumulado >= 50 ? "text-status-warning" : ""
               )}>
                 {roiAcumulado.toFixed(0)}%
               </p>

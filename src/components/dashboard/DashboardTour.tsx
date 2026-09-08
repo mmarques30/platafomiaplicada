@@ -130,12 +130,12 @@ export function DashboardTour({ run, previewMode, onComplete }: DashboardTourPro
       continuous
       options={{
         // Tokens da marca em HSL → hex equivalentes (Joyride não aceita CSS vars)
-        backgroundColor: "#F7F6E8",      // brand-cream-soft
-        primaryColor: "#5C6F1D",         // brand-strong
+        backgroundColor: "#1b1f13",      // brand-cream-soft
+        primaryColor: "#7a8f30",         // brand-strong
         textColor: "#0A0A0A",            // foreground
         overlayColor: "rgba(10, 10, 10, 0.45)",
         showProgress: true,
-        arrowColor: "#F7F6E8",           // brand-cream-soft (continua o tooltip)
+        arrowColor: "#1b1f13",           // brand-cream-soft (continua o tooltip)
         zIndex: 10000,
       }}
       locale={{
@@ -167,8 +167,8 @@ export function DashboardTour({ run, previewMode, onComplete }: DashboardTourPro
           padding: "8px 0 4px",
         },
         buttonNext: {
-          backgroundColor: "#5C6F1D",    // brand-strong
-          color: "#F0EFD9",              // brand-cream
+          backgroundColor: "#7a8f30",    // brand-strong
+          color: "#1b1f13",              // brand-cream
           borderRadius: 8,
           padding: "8px 16px",
           fontSize: 13,

@@ -70,9 +70,9 @@ export function BusinessEntregasSection({
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'concluida':
-        return <CheckCircle2 className="h-4 w-4 text-emerald-600" />;
+        return <CheckCircle2 className="h-4 w-4 text-status-success" />;
       case 'em_andamento':
-        return <Clock className="h-4 w-4 text-amber-600" />;
+        return <Clock className="h-4 w-4 text-status-warning" />;
       default:
         return <Circle className="h-4 w-4 text-muted-foreground" />;
     }
@@ -80,10 +80,10 @@ export function BusinessEntregasSection({
 
   const getStatusBadge = (status: string) => {
     const statusMap: Record<string, { label: string; className: string }> = {
-      'em_andamento': { label: 'Em andamento', className: 'bg-amber-500/10 text-amber-700 border-amber-500/30' },
-      'concluida': { label: 'Concluída', className: 'bg-emerald-500/10 text-emerald-700 border-emerald-500/30' },
+      'em_andamento': { label: 'Em andamento', className: 'bg-status-warning/10 text-status-warning border-status-warning/30' },
+      'concluida': { label: 'Concluída', className: 'bg-status-success/10 text-status-success border-status-success/30' },
       'pendente': { label: 'Pendente', className: 'bg-muted text-muted-foreground border-border' },
-      'cancelada': { label: 'Cancelada', className: 'bg-red-500/10 text-red-700 border-red-500/30' },
+      'cancelada': { label: 'Cancelada', className: 'bg-status-danger/10 text-status-danger border-status-danger/30' },
     };
     const config = statusMap[status] || statusMap['pendente'];
     return <Badge variant="outline" className={config.className}>{config.label}</Badge>;
@@ -91,11 +91,11 @@ export function BusinessEntregasSection({
 
   const getPrioridadeBadge = (prioridade: string) => {
     const prioridadeMap: Record<string, { label: string; className: string }> = {
-      'urgente': { label: 'Urgente', className: 'bg-red-500/10 text-red-700 border-red-500/30' },
-      'critica': { label: 'Urgente', className: 'bg-red-500/10 text-red-700 border-red-500/30' },
-      'alta': { label: 'Alta', className: 'bg-orange-500/10 text-orange-700 border-orange-500/30' },
-      'media': { label: 'Média', className: 'bg-blue-500/10 text-blue-700 border-blue-500/30' },
-      'baixa': { label: 'Baixa', className: 'bg-gray-500/10 text-gray-600 border-gray-500/30' },
+      'urgente': { label: 'Urgente', className: 'bg-status-danger/10 text-status-danger border-status-danger/30' },
+      'critica': { label: 'Urgente', className: 'bg-status-danger/10 text-status-danger border-status-danger/30' },
+      'alta': { label: 'Alta', className: 'bg-status-warning/10 text-status-warning border-status-warning/30' },
+      'media': { label: 'Média', className: 'bg-status-info/10 text-status-info border-status-info/30' },
+      'baixa': { label: 'Baixa', className: 'bg-card/10 text-muted-foreground border-foreground/30/30' },
     };
     const config = prioridadeMap[prioridade] || prioridadeMap['media'];
     return <Badge variant="outline" className={`text-xs ${config.className}`}>{config.label}</Badge>;
@@ -228,7 +228,7 @@ export function BusinessEntregasSection({
                       </div>
                       
                       {tarefa.arquivo_entrega_url ? (
-                        <Badge variant="outline" className="bg-emerald-500/10 text-emerald-700 border-emerald-500/30 text-xs">
+                        <Badge variant="outline" className="bg-status-success/10 text-status-success border-status-success/30 text-xs">
                           Entregue
                         </Badge>
                       ) : onUploadEntrega && (

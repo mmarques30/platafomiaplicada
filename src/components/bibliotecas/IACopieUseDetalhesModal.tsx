@@ -31,18 +31,18 @@ const getFileIcon = (url: string) => {
   const ext = url.split('.').pop()?.toLowerCase();
   switch (ext) {
     case 'pdf':
-      return <FileText className="h-4 w-4 shrink-0 text-red-500" />;
+      return <FileText className="h-4 w-4 shrink-0 text-status-danger" />;
     case 'png':
     case 'jpg':
     case 'jpeg':
-      return <Image className="h-4 w-4 shrink-0 text-purple-500" />;
+      return <Image className="h-4 w-4 shrink-0 text-secondary" />;
     case 'csv':
     case 'xlsx':
     case 'xls':
-      return <Table className="h-4 w-4 shrink-0 text-green-600" />;
+      return <Table className="h-4 w-4 shrink-0 text-status-success" />;
     case 'html':
     case 'htm':
-      return <FileCode className="h-4 w-4 shrink-0 text-orange-500" />;
+      return <FileCode className="h-4 w-4 shrink-0 text-status-warning" />;
     default:
       return <FileText className="h-4 w-4 shrink-0" />;
   }

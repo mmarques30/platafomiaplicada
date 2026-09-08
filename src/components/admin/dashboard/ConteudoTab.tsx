@@ -153,7 +153,7 @@ export function ConteudoTab({ data }: ConteudoTabProps) {
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Avaliação Média</span>
                 <div className="flex items-center gap-1">
-                  <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                  <Star className="h-4 w-4 text-status-warning fill-status-warning" />
                   <span className="font-medium">{data.conteudo.mediaAvaliacoes}</span>
                 </div>
               </div>

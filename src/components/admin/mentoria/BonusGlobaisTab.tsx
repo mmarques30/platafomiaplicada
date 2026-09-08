@@ -95,13 +95,13 @@ export default function BonusGlobaisTab({ showHeader = true }: BonusGlobaisTabPr
                   <div className="flex items-center gap-3">
                     <div className={`p-2 rounded-lg ${
                       bonus.publico_alvo === 'usuarios_especificos'
-                        ? (stats?.liberados ? 'bg-blue-100 dark:bg-blue-900/30' : 'bg-muted')
-                        : (bonus.liberado ? 'bg-green-100 dark:bg-green-900/30' : 'bg-muted')
+                        ? (stats?.liberados ? 'bg-status-info/15 dark:bg-status-info/30' : 'bg-muted')
+                        : (bonus.liberado ? 'bg-status-success/15 dark:bg-status-success/30' : 'bg-muted')
                     }`}>
                       {bonus.publico_alvo === 'usuarios_especificos' ? (
-                        <Users className="h-4 w-4 text-blue-600" />
+                        <Users className="h-4 w-4 text-status-info" />
                       ) : bonus.liberado ? (
-                        <CheckCircle className="h-4 w-4 text-green-600" />
+                        <CheckCircle className="h-4 w-4 text-status-success" />
                       ) : (
                         <Lock className="h-4 w-4 text-muted-foreground" />
                       )}
@@ -187,7 +187,7 @@ export default function BonusGlobaisTab({ showHeader = true }: BonusGlobaisTabPr
                             <div 
                               key={u.user_id} 
                               className={`flex items-center justify-between p-2 rounded-lg text-xs ${
-                                u.liberado ? 'bg-green-50 dark:bg-green-950/20' : 'bg-background'
+                                u.liberado ? 'bg-status-success/15 dark:bg-status-success/20' : 'bg-background'
                               }`}
                             >
                               <span>{u.user?.nome_completo || 'Usuário'}</span>

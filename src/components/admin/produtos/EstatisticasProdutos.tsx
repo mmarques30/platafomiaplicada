@@ -10,9 +10,9 @@ export function EstatisticasProdutos() {
   }
 
   const produtos = [
-    { key: "academy", nome: "Academy", cor: "bg-blue-500" },
-    { key: "skills", nome: "Skills", cor: "bg-orange-500" },
-    { key: "business", nome: "Insider", cor: "bg-purple-500" },
+    { key: "academy", nome: "Academy", cor: "bg-status-info" },
+    { key: "skills", nome: "Skills", cor: "bg-status-warning" },
+    { key: "business", nome: "Insider", cor: "bg-secondary" },
   ];
 
   return (

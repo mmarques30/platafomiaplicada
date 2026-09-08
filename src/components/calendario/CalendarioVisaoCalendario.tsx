@@ -34,10 +34,10 @@ const tipoEventoConfig = {
   },
   live_youtube: {
     label: "Live YouTube",
-    color: "bg-red-500",
-    borderColor: "border-red-500",
-    textColor: "text-red-500",
-    legendColor: "bg-red-500 ring-red-500/30",
+    color: "bg-status-danger",
+    borderColor: "border-status-danger",
+    textColor: "text-status-danger",
+    legendColor: "bg-status-danger ring-status-danger/30",
     icon: Youtube,
   },
   outro: {
@@ -120,7 +120,7 @@ export function CalendarioVisaoCalendario() {
           <span className="text-sm font-medium text-foreground">Q&A</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="w-4 h-4 rounded-full bg-red-500 ring-2 ring-red-500/30" />
+          <span className="w-4 h-4 rounded-full bg-status-danger ring-2 ring-status-danger/30" />
           <span className="text-sm font-medium text-foreground">Live YouTube</span>
         </div>
         <div className="flex items-center gap-2">
@@ -166,7 +166,7 @@ export function CalendarioVisaoCalendario() {
           modifiersClassNames={{
             aulaAoVivo: "border-2 border-aplicada-green-700 font-bold text-foreground bg-aplicada-green-700/10",
             qa: "border-2 border-aplicada-green-500 font-bold text-foreground bg-aplicada-green-500/10",
-            liveYoutube: "border-2 border-red-500 font-bold text-foreground bg-red-500/10",
+            liveYoutube: "border-2 border-status-danger font-bold text-foreground bg-status-danger/10",
             outro: "border-2 border-aplicada-green-800 font-bold text-foreground bg-aplicada-green-800/10",
           }}
         />

@@ -178,7 +178,7 @@ export function GerarReportIAModal({ open, onOpenChange, contratoId, userId, onS
                   <ul className="space-y-2">
                     {reportGerado.destaques.map((destaque, index) => (
                       <li key={index} className="text-sm flex items-start gap-2">
-                        <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                        <CheckCircle2 className="h-4 w-4 text-status-success mt-0.5 flex-shrink-0" />
                         {destaque}
                       </li>
                     ))}

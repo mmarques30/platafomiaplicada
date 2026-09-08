@@ -17,9 +17,9 @@ const TIPO_LABELS: Record<TipoConteudo, string> = {
 };
 
 const TIPO_COLORS: Record<string, string> = {
-  noticia: "bg-blue-500/10 text-blue-600 border-blue-500/20",
-  dica: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20",
-  newsletter: "bg-amber-500/10 text-amber-600 border-amber-500/20",
+  noticia: "bg-status-info/10 text-status-info border-status-info/20",
+  dica: "bg-status-success/10 text-status-success border-status-success/20",
+  newsletter: "bg-status-warning/10 text-status-warning border-status-warning/20",
 };
 
 function CuradoriaCard({
@@ -63,7 +63,7 @@ function CuradoriaCard({
                 {TIPO_LABELS[item.tipo]}
               </Badge>
               {item.status === "aprovado" && (
-                <Badge className="bg-green-500/10 text-green-600 border-green-500/20">Aprovado</Badge>
+                <Badge className="bg-status-success/10 text-status-success border-status-success/20">Aprovado</Badge>
               )}
               {item.status === "descartado" && (
                 <Badge variant="secondary">Descartado</Badge>
@@ -81,7 +81,7 @@ function CuradoriaCard({
                   <Pencil className="h-3.5 w-3.5" />
                 </Button>
               )}
-              <Button size="icon" variant="ghost" className="h-8 w-8 text-green-600 hover:text-green-700" onClick={onApprove}>
+              <Button size="icon" variant="ghost" className="h-8 w-8 text-status-success hover:text-status-success" onClick={onApprove}>
                 <Check className="h-4 w-4" />
               </Button>
               <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive" onClick={onDiscard}>
@@ -153,7 +153,7 @@ export function CuradoriaIATab() {
           <span className="text-muted-foreground">
             {pendingCount} pendente{pendingCount !== 1 ? "s" : ""}
           </span>
-          <span className="text-green-600">
+          <span className="text-status-success">
             {approvedCount} aprovado{approvedCount !== 1 ? "s" : ""}
           </span>
         </div>

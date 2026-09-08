@@ -37,11 +37,11 @@ const PRIORIDADE_CONFIG: Record<string, { label: string; variant: 'default' | 's
 };
 
 const STATUS_CONFIG: Record<string, { label: string; icon: React.ReactNode; color: string; bgColor: string }> = {
-  pendente: { label: 'Pendente', icon: <Clock className="h-4 w-4" />, color: 'text-amber-600', bgColor: 'bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-800' },
-  em_analise: { label: 'Em Análise', icon: <Eye className="h-4 w-4" />, color: 'text-blue-600', bgColor: 'bg-blue-50 dark:bg-blue-950/40 border-blue-200 dark:border-blue-800' },
-  aprovado: { label: 'Aprovado', icon: <CheckCircle2 className="h-4 w-4" />, color: 'text-emerald-600', bgColor: 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800' },
-  rejeitado: { label: 'Rejeitado', icon: <XCircle className="h-4 w-4" />, color: 'text-red-600', bgColor: 'bg-red-50 dark:bg-red-950/40 border-red-200 dark:border-red-800' },
-  revisao_solicitada: { label: 'Revisão Solicitada', icon: <RotateCcw className="h-4 w-4" />, color: 'text-orange-600', bgColor: 'bg-orange-50 dark:bg-orange-950/40 border-orange-200 dark:border-orange-800' },
+  pendente: { label: 'Pendente', icon: <Clock className="h-4 w-4" />, color: 'text-status-warning', bgColor: 'bg-status-warning/15 dark:bg-status-warning/40 border-status-warning/40 dark:border-status-warning' },
+  em_analise: { label: 'Em Análise', icon: <Eye className="h-4 w-4" />, color: 'text-status-info', bgColor: 'bg-status-info/15 dark:bg-status-info/40 border-status-info/40 dark:border-status-info' },
+  aprovado: { label: 'Aprovado', icon: <CheckCircle2 className="h-4 w-4" />, color: 'text-status-success', bgColor: 'bg-status-success/15 dark:bg-status-success/40 border-status-success/40 dark:border-status-success' },
+  rejeitado: { label: 'Rejeitado', icon: <XCircle className="h-4 w-4" />, color: 'text-status-danger', bgColor: 'bg-status-danger/15 dark:bg-status-danger/40 border-status-danger/40 dark:border-status-danger' },
+  revisao_solicitada: { label: 'Revisão Solicitada', icon: <RotateCcw className="h-4 w-4" />, color: 'text-status-warning', bgColor: 'bg-status-warning/15 dark:bg-status-warning/40 border-status-warning/40 dark:border-status-warning' },
 };
 
 export default function MentoriaTasksBusiness() {
@@ -162,9 +162,9 @@ export default function MentoriaTasksBusiness() {
 
               {/* Instruções de validação */}
               {task.instrucoes_validacao && (
-                <div className="bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 rounded-lg p-3 mb-3">
-                  <p className="text-xs font-semibold text-blue-700 dark:text-blue-300 uppercase mb-1">O que precisa fazer:</p>
-                  <p className="text-sm text-blue-900 dark:text-blue-100">{task.instrucoes_validacao}</p>
+                <div className="bg-status-info/15 dark:bg-status-info/40 border border-status-info/40 dark:border-status-info rounded-lg p-3 mb-3">
+                  <p className="text-xs font-semibold text-status-info dark:text-status-info uppercase mb-1">O que precisa fazer:</p>
+                  <p className="text-sm text-status-info dark:text-status-info/40">{task.instrucoes_validacao}</p>
                 </div>
               )}
 
@@ -251,13 +251,13 @@ export default function MentoriaTasksBusiness() {
             </div>
 
             <div className="flex gap-3 text-sm">
-              <Badge variant="outline" className="text-amber-600 border-amber-300">
+              <Badge variant="outline" className="text-status-warning border-status-warning/40">
                 {tasksPendentes.length} pendentes
               </Badge>
-              <Badge variant="outline" className="text-blue-600 border-blue-300">
+              <Badge variant="outline" className="text-status-info border-status-info/40">
                 {tasksEmAnalise.length} em análise
               </Badge>
-              <Badge variant="outline" className="text-emerald-600 border-emerald-300">
+              <Badge variant="outline" className="text-status-success border-status-success/40">
                 {tasksConcluidas.length} concluídas
               </Badge>
             </div>

@@ -24,9 +24,9 @@ export function RankingEngajamento({ ranking }: RankingEngajamentoProps) {
 
   const getMedalColor = (posicao: number) => {
     switch (posicao) {
-      case 1: return "text-amber-600 border-amber-600";
+      case 1: return "text-status-warning border-status-warning";
       case 2: return "text-brand-strong border-brand-strong/40";
-      case 3: return "text-amber-700 border-amber-700";
+      case 3: return "text-status-warning border-status-warning";
       default: return "text-muted-foreground border-brand-hairline";
     }
   };
@@ -42,9 +42,9 @@ export function RankingEngajamento({ ranking }: RankingEngajamentoProps) {
 
   const getAvatarBg = (posicao: number) => {
     switch (posicao) {
-      case 1: return "bg-amber-600";
+      case 1: return "bg-status-warning";
       case 2: return "bg-brand-strong";
-      case 3: return "bg-amber-700";
+      case 3: return "bg-status-warning";
       default: return "bg-brand-strong";
     }
   };
@@ -93,7 +93,7 @@ export function RankingEngajamento({ ranking }: RankingEngajamentoProps) {
               )}>
                 {item.nome_completo}
                 {item.user_id === user?.id && (
-                  <span className="ml-1 text-xs text-amber-700">(Você)</span>
+                  <span className="ml-1 text-xs text-status-warning">(Você)</span>
                 )}
               </p>
               

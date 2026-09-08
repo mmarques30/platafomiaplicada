@@ -15,11 +15,11 @@ interface ConquistaCardProps {
 const getMedalhaColor = (medalha?: string) => {
   switch (medalha) {
     case "bronze":
-      return "bg-amber-700 text-white border-transparent";
+      return "bg-status-warning text-white border-transparent";
     case "prata":
-      return "bg-slate-400 text-white border-transparent";
+      return "bg-surface text-white border-transparent";
     case "ouro":
-      return "bg-yellow-500 text-white border-transparent";
+      return "bg-status-warning text-white border-transparent";
     default:
       return "";
   }

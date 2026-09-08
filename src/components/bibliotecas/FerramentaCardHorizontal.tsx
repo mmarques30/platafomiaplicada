@@ -71,7 +71,7 @@ export function FerramentaCardHorizontal({ ferramenta, onVerMais }: FerramentaCa
               <div className="flex sm:flex-col gap-3 sm:gap-2 sm:items-end flex-shrink-0">
                 {/* Avaliação Mari */}
                 <div className="flex items-center gap-2 bg-muted/50 rounded-lg px-3 py-1.5">
-                  <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                  <Star className="w-4 h-4 text-status-warning fill-status-warning" />
                   <div className="flex flex-col">
                     <span className="text-xs text-muted-foreground whitespace-nowrap">Avaliação Mari</span>
                     <span className="font-bold">{ferramenta.avaliacao_mari || 0}/5</span>
@@ -80,7 +80,7 @@ export function FerramentaCardHorizontal({ ferramenta, onVerMais }: FerramentaCa
 
                 {/* Avaliação Comunidade */}
                 <div className="flex items-center gap-2 bg-muted/50 rounded-lg px-3 py-1.5">
-                  <Users className="w-4 h-4 text-blue-500" />
+                  <Users className="w-4 h-4 text-status-info" />
                   <div className="flex flex-col">
                     <span className="text-xs text-muted-foreground whitespace-nowrap">Comunidade</span>
                     <span className="font-bold">

@@ -177,8 +177,8 @@ export default function MeuSistemaDocumentos() {
   // Saúde do projeto (progresso vs cronograma)
   const saudeProjeto: { label: string; classe: string } = (() => {
     if (!cronograma) return { label: "Sem cronograma definido", classe: "bg-muted text-muted-foreground border-transparent" };
-    if (progresso.percentual >= cronograma.percentual) return { label: "No prazo", classe: "bg-emerald-500/15 text-emerald-600 border-transparent" };
-    if (progresso.percentual >= cronograma.percentual - 15) return { label: "Atenção", classe: "bg-amber-500/15 text-amber-600 border-transparent" };
+    if (progresso.percentual >= cronograma.percentual) return { label: "No prazo", classe: "bg-status-success/15 text-status-success border-transparent" };
+    if (progresso.percentual >= cronograma.percentual - 15) return { label: "Atenção", classe: "bg-status-warning/15 text-status-warning border-transparent" };
     return { label: "Atrasado", classe: "bg-destructive/15 text-destructive border-transparent" };
   })();
 
@@ -495,7 +495,7 @@ export default function MeuSistemaDocumentos() {
             <span className={cn(
               "text-xs font-medium px-3 py-1.5 rounded-full border whitespace-nowrap",
               saudeProjeto.label === "No prazo" && "bg-brand-strong/10 text-brand-strong border-brand-strong/25",
-              saudeProjeto.label === "Atenção" && "bg-amber-500/10 text-amber-700 border-amber-500/25",
+              saudeProjeto.label === "Atenção" && "bg-status-warning/10 text-status-warning border-status-warning/25",
               saudeProjeto.label === "Atrasado" && "bg-destructive/10 text-destructive border-destructive/25",
               saudeProjeto.label === "Sem cronograma definido" && "bg-muted text-muted-foreground border-transparent"
             )}>
@@ -534,7 +534,7 @@ export default function MeuSistemaDocumentos() {
                   return (
                     <span className={cn(
                       "ml-auto text-xs font-medium tabular-nums",
-                      delta >= 0 ? "text-brand-strong" : delta >= -15 ? "text-amber-700" : "text-destructive"
+                      delta >= 0 ? "text-brand-strong" : delta >= -15 ? "text-status-warning" : "text-destructive"
                     )}>
                       {delta >= 0 ? "+" : ""}{delta}% vs cronograma
                     </span>

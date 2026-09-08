@@ -77,7 +77,7 @@ export function CategoriaModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-zinc-900 border-zinc-800 text-zinc-100">
+      <DialogContent className="bg-background border-foreground/30 text-muted-foreground">
         <DialogHeader>
           <DialogTitle>
             {categoria ? "Editar Categoria" : "Nova Categoria"}
@@ -91,7 +91,7 @@ export function CategoriaModal({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Ex: Dúvidas, Casos de Sucesso..."
-              className="bg-zinc-800 border-zinc-700"
+              className="bg-background border-foreground/30"
             />
           </div>
 
@@ -101,7 +101,7 @@ export function CategoriaModal({
               value={emoji}
               onChange={(e) => setEmoji(e.target.value)}
               placeholder="Ex: 💡, 🚀, ❓"
-              className="bg-zinc-800 border-zinc-700"
+              className="bg-background border-foreground/30"
             />
           </div>
 
@@ -111,7 +111,7 @@ export function CategoriaModal({
               type="number"
               value={ordem}
               onChange={(e) => setOrdem(Number(e.target.value))}
-              className="bg-zinc-800 border-zinc-700"
+              className="bg-background border-foreground/30"
             />
           </div>
 

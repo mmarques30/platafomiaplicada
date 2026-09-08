@@ -38,9 +38,9 @@ const tiposEntrega = [
 ];
 
 const statusEntrega = [
-  { value: "pendente", label: "Pendente", color: "bg-yellow-500/10 text-yellow-600" },
-  { value: "em_andamento", label: "Em Andamento", color: "bg-blue-500/10 text-blue-600" },
-  { value: "concluida", label: "Concluída", color: "bg-green-500/10 text-green-600" },
+  { value: "pendente", label: "Pendente", color: "bg-status-warning/10 text-status-warning" },
+  { value: "em_andamento", label: "Em Andamento", color: "bg-status-info/10 text-status-info" },
+  { value: "concluida", label: "Concluída", color: "bg-status-success/10 text-status-success" },
 ];
 
 export function ContratoBusinessManager({ userId, userName }: ContratoBusinessManagerProps) {

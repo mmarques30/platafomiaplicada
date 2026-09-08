@@ -410,7 +410,7 @@ export default function GerenciarAvisos() {
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <Badge variant={aula.realizada ? "default" : "outline"} className={`text-xs ${aula.realizada ? "bg-green-600" : ""}`}>
+                        <Badge variant={aula.realizada ? "default" : "outline"} className={`text-xs ${aula.realizada ? "bg-status-success" : ""}`}>
                           {aula.realizada ? "Realizada" : "Pendente"}
                         </Badge>
                       </TableCell>

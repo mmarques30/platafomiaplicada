@@ -27,10 +27,10 @@ class PanelErrorBoundary extends Component<{ children: ReactNode }, { error: Err
   render() {
     if (this.state.error) {
       return (
-        <div className="rounded-md border border-red-300 bg-red-50 p-4 text-sm">
-          <p className="font-semibold text-red-900">Erro ao renderizar o painel do aluno</p>
-          <p className="mt-1 text-red-900/80">{this.state.error.message}</p>
-          <p className="mt-2 text-xs text-red-900/60">
+        <div className="rounded-md border border-status-danger/40 bg-status-danger/15 p-4 text-sm">
+          <p className="font-semibold text-status-danger">Erro ao renderizar o painel do aluno</p>
+          <p className="mt-1 text-status-danger/80">{this.state.error.message}</p>
+          <p className="mt-2 text-xs text-status-danger/60">
             Provavelmente o `insight_ia` está com um campo faltando ou em formato
             inesperado. Tente regerar o insight pelo botão acima.
           </p>
@@ -76,7 +76,7 @@ export default function MentoriaAcademyPage() {
           <h1 className={adminTheme.pageTitle}>Aluno Academy</h1>
           <p className={adminTheme.pageSubtitle}>Gerenciar mentorados do plano Academy</p>
         </div>
-        <Badge variant="secondary" className="bg-blue-500/10 text-blue-500 text-xs">
+        <Badge variant="secondary" className="bg-status-info/10 text-status-info text-xs">
           {users.length} mentorados
         </Badge>
       </div>
@@ -139,10 +139,10 @@ export default function MentoriaAcademyPage() {
               no insight_ia, payload inesperado etc) não derrube a página
               inteira e Mari saiba o que está acontecendo. */}
           {diagnosticoError ? (
-            <Card className="border-red-300 bg-red-50">
+            <Card className="border-status-danger/40 bg-status-danger/15">
               <CardContent className="py-6 space-y-2 text-sm">
-                <p className="font-semibold text-red-900">Erro ao buscar diagnóstico</p>
-                <p className="text-red-900/80">{(diagnosticoError as any)?.message ?? String(diagnosticoError)}</p>
+                <p className="font-semibold text-status-danger">Erro ao buscar diagnóstico</p>
+                <p className="text-status-danger/80">{(diagnosticoError as any)?.message ?? String(diagnosticoError)}</p>
               </CardContent>
             </Card>
           ) : loadingDiagnostico ? (
@@ -150,12 +150,12 @@ export default function MentoriaAcademyPage() {
           ) : diagnosticoUsuario ? (
             <div className="relative">
               <div className="absolute -top-3 left-4 z-10">
-                <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-500/30">
+                <Badge variant="outline" className="bg-status-warning/10 text-status-warning border-status-warning/30">
                   <Eye className="h-3 w-3 mr-1" />
                   VISÃO DO ALUNO
                 </Badge>
               </div>
-              <div className="border-2 border-dashed border-amber-500/30 rounded-xl p-4 pt-6 bg-card/50">
+              <div className="border-2 border-dashed border-status-warning/30 rounded-xl p-4 pt-6 bg-card/50">
                 <PanelErrorBoundary>
                   <DiagnosticoAcademyPanel diagnostico={diagnosticoUsuario} />
                 </PanelErrorBoundary>

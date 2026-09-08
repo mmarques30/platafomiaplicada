@@ -29,18 +29,18 @@ const statusLabels: Record<string, string> = {
 
 const statusColors: Record<string, string> = {
   levantado: "bg-muted text-muted-foreground",
-  aprovado: "bg-blue-500/15 text-blue-700 border-blue-200",
+  aprovado: "bg-status-info/15 text-status-info border-status-info/40",
   nao_aprovado: "bg-destructive/15 text-destructive border-destructive/30",
-  backlog: "bg-amber-500/15 text-amber-700 border-amber-200",
-  priorizado: "bg-indigo-500/15 text-indigo-700 border-indigo-200",
-  em_execucao: "bg-[#9EB038]/15 text-[#738925] border-[#9EB038]/30",
-  entregue: "bg-emerald-500/15 text-emerald-700 border-emerald-200",
+  backlog: "bg-status-warning/15 text-status-warning border-status-warning/40",
+  priorizado: "bg-status-info/15 text-status-info border-status-info/40",
+  em_execucao: "bg-primary/15 text-secondary border-primary/30",
+  entregue: "bg-status-success/15 text-status-success border-status-success/40",
 };
 
 
 const prioridadeTrilhaCores: Record<string, string> = {
   essencial: "bg-primary/15 text-primary border-primary/30",
-  recomendado: "bg-[#9EB038]/15 text-[#738925] border-[#9EB038]/30",
+  recomendado: "bg-primary/15 text-secondary border-primary/30",
 };
 
 interface ProjetoDetailModalProps {
@@ -156,7 +156,7 @@ export default function ProjetoDetailModal({ item, open, onOpenChange, onStatusC
               {(currentStatus === "levantado" || currentStatus === "backlog") && (
                 <>
                   <Button size="sm" variant="outline" className="gap-1.5 text-xs" onClick={() => onStatusChange(item.id, "aprovado")}>
-                    <CheckCircle2 className="h-3.5 w-3.5 text-blue-600" />
+                    <CheckCircle2 className="h-3.5 w-3.5 text-status-info" />
                     Aprovar
                   </Button>
                   <Button size="sm" variant="outline" className="gap-1.5 text-xs" onClick={() => onStatusChange(item.id, "nao_aprovado")}>
@@ -165,7 +165,7 @@ export default function ProjetoDetailModal({ item, open, onOpenChange, onStatusC
                   </Button>
                   {currentStatus === "levantado" && (
                     <Button size="sm" variant="outline" className="gap-1.5 text-xs" onClick={() => onStatusChange(item.id, "backlog")}>
-                      <Archive className="h-3.5 w-3.5 text-amber-600" />
+                      <Archive className="h-3.5 w-3.5 text-status-warning" />
                       Manter no Backlog
                     </Button>
                   )}
@@ -173,19 +173,19 @@ export default function ProjetoDetailModal({ item, open, onOpenChange, onStatusC
               )}
               {currentStatus === "aprovado" && (
                 <Button size="sm" variant="outline" className="gap-1.5 text-xs" onClick={() => onStatusChange(item.id, "priorizado")}>
-                  <ArrowRight className="h-3.5 w-3.5 text-indigo-600" />
+                  <ArrowRight className="h-3.5 w-3.5 text-status-info" />
                   Priorizar
                 </Button>
               )}
               {currentStatus === "priorizado" && (
                 <Button size="sm" variant="outline" className="gap-1.5 text-xs" onClick={() => onStatusChange(item.id, "em_execucao")}>
-                  <Play className="h-3.5 w-3.5 text-[#738925]" />
+                  <Play className="h-3.5 w-3.5 text-secondary" />
                   Iniciar Execução
                 </Button>
               )}
               {currentStatus === "em_execucao" && (
                 <Button size="sm" variant="outline" className="gap-1.5 text-xs" onClick={() => onStatusChange(item.id, "entregue")}>
-                  <PackageCheck className="h-3.5 w-3.5 text-emerald-600" />
+                  <PackageCheck className="h-3.5 w-3.5 text-status-success" />
                   Marcar como Entregue
                 </Button>
               )}
@@ -217,7 +217,7 @@ export default function ProjetoDetailModal({ item, open, onOpenChange, onStatusC
                   type="button"
                   variant="ghost"
                   size="sm"
-                  className="h-7 gap-1.5 text-xs text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+                  className="h-7 gap-1.5 text-xs text-status-warning hover:text-status-warning hover:bg-status-warning/15"
                   disabled={isGeneratingAI}
                   onClick={async () => {
                     if (!item) return;
@@ -630,8 +630,8 @@ export default function ProjetoDetailModal({ item, open, onOpenChange, onStatusC
                 {entregasProjeto.map((entrega) => {
                   const statusEntregaColors: Record<string, string> = {
                     pendente: "bg-muted text-muted-foreground",
-                    em_andamento: "bg-blue-500/15 text-blue-700",
-                    concluido: "bg-emerald-500/15 text-emerald-700",
+                    em_andamento: "bg-status-info/15 text-status-info",
+                    concluido: "bg-status-success/15 text-status-success",
                     bloqueado: "bg-destructive/15 text-destructive",
                   };
                   const statusEntregaLabels: Record<string, string> = {

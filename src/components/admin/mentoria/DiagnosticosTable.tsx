@@ -74,7 +74,7 @@ export function DiagnosticosTable({ onViewDetails }: DiagnosticosTableProps) {
   const getPlanoBadgeColor = (plano: string) => {
     switch (plano) {
       case "academy":
-        return "bg-blue-500/10 text-blue-500 border-blue-500/20";
+        return "bg-status-info/10 text-status-info border-status-info/20";
       case "business":
         return "bg-primary/10 text-primary border-primary/20";
       default:
@@ -96,20 +96,20 @@ export function DiagnosticosTable({ onViewDetails }: DiagnosticosTableProps) {
           <p className="text-sm text-muted-foreground">Total</p>
           <p className="text-2xl font-bold">{formularios?.length || 0}</p>
         </div>
-        <div className="bg-blue-500/10 rounded-lg p-3">
-          <p className="text-sm text-blue-500">Academy</p>
+        <div className="bg-status-info/10 rounded-lg p-3">
+          <p className="text-sm text-status-info">Academy</p>
           <p className="text-2xl font-bold">{totalAcademy}</p>
         </div>
         <div className="bg-primary/10 rounded-lg p-3">
           <p className="text-sm text-primary">Business</p>
           <p className="text-2xl font-bold">{totalBusiness}</p>
         </div>
-        <div className="bg-green-500/10 rounded-lg p-3">
-          <p className="text-sm text-green-500">Completos</p>
+        <div className="bg-status-success/10 rounded-lg p-3">
+          <p className="text-sm text-status-success">Completos</p>
           <p className="text-2xl font-bold">{totalCompletos}</p>
         </div>
-        <div className="bg-amber-500/10 rounded-lg p-3">
-          <p className="text-sm text-amber-500">Incompletos</p>
+        <div className="bg-status-warning/10 rounded-lg p-3">
+          <p className="text-sm text-status-warning">Incompletos</p>
           <p className="text-2xl font-bold">{totalIncompletos}</p>
         </div>
       </div>
