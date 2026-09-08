@@ -12,7 +12,6 @@ import { CentralConteudo } from "@/components/dashboard/CentralConteudo";
 import { CentralConteudoGratuito } from "@/components/dashboard/CentralConteudoGratuito";
 import { RankingTicker } from "@/components/dashboard/RankingTicker";
 import { RankingTickerGratuito } from "@/components/dashboard/RankingTickerGratuito";
-import { DashboardTour } from "@/components/dashboard/DashboardTour";
 import { WeeklyProgressCard } from "@/components/dashboard/WeeklyProgressCard";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useUserRole } from "@/hooks/useUserRole";
@@ -31,12 +30,6 @@ export default function Dashboard() {
     if (isVisitante) return false;
     return profile?.senha_temporaria === true || profile?.primeiro_acesso === true;
   }, [loadingRole, loadingProfile, isVisitante, profile]);
-
-  const showTour = useMemo(() => {
-    if (loadingProfile) return false;
-    if (isVisitante) return false;
-    return profile?.primeiro_acesso === true && sessionStorage.getItem('onboarding_video_visto') === 'true';
-  }, [loadingProfile, isVisitante, profile]);
 
   /* Espelha a query do NovidadesSemana — TanStack faz dedup pela mesma key.
      Esconde a section "Comunidade" quando não há novidade publicada. */
@@ -62,9 +55,6 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Tour guiado no primeiro acesso */}
-      {showTour && <DashboardTour run={showTour} />}
-
       <main className="w-full space-y-6 px-4 pt-6 pb-8 md:space-y-8 md:px-8 md:pt-6 md:pb-10 lg:px-12 lg:pt-8 lg:pb-12">
         {isVisitante ? (
           <div className="space-y-6">

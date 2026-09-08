@@ -27,14 +27,14 @@ const planConfig: Record<PlanType, { title: string; icon: React.ReactNode; empty
     emptyMessage: 'Nenhum mentorado Academy encontrado',
   },
   business_sistemas: {
-    title: 'Selecionar Cliente Insider',
+    title: 'Selecionar Insider Pago',
     icon: <Building2 className="h-5 w-5 text-primary" />,
-    emptyMessage: 'Nenhum cliente Insider encontrado',
+    emptyMessage: 'Nenhum Insider Pago encontrado',
   },
   insider_free: {
-    title: 'Selecionar Insider (não pago)',
+    title: 'Selecionar Insider Free',
     icon: <Sparkles className="h-5 w-5 text-primary" />,
-    emptyMessage: 'Nenhum Insider não pago encontrado',
+    emptyMessage: 'Nenhum Insider Free encontrado',
   },
 };
 

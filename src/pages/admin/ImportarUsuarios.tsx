@@ -250,11 +250,11 @@ export default function ImportarUsuarios() {
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="business_sistemas" id="business_sistemas" />
-                  <Label htmlFor="business_sistemas" className="cursor-pointer font-normal">Insider</Label>
+                  <Label htmlFor="business_sistemas" className="cursor-pointer font-normal">Insider Pago</Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="insider_free" id="insider_free" />
-                  <Label htmlFor="insider_free" className="cursor-pointer font-normal">Insider (não pago)</Label>
+                  <Label htmlFor="insider_free" className="cursor-pointer font-normal">Insider Free</Label>
                 </div>
               </RadioGroup>
             </div>

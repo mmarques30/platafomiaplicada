@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Eye, EyeOff, GraduationCap, Building2, Sparkles, Play } from "lucide-react";
+import { Eye, EyeOff, GraduationCap, Building2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -11,9 +11,6 @@ import {
 import { useAdminView } from "@/hooks/useAdminView";
 import { AdminViewMode } from "@/contexts/AdminViewContext";
 import { UserSelectorByPlanModal } from "./UserSelectorByPlanModal";
-import { OnboardingVideo } from "@/components/onboarding/OnboardingVideo";
-import { DashboardTour } from "@/components/dashboard/DashboardTour";
-import { ProximosPassosCard } from "@/components/onboarding/ProximosPassosCard";
 
 interface AdminViewSelectorProps {
   isAdmin: boolean;
@@ -23,14 +20,13 @@ type PlanType = 'academy' | 'business_sistemas' | 'insider_free';
 
 const viewOptions: { mode: AdminViewMode; label: string; icon: React.ReactNode }[] = [
   { mode: "academy", label: "Academy", icon: <GraduationCap className="h-4 w-4" /> },
-  { mode: "business_sistemas", label: "Insider", icon: <Building2 className="h-4 w-4" /> },
-  { mode: "insider_free", label: "Insider (não pago)", icon: <Sparkles className="h-4 w-4" /> },
+  { mode: "business_sistemas", label: "Insider Pago", icon: <Building2 className="h-4 w-4" /> },
+  { mode: "insider_free", label: "Insider Free", icon: <Sparkles className="h-4 w-4" /> },
 ];
 
 export function AdminViewSelector({ isAdmin }: AdminViewSelectorProps) {
   const { viewAs, setViewAs, resetView, canUseViewAs, impersonatedUserName } = useAdminView(isAdmin);
   const [selectedPlanForModal, setSelectedPlanForModal] = useState<PlanType | null>(null);
-  const [onboardingStep, setOnboardingStep] = useState<'idle' | 'video' | 'tour' | 'proximos_passos'>('idle');
 
   if (!canUseViewAs) return null;
 
@@ -96,11 +92,6 @@ export function AdminViewSelector({ isAdmin }: AdminViewSelectorProps) {
               </DropdownMenuItem>
             </>
           )}
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => setOnboardingStep('video')} className="gap-2 cursor-pointer">
-            <Play className="h-4 w-4" />
-            Simular Onboarding
-          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
@@ -113,17 +104,6 @@ export function AdminViewSelector({ isAdmin }: AdminViewSelectorProps) {
         />
       )}
 
-      {onboardingStep === 'video' && (
-        <OnboardingVideo previewMode onClose={() => setOnboardingStep('tour')} />
-      )}
-
-      {onboardingStep === 'tour' && (
-        <DashboardTour run previewMode onComplete={() => setOnboardingStep('proximos_passos')} />
-      )}
-
-      {onboardingStep === 'proximos_passos' && (
-        <ProximosPassosCard previewMode onClose={() => setOnboardingStep('idle')} />
-      )}
     </>
   );
 }

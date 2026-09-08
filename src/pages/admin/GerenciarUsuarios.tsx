@@ -282,8 +282,8 @@ export default function GerenciarUsuários() {
           <SelectContent>
             <SelectItem value="all">Todos os Planos</SelectItem>
             <SelectItem value="academy">Academy</SelectItem>
-            <SelectItem value="business_sistemas">Insider</SelectItem>
-            <SelectItem value="insider_free">Insider (não pago)</SelectItem>
+            <SelectItem value="business_sistemas">Insider Pago</SelectItem>
+            <SelectItem value="insider_free">Insider Free</SelectItem>
             <SelectItem value="none">Sem Plano</SelectItem>
           </SelectContent>
         </Select>
@@ -363,8 +363,8 @@ export default function GerenciarUsuários() {
                       }`}
                     >
                       {(user as any).plano_mentoria === "academy" && "Academy"}
-                      {(user as any).plano_mentoria === "business_sistemas" && "Insider"}
-                      {(user as any).plano_mentoria === "insider_free" && "Insider (não pago)"}
+                      {(user as any).plano_mentoria === "business_sistemas" && "Insider Pago"}
+                      {(user as any).plano_mentoria === "insider_free" && "Insider Free"}
                     </Badge>
                   ) : (
                     <Badge variant="outline" className="border-gray-400 text-gray-600 text-xs">

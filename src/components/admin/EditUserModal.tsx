@@ -57,8 +57,8 @@ interface EditUserModalProps {
 
 const PLANOS = [
   { value: "academy", label: "Academy", description: "B2C Individual - Acesso às trilhas" },
-  { value: "business_sistemas", label: "Insider", description: "Pago - IAplicada constrói, cliente acompanha (tem Academy)" },
-  { value: "insider_free", label: "Insider (não pago)", description: "Sem projeto contratado - visão Insider" },
+  { value: "business_sistemas", label: "Insider Pago", description: "Pago - IAplicada constrói, cliente acompanha (tem Academy)" },
+  { value: "insider_free", label: "Insider Free", description: "Sem projeto contratado - visão Insider" },
 ];
 
 export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) {

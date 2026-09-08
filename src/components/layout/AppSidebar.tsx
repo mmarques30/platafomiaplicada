@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Home, BookOpen, Star, Bell, Settings, LogOut, MessageSquare, TrendingUp, GraduationCap, Layers, ChevronDown } from "lucide-react";
+import { Home, BookOpen, Star, Bell, LogOut, MessageSquare, TrendingUp, GraduationCap, Layers, ChevronDown } from "lucide-react";
 import { SidebarComunidadeItem } from "./SidebarComunidadeItem";
 import { SidebarAdminSection } from "./SidebarAdminSection";
 import { useAdminViewContext } from "@/contexts/AdminViewContext";
@@ -30,11 +30,6 @@ import { useMenuConfig } from "@/hooks/useMenuConfig";
 import { useEnvironment } from "@/hooks/useEnvironment";
 import { useSkillsMembro } from "@/hooks/useSkillsMembro";
 import * as LucideIcons from "lucide-react";
-import { SidebarUserCard } from "./SidebarUserCard";
-import { useBusinessUserId } from "@/hooks/useBusinessUserId";
-import { useContratosBusiness } from "@/hooks/useContratosBusiness";
-import { useEtapasBusiness } from "@/hooks/useEtapasBusiness";
-import { useProgressoGeral } from "@/hooks/useEvolucao";
 
 export function AppSidebar() {
   const { open } = useSidebar();
@@ -48,24 +43,6 @@ export function AppSidebar() {
   const { isLider: isSkillsLider, isLoading: skillsMembroLoading } = useSkillsMembro();
   const { currentEnvironment } = useEnvironment();
 
-  // Progress data for SidebarUserCard
-  const businessUserId = useBusinessUserId();
-  const { contrato } = useContratosBusiness(isBusiness ? businessUserId : undefined);
-  const { data: etapas } = useEtapasBusiness(isBusiness ? contrato?.id : undefined);
-  const { data: progressoGeral } = useProgressoGeral();
-
-  const userName = user?.user_metadata?.nome_completo || user?.email || "";
-  const userProgress = (() => {
-    if (isBusiness && etapas && etapas.length > 0) {
-      const concluidas = etapas.filter((e: any) => e.status === "concluida").length;
-      return Math.round((concluidas / etapas.length) * 100);
-    }
-    if (isAcademy && progressoGeral) {
-      return progressoGeral.percentualConclusao ?? 0;
-    }
-    return 0;
-  })();
-  
   const collapsed = !open;
   const [expandedMenus, setExpandedMenus] = useState<string[]>([]);
   const [logoError, setLogoError] = useState(false);
@@ -540,40 +517,7 @@ export function AppSidebar() {
       </SidebarContent>
 
       <SidebarFooter className="border-t border-sidebar-border p-4">
-        {!isVisitante && effectivePlan && (
-          <SidebarUserCard
-            nome={userName}
-            plano={effectivePlan}
-            progresso={userProgress}
-            collapsed={collapsed}
-          />
-        )}
         <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild className="group">
-              <NavLink 
-                data-tour="configuracoes"
-                to="/configuracoes"
-                className={({ isActive }) => cn(
-                  "relative flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors font-medium pl-4",
-                  isActive ? "text-foreground font-semibold" : "text-foreground/75 hover:text-foreground"
-                )}
-              >
-                {({ isActive }) => (
-                  <>
-                    <span className={cn(
-                      "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
-                      isActive 
-                        ? "bg-brand-strong opacity-100" 
-                        : "bg-brand-strong opacity-0 group-hover:opacity-50"
-                    )} />
-                    <Settings className="h-4 w-4 shrink-0" strokeWidth={1.5} />
-                    {!collapsed && <span className="text-sm">Configurações</span>}
-                  </>
-                )}
-              </NavLink>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton onClick={handleLogout} className="text-destructive/80 hover:text-destructive hover:bg-destructive/10 py-2.5">
               <LogOut className="h-4 w-4 shrink-0" strokeWidth={1.5} />
