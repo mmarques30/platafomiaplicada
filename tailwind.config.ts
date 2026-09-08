@@ -95,16 +95,19 @@ export default {
         },
         /* IAplicada Brand Colors - Full palette */
         aplicada: {
+          // Paleta legada "aplicada-green" mapeada para os tokens da marca:
+          // assim as telas antigas seguem o design system (e o escopo escuro
+          // dos cards, onde primary vira lima) sem reescrever cada classe.
           green: {
-            900: "hsl(73, 64%, 32%)",  /* #738925 - Darkest */
-            800: "hsl(73, 54%, 39%)",  /* #889C2D - Dark */
-            700: "hsl(73, 55%, 47%)",  /* #9EB038 - Primary */
-            600: "hsl(73, 37%, 58%)",  /* #BCC95D - Subtitle */
-            500: "hsl(73, 35%, 65%)",  /* #C8D27B - Secondary */
-            400: "hsl(73, 40%, 75%)",  /* Light accent */
-            300: "hsl(73, 45%, 85%)",  /* Lighter */
-            200: "hsl(73, 50%, 92%)",  /* Very light */
-            100: "hsl(63, 45%, 94%)",  /* #F6F7E9 - Off-white */
+            900: "hsl(var(--brand-strong) / <alpha-value>)",
+            800: "hsl(var(--brand-strong) / <alpha-value>)",
+            700: "hsl(var(--primary) / <alpha-value>)",
+            600: "hsl(var(--lime) / <alpha-value>)",
+            500: "hsl(var(--lime) / <alpha-value>)",
+            400: "hsl(var(--secondary) / <alpha-value>)",
+            300: "hsl(var(--secondary) / <alpha-value>)",
+            200: "hsl(var(--secondary) / <alpha-value>)",
+            100: "hsl(var(--muted) / <alpha-value>)",
           },
           dark: "hsl(72, 6%, 18%)",     /* #2F302B - Dark base */
           light: "hsl(0, 0%, 100%)",    /* #FFFFFF */
