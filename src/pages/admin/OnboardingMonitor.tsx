@@ -49,8 +49,8 @@ interface UserRow {
 
 const PLANO_LABELS: Record<string, string> = {
   academy: "Academy",
-  business_sistemas: "Insider",
-  insider_free: "Insider (não pago)",
+  business_sistemas: "Insider Pago",
+  insider_free: "Insider Free",
 };
 
 function planoLabel(p: Plano) {
@@ -122,8 +122,8 @@ type FilterKey = "todos" | "academy" | "business_sistemas" | "insider_free" | "s
 const FILTERS: { key: FilterKey; label: string }[] = [
   { key: "todos", label: "Todos" },
   { key: "academy", label: "Academy" },
-  { key: "business_sistemas", label: "Insider" },
-  { key: "insider_free", label: "Insider (não pago)" },
+  { key: "business_sistemas", label: "Insider Pago" },
+  { key: "insider_free", label: "Insider Free" },
   { key: "sem_plano", label: "Sem plano" },
   { key: "parados", label: "Parados 3+ dias" },
 ];

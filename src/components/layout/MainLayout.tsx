@@ -16,9 +16,7 @@ import logoAplicada from "@/assets/logo-aplicada-nova.png";
 import { MarIAnaFloatingButton } from "@/components/shared/MarIAnaFloatingButton";
 import { PageSkeleton } from "@/components/shared/PageSkeleton";
 import { VisitorExpirationNotice } from "@/components/shared/VisitorExpirationNotice";
-import { OnboardingVideo } from "@/components/onboarding/OnboardingVideo";
 import { TrocarSenhaModal } from "@/components/auth/TrocarSenhaModal";
-import { ProximosPassosCard } from "@/components/onboarding/ProximosPassosCard";
 import { useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import { AnimatePresence } from "framer-motion";
@@ -76,7 +74,6 @@ export function MainLayout() {
   // Layout unificado para todos os usuários
   return (
     <>
-      {!isBusinessPlan && <OnboardingVideo />}
       <SidebarProvider>
         <TopHeader />
         <div className={cn(
@@ -109,7 +106,6 @@ export function MainLayout() {
           )}
         </div>
       </SidebarProvider>
-      <ProximosPassosCard />
     </>
   );
 }

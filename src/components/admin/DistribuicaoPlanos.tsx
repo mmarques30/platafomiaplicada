@@ -19,8 +19,8 @@ const COLORS = {
 
 const LABELS = {
   academy: "Academy",
-  business_sistemas: "Insider",
-  insider_free: "Insider (não pago)",
+  business_sistemas: "Insider Pago",
+  insider_free: "Insider Free",
   sem_plano: "Sem Plano",
 };
 
