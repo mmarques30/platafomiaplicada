@@ -1,65 +1,50 @@
-import { Card } from "@/components/ui/card";
 import { Users } from "lucide-react";
 import { useRankingComunidade } from "@/hooks/useRankingComunidade";
 import { useAuth } from "@/hooks/useAuth";
-import grafiaEvolucao from "@/assets/grafia-evolucao.svg";
 
 export function HeroComunidade() {
   const { data: ranking } = useRankingComunidade();
   const { user } = useAuth();
-  
+
   const minhaPosicao = ranking?.find((r: any) => r.user_id === user?.id);
   const totalMembros = ranking?.length || 0;
   const meusPontos = minhaPosicao?.total_pontos || 0;
   const posicao = minhaPosicao?.posicao || 0;
 
+  const stats = [
+    { label: "Sua posição", value: posicao > 0 ? `${posicao}º` : "-", unit: "no ranking" },
+    { label: "Pontos", value: meusPontos.toLocaleString(), unit: "XP acumulado" },
+    { label: "Comunidade", value: totalMembros, unit: "membros ativos" },
+  ];
+
   return (
-    <Card className="relative overflow-hidden border border-primary/30 bg-card">
-      <img 
-        src={grafiaEvolucao} 
-        alt="" 
-        className="absolute bottom-2 right-2 h-16 opacity-20 pointer-events-none" 
-      />
-      <div className="p-8">
-        <div className="flex items-start justify-between mb-6">
-          <div>
-            <h2 className="text-3xl font-bold text-foreground mb-2">
-              <span className="text-primary">Ranking</span> IAplicada
-            </h2>
-            <p className="text-muted-foreground text-lg">
-              Veja como você está em relação aos outros membros
-            </p>
-          </div>
-          <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-muted/50 border border-border">
-            <Users className="h-5 w-5 text-primary" />
-            <span className="text-foreground font-semibold">{totalMembros}</span>
-            <span className="text-muted-foreground text-sm">membros</span>
-          </div>
+    <section className="rounded-2xl border border-border bg-card p-5 md:p-8">
+      <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+        <div className="space-y-2">
+          <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">Comunidade</span>
+          <h2 className="font-serif-display text-3xl leading-none text-foreground md:text-4xl">
+            Ranking <em className="font-serif-italic text-primary">IAplicada</em>
+          </h2>
+          <p className="text-sm text-muted-foreground">Veja como você está em relação aos outros membros.</p>
         </div>
-
-        {/* Mini Cards de Estatísticas */}
-        <div className="grid grid-cols-3 gap-3">
-          <div className="rounded-lg border border-border bg-card p-3">
-            <span className="text-xs text-foreground uppercase tracking-wide block mb-2">Sua Posição</span>
-            <p className="text-xl font-semibold text-foreground">
-              {posicao > 0 ? `#${posicao}º` : '-'}
-            </p>
-            <p className="text-xs text-muted-foreground">no ranking</p>
-          </div>
-
-          <div className="rounded-lg border border-border bg-card p-3">
-            <span className="text-xs text-foreground uppercase tracking-wide block mb-2">Pontos Totais</span>
-            <p className="text-xl font-semibold text-foreground">{meusPontos.toLocaleString()}</p>
-            <p className="text-xs text-muted-foreground">XP acumulado</p>
-          </div>
-
-          <div className="rounded-lg border border-border bg-card p-3">
-            <span className="text-xs text-foreground uppercase tracking-wide block mb-2">Comunidade</span>
-            <p className="text-xl font-semibold text-foreground">{totalMembros}</p>
-            <p className="text-xs text-muted-foreground">membros ativos</p>
-          </div>
+        <div className="inline-flex shrink-0 items-center gap-2 self-start rounded-full border border-border bg-muted px-4 py-2 text-sm">
+          <Users className="h-4 w-4 text-primary" />
+          <span className="font-semibold text-foreground">{totalMembros}</span>
+          <span className="text-muted-foreground">membros</span>
         </div>
       </div>
-    </Card>
+
+      <div className="mt-6 grid grid-cols-3 gap-3">
+        {stats.map(({ label, value, unit }) => (
+          <div key={label} className="rounded-xl border border-border bg-card p-3 md:p-4">
+            <span className="block text-[10px] font-medium uppercase tracking-[0.08em] text-muted-foreground sm:text-[11px] sm:tracking-[0.12em]">
+              {label}
+            </span>
+            <p className="mt-2 text-2xl font-semibold leading-none text-foreground md:text-3xl">{value}</p>
+            <p className="mt-1 text-xs text-muted-foreground">{unit}</p>
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }

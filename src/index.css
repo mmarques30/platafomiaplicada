@@ -536,16 +536,6 @@
     color: hsl(72 6% 18%) !important;
   }
 
-  .bg-muted,
-  .bg-input {
-    color: hsl(72 6% 18%) !important;
-  }
-
-  .bg-muted::placeholder,
-  .bg-input::placeholder {
-    color: hsl(72 6% 45%) !important;
-  }
-
   .bg-card h1,
   .bg-card h2,
   .bg-card h3,

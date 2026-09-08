@@ -9,7 +9,7 @@ export default function MeuDiagnostico() {
   const navigate = useNavigate();
   const { formulario, isLoading } = useMentoriaForm();
   const { isAdmin, isLoading: roleLoading } = useUserRole();
-  const { effectivePlan, isVisitante, isBusiness, isSimulating, isLoading: planLoading } = useEffectivePlan(isAdmin, roleLoading);
+  const { isVisitante, isBusinessSistemas, isSimulating, isLoading: planLoading } = useEffectivePlan(isAdmin, roleLoading);
   
   // Ref para garantir que o redirect aconteça apenas UMA vez
   const hasRedirected = useRef(false);
@@ -31,8 +31,8 @@ export default function MeuDiagnostico() {
       return;
     }
 
-    // Business -> mentoria/diagnostico (dashboard robusto)
-    if (isBusiness) {
+    // Insider pago -> diagnóstico da mentoria (painel do projeto)
+    if (isBusinessSistemas) {
       hasRedirected.current = true;
       navigate('/mentoria/diagnostico', { replace: true });
       return;
@@ -42,7 +42,7 @@ export default function MeuDiagnostico() {
     // O painel já mostra o botão "Preencher diagnóstico" se ainda não preencheu
     hasRedirected.current = true;
     navigate('/diagnostico/painel', { replace: true });
-  }, [isLoading, planLoading, isVisitante, isBusiness, isAdmin, isSimulating, formulario, navigate]);
+  }, [isLoading, planLoading, isVisitante, isBusinessSistemas, isAdmin, isSimulating, formulario, navigate]);
 
   // Tela de loading enquanto redireciona
   return (

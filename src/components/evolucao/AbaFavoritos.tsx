@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Heart, Search } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import FavoritoRow from "@/components/favoritos/FavoritoRow";
 
 export function AbaFavoritos() {
@@ -109,11 +110,11 @@ export function AbaFavoritos() {
     return matchesSearch && matchesTab;
   });
 
-  if (isLoading) return <div className="py-8"><p>Carregando...</p></div>;
+  if (isLoading) return <Skeleton className="h-64 w-full rounded-2xl" />;
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row gap-3 mb-6">
+      <div className="flex flex-col gap-3 sm:flex-row">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input placeholder="Buscar nos favoritos..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-10" />
@@ -138,8 +139,10 @@ export function AbaFavoritos() {
         {!filteredFavoritos || filteredFavoritos.length === 0 ? (
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-12">
-              <Heart className="h-16 w-16 text-muted-foreground mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Nenhum favorito encontrado</h3>
+              <span className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-muted text-primary">
+                <Heart className="h-6 w-6" />
+              </span>
+              <h3 className="mb-1 font-serif-display text-2xl text-foreground">Nenhum favorito encontrado</h3>
               <p className="text-muted-foreground text-center">
                 {searchTerm ? "Tente ajustar sua busca" : "Comece a favoritar conteúdos"}
               </p>
@@ -147,7 +150,7 @@ export function AbaFavoritos() {
           </Card>
         ) : (
           <Card>
-            <CardContent className="p-0">
+            <CardContent className="divide-y divide-border p-0">
               {filteredFavoritos.map((favorito) => {
                 const { item, link } = getFavoritoDetails(favorito);
                 if (!item) return null;

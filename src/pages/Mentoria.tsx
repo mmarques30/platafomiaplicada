@@ -35,7 +35,7 @@ export default function Mentoria() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { isAdmin, isLoading: roleLoading } = useUserRole();
-  const { isBusiness, isBusinessParceria, isBusinessSistemas, isSkills, isAcademy } = useEffectivePlan(isAdmin, roleLoading);
+  const { isBusiness, isBusinessParceria, isBusinessSistemas, isAcademy, isLoading: planLoading } = useEffectivePlan(isAdmin, roleLoading);
   const [searchParams, setSearchParams] = useSearchParams();
   const { track } = useOnboardingTracking();
   const trackedRoadmapRef = useRef(false);
@@ -74,20 +74,15 @@ export default function Mentoria() {
     { numero: 4, label: 'Certificado', status: 'proximo' as const },
   ];
   
-  // Redirecionar usuários Skills para suas páginas específicas
+  // O painel de mentoria ficou restrito ao Insider pago (projeto em
+  // andamento). Todo o resto — Academy, ex-Builder, ex-Skills e a equipe sem
+  // "Ver como" — usa a visão "Meu progresso" da Academy (/evolucao).
+  const usaVisaoAcademy = !roleLoading && !planLoading && !isBusinessSistemas;
   useEffect(() => {
-    if (isSkills && !isBusiness) {
-      const tab = searchParams.get("tab");
-      if (tab === "roadmap") {
-        navigate('/skills/roadmap', { replace: true });
-      } else {
-        navigate('/skills/equipe', { replace: true });
-      }
-    }
-  }, [isSkills, isBusiness, navigate, searchParams]);
+    if (usaVisaoAcademy) navigate('/evolucao', { replace: true });
+  }, [usaVisaoAcademy, navigate]);
 
-  // Se Skills (sem Business), não renderizar (aguardar redirect)
-  if (isSkills && !isBusiness) {
+  if (roleLoading || planLoading || usaVisaoAcademy) {
     return null;
   }
   

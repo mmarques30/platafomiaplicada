@@ -27,7 +27,7 @@ export default function FavoritoRow({ tipo, titulo, descricao, link, onRemove, i
   const Icon = config.icon;
 
   return (
-    <div className="flex items-center gap-4 p-4 border-b last:border-b-0 hover:bg-accent/50 transition-colors group">
+    <div className="group flex items-center gap-4 p-4 transition-colors first:rounded-t-2xl last:rounded-b-2xl hover:bg-accent/50">
       {/* Ícone por tipo */}
       <div className={`w-10 h-10 rounded-lg ${config.bgColor} flex items-center justify-center shrink-0`}>
         <Icon className="w-5 h-5 text-primary" />
