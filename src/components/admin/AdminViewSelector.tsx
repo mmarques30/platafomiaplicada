@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Eye, EyeOff, User, GraduationCap, Building2, Wrench, Play } from "lucide-react";
+import { Eye, EyeOff, GraduationCap, Building2, Sparkles, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -19,13 +19,12 @@ interface AdminViewSelectorProps {
   isAdmin: boolean;
 }
 
-type PlanType = 'academy' | 'skills' | 'business_parceria' | 'business_sistemas';
+type PlanType = 'academy' | 'business_sistemas' | 'insider_free';
 
 const viewOptions: { mode: AdminViewMode; label: string; icon: React.ReactNode }[] = [
-  { mode: "visitante", label: "Visitante (gratuito)", icon: <User className="h-4 w-4" /> },
   { mode: "academy", label: "Academy", icon: <GraduationCap className="h-4 w-4" /> },
-  { mode: "business_parceria", label: "Builder", icon: <Building2 className="h-4 w-4" /> },
-  { mode: "business_sistemas", label: "System", icon: <Wrench className="h-4 w-4" /> },
+  { mode: "business_sistemas", label: "Insider", icon: <Building2 className="h-4 w-4" /> },
+  { mode: "insider_free", label: "Insider (não pago)", icon: <Sparkles className="h-4 w-4" /> },
 ];
 
 export function AdminViewSelector({ isAdmin }: AdminViewSelectorProps) {
@@ -38,13 +37,8 @@ export function AdminViewSelector({ isAdmin }: AdminViewSelectorProps) {
   const currentView = viewOptions.find((opt) => opt.mode === viewAs);
 
   const handleOptionClick = (mode: AdminViewMode) => {
-    if (mode === "visitante") {
-      // Visitante não requer seleção de usuário
-      setViewAs(mode);
-    } else {
-      // Para Academy, Builder e System, abrir modal de seleção
-      setSelectedPlanForModal(mode as PlanType);
-    }
+    // Toda visão simula um usuário real do plano: abre o seletor
+    if (mode) setSelectedPlanForModal(mode as PlanType);
   };
 
   const handleUserSelect = (userId: string, userName: string) => {
@@ -56,7 +50,7 @@ export function AdminViewSelector({ isAdmin }: AdminViewSelectorProps) {
   // Determinar o label do botão
   const getButtonLabel = () => {
     if (!currentView) return "Ver como...";
-    if (viewAs !== "visitante" && impersonatedUserName) {
+    if (impersonatedUserName) {
       // Truncar nome se muito longo
       const shortName = impersonatedUserName.split(" ")[0];
       return `${currentView.label}: ${shortName}`;
@@ -86,7 +80,7 @@ export function AdminViewSelector({ isAdmin }: AdminViewSelectorProps) {
             >
               {option.icon}
               {option.label}
-              {option.mode !== "visitante" && viewAs === option.mode && impersonatedUserName && (
+              {viewAs === option.mode && impersonatedUserName && (
                 <span className="ml-auto text-xs text-muted-foreground">
                   ({impersonatedUserName.split(" ")[0]})
                 </span>

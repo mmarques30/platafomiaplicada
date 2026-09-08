@@ -42,6 +42,14 @@ export function MainLayout() {
   // papel carregam, segura o skeleton para não piscar menus errados.
   const environmentLoading = Boolean(environmentContext?.isLoading);
 
+  // Sem nenhum ambiente disponível (cadastro gratuito antigo, visitante ou
+  // conta sem plano): a plataforma não tem mais acesso gratuito.
+  useEffect(() => {
+    if (!isLoading && environmentContext && !environmentContext.isLoading && !environmentContext.hasAccess) {
+      navigate("/sem-acesso", { replace: true });
+    }
+  }, [isLoading, environmentContext, navigate]);
+
   // Redirecionar Business com primeiro_acesso para tela de boas-vindas
   useEffect(() => {
     if (

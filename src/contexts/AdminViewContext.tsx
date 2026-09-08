@@ -1,6 +1,9 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
-export type AdminViewMode = "visitante" | "academy" | "skills" | "business_parceria" | "business_sistemas" | null;
+/** Visões que o admin pode simular. Gratuito, Builder e Skills deixaram de existir. */
+export type AdminViewMode = "academy" | "business_sistemas" | "insider_free" | null;
+
+const VALID_VIEW_MODES: AdminViewMode[] = ["academy", "business_sistemas", "insider_free"];
 
 interface AdminViewContextType {
   viewAs: AdminViewMode;
@@ -16,7 +19,9 @@ const AdminViewContext = createContext<AdminViewContextType | undefined>(undefin
 export function AdminViewProvider({ children }: { children: ReactNode }) {
   const [viewAs, setViewAsState] = useState<AdminViewMode>(() => {
     if (typeof window !== "undefined") {
-      return localStorage.getItem("admin_view_as") as AdminViewMode || null;
+      const stored = localStorage.getItem("admin_view_as") as AdminViewMode | null;
+      // Valores antigos (visitante, skills, business_parceria) são descartados
+      return stored && VALID_VIEW_MODES.includes(stored) ? stored : null;
     }
     return null;
   });

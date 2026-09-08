@@ -1,4 +1,4 @@
-import { Lock, ChevronDown } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -8,34 +8,25 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useEnvironmentSafe, Environment, ENVIRONMENT_CONFIG } from "@/contexts/EnvironmentContext";
+import { useEnvironmentSafe, ENVIRONMENT_CONFIG } from "@/contexts/EnvironmentContext";
 import { cn } from "@/lib/utils";
 
-const ALL_ENVIRONMENTS: Environment[] = ["gratuito", "academy", "business_parceria", "business_sistemas"];
-
+/**
+ * Alternador de ambiente no topo. Só aparece para quem tem mais de um
+ * ambiente (ex.: Insider pago, que também tem Academy). Lista apenas os
+ * ambientes disponíveis — não existe mais "ambiente bloqueado" nem tela
+ * de seleção.
+ */
 export function EnvironmentSwitcher() {
   const env = useEnvironmentSafe();
 
   if (!env) return null;
 
-  const { 
-    currentEnvironment, 
-    availableEnvironments, 
-    setEnvironment,
-    environmentConfig 
-  } = env;
+  const { currentEnvironment, availableEnvironments, setEnvironment, environmentConfig } = env;
 
-  if (!currentEnvironment || !environmentConfig) {
+  if (!currentEnvironment || !environmentConfig || availableEnvironments.length < 2) {
     return null;
   }
-
-  const handleSelectEnvironment = (env: Environment) => {
-    if (!availableEnvironments.includes(env)) {
-      // Poderia abrir modal de upgrade
-      return;
-    }
-    setEnvironment(env);
-  };
 
   return (
     <DropdownMenu>
@@ -57,25 +48,18 @@ export function EnvironmentSwitcher() {
           Ambiente atual
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        
-        {ALL_ENVIRONMENTS.map((env) => {
-          const config = ENVIRONMENT_CONFIG[env];
-          const isAvailable = availableEnvironments.includes(env);
-          const isActive = currentEnvironment === env;
+
+        {availableEnvironments.map((option) => {
+          const config = ENVIRONMENT_CONFIG[option];
+          const isActive = currentEnvironment === option;
 
           return (
             <DropdownMenuItem
-              key={env}
-              onClick={() => handleSelectEnvironment(env)}
-              disabled={!isAvailable}
-              className={cn(
-                "flex items-center gap-2 cursor-pointer",
-                isActive && "bg-accent",
-                !isAvailable && "opacity-50 cursor-not-allowed"
-              )}
+              key={option}
+              onClick={() => setEnvironment(option)}
+              className={cn("flex items-center gap-2 cursor-pointer", isActive && "bg-accent")}
             >
               <span className="flex-1 font-medium text-sm">{config.label}</span>
-              {!isAvailable && <Lock className="h-3.5 w-3.5 text-muted-foreground" />}
               {isActive && <div className="w-2 h-2 rounded-full bg-primary" />}
             </DropdownMenuItem>
           );

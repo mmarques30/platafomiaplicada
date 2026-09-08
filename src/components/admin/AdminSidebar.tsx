@@ -110,7 +110,7 @@ const menuGroups: MenuGroup[] = [
     label: "Consultoria",
     icon: Wrench,
     items: [
-      { path: "/admin/mentoria/business-iaplicada", label: "System" },
+      { path: "/admin/mentoria/business-iaplicada", label: "Insider" },
     ],
   },
   {

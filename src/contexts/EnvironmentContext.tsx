@@ -3,13 +3,26 @@ import { useUserPlan, type UserPlan } from "@/hooks/useUserPlan";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useAuth } from "@/hooks/useAuth";
 
-export type Environment = "gratuito" | "academy" | "business_parceria" | "business_sistemas";
+/**
+ * Ambientes da plataforma.
+ *
+ * - academy          → alunos do Academy (inclui ex-Builder e ex-Skills)
+ * - business_sistemas → Insider pago (projeto em andamento; tem Academy também)
+ * - insider_free     → Insider não pago ("outra visão", ainda a definir)
+ *
+ * Não existe mais ambiente Gratuito nem Builder. A chave `business_sistemas`
+ * foi mantida para o Insider pago porque é o valor gravado em
+ * profiles.plano_mentoria e em menu_config.planos_permitidos.
+ */
+export type Environment = "academy" | "business_sistemas" | "insider_free";
 
 interface EnvironmentContextType {
   currentEnvironment: Environment | null;
   setEnvironment: (env: Environment) => void;
   availableEnvironments: Environment[];
   isEnvironmentSelected: boolean;
+  /** false = usuário autenticado mas sem nenhum ambiente (ex.: cadastro gratuito antigo) */
+  hasAccess: boolean;
   isLoading: boolean;
   environmentConfig: {
     label: string;
@@ -30,106 +43,101 @@ export const ENVIRONMENT_CONFIG: Record<Environment, {
   color: string;
   description: string;
 }> = {
-  gratuito: {
-    label: "Gratuito",
-    icon: "Gift",
-    color: "hsl(142, 76%, 36%)",
-    description: "Explore conteúdos gratuitos e a comunidade",
-  },
   academy: {
     label: "Academy",
     icon: "GraduationCap",
     color: "hsl(73, 55%, 46%)", // #9EB038
     description: "Trilhas completas + diagnóstico + evolução",
   },
-  business_parceria: {
-    label: "Builder",
-    icon: "Crown",
-    color: "hsl(45, 93%, 47%)",
-    description: "Academy + mentoria 1:1 + roadmap",
-  },
   business_sistemas: {
-    label: "System",
+    label: "Insider",
     icon: "Wrench",
     color: "hsl(45, 93%, 47%)",
-    description: "Acompanhamento de projeto - iAplicada constrói",
+    description: "Acompanhamento do projeto que a IAplicada constrói",
+  },
+  insider_free: {
+    label: "Insider",
+    icon: "Sparkles",
+    color: "hsl(45, 93%, 47%)",
+    description: "Visão Insider sem projeto contratado",
   },
 };
 
-/** Ordem de preferência quando o plano não aponta um ambiente específico. */
-const ENVIRONMENT_PRIORITY: Environment[] = ["business_sistemas", "business_parceria", "academy", "gratuito"];
+const ALL_ENVIRONMENTS: Environment[] = ["academy", "business_sistemas", "insider_free"];
+
+/**
+ * Ambientes a que um plano dá acesso.
+ *
+ * Valores legados continuam entrando (a migração no banco converte
+ * business_parceria/business/skills → academy e business_iaplicada →
+ * business_sistemas, mas o app trata os dois casos para não deixar
+ * ninguém pago de fora caso a migração ainda não tenha rodado).
+ */
+export function environmentsForPlan(plan: UserPlan | string | null): Environment[] {
+  switch (plan) {
+    case "business_sistemas":
+    case "business_iaplicada":
+      return ["academy", "business_sistemas"];
+    case "insider_free":
+      return ["insider_free"];
+    case "academy":
+    case "skills":
+    case "business_parceria":
+    case "business":
+      return ["academy"];
+    default:
+      return [];
+  }
+}
 
 /**
  * Resolve o ambiente em que o usuário entra automaticamente após o login.
- *
- * Não existe mais tela de seleção: o ambiente é o do plano contratado
- * (System, Builder ou Academy). Sem plano → Gratuito. Admin sem plano cai
- * no Builder, o mesmo padrão que a sidebar já assumia ao inferir pelo
- * plano efetivo.
+ * Não existe mais tela de seleção. Retorna null quando não há acesso.
  */
-function resolveDefaultEnvironment(
+export function resolveDefaultEnvironment(
   availableEnvironments: Environment[],
-  plan: UserPlan,
-  isAdmin: boolean,
-): Environment {
-  const planEnvironment: Environment | null =
-    plan === "business_sistemas"
+  plan: UserPlan | string | null,
+): Environment | null {
+  const preferred = environmentsForPlan(plan);
+  // Insider pago entra no Insider (não no Academy).
+  const planEnvironment =
+    plan === "business_sistemas" || plan === "business_iaplicada"
       ? "business_sistemas"
-      : plan === "business_parceria"
-        ? "business_parceria"
-        : plan === "academy" || plan === "skills"
-          ? "academy"
-          : null;
+      : preferred[0] ?? null;
 
   if (planEnvironment && availableEnvironments.includes(planEnvironment)) {
     return planEnvironment;
   }
-  if (isAdmin && availableEnvironments.includes("business_parceria")) {
-    return "business_parceria";
-  }
-  return ENVIRONMENT_PRIORITY.find((env) => availableEnvironments.includes(env)) ?? "gratuito";
+  // Equipe/admin sem plano: Academy é a visão mais completa.
+  if (availableEnvironments.includes("academy")) return "academy";
+  return availableEnvironments[0] ?? null;
 }
 
 export function EnvironmentProvider({ children }: { children: ReactNode }) {
   const [currentEnvironment, setCurrentEnvironment] = useState<Environment | null>(() => {
-    return sessionStorage.getItem(STORAGE_KEY) as Environment | null;
+    const stored = sessionStorage.getItem(STORAGE_KEY);
+    return stored && (ALL_ENVIRONMENTS as string[]).includes(stored) ? (stored as Environment) : null;
   });
 
   const { user } = useAuth();
   const { plan, isVisitante, isLoading: planLoading } = useUserPlan();
-  const { isAdmin, isLoading: roleLoading } = useUserRole();
+  const { isAdmin, isEquipe, isParceiro, isLoading: roleLoading } = useUserRole();
 
   const isLoading = planLoading || roleLoading;
 
   // Determinar ambientes disponíveis baseado no plano
   const availableEnvironments = useMemo<Environment[]>(() => {
     // Admin vê todos para simulação
-    if (isAdmin) {
-      return ["gratuito", "academy", "business_parceria", "business_sistemas"];
-    }
+    if (isAdmin) return [...ALL_ENVIRONMENTS];
 
-    // Visitante só vê gratuito
-    if (isVisitante) {
-      return ["gratuito"];
-    }
+    // Equipe e parceiros operam os projetos: Academy + Insider
+    if (isEquipe || isParceiro) return ["academy", "business_sistemas"];
 
-    // Baseado no plano - hierarquia paralela
-    switch (plan) {
-      case "business_parceria":
-        // Builder: ambiente próprio + acesso ao Academy
-        return ["gratuito", "academy", "business_parceria"];
-      case "business_sistemas":
-        // System: ambiente próprio (entrada separada do Builder) + acesso ao Academy
-        return ["gratuito", "academy", "business_sistemas"];
-      case "skills":
-        // Plano legado "skills" não tem mais ambiente próprio: cai no Academy
-        return ["gratuito", "academy"];
-      case "academy":
-        return ["gratuito", "academy"];
-      default:
-        return ["gratuito"];
-    }
-  }, [plan, isVisitante, isAdmin]);
+    // Cadastro gratuito (visitante) não tem mais acesso à plataforma
+    if (isVisitante) return [];
+
+    return environmentsForPlan(plan);
+  }, [plan, isVisitante, isAdmin, isEquipe, isParceiro]);
 
   const setEnvironment = (env: Environment) => {
     setCurrentEnvironment(env);
@@ -156,7 +164,6 @@ export function EnvironmentProvider({ children }: { children: ReactNode }) {
   // Validar se o ambiente atual ainda é válido quando os ambientes disponíveis mudam
   useEffect(() => {
     if (!isLoading && currentEnvironment && !availableEnvironments.includes(currentEnvironment)) {
-      // Ambiente atual não é mais válido, limpar
       clearEnvironment();
     }
   }, [availableEnvironments, currentEnvironment, isLoading]);
@@ -166,8 +173,10 @@ export function EnvironmentProvider({ children }: { children: ReactNode }) {
   // e papel ficam desabilitadas sem sessão.)
   useEffect(() => {
     if (isLoading || currentEnvironment) return;
-    setEnvironment(resolveDefaultEnvironment(availableEnvironments, plan, isAdmin));
-  }, [isLoading, currentEnvironment, availableEnvironments, plan, isAdmin]);
+    const next = resolveDefaultEnvironment(availableEnvironments, plan);
+    if (next) setEnvironment(next);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoading, currentEnvironment, availableEnvironments, plan]);
 
   const environmentConfig = currentEnvironment ? ENVIRONMENT_CONFIG[currentEnvironment] : null;
 
@@ -178,6 +187,7 @@ export function EnvironmentProvider({ children }: { children: ReactNode }) {
         setEnvironment,
         availableEnvironments,
         isEnvironmentSelected: currentEnvironment !== null,
+        hasAccess: availableEnvironments.length > 0,
         isLoading,
         environmentConfig,
       }}

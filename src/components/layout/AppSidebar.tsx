@@ -82,37 +82,29 @@ export function AppSidebar() {
   };
 
   // Em modo simulação, o EnvironmentSwitcher fica oculto; então garantimos que o filtro de menus
-  // acompanhe o plano simulado (evita cenário: ambiente "business" ocultando submenus de academy/skills).
-  // Builder (business_parceria) e System (business_sistemas) têm entradas separadas: respeitamos
-  // o ambiente escolhido pelo usuário e só inferimos do plano quando nada foi selecionado.
+  // acompanhe o plano simulado. Ambientes atuais: academy, business_sistemas (Insider pago)
+  // e insider_free (Insider não pago). Gratuito, Builder e Skills não existem mais.
   const effectiveEnvironment = (() => {
     if (!isViewingAs) {
       // Fallback: se nenhum ambiente selecionado, inferir do plano
       if (!currentEnvironment) {
         if (effectivePlan === 'business_sistemas') return 'business_sistemas';
-        // Plano legado "skills" não tem mais ambiente próprio: cai no Academy
-        if (effectivePlan === 'skills') return 'academy';
-        if (effectivePlan === 'business_parceria') return 'business_parceria';
-        if (effectivePlan === 'academy') return 'academy';
-        if (isVisitante) return 'gratuito';
+        if (effectivePlan === 'insider_free') return 'insider_free';
+        // Builder (legado) cai no Academy
+        if (effectivePlan === 'business_parceria' || effectivePlan === 'academy') return 'academy';
         return null;
       }
       return currentEnvironment;
     }
 
-    // Simulação: manter lógica existente
+    // Simulação
     switch (viewAs) {
-      case "visitante":
-        return "gratuito";
       case "academy":
         return "academy";
-      case "skills":
-        // Plano legado "skills" não tem mais ambiente próprio: cai no Academy
-        return "academy";
-      case "business_parceria":
-        return "business_parceria";
       case "business_sistemas":
         return "business_sistemas";
+      case "insider_free":
+        return "insider_free";
       default:
         return currentEnvironment;
     }
@@ -168,10 +160,6 @@ export function AppSidebar() {
   // Helper para determinar URL dinâmica baseada no plano
   const getMenuUrl = (menu: { menu_key: string; url: string | null }) => {
     if (menu.menu_key === 'meu_progresso') {
-      // Plano legado "skills" ainda roteia para /skills/equipe (Minha Equipe)
-      if (effectivePlan === 'skills') {
-        return '/skills/equipe';
-      }
       // Business vai para /mentoria (Visão Geral)
       if (effectivePlan === 'business_parceria' || effectivePlan === 'business_sistemas') {
         return '/mentoria';

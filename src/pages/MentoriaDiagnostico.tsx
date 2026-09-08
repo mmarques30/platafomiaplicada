@@ -55,9 +55,6 @@ export default function MentoriaDiagnostico() {
       navigate("/trilhas", { replace: true });
       return;
     }
-    if (effectivePlan === "skills") {
-      navigate("/skills/projeto/diagnostico", { replace: true });
-    }
   }, [isVisitante, effectivePlan, planLoading, navigate]);
 
   // Admin real (não simulando) na rota de formulário vai pro painel

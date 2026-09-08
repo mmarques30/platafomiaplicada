@@ -184,7 +184,7 @@ export function useUpdateUser() {
         profissao?: string | null;
         idade?: number | null;
         linkedin?: string | null;
-        plano_mentoria?: "academy" | "skills" | "business" | null;
+        plano_mentoria?: "academy" | "business_sistemas" | "insider_free" | null;
         data_expiracao_acesso?: string | null;
         conta_ativa?: boolean;
         roles?: AppRole[];

@@ -49,31 +49,8 @@ export function useMenuConfig() {
   const getSidebarMenus = (userPlan?: string | null, currentEnvironment?: string | null) => {
   // Menus a ocultar quando em ambiente específico
     const hiddenByEnvironment: Record<string, string[]> = {
-      // Gratuito: oculta tudo de progresso, skills e projeto
-      gratuito: [
-        'meu_progresso', 'meu_progresso_visao_geral', 'meu_progresso_roadmap',
-        'meu_progresso_conteudo', 'meu_progresso_entregas',
-        'evolucao', 'meu_diagnostico', 'minhas_duvidas',
-        'projeto_skills', 'projeto_skills_visao_geral',
-        'projeto_skills_performance', 'projeto_skills_diagnostico', 'projeto_skills_projetos', 'projeto_skills_entregas',
-        'trilhas_skills', 'skills_minha_equipe', 'skills_backlog',
-        'skills_roadmap', 'skills_entregas', 'skills_painel_lider',
-        'squad', 'squad_lider',
-        'meu_sistema'
-      ],
-
-      // Business Parceria: tem acesso completo ao Academy, então "Aprender"
-      // (trilhas) fica visível. Oculta apenas Skills-only + Squad + Projeto Skills.
-      business_parceria: [
-        'evolucao', 'meu_diagnostico', 'minhas_duvidas',
-        'trilhas_skills', 'skills_minha_equipe', 'skills_backlog', 'skills_roadmap',
-        'skills_entregas', 'skills_painel_lider',
-        'projeto_skills', 'projeto_skills_visao_geral', 'projeto_skills_performance', 'projeto_skills_diagnostico', 'projeto_skills_projetos', 'projeto_skills_entregas',
-        'squad', 'squad_lider',
-        'meu_sistema'
-      ],
-      
-      // Business Sistemas: versão mais restrita (cliente apenas acompanha) + Squad + Projeto Skills
+      // Insider pago (business_sistemas): cliente acompanha o projeto.
+      // Sem trilhas/calendário/progresso de mentoria, sem Skills e Squad.
       business_sistemas: [
         'trilhas', 'trilhas_skills', 'calendario',
         'evolucao', 'meu_diagnostico', 'minhas_duvidas',
@@ -83,6 +60,20 @@ export function useMenuConfig() {
         'projeto_skills', 'projeto_skills_visao_geral', 'projeto_skills_performance', 'projeto_skills_diagnostico', 'projeto_skills_projetos', 'projeto_skills_entregas',
         'ia_copie_use', 'metodos_aplicar',
         'squad', 'squad_lider'
+      ],
+
+      // Insider não pago: a "outra visão" ainda vai ser definida. Por ora
+      // esconde tudo que depende de projeto contratado ou de plano pago.
+      insider_free: [
+        'trilhas', 'trilhas_skills', 'calendario',
+        'evolucao', 'meu_diagnostico', 'minhas_duvidas',
+        'meu_progresso', 'meu_progresso_visao_geral', 'meu_progresso_roadmap',
+        'meu_progresso_conteudo', 'meu_progresso_entregas',
+        'skills_minha_equipe', 'skills_backlog', 'skills_roadmap', 'skills_entregas', 'skills_painel_lider',
+        'projeto_skills', 'projeto_skills_visao_geral', 'projeto_skills_performance', 'projeto_skills_diagnostico', 'projeto_skills_projetos', 'projeto_skills_entregas',
+        'ia_copie_use', 'metodos_aplicar',
+        'squad', 'squad_lider',
+        'meu_sistema'
       ],
       
       // Academy: usa evolução/diagnóstico/dúvidas soltos, NÃO o grupo "Meu Progresso"
@@ -128,9 +119,6 @@ export function useMenuConfig() {
       // Fallback: verificar plano do usuário
       return matchesPlan(userPlan);
     }).map(m => {
-    if (m.menu_key === 'meu_progresso' && currentEnvironment === 'business_parceria') {
-        return { ...m, label: 'Minha Trajetória' };
-      }
       if (m.menu_key === 'meu_sistema' && currentEnvironment === 'business_sistemas') {
         return { ...m, label: 'Meu Projeto' };
       }

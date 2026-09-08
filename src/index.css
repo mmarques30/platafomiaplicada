@@ -916,7 +916,8 @@ body.modo-foco main { max-width: 720px; margin: 0 auto; padding: 0 24px; }
   font-family: 'Instrument Serif', 'Fraunces', Georgia, serif;
   font-style: italic;
   font-weight: 400;
-  font-size: clamp(36px, 4vw, 48px);
+  /* Na escala da logo (32-36px): título é apoio, a marca é o destaque */
+  font-size: clamp(26px, 2.4vw, 32px);
   line-height: 1;
   letter-spacing: -0.02em;
   color: var(--ia-cream);
@@ -959,6 +960,34 @@ body.modo-foco main { max-width: 720px; margin: 0 auto; padding: 0 24px; }
   -webkit-text-fill-color: var(--ia-cream);
   -webkit-box-shadow: 0 0 0 1000px #1d2115 inset;
   caret-color: var(--ia-cream);
+}
+.ia-entry-coupon {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--ia-sage);
+}
+.ia-entry-coupon__code {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 9999px;
+  border: 1px solid rgba(213, 233, 90, 0.4);
+  background-color: rgba(213, 233, 90, 0.08);
+  color: var(--ia-lime);
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+.ia-entry-coupon__code:hover {
+  background-color: rgba(213, 233, 90, 0.16);
+  border-color: rgba(213, 233, 90, 0.7);
 }
 .ia-entry-link {
   font-size: 13px;

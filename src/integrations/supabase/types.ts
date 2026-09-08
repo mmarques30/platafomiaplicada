@@ -6458,6 +6458,7 @@ export type Database = {
         | "business_iaplicada"
         | "business_parceria"
         | "business_sistemas"
+        | "insider_free"
       status_projeto:
         | "planejamento"
         | "em_andamento"

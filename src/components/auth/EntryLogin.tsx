@@ -19,14 +19,14 @@ export function EntryLogin({ onBack }: EntryLoginProps) {
       <motion.img
         src={logoIAplicada}
         alt="IAplicada"
-        className="h-7 w-auto md:h-8"
+        className="h-8 w-auto md:h-9"
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
       />
 
       <motion.h1
-        className="ia-entry-login-title mt-8"
+        className="ia-entry-login-title mt-7"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45, delay: 0.08 }}
