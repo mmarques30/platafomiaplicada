@@ -91,7 +91,7 @@ export default function PoliticaServicos() {
           )}
         </CardHeader>
         <CardContent>
-          <div className="prose prose-sm dark:prose-invert max-w-none">
+          <div className="prose prose-sm prose-invert max-w-none prose-invert">
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {documento.conteudo}
             </ReactMarkdown>

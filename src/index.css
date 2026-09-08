@@ -141,14 +141,20 @@
     --brand-ink: 67 31% 94%;
     --brand-hairline: 81 17% 16%;
 
-    /* Sidebar: mesmo charcoal do fundo, item ativo em lime */
-    --sidebar-background: 80 27% 4%;
+    /* Chrome (topo + sidebar): verde-oliva profundo, distinto do fundo charcoal */
+    --chrome: 78 42% 15%;             /* #2b3616 */
+    --chrome-foreground: 67 31% 94%;
+    --chrome-border: 78 30% 24%;
+    --chrome-accent: 78 36% 21%;      /* hover de itens */
+
+    /* Sidebar usa o chrome; item ativo em lime */
+    --sidebar-background: 78 42% 15%;
     --sidebar-foreground: 67 31% 94%;
     --sidebar-primary: 69 71% 52%;
     --sidebar-primary-foreground: 80 27% 4%;
-    --sidebar-accent: 80 18% 12%;
+    --sidebar-accent: 78 36% 21%;
     --sidebar-accent-foreground: 67 31% 94%;
-    --sidebar-border: 81 17% 16%;
+    --sidebar-border: 78 30% 24%;
     --sidebar-ring: 69 71% 52%;
     --sidebar-active: 69 71% 52%;
 

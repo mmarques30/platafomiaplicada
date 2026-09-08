@@ -227,11 +227,11 @@ export function WelcomeHeader() {
                 {saudacao}
               </h1>
               {aulaAtiva ? (
-                <p className="mt-2 max-w-prose text-sm font-light text-muted-foreground md:text-base">
+                <p className="mt-2 max-w-prose text-sm font-light text-muted-foreground md:text-base prose-invert">
                   <span className="font-medium text-foreground">Aula:</span> {aulaAtiva.tema}
                 </p>
               ) : (
-                <p className="mt-2 max-w-prose text-sm font-light text-muted-foreground md:text-base">
+                <p className="mt-2 max-w-prose text-sm font-light text-muted-foreground md:text-base prose-invert">
                   {tagline}
                 </p>
               )}

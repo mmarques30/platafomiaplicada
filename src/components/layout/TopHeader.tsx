@@ -115,7 +115,7 @@ export function TopHeader() {
       
       <header
         className={cn(
-          "fixed z-50 w-full border-b border-border bg-background/85 text-foreground backdrop-blur-md transition-transform duration-300 ease-in-out",
+          "fixed z-50 w-full border-b border-chrome-border bg-chrome text-chrome-foreground transition-transform duration-300 ease-in-out",
           isScrolled && !isHovered ? "-translate-y-full" : "translate-y-0",
           isAdmin && isViewingAs ? "top-10" : "top-0"
         )}

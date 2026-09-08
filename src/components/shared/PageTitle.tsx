@@ -39,7 +39,7 @@ export function PageTitle({
         </span>
       </h1>
       {description && (
-        <p className="max-w-prose text-sm font-light text-muted-foreground md:text-base">
+        <p className="max-w-prose text-sm font-light text-muted-foreground md:text-base prose-invert">
           {description}
         </p>
       )}
