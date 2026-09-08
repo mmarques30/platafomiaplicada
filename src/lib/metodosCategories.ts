@@ -25,6 +25,22 @@ export const ARSENAL_TIPOS = [
   { value: "documento", label: "Documento" },
 ] as const;
 
+/**
+ * Normaliza o valor gravado em `metodos.ferramenta` para uma das ferramentas
+ * do arsenal (tolerante a "gpt-4", "claude 3.5", "Google Gemini", etc.).
+ * Retorna null quando não reconhece.
+ */
+export function normalizarFerramenta(valor: string | null | undefined): string | null {
+  if (!valor) return null;
+  const v = valor.toLowerCase();
+  if (v.includes("claude") || v.includes("anthropic")) return "Claude";
+  if (v.includes("gpt") || v.includes("openai")) return "ChatGPT";
+  if (v.includes("gemini") || v.includes("google")) return "Gemini";
+  if (v.includes("copilot") || v.includes("microsoft")) return "Copilot";
+  if (v.includes("perplexity")) return "Perplexity";
+  return null;
+}
+
 export const ARSENAL_FERRAMENTAS = [
   { value: "Claude", label: "Claude", icon: "🟠", color: "bg-orange-500/10 text-orange-700 border-orange-500/30" },
   { value: "ChatGPT", label: "ChatGPT", icon: "🟢", color: "bg-emerald-500/10 text-emerald-700 border-emerald-500/30" },

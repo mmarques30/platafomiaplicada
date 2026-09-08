@@ -7,10 +7,11 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ToolLogo } from "@/components/shared/ToolLogo";
 import { FavoriteButton } from "@/components/shared/FavoriteButton";
 import { useMetodos } from "@/hooks/useFerramentas";
 import { Search, Zap, BookOpen, FileText, ExternalLink, ArrowLeft, Users, Sparkles, Copy, Check } from "lucide-react";
-import { ARSENAL_FERRAMENTAS, ARSENAL_NIVEIS, ARSENAL_TIPOS } from "@/lib/metodosCategories";
+import { ARSENAL_FERRAMENTAS, normalizarFerramenta, ARSENAL_NIVEIS, ARSENAL_TIPOS } from "@/lib/metodosCategories";
 import { PageTitle } from "@/components/shared/PageTitle";
 import { MateriaisBibliotecaTab } from "@/components/biblioteca/MateriaisBibliotecaTab";
 import { toast } from "sonner";
@@ -63,8 +64,9 @@ export default function MetodosAplicar() {
     const counts: Record<string, number> = {};
     ARSENAL_FERRAMENTAS.forEach(f => { counts[f.value] = 0; });
     skills.forEach(s => {
-      if (s.ferramenta && counts[s.ferramenta] !== undefined) {
-        counts[s.ferramenta]++;
+      const f = normalizarFerramenta(s.ferramenta);
+      if (f && counts[f] !== undefined) {
+        counts[f]++;
       }
     });
     return counts;
@@ -75,7 +77,7 @@ export default function MetodosAplicar() {
   const filteredSkills = useMemo(() => {
     let items = skills;
     if (selectedFerramenta && selectedFerramenta !== "todas") {
-      items = items.filter(s => s.ferramenta === selectedFerramenta);
+      items = items.filter(s => normalizarFerramenta(s.ferramenta) === selectedFerramenta);
     }
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
@@ -238,10 +240,12 @@ export default function MetodosAplicar() {
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
                 {/* Card "Todas as skills" — pra ver tudo, incluindo skills sem ferramenta */}
                 <Card
-                  className="p-5 cursor-pointer hover:shadow-lg transition-all duration-200 border-2 border-brand-strong/30 hover:border-brand-strong bg-brand-cream-soft flex flex-col items-center text-center gap-3"
+                  className="p-5 cursor-pointer transition-colors border hover:border-primary/50 flex flex-col items-center text-center gap-3"
                   onClick={() => setSelectedFerramenta("todas")}
                 >
-                  <Sparkles className="h-7 w-7 text-brand-strong" strokeWidth={1.75} />
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-muted text-primary">
+                    <Sparkles className="h-5 w-5" strokeWidth={1.75} />
+                  </div>
                   <div>
                     <h3 className="font-semibold text-sm text-foreground">Todas</h3>
                     <p className="text-xs text-muted-foreground mt-0.5">
@@ -255,10 +259,12 @@ export default function MetodosAplicar() {
                   return (
                     <Card
                       key={ferramenta.value}
-                      className={`p-5 cursor-pointer hover:shadow-lg transition-all duration-200 border-2 hover:border-primary/40 flex flex-col items-center text-center gap-3 ${ferramenta.color}`}
+                      className="p-5 cursor-pointer transition-colors border hover:border-primary/50 flex flex-col items-center text-center gap-3"
                       onClick={() => setSelectedFerramenta(ferramenta.value)}
                     >
-                      <span className="text-3xl">{ferramenta.icon}</span>
+                      <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-muted">
+                        <ToolLogo toolName={ferramenta.label} size="md" />
+                      </div>
                       <div>
                         <h3 className="font-semibold text-sm">{ferramenta.label}</h3>
                         <p className="text-xs text-muted-foreground mt-0.5">
@@ -292,9 +298,14 @@ export default function MetodosAplicar() {
                         </div>
                         <p className="text-xs text-muted-foreground line-clamp-2">{skill.descricao}</p>
                         <div className="flex items-center gap-1.5 flex-wrap">
-                          {skill.ferramenta && (
-                            <Badge variant="outline" className="text-xs">
-                              {ARSENAL_FERRAMENTAS.find(f => f.value === skill.ferramenta)?.icon} {skill.ferramenta}
+                          {normalizarFerramenta(skill.ferramenta) ? (
+                            <Badge variant="outline" className="gap-1.5 text-xs">
+                              <ToolLogo toolName={normalizarFerramenta(skill.ferramenta)!} size="sm" />
+                              {normalizarFerramenta(skill.ferramenta)}
+                            </Badge>
+                          ) : (
+                            <Badge variant="outline" className="text-xs text-muted-foreground">
+                              Sem ferramenta
                             </Badge>
                           )}
                           {getNivelBadge(skill.nivel)}

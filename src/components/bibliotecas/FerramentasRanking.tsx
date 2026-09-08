@@ -29,11 +29,28 @@ interface FerramentasRankingProps {
 export function FerramentasRanking({ ferramentas, onVerMais }: FerramentasRankingProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
-  // Ranking dinâmico: Top 5 ordenado por score_ranking
+  // Top 5 curado pela mentora, nesta ordem. Cada posição casa pelo nome da
+  // ferramenta (tolerante a variações como "Lovable (GPT Engineer)" ou
+  // "Wispr Flow"). Se alguma não existir na base, a vaga é preenchida pela
+  // próxima melhor colocada no score_ranking.
   const top5 = useMemo(() => {
-    // Ferramentas já vêm ordenadas por score_ranking do hook.
-    // Pegar as 5 primeiras com algum critério de ranking preenchido.
-    return ferramentas
+    const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
+    const curado: string[][] = [
+      ["claude"],
+      ["chatgpt", "gpt"],
+      ["manus"],
+      ["lovable"],
+      ["wisprflow", "wisperflow", "whisperflow", "wispr", "whisper"],
+    ];
+    const escolhidas: Ferramenta[] = [];
+    for (const aliases of curado) {
+      const found = ferramentas.find(
+        (f) => !escolhidas.includes(f) && aliases.some((a) => norm(f.nome).includes(a))
+      );
+      if (found) escolhidas.push(found);
+    }
+    const porScore = ferramentas
+      .filter((f) => !escolhidas.includes(f))
       .filter(
         (f) =>
           (f.score_ranking || 0) > 0 ||
@@ -41,24 +58,18 @@ export function FerramentasRanking({ ferramentas, onVerMais }: FerramentasRankin
           (f.avaliacao_comunidade || 0) > 0 ||
           (f.relevancia_mercado || 0) > 0 ||
           (f.recencia_modelo || 0) > 0
-      )
-      .slice(0, 5);
+      );
+    return [...escolhidas, ...porScore].slice(0, 5);
   }, [ferramentas]);
 
   if (top5.length === 0) return null;
 
   return (
-    <div className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-primary/5 via-background to-primary/10 p-6 md:p-8">
-      {/* Background decoration */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-24 -right-24 w-48 h-48 bg-primary/10 rounded-full blur-3xl" />
-        <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-primary/5 rounded-full blur-3xl" />
-      </div>
-
+    <div className="relative rounded-2xl overflow-hidden bg-card border border-border p-6 md:p-8">
       {/* Header */}
       <div className="relative text-center mb-8">
-        <h2 className="text-2xl md:text-3xl font-semibold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-          Top 5 Ferramentas Recomendadas
+        <h2 className="font-serif-display text-2xl md:text-3xl text-foreground">
+          Top 5 Ferramentas <span className="font-serif-italic text-primary">recomendadas</span>
         </h2>
         <p className="text-muted-foreground mt-2 text-sm md:text-base">
           Classificadas por relevância de mercado, últimos modelos e avaliações da mentora e da comunidade
@@ -105,9 +116,9 @@ export function FerramentasRanking({ ferramentas, onVerMais }: FerramentasRankin
           <div
             key={ferramenta.id}
             className={cn(
-              "group relative rounded-xl p-4 transition-all duration-300 h-full flex flex-col",
-              "glass-card hover:border-primary/40 hover:shadow-xl hover:shadow-primary/10",
-              hoveredIndex === idx && "border-primary/40 shadow-xl shadow-primary/10"
+              "group relative rounded-xl p-4 transition-colors duration-200 h-full flex flex-col",
+              "bg-card border border-border hover:border-primary/50",
+              hoveredIndex === idx && "border-primary/50"
             )}
             onMouseEnter={() => setHoveredIndex(idx)}
             onMouseLeave={() => setHoveredIndex(null)}

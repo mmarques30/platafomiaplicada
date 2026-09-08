@@ -66,17 +66,17 @@ export function MaterialCard({ material }: MaterialCardProps) {
       className={`
         group relative p-3 sm:p-4 md:p-5 rounded-lg sm:rounded-xl 
         bg-card/90 backdrop-blur-sm 
-        border border-primary/30 dark:border-primary/40 sm:border-2 hover:border-primary/60 
+        border border-border hover:border-primary/50 
         transition-all duration-300 cursor-pointer
-        shadow-md sm:shadow-lg hover:shadow-xl hover:shadow-primary/20
-        min-w-[200px] max-w-[240px] sm:min-w-[280px] sm:max-w-[320px] flex-shrink-0
+        
+        h-full w-full
         min-h-[160px] sm:min-h-[180px] card-interactive
       `}
       onClick={handleClick}
     >
       {/* Icon */}
-      <div className={`w-8 h-8 sm:w-10 sm:h-10 md:w-11 md:h-11 rounded-lg sm:rounded-xl ${iconBgClass} flex items-center justify-center mb-2.5 sm:mb-3 md:mb-4 shadow-md`}>
-        <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+      <div className={`w-9 h-9 rounded-lg bg-muted text-primary flex items-center justify-center mb-3`}>
+        <Icon className="w-4 h-4" />
       </div>
 
       {/* Content */}

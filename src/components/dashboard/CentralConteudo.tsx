@@ -46,45 +46,37 @@ export function CentralConteudo() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
                 transition={{ duration: 0.15 }}
-                className="flex gap-3 md:gap-4 overflow-x-auto pb-3 scrollbar-thin snap-x snap-mandatory -mx-1 px-1"
+                className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 md:gap-4"
               >
                 {tab.value === "material" ? (
                   isLoadingMateriais ? (
                     <>
-                      {[1, 2, 3].map((i) => (
-                        <div key={i} className="min-w-[200px] max-w-[240px] sm:min-w-[280px] sm:max-w-[320px] flex-shrink-0">
-                          <div className="h-[160px] sm:h-[200px] w-full rounded-lg bg-brand-hairline/40 animate-pulse" />
-                        </div>
+                      {[1, 2, 3, 4, 5].map((i) => (
+                        <div key={i} className="h-[180px] w-full rounded-xl bg-muted animate-pulse" />
                       ))}
                     </>
                   ) : materiais && materiais.length > 0 ? (
-                    materiais.map((material) => (
-                      <div key={material.id} className="snap-start">
-                        <MaterialCard material={material} />
-                      </div>
+                    materiais.slice(0, 5).map((material) => (
+                      <MaterialCard key={material.id} material={material} />
                     ))
                   ) : (
-                    <div className="w-full py-10 text-center">
+                    <div className="col-span-full w-full py-10 text-center">
                       <tab.icon className="w-10 h-10 mx-auto text-muted-foreground/40 mb-3" strokeWidth={1.5} />
                       <p className="text-sm text-muted-foreground">Nenhum material disponivel</p>
                     </div>
                   )
                 ) : isLoading ? (
                   <>
-                    {[1, 2, 3].map((i) => (
-                      <div key={i} className="min-w-[200px] max-w-[240px] sm:min-w-[280px] sm:max-w-[320px] flex-shrink-0">
-                        <div className="h-[160px] sm:h-[200px] w-full rounded-lg bg-brand-hairline/40 animate-pulse" />
-                      </div>
+                    {[1, 2, 3, 4, 5].map((i) => (
+                      <div key={i} className="h-[180px] w-full rounded-xl bg-muted animate-pulse" />
                     ))}
                   </>
                 ) : conteudos && conteudos.length > 0 ? (
-                  conteudos.map((conteudo) => (
-                    <div key={conteudo.id} className="snap-start">
-                      <ConteudoCard conteudo={conteudo} />
-                    </div>
+                  conteudos.slice(0, 5).map((conteudo) => (
+                    <ConteudoCard key={conteudo.id} conteudo={conteudo} />
                   ))
                 ) : (
-                  <div className="w-full py-10 text-center">
+                  <div className="col-span-full w-full py-10 text-center">
                     <tab.icon className="w-10 h-10 mx-auto text-muted-foreground/40 mb-3" strokeWidth={1.5} />
                     <p className="text-sm text-muted-foreground">Nenhum conteudo disponivel nesta categoria</p>
                   </div>
