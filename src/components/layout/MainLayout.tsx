@@ -37,12 +37,10 @@ export function MainLayout() {
   const { effectivePlan } = useEffectivePlan(isAdmin, isLoading);
   const isBusinessPlan = effectivePlan === 'business_parceria' || effectivePlan === 'business_sistemas';
 
-  // Redirecionar para seleção de ambiente se não selecionado
-  useEffect(() => {
-    if (!isLoading && environmentContext && !environmentContext.isLoading && !environmentContext.isEnvironmentSelected) {
-      navigate("/selecionar-ambiente", { replace: true });
-    }
-  }, [isLoading, environmentContext, navigate]);
+  // O ambiente é resolvido automaticamente pelo EnvironmentProvider a partir
+  // do plano do usuário (não existe mais tela de seleção). Enquanto plano e
+  // papel carregam, segura o skeleton para não piscar menus errados.
+  const environmentLoading = Boolean(environmentContext?.isLoading);
 
   // Redirecionar Business com primeiro_acesso para tela de boas-vindas
   useEffect(() => {
@@ -63,7 +61,7 @@ export function MainLayout() {
     navigate("/auth");
   };
 
-  if (isLoading) {
+  if (isLoading || environmentLoading) {
     return <PageSkeleton variant="dashboard" />;
   }
 

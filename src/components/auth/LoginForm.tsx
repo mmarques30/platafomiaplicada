@@ -1,12 +1,16 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { RecuperarSenhaModal } from "@/components/auth/RecuperarSenhaModal";
 
+/**
+ * Formulário de acesso (e-mail + senha), versão discreta sobre o fundo
+ * escuro do acesso inicial. Os campos ficam translúcidos e clareiam ao
+ * receber foco (ver .ia-entry-input em index.css).
+ */
 export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [showRecuperarSenha, setShowRecuperarSenha] = useState(false);
@@ -37,9 +41,9 @@ export function LoginForm() {
 
   return (
     <>
-      <form onSubmit={handleSignIn} className="space-y-5">
-        <div className="space-y-2 text-left">
-          <Label htmlFor="signin-email" className="text-foreground text-sm font-medium">
+      <form onSubmit={handleSignIn} className="space-y-3">
+        <div className="ia-entry-field">
+          <Label htmlFor="signin-email" className="sr-only">
             Email
           </Label>
           <Input
@@ -47,38 +51,40 @@ export function LoginForm() {
             name="signin-email"
             type="email"
             placeholder="seu@email.com"
+            autoComplete="email"
             required
-            className="bg-brand-cream-soft border-brand-hairline text-foreground placeholder:text-muted-foreground h-12 rounded-lg focus:border-primary focus:ring-primary/30 "
+            className="ia-entry-input"
           />
         </div>
         
-        <div className="space-y-2 text-left">
-          <Label htmlFor="signin-password" className="text-foreground text-sm font-medium">
+        <div className="ia-entry-field">
+          <Label htmlFor="signin-password" className="sr-only">
             Senha
           </Label>
           <PasswordInput
             id="signin-password"
             name="signin-password"
-            placeholder="••••••••"
+            placeholder="Senha"
+            autoComplete="current-password"
             required
-            className="bg-brand-cream-soft border-brand-hairline text-foreground placeholder:text-muted-foreground h-12 rounded-lg focus:border-primary focus:ring-primary/30 "
+            className="ia-entry-input"
           />
         </div>
         
-        <Button 
-          type="submit" 
-          className="w-full h-12 bg-foreground hover:bg-foreground/90 text-background font-medium rounded-lg transition-all mt-4" 
+        <button
+          type="submit"
+          className="ia-entry-form-cta mt-2 h-12 w-full rounded-full text-[13.5px] uppercase tracking-[0.06em] disabled:pointer-events-none disabled:opacity-60"
           disabled={isLoading}
         >
           {isLoading ? "Acessando..." : "Acessar"}
-        </Button>
+        </button>
 
         {/* Link esqueceu a senha */}
-        <div className="text-center mt-3">
+        <div className="pt-2 text-center">
           <button
             type="button"
             onClick={() => setShowRecuperarSenha(true)}
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            className="ia-entry-link"
           >
             Esqueceu a senha?
           </button>

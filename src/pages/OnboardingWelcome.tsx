@@ -33,7 +33,8 @@ export default function OnboardingWelcome() {
 
   const handleContinue = () => {
     sessionStorage.setItem("onboarding_complete", "true");
-    navigate("/selecionar-ambiente");
+    // Entra direto no ambiente resolvido pelo plano (sem tela de seleção).
+    navigate("/", { replace: true });
   };
 
   return (
@@ -86,7 +87,7 @@ export default function OnboardingWelcome() {
             </p>
 
             <p className="text-white/60 text-sm">
-              Mas fique à vontade para explorar qualquer ambiente quando quiser!
+              Você já entra direto no seu ambiente. Se tiver acesso a mais de um, é só alternar pelo menu no topo.
             </p>
           </div>
         </motion.div>
@@ -101,7 +102,7 @@ export default function OnboardingWelcome() {
             onClick={handleContinue}
             className="h-12 px-8 bg-[#9EB038] hover:bg-[#8a9a31] text-white font-medium rounded-xl text-base gap-2"
           >
-            Escolher meu ambiente
+            Começar a aplicar
             <ArrowRight className="w-4 h-4" />
           </Button>
         </motion.div>
