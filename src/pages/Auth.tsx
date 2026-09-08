@@ -4,15 +4,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
 import { IAplicadaBackground } from "@/components/auth/IAplicadaBackground";
 import { EntryHero } from "@/components/auth/EntryHero";
-import { EntryAccessCard, type EntryAccessMode } from "@/components/auth/EntryAccessCard";
-import logoIAplicada from "@/assets/logo-auth-fundo-escuro.png";
+import { EntryLogin } from "@/components/auth/EntryLogin";
 
-type EntryView = "hero" | EntryAccessMode;
+type EntryView = "hero" | "login";
 
 function viewFromTab(tab: string | null): EntryView {
-  if (tab === "signup") return "signup";
-  if (tab === "login") return "login";
-  return "hero";
+  // Não existe mais criação de conta: qualquer ?tab abre o acesso.
+  return tab ? "login" : "hero";
 }
 
 /**
@@ -20,7 +18,7 @@ function viewFromTab(tab: string | null): EntryView {
  *
  * 1. Hero no branding da LP iaplicada.com (fundo quadriculado escuro, frase
  *    do que a pessoa pode fazer ao entrar, CTA "Começar a aplicar").
- * 2. Ao clicar, o hero dá lugar ao card de acesso (email + senha).
+ * 2. Ao clicar, o hero dá lugar ao acesso discreto (email + senha), sem card.
  * 3. Autenticou → vai para "/" e o EnvironmentProvider já resolve o ambiente
  *    de acordo com o plano. A antiga tela "Selecione seu ambiente" não existe
  *    mais.
@@ -32,7 +30,7 @@ export default function Auth() {
   const tab = searchParams.get("tab");
   const [view, setView] = useState<EntryView>(() => viewFromTab(tab));
 
-  // Links externos (?tab=login / ?tab=signup) abrem direto o card de acesso.
+  // Links externos (?tab=login) abrem direto o acesso.
   useEffect(() => {
     if (tab) setView(viewFromTab(tab));
   }, [tab]);
@@ -73,21 +71,14 @@ export default function Auth() {
             </motion.div>
           ) : (
             <motion.div
-              key="access"
+              key="login"
               className="flex w-full justify-center"
-              initial={{ opacity: 0, y: 16, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -12, transition: { duration: 0.2 } }}
               transition={{ duration: 0.4 }}
             >
-              <div className="flex w-full max-w-md flex-col items-center gap-8">
-                <img src={logoIAplicada} alt="IAplicada" className="h-7 w-auto md:h-8" />
-                <EntryAccessCard
-                  mode={view}
-                  onModeChange={setView}
-                  onBack={() => setView("hero")}
-                />
-              </div>
+              <EntryLogin onBack={() => setView("hero")} />
             </motion.div>
           )}
         </AnimatePresence>
