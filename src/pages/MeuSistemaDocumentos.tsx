@@ -231,24 +231,24 @@ export default function MeuSistemaDocumentos() {
         </CollapsibleTrigger>
         <CollapsibleContent className="px-5 pb-5 pt-1 border-t border-brand-hairline">
         <Tabs defaultValue="arquivos" className="space-y-4 mt-4">
-          <TabsList className="inline-flex items-center gap-0.5 rounded-full bg-brand-cream/60 border border-brand-hairline p-1 h-auto flex-wrap">
-          <TabsTrigger value="arquivos" className="text-sm rounded-full px-4 py-1.5 gap-2 text-muted-foreground data-[state=active]:bg-brand-strong data-[state=active]:text-brand-cream data-[state=active]:shadow-sm transition-colors">
+          <TabsList className="flex-wrap">
+          <TabsTrigger value="arquivos" className="text-sm gap-2">
             <FileText className="h-3.5 w-3.5" />
             Arquivos ({arquivosCount})
           </TabsTrigger>
-          <TabsTrigger value="anotacoes" className="text-sm rounded-full px-4 py-1.5 gap-2 text-muted-foreground data-[state=active]:bg-brand-strong data-[state=active]:text-brand-cream data-[state=active]:shadow-sm transition-colors">
+          <TabsTrigger value="anotacoes" className="text-sm gap-2">
             <StickyNote className="h-3.5 w-3.5" />
             Anotações ({notas.length})
           </TabsTrigger>
-          <TabsTrigger value="links" className="text-sm rounded-full px-4 py-1.5 gap-2 text-muted-foreground data-[state=active]:bg-brand-strong data-[state=active]:text-brand-cream data-[state=active]:shadow-sm transition-colors">
+          <TabsTrigger value="links" className="text-sm gap-2">
             <Link2 className="h-3.5 w-3.5" />
             Links ({links.length})
           </TabsTrigger>
-          <TabsTrigger value="reports" className="text-sm rounded-full px-4 py-1.5 gap-2 text-muted-foreground data-[state=active]:bg-brand-strong data-[state=active]:text-brand-cream data-[state=active]:shadow-sm transition-colors">
+          <TabsTrigger value="reports" className="text-sm gap-2">
             <FileText className="h-3.5 w-3.5" />
             Reports ({reports.length})
           </TabsTrigger>
-          <TabsTrigger value="contrato" className="text-sm rounded-full px-4 py-1.5 gap-2 text-muted-foreground data-[state=active]:bg-brand-strong data-[state=active]:text-brand-cream data-[state=active]:shadow-sm transition-colors">
+          <TabsTrigger value="contrato" className="text-sm gap-2">
             <Shield className="h-3.5 w-3.5" />
             Contrato
           </TabsTrigger>

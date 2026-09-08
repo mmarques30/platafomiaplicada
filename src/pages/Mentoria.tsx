@@ -118,23 +118,23 @@ export default function Mentoria() {
       {/* Abas (por página) — unificado para Academy, Sistemas e Business Parceria */}
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full mt-6">
         <div className="flex mb-6">
-          <TabsList className="inline-flex gap-1 bg-brand-cream/60 border border-brand-hairline p-1 rounded-full h-auto">
+          <TabsList className="w-fit">
             <TabsTrigger
               value="visao-geral"
-              className="flex items-center justify-center gap-2 text-muted-foreground data-[state=active]:bg-brand-strong data-[state=active]:text-brand-cream data-[state=active]:shadow-sm rounded-full px-5 py-2 transition-colors text-sm"
+              className="gap-2 text-sm"
             >
               Visão Geral
             </TabsTrigger>
             <TabsTrigger
               value="roadmap"
-              className="flex items-center justify-center gap-2 text-muted-foreground data-[state=active]:bg-brand-strong data-[state=active]:text-brand-cream data-[state=active]:shadow-sm rounded-full px-5 py-2 transition-colors text-sm"
+              className="gap-2 text-sm"
             >
               Roadmap
             </TabsTrigger>
             {showEvolucaoTab && (
               <TabsTrigger
                 value="evolucao-aprendizado"
-                className="flex items-center justify-center gap-2 text-muted-foreground data-[state=active]:bg-brand-strong data-[state=active]:text-brand-cream data-[state=active]:shadow-sm rounded-full px-5 py-2 transition-colors text-sm"
+                className="gap-2 text-sm"
               >
                 Evolução
               </TabsTrigger>

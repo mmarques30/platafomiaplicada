@@ -121,16 +121,16 @@ export function DocumentosBusinessManager({ contratoId, userId, userName }: Docu
         </CollapsibleTrigger>
         <CollapsibleContent className="px-4 pb-4 pt-2">
           <Tabs defaultValue="arquivos" className="space-y-4">
-        <TabsList className="bg-muted/40 border-0 rounded-lg p-1">
-          <TabsTrigger value="arquivos" className="text-xs rounded-md px-3 py-1.5 gap-1.5 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+        <TabsList className="w-fit">
+          <TabsTrigger value="arquivos" className="text-xs gap-1.5">
             <FileText className="h-3.5 w-3.5" />
             Arquivos ({arquivosCount})
           </TabsTrigger>
-          <TabsTrigger value="anotacoes" className="text-xs rounded-md px-3 py-1.5 gap-1.5 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+          <TabsTrigger value="anotacoes" className="text-xs gap-1.5">
             <StickyNote className="h-3.5 w-3.5" />
             Anotações ({notas.length})
           </TabsTrigger>
-          <TabsTrigger value="links" className="text-xs rounded-md px-3 py-1.5 gap-1.5 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+          <TabsTrigger value="links" className="text-xs gap-1.5">
             <Link2 className="h-3.5 w-3.5" />
             Links ({links.length})
           </TabsTrigger>

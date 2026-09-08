@@ -36,22 +36,22 @@ export default function Comunidade() {
         <Tabs defaultValue="feed" className="w-full">
           {/* Tabs centralizadas, estilo pill da marca */}
           <div className="flex justify-center mb-6">
-            <TabsList className="inline-flex gap-1 bg-brand-cream/60 border border-brand-hairline p-1 rounded-full h-auto">
+            <TabsList className="w-fit">
               <TabsTrigger
                 value="feed"
-                className="flex items-center justify-center gap-2 text-muted-foreground data-[state=active]:bg-brand-strong data-[state=active]:text-brand-cream data-[state=active]:shadow-sm rounded-full px-6 py-2 transition-colors text-sm"
+                className="gap-2 text-sm"
               >
                 Feed
               </TabsTrigger>
               <TabsTrigger
                 value="ranking"
-                className="flex items-center justify-center gap-2 text-muted-foreground data-[state=active]:bg-brand-strong data-[state=active]:text-brand-cream data-[state=active]:shadow-sm rounded-full px-6 py-2 transition-colors text-sm"
+                className="gap-2 text-sm"
               >
                 Ranking
               </TabsTrigger>
               <TabsTrigger
                 value="members"
-                className="flex items-center justify-center gap-2 text-muted-foreground data-[state=active]:bg-brand-strong data-[state=active]:text-brand-cream data-[state=active]:shadow-sm rounded-full px-6 py-2 transition-colors text-sm"
+                className="gap-2 text-sm"
               >
                 Membros
               </TabsTrigger>

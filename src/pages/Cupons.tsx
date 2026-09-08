@@ -57,10 +57,10 @@ export default function Cupons() {
 
         {/* Sistema de Abas */}
         <Tabs defaultValue="academy" className="w-full">
-          <TabsList className="bg-muted/50 rounded-full p-1">
+          <TabsList className="w-fit">
             <TabsTrigger 
               value="academy" 
-              className="rounded-full px-6 data-[state=active]:bg-aplicada-green-100 data-[state=active]:text-aplicada-green-700 data-[state=active]:shadow-sm"
+             
             >
               Academy
             </TabsTrigger>

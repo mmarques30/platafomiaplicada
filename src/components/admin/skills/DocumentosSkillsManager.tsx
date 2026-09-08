@@ -102,9 +102,9 @@ export default function DocumentosSkillsManager({ equipeId, equipeName }: Props)
       </div>
 
       <Tabs defaultValue="documentos" className="space-y-4">
-        <TabsList className="bg-muted/40 border-0 rounded-lg p-1">
-          <TabsTrigger value="documentos" className="text-xs rounded-md px-3 py-1.5 gap-1.5 data-[state=active]:bg-background data-[state=active]:shadow-sm"><FileText className="h-3.5 w-3.5" /> Documentos ({documentos.length})</TabsTrigger>
-          <TabsTrigger value="links" className="text-xs rounded-md px-3 py-1.5 gap-1.5 data-[state=active]:bg-background data-[state=active]:shadow-sm"><Link2 className="h-3.5 w-3.5" /> Links ({links.length})</TabsTrigger>
+        <TabsList className="w-fit">
+          <TabsTrigger value="documentos" className="text-xs gap-1.5"><FileText className="h-3.5 w-3.5" /> Documentos ({documentos.length})</TabsTrigger>
+          <TabsTrigger value="links" className="text-xs gap-1.5"><Link2 className="h-3.5 w-3.5" /> Links ({links.length})</TabsTrigger>
         </TabsList>
 
         <TabsContent value="documentos" className="space-y-4 mt-4">

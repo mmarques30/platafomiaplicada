@@ -32,7 +32,7 @@ import * as LucideIcons from "lucide-react";
 
 // Menus que deixaram de existir no sidebar: "Comunicações" (hoje no menu
 // superior) e "Minhas dúvidas" (removido do produto).
-const HIDDEN_MENU_KEYS = ['interacoes', 'minhas_duvidas'];
+const HIDDEN_MENU_KEYS = ['interacoes', 'minhas_duvidas', 'calendario'];
 
 export function AppSidebar() {
   const { open } = useSidebar();

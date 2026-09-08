@@ -16,6 +16,51 @@
 }
 
 /* Fundo das páginas autenticadas: creme liso (sem grade) */
+/* Escopo claro: dentro de .cards-light (bibliotecas, métodos, prompts,
+   ferramentas e player de vídeo) os cards voltam a ser brancos sobre a
+   página cinza, com os tokens claros. Card aninhado: cinza bem leve. */
+.cards-light .bg-card,
+.cards-light .card-dark {
+  color-scheme: light;
+  --background: 0 0% 96%;
+  --foreground: 0 0% 5%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 5%;
+  --surface: 0 0% 100%;
+  --muted: 0 0% 94%;
+  --muted-foreground: 0 0% 40%;
+  --accent: 0 0% 93%;
+  --accent-foreground: 0 0% 5%;
+  --secondary: 73 30% 92%;
+  --secondary-foreground: 0 0% 5%;
+  --border: 0 0% 90%;
+  --input: 0 0% 88%;
+  --primary: 73 57% 34%;
+  --primary-foreground: 0 0% 100%;
+  --ring: 73 57% 34%;
+  --lime: 73 50% 50%;
+  --brand-strong: 73 58% 27%;
+  --brand-strong-foreground: 0 0% 100%;
+  --brand-cream: 0 0% 95%;
+  --brand-cream-soft: 0 0% 98%;
+  --brand-hairline: 0 0% 90%;
+  --brand-ink: 0 0% 5%;
+  --sage: 0 0% 40%;
+  --charcoal: 0 0% 5%;
+  --status-success: 73 57% 34%;
+  --status-warning: 36 79% 47%;
+  --status-info: 206 70% 48%;
+  --status-danger: 352 71% 51%;
+  --chart-1: 73 57% 34%;
+  --chart-2: 73 50% 50%;
+  --chart-3: 75 4% 55%;
+}
+.cards-light .bg-card .bg-card,
+.cards-light .bg-card .card-dark {
+  --card: 0 0% 97%;
+  --surface: 0 0% 100%;
+}
+
 .dot-grid-bg {
   display: none;
 }

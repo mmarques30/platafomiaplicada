@@ -15,7 +15,6 @@ type TabValue = TipoConteudo | "material";
 const tabs = [
   { value: "noticia" as TabValue, label: "Notícias IA", icon: Globe },
   { value: "dica" as TabValue, label: "Dicas Práticas", icon: Lightbulb },
-  { value: "material" as TabValue, label: "Materiais", icon: FileText },
   { value: "newsletter" as TabValue, label: "Newsletter", icon: Newspaper },
 ];
 
@@ -62,12 +61,12 @@ export function CentralConteudoGratuito() {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as TabValue)} className="w-full">
-          <TabsList className="w-full md:w-auto grid grid-cols-4 md:inline-flex gap-0.5 sm:gap-1 bg-primary/20 dark:bg-primary/30 p-1 sm:p-1.5 rounded-lg sm:rounded-xl mb-3 sm:mb-4 md:mb-6 border border-primary/30 dark:border-primary/40">
+          <TabsList className="grid w-full grid-cols-4 md:inline-flex md:w-auto mb-6">
             {tabs.map((tab) => (
               <TabsTrigger
                 key={tab.value}
                 value={tab.value}
-                className="flex items-center justify-center gap-1 sm:gap-2 text-foreground/70 data-[state=active]:bg-brand-strong data-[state=active]:text-brand-strong-foreground data-[state=active]:shadow-lg rounded-md sm:rounded-lg px-2 sm:px-4 py-1.5 sm:py-2.5 transition-all duration-200 text-xs sm:text-sm"
+                className="gap-1 sm:gap-2 text-xs sm:text-sm"
               >
                 <tab.icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 <span className="hidden sm:inline">{tab.label}</span>
