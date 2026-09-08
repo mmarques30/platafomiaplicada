@@ -75,7 +75,7 @@
   :root,
   .dark {
     /* Superfícies */
-    --background: 60 100% 98%;        /* #fffff6 creme da LP */
+    --background: 0 0% 98%;           /* #fafafa neutro */
     --surface: 0 0% 95%;              /* #f2f2f2 (inputs, faixas) */
     --foreground: 0 0% 5%;            /* #0d0d0d cocoa */
 
@@ -90,15 +90,15 @@
     --primary-foreground: 0 0% 100%;
 
     /* Secondary: verde claro de apoio (texto cocoa) */
-    --secondary: 73 45% 90%;
+    --secondary: 73 30% 92%;
     --secondary-foreground: 0 0% 5%;
 
     /* Muted */
-    --muted: 60 30% 95%;
-    --muted-foreground: 75 4% 40%;    /* cinza-oliva legível */
+    --muted: 0 0% 94%;
+    --muted-foreground: 0 0% 40%;
 
     /* Accent: hover de menus/itens */
-    --accent: 60 30% 94%;
+    --accent: 0 0% 93%;
     --accent-foreground: 0 0% 5%;
 
     --destructive: 352 71% 51%;       /* #db2b42 alerta da LP */
@@ -113,7 +113,7 @@
     /* Paleta de marca (nomeada) */
     --lime: 73 50% 50%;               /* #afc040 brand */
     --olive: 73 57% 34%;              /* #738925 */
-    --sage: 75 4% 40%;
+    --sage: 0 0% 40%;
     --charcoal: 0 0% 5%;
 
     /* Status */
@@ -123,8 +123,8 @@
     --status-danger: 352 71% 51%;
 
     /* Brand tokens legados: mesmos papéis de antes, na paleta da LP */
-    --brand-cream: 60 30% 95%;
-    --brand-cream-soft: 60 100% 98%;
+    --brand-cream: 0 0% 95%;
+    --brand-cream-soft: 0 0% 98%;
     --brand-strong: 73 58% 27%;       /* #5c6f1d CTA sólido */
     --brand-strong-foreground: 0 0% 100%;
     --brand-ink: 0 0% 5%;
@@ -132,7 +132,7 @@
 
     /* Chrome do topo: charcoal fino, como o header da LP */
     --chrome: 0 0% 5%;
-    --chrome-foreground: 60 100% 98%;
+    --chrome-foreground: 0 0% 100%;
     --chrome-border: 0 0% 12%;
     --chrome-accent: 0 0% 12%;
 
@@ -141,7 +141,7 @@
     --sidebar-foreground: 0 0% 5%;
     --sidebar-primary: 73 57% 34%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 60 30% 95%;
+    --sidebar-accent: 0 0% 95%;
     --sidebar-accent-foreground: 0 0% 5%;
     --sidebar-border: 0 0% 90%;
     --sidebar-ring: 73 57% 34%;

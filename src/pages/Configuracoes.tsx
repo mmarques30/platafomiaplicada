@@ -97,9 +97,10 @@ export default function Configuracoes() {
       />
 
       <div className="space-y-6">
-        <div className="grid gap-6 lg:grid-cols-2 items-start">
+        {/* Cards com a mesma altura por linha; ações alinhadas na base */}
+        <div className="grid gap-5 md:grid-cols-2 items-stretch">
         {/* Instalar Aplicativo */}
-        <Card>
+        <Card className="flex h-full flex-col">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Smartphone className="h-5 w-5" />
@@ -109,7 +110,7 @@ export default function Configuracoes() {
               Acesse o Academy direto da tela inicial do seu celular
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="flex flex-1 flex-col justify-end gap-4">
             {isInstalled ? (
               <div className="flex items-center gap-3 p-3 bg-status-success/10 rounded-lg border border-status-success/20">
                 <CheckCircle2 className="h-5 w-5 text-status-success" />
@@ -123,11 +124,11 @@ export default function Configuracoes() {
                 </div>
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="flex flex-1 flex-col justify-end gap-4">
                 <p className="text-sm text-muted-foreground">
                   {deviceType === 'ios' 
-                    ? "No Safari, toque em Compartilhar e depois em 'Adicionar à Tela de Início'"
-                    : "Instale o app para acesso rápido, offline e notificações"
+                    ? "No Safari, toque em Compartilhar e depois em 'Adicionar à Tela de Início'."
+                    : "Acesso rápido, offline e com notificações."
                   }
                 </p>
                 
@@ -151,7 +152,7 @@ export default function Configuracoes() {
         </Card>
 
         {/* Notificações */}
-        <Card>
+        <Card className="flex h-full flex-col">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Bell className="h-5 w-5" />
@@ -159,8 +160,8 @@ export default function Configuracoes() {
             </CardTitle>
             <CardDescription>Gerencie suas preferências de notificações</CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
+          <CardContent className="flex flex-1 flex-col justify-end">
+            <div className="flex items-center justify-between rounded-xl border border-border bg-muted/50 px-4 py-3">
               <div className="space-y-0.5">
                 <Label htmlFor="email-notifications">Notificações por Email</Label>
                 <p className="text-sm text-muted-foreground">
@@ -177,7 +178,7 @@ export default function Configuracoes() {
         </Card>
 
         {/* Segurança */}
-        <Card>
+        <Card className="flex h-full flex-col">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Lock className="h-5 w-5" />
@@ -185,7 +186,7 @@ export default function Configuracoes() {
             </CardTitle>
             <CardDescription>Altere sua senha de acesso</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="flex flex-1 flex-col justify-end gap-4">
             {senhaTemporaria && (
               <Alert variant="destructive">
                 <AlertTriangle className="h-4 w-4" />
@@ -197,7 +198,7 @@ export default function Configuracoes() {
             )}
 
             {!isChangingPassword ? (
-              <Button onClick={() => setIsChangingPassword(true)} variant="outline">
+              <Button onClick={() => setIsChangingPassword(true)} variant="outline" className="self-start">
                 Alterar Senha
               </Button>
             ) : (
@@ -241,25 +242,21 @@ export default function Configuracoes() {
         </Card>
 
         {/* Atualização do App */}
-        <Card>
+        <Card className="flex h-full flex-col">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <RefreshCw className="h-5 w-5" />
               Atualização do App
             </CardTitle>
             <CardDescription>
-              Force a atualização se algo não estiver funcionando corretamente
+              Se algo não estiver funcionando ou aparecerem imagens antigas, force uma atualização completa
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-sm text-muted-foreground">
-              Se você está vendo imagens antigas ou comportamentos estranhos, 
-              clique no botão abaixo para forçar uma atualização completa.
-            </p>
+          <CardContent className="flex flex-1 flex-col justify-end gap-4">
             <Button 
               variant="outline"
               onClick={forceFullAppReload}
-              className="gap-2"
+              className="gap-2 self-start"
             >
               <RefreshCw className="h-4 w-4" />
               Forçar Atualização Completa
@@ -269,7 +266,7 @@ export default function Configuracoes() {
 
         {/* Políticas e Termos - Apenas para clientes pagantes */}
         {!isVisitante && (
-          <Card>
+          <Card className="flex h-full flex-col">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <FileText className="h-5 w-5" />
@@ -277,7 +274,7 @@ export default function Configuracoes() {
               </CardTitle>
               <CardDescription>Consulte os documentos legais da plataforma</CardDescription>
             </CardHeader>
-            <CardContent className="flex flex-wrap gap-3">
+            <CardContent className="flex flex-1 flex-wrap items-end gap-3">
               <Link to="/politica-servicos">
                 <Button variant="outline">Política de Serviços</Button>
               </Link>
