@@ -96,7 +96,7 @@ export function TopHeader() {
     <>
       {/* Banner de simulação unificado */}
       {isAdmin && isViewingAs && (
-        <div className="fixed top-0 left-0 right-0 bg-amber-500 text-black text-center py-2 z-[60] text-sm font-medium flex items-center justify-center gap-4">
+        <div className="fixed top-0 left-0 right-0 bg-status-warning text-charcoal text-center py-2 z-[60] text-sm font-medium flex items-center justify-center gap-4">
           <span>
             <Eye className="h-4 w-4 inline mr-1" /> Visualizando como: <strong>
               {`${impersonatedUserName} (${viewAs === 'academy' ? 'Academy' : viewAs === 'business_sistemas' ? 'Insider Pago' : 'Insider Free'})`}
@@ -106,7 +106,7 @@ export function TopHeader() {
             size="sm" 
             variant="ghost" 
             onClick={resetView} 
-            className="h-7 px-3 text-black hover:text-black hover:bg-amber-600"
+            className="h-7 px-3 text-charcoal hover:text-charcoal hover:bg-black/10"
           >
             Sair da simulação
           </Button>
@@ -115,7 +115,7 @@ export function TopHeader() {
       
       <header
         className={cn(
-          "fixed z-50 w-full border-b border-white/10 bg-[#2E2E2E] text-white transition-transform duration-300 ease-in-out",
+          "fixed z-50 w-full border-b border-border bg-background/85 text-foreground backdrop-blur-md transition-transform duration-300 ease-in-out",
           isScrolled && !isHovered ? "-translate-y-full" : "translate-y-0",
           isAdmin && isViewingAs ? "top-10" : "top-0"
         )}
@@ -143,7 +143,7 @@ export function TopHeader() {
             end
             className={({ isActive }) => cn(
               "text-sm font-medium transition-colors",
-              isActive ? "text-[#AFC040] font-semibold" : "text-white/60 hover:text-white"
+              isActive ? "text-primary font-semibold" : "text-white/60 hover:text-white"
             )}
           >
             Página Inicial
@@ -157,7 +157,7 @@ export function TopHeader() {
                   variant="ghost" 
                   className={cn(
                     "text-sm font-medium h-auto p-0 transition-colors hover:bg-transparent",
-                    isCursosActive ? "text-[#AFC040] font-semibold" : "text-white/60 hover:text-white"
+                    isCursosActive ? "text-primary font-semibold" : "text-white/60 hover:text-white"
                   )}
                 >
                   Cursos
@@ -192,7 +192,7 @@ export function TopHeader() {
               type="button"
               data-tour="primeiros-passos"
               onClick={() => window.dispatchEvent(new CustomEvent("abrir-primeiros-passos"))}
-              className="text-sm font-semibold text-[#2E2E2E] bg-brand-cream rounded-full px-3.5 py-1 hover:bg-brand-cream/90 transition-colors"
+              className="text-sm font-semibold text-primary-foreground bg-primary rounded-full px-3.5 py-1 hover:bg-lime transition-colors"
             >
               Primeiros passos
             </button>
@@ -206,7 +206,7 @@ export function TopHeader() {
                   variant="ghost" 
                   className={cn(
                     "text-sm font-medium h-auto p-0 transition-colors hover:bg-transparent",
-                    isComunicacoesActive ? "text-[#AFC040] font-semibold" : "text-white/60 hover:text-white"
+                    isComunicacoesActive ? "text-primary font-semibold" : "text-white/60 hover:text-white"
                   )}
                 >
                   Chat AI
@@ -240,7 +240,7 @@ export function TopHeader() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className={`hidden md:flex h-9 w-9 transition-colors ${modoFoco ? 'bg-[#AFC040]/15 text-[#AFC040]' : 'text-white/70 hover:text-white hover:bg-white/10'}`}
+                  className={`hidden md:flex h-9 w-9 transition-colors ${modoFoco ? 'bg-primary/15 text-primary' : 'text-white/70 hover:text-white hover:bg-white/10'}`}
                   onClick={toggleFoco}
                 >
                   {modoFoco ? <Minimize2 className="h-5 w-5" strokeWidth={1.5} /> : <Maximize2 className="h-5 w-5" strokeWidth={1.5} />}

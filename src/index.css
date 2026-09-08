@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500;1,9..144,600&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -10,22 +8,25 @@
   transition: border-color 150ms ease, transform 150ms ease;
 }
 .card-interactive:hover {
-  border-color: rgba(175,192,64,0.25);
+  border-color: hsl(var(--primary) / 0.35);
   transform: scale(1.003);
 }
 .card-interactive:active {
   transform: scale(0.998);
 }
 
-/* Dot grid background for authenticated pages */
+/* Grade da LP como fundo das páginas autenticadas (estática, sutil) */
 .dot-grid-bg {
-  background-image: radial-gradient(circle, #AFC040 1px, transparent 1px);
-  background-size: 28px 28px;
-  opacity: 0.025;
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: 0;
+  background-image:
+    linear-gradient(rgba(158, 176, 56, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(158, 176, 56, 0.07) 1px, transparent 1px);
+  background-size: 58px 58px;
+  -webkit-mask-image: radial-gradient(120% 100% at 70% 0%, #000 20%, transparent 80%);
+  mask-image: radial-gradient(120% 100% at 70% 0%, #000 20%, transparent 80%);
 }
 
 /* Auth page subtle animations */
@@ -72,136 +73,94 @@
 }
 
 /* ============================================
-   IAplicada Design System - Brand Guidelines
-   Executiva-tech · Neutro · Limpeza · Modernidade
+   IAplicada Design System — branding iaplicada.com
+   Tema escuro integral: charcoal + grafite, lime/olive, creme.
+   Valores portados dos tokens da LP (repo ia-transform, styles.css):
+   background oklch(0.14 0.018 122), card oklch(0.22 0.024 122),
+   primary oklch(0.75 0.2 122), olive oklch(0.58 0.16 125), sage, border.
+   Um único tema: :root e .dark carregam os mesmos valores.
    ============================================ */
 
 @layer base {
-  :root {
-    /* Light Mode - Professional & Clean */
-    --background: 0 0% 100%;
-    --foreground: 72 6% 18%;
-    
-    --card: 60 5% 96%;
-    --card-foreground: 72 6% 18%;
-    
-    --popover: 0 0% 100%;
-    --popover-foreground: 72 6% 18%;
-    
-    /* Primary: Brand Green #9EB038 */
-    --primary: 73 55% 47%;
-    --primary-foreground: 0 0% 100%;
-    
-    /* Secondary: Light Green #C8D27B */
-    --secondary: 73 35% 65%;
-    --secondary-foreground: 72 6% 18%;
-    
-    /* Muted: Off-white Neutro */
-    --muted: 60 5% 92%;
-    --muted-foreground: 72 6% 45%;
-    
-    /* Accent: Subtitle Green #BCC95D */
-    --accent: 73 37% 58%;
-    --accent-foreground: 72 6% 18%;
-    
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
-    
-    --border: 73 20% 85%;
-    --input: 73 20% 85%;
-    --ring: 73 55% 47%;
-
-    --radius: 0.75rem;
-
-    /* Brand tokens espelhando academy.iaplicada.com (LP) */
-    --brand-cream: 60 50% 90%;        /* #F0EFD9 - fundo creme do topo */
-    --brand-cream-soft: 60 45% 95%;   /* #F7F6E8 - creme suave/transições */
-    --brand-strong: 73 58% 27%;       /* #5C6F1D - verde escuro de CTA sólido */
-    --brand-strong-foreground: 0 0% 100%;
-    --brand-ink: 0 0% 4%;             /* #0A0A0A - preto profundo da LP */
-    --brand-hairline: 60 20% 90%;     /* #EAEAE0 - bordas sutis */
-    
-    /* Sidebar: branco puro pra diferenciar do topbar creme.
-       Topbar = chrome (creme), Sidebar+Main = conteúdo (branco). */
-    --sidebar-background: 0 0% 100%;        /* branco puro (= main bg) */
-    --sidebar-foreground: 0 0% 4%;          /* preto profundo da LP */
-    --sidebar-primary: 73 58% 27%;          /* brand-strong (active pill) */
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 60 20% 95%;           /* hover sutil */
-    --sidebar-accent-foreground: 0 0% 4%;
-    --sidebar-border: 60 20% 90%;           /* = --brand-hairline */
-    --sidebar-ring: 73 58% 27%;
-    --sidebar-active: 73 58% 27%;           /* = --brand-strong */
-    
-    --complexity-high: 0 100% 65%;
-    --complexity-medium: 35 90% 55%;
-    --complexity-low: 73 55% 47%;
-    
-    --chart-1: 73 55% 47%;
-    --chart-2: 73 35% 65%;
-    --chart-3: 73 37% 58%;
-    --chart-4: 72 6% 18%;
-    --chart-5: 60 5% 92%;
-  }
-
+  :root,
   .dark {
-    /* Dark Mode - Professional Dark #2F302B base */
-    --background: 72 6% 12%;
-    --foreground: 0 0% 95%;
-    
-    /* Card: Dark base #2F302B */
-    --card: 72 6% 18%;
-    --card-foreground: 63 48% 91%;
-    
-    --popover: 72 6% 16%;
-    --popover-foreground: 0 0% 95%;
-    
-    /* Primary: Brand Green #9EB038 */
-    --primary: 73 55% 47%;
-    --primary-foreground: 0 0% 100%;
-    
-    /* Secondary: Darker tone */
-    --secondary: 72 6% 25%;
-    --secondary-foreground: 63 48% 91%;
-    
-    /* Muted: Dark subtle */
-    --muted: 72 6% 22%;
-    --muted-foreground: 73 20% 65%;
-    
-    /* Accent: Subtle green */
-    --accent: 73 37% 30%;
-    --accent-foreground: 63 48% 91%;
-    
-    --destructive: 0 63% 31%;
+    /* Superfícies */
+    --background: 80 27% 4%;          /* #0c0e08 charcoal profundo */
+    --surface: 82 21% 8%;             /* #14170f charcoal claro (inputs, chrome) */
+    --foreground: 67 31% 94%;         /* #f4f5ec creme suave */
+
+    --card: 80 24% 10%;               /* #1b1f13 grafite (cards e containers) */
+    --card-foreground: 67 31% 94%;
+
+    --popover: 82 21% 8%;
+    --popover-foreground: 67 31% 94%;
+
+    /* Primary: lime da LP */
+    --primary: 69 71% 52%;            /* #c8e040 */
+    --primary-foreground: 80 27% 4%;  /* texto charcoal sobre lime */
+
+    /* Secondary: olive */
+    --secondary: 73 50% 37%;          /* #7a8f30 */
+    --secondary-foreground: 67 31% 94%;
+
+    /* Muted: step de superfície + sage */
+    --muted: 80 18% 14%;
+    --muted-foreground: 82 7% 63%;    /* #a3a89a sage */
+
+    /* Accent: hover de menus/itens (superfície elevada) */
+    --accent: 80 18% 14%;
+    --accent-foreground: 67 31% 94%;
+
+    --destructive: 352 71% 51%;       /* #db2b42 alerta da LP */
     --destructive-foreground: 0 0% 100%;
-    
-    --border: 72 6% 25%;
-    --input: 72 6% 25%;
-    --ring: 73 55% 47%;
-    
+
+    --border: 81 17% 16%;             /* #2b3022 */
+    --input: 81 17% 16%;
+    --ring: 69 71% 52%;
+
     --radius: 0.75rem;
-    
-    /* Sidebar: Dark Mode - harmonizado com o tema escuro */
-    --sidebar-background: 72 6% 10%;
-    --sidebar-foreground: 0 0% 90%;
-    --sidebar-primary: 73 55% 47%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 72 6% 15%;
-    --sidebar-accent-foreground: 0 0% 95%;
-    --sidebar-border: 72 6% 18%;
-    --sidebar-ring: 73 55% 47%;
-    /* Active indicator: brand green */
-    --sidebar-active: 73 55% 47%;
-    
-    --chart-1: 73 55% 47%;
-    --chart-2: 73 35% 65%;
-    --chart-3: 73 37% 58%;
-    --chart-4: 72 6% 18%;
-    --chart-5: 60 5% 92%;
-    
-    --complexity-high: 0 100% 65%;
-    --complexity-medium: 35 90% 55%;
-    --complexity-low: 73 55% 47%;
+
+    /* Paleta de marca (nomeada) */
+    --lime: 68 77% 63%;               /* #d5e95a realce */
+    --olive: 73 50% 37%;              /* #7a8f30 */
+    --sage: 82 7% 63%;                /* #a3a89a */
+    --charcoal: 80 27% 4%;
+
+    /* Status (na paleta da LP) */
+    --status-success: 69 71% 52%;
+    --status-warning: 36 79% 57%;     /* #e8a43c */
+    --status-info: 206 70% 58%;       /* #4a9fe0 */
+    --status-danger: 352 71% 51%;
+
+    /* Brand tokens legados (usados em ~600 pontos) remapeados para o escuro:
+       cream → superfícies, strong → olive, hairline → border, ink → creme */
+    --brand-cream: 82 21% 8%;
+    --brand-cream-soft: 80 24% 10%;
+    --brand-strong: 73 50% 37%;
+    --brand-strong-foreground: 67 31% 94%;
+    --brand-ink: 67 31% 94%;
+    --brand-hairline: 81 17% 16%;
+
+    /* Sidebar: mesmo charcoal do fundo, item ativo em lime */
+    --sidebar-background: 80 27% 4%;
+    --sidebar-foreground: 67 31% 94%;
+    --sidebar-primary: 69 71% 52%;
+    --sidebar-primary-foreground: 80 27% 4%;
+    --sidebar-accent: 80 18% 12%;
+    --sidebar-accent-foreground: 67 31% 94%;
+    --sidebar-border: 81 17% 16%;
+    --sidebar-ring: 69 71% 52%;
+    --sidebar-active: 69 71% 52%;
+
+    --complexity-high: 352 71% 51%;
+    --complexity-medium: 36 79% 57%;
+    --complexity-low: 69 71% 52%;
+
+    --chart-1: 69 71% 52%;
+    --chart-2: 73 50% 37%;
+    --chart-3: 82 7% 63%;
+    --chart-4: 206 70% 58%;
+    --chart-5: 36 79% 57%;
   }
 }
 
@@ -247,8 +206,8 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Sora', system-ui, -apple-system, sans-serif;
-    letter-spacing: -0.01em;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    letter-spacing: -0.005em;
     overflow-x: hidden;
   }
 
@@ -427,9 +386,9 @@
     color: hsl(var(--primary));
   }
   
-  /* Typography - Sora weights */
+  /* Typography — Inter (corpo) + Instrument Serif (display), como na LP */
   h1, h2, h3, h4, h5, h6 {
-    font-weight: 500;
+    font-weight: 600;
     color: hsl(var(--foreground));
     letter-spacing: -0.02em;
   }
@@ -446,7 +405,7 @@
   }
 
   p, span, div, label {
-    font-weight: 300;
+    font-weight: 400;
   }
 
   strong, b {
@@ -455,21 +414,20 @@
 
   .brand-text strong,
   .brand-text b {
-    color: hsl(73 54% 39%);
+    color: hsl(var(--primary));
   }
 
-  /* Fraunces serif (display) - LP Academy */
+  /* Instrument Serif (display) — títulos editoriais como na LP */
   .font-serif-display {
-    font-family: 'Fraunces', 'Sora', serif;
-    font-optical-sizing: auto;
-    font-variation-settings: "opsz" 96;
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-weight: 400;
     letter-spacing: -0.02em;
   }
 
   .font-serif-italic {
-    font-family: 'Fraunces', serif;
+    font-family: 'Instrument Serif', Georgia, serif;
     font-style: italic;
-    font-variation-settings: "opsz" 72;
+    font-weight: 400;
   }
 
   /* Eyebrow CAPS muted-foreground com tracking — usado em headers de seção. */
@@ -483,26 +441,11 @@
     background-color: hsl(var(--foreground) / 0.4);
   }
 
-  /* Sora font weight utilities */
-  .font-sora-light {
-    font-family: 'Sora', system-ui, sans-serif;
-    font-weight: 300;
-  }
-
-  .font-sora-regular {
-    font-family: 'Sora', system-ui, sans-serif;
-    font-weight: 400;
-  }
-
-  .font-sora-medium {
-    font-family: 'Sora', system-ui, sans-serif;
-    font-weight: 500;
-  }
-
-  .font-sora-semibold {
-    font-family: 'Sora', system-ui, sans-serif;
-    font-weight: 600;
-  }
+  /* Utilitários de peso (nome legado "sora" mantido; fonte é Inter) */
+  .font-sora-light { font-weight: 300; }
+  .font-sora-regular { font-weight: 400; }
+  .font-sora-medium { font-weight: 500; }
+  .font-sora-semibold { font-weight: 600; }
   
 
   .card-emphasis {
