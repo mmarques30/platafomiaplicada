@@ -158,7 +158,7 @@ export default function DiagnosticosSkillsTab({ equipeId }: Props) {
           ) : (
             <div className="space-y-4">
               {consolidado.insights_ia && (
-                <div className="p-3 bg-muted/30 rounded-lg prose prose-sm max-w-none prose-invert prose-invert">
+                <div className="p-3 bg-muted/30 rounded-lg prose prose-sm max-w-none">
                   <ReactMarkdown>{consolidado.insights_ia as string}</ReactMarkdown>
                 </div>
               )}

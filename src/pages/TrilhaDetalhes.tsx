@@ -392,7 +392,7 @@ export default function TrilhaDetalhes() {
                       </TabsList>
 
                       <TabsContent value="descricao" className="mt-0 space-y-6">
-                        <div className="prose prose-sm prose-invert max-w-none text-muted-foreground prose-invert">
+                        <div className="prose prose-sm max-w-none text-muted-foreground">
                           <ReactMarkdown remarkPlugins={[remarkGfm]}>
                             {currentVideo.descricao || "Sem descrição disponível."}
                           </ReactMarkdown>

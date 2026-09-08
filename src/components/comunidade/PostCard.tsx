@@ -109,7 +109,7 @@ export function PostCard({ post, onLike, onDelete }: PostCardProps) {
           {/* Content + Image Layout */}
           <div className="mt-1">
             {/* Post Content with Markdown links */}
-            <div className="text-foreground prose prose-sm max-w-none prose-invert prose-invert">
+            <div className="text-foreground prose prose-sm max-w-none">
               <ReactMarkdown
                 components={{
                   p: ({ children }) => (

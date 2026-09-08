@@ -15,17 +15,15 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default:
-          "bg-primary text-primary-foreground hover:bg-lime hover:-translate-y-px shadow-[0_8px_24px_-12px_hsl(var(--primary)/0.6)]",
+        default: "bg-primary text-primary-foreground hover:bg-brand-strong",
         destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         outline:
           "border border-foreground/20 bg-transparent text-foreground hover:border-primary/60 hover:text-primary",
-        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/85 hover:-translate-y-px",
+        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "text-foreground/80 hover:bg-accent hover:text-foreground",
         link: "text-primary underline-offset-4 hover:underline",
         /* Aliases legados (mesmo visual do default/outline) */
-        "brand-pill":
-          "bg-primary text-primary-foreground hover:bg-lime hover:-translate-y-px shadow-[0_8px_24px_-12px_hsl(var(--primary)/0.6)]",
+        "brand-pill": "bg-primary text-primary-foreground hover:bg-brand-strong",
         "brand-pill-outline":
           "border border-foreground/20 bg-transparent text-foreground hover:border-primary/60 hover:text-primary",
       },

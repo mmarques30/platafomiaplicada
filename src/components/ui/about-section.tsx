@@ -57,7 +57,7 @@ export function AboutSection() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.4 }}
-          className="text-sm md:text-base font-light leading-relaxed text-muted-foreground max-w-prose prose-invert"
+          className="text-sm md:text-base font-light leading-relaxed text-muted-foreground max-w-prose"
         >
           A IAplicada nasceu da experiência prática em operações complexas de empresas como
           Mercado Livre, Suzano e AngloGold Ashanti. Depois de anos lidando com rotinas,

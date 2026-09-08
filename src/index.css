@@ -15,18 +15,9 @@
   transform: scale(0.998);
 }
 
-/* Grade da LP como fundo das páginas autenticadas (estática, sutil) */
+/* Fundo das páginas autenticadas: creme liso (sem grade) */
 .dot-grid-bg {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  background-image:
-    linear-gradient(rgba(158, 176, 56, 0.07) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(158, 176, 56, 0.07) 1px, transparent 1px);
-  background-size: 58px 58px;
-  -webkit-mask-image: radial-gradient(120% 100% at 70% 0%, #000 20%, transparent 80%);
-  mask-image: radial-gradient(120% 100% at 70% 0%, #000 20%, transparent 80%);
+  display: none;
 }
 
 /* Auth page subtle animations */
@@ -73,11 +64,10 @@
 }
 
 /* ============================================
-   IAplicada Design System — branding iaplicada.com
-   Tema escuro integral: charcoal + grafite, lime/olive, creme.
-   Valores portados dos tokens da LP (repo ia-transform, styles.css):
-   background oklch(0.14 0.018 122), card oklch(0.22 0.024 122),
-   primary oklch(0.75 0.2 122), olive oklch(0.58 0.16 125), sage, border.
+   IAplicada Design System — branding iaplicada.com (variante leve)
+   Base: tokens "academy" da LP (repo ia-transform): creme #fffff6,
+   cocoa #0d0d0d, brand #afc040 / brand-dark #738925, borda #e5e5e5.
+   Conteúdo claro e leve; charcoal só no topo; verde nos botões e destaques.
    Um único tema: :root e .dark carregam os mesmos valores.
    ============================================ */
 
@@ -85,88 +75,108 @@
   :root,
   .dark {
     /* Superfícies */
-    --background: 80 27% 4%;          /* #0c0e08 charcoal profundo */
-    --surface: 82 21% 8%;             /* #14170f charcoal claro (inputs, chrome) */
-    --foreground: 67 31% 94%;         /* #f4f5ec creme suave */
+    --background: 60 100% 98%;        /* #fffff6 creme da LP */
+    --surface: 0 0% 95%;              /* #f2f2f2 (inputs, faixas) */
+    --foreground: 0 0% 5%;            /* #0d0d0d cocoa */
 
-    --card: 80 24% 10%;               /* #1b1f13 grafite (cards e containers) */
-    --card-foreground: 67 31% 94%;
+    --card: 0 0% 100%;                /* branco */
+    --card-foreground: 0 0% 5%;
 
-    --popover: 82 21% 8%;
-    --popover-foreground: 67 31% 94%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 5%;
 
-    /* Primary: lime da LP */
-    --primary: 69 71% 52%;            /* #c8e040 */
-    --primary-foreground: 80 27% 4%;  /* texto charcoal sobre lime */
+    /* Primary: verde-oliva escuro dos CTAs da LP (texto branco) */
+    --primary: 73 57% 34%;            /* #738925 */
+    --primary-foreground: 0 0% 100%;
 
-    /* Secondary: olive */
-    --secondary: 73 50% 37%;          /* #7a8f30 */
-    --secondary-foreground: 67 31% 94%;
+    /* Secondary: verde claro de apoio (texto cocoa) */
+    --secondary: 73 45% 90%;
+    --secondary-foreground: 0 0% 5%;
 
-    /* Muted: step de superfície + sage */
-    --muted: 80 18% 14%;
-    --muted-foreground: 82 7% 63%;    /* #a3a89a sage */
+    /* Muted */
+    --muted: 60 30% 95%;
+    --muted-foreground: 75 4% 40%;    /* cinza-oliva legível */
 
-    /* Accent: hover de menus/itens (superfície elevada) */
-    --accent: 80 18% 14%;
-    --accent-foreground: 67 31% 94%;
+    /* Accent: hover de menus/itens */
+    --accent: 60 30% 94%;
+    --accent-foreground: 0 0% 5%;
 
     --destructive: 352 71% 51%;       /* #db2b42 alerta da LP */
     --destructive-foreground: 0 0% 100%;
 
-    --border: 81 17% 16%;             /* #2b3022 */
-    --input: 81 17% 16%;
-    --ring: 69 71% 52%;
+    --border: 0 0% 90%;               /* #e5e5e5 */
+    --input: 0 0% 88%;
+    --ring: 73 57% 34%;
 
     --radius: 0.75rem;
 
     /* Paleta de marca (nomeada) */
-    --lime: 68 77% 63%;               /* #d5e95a realce */
-    --olive: 73 50% 37%;              /* #7a8f30 */
-    --sage: 82 7% 63%;                /* #a3a89a */
-    --charcoal: 80 27% 4%;
+    --lime: 73 50% 50%;               /* #afc040 brand */
+    --olive: 73 57% 34%;              /* #738925 */
+    --sage: 75 4% 40%;
+    --charcoal: 0 0% 5%;
 
-    /* Status (na paleta da LP) */
-    --status-success: 69 71% 52%;
-    --status-warning: 36 79% 57%;     /* #e8a43c */
-    --status-info: 206 70% 58%;       /* #4a9fe0 */
+    /* Status */
+    --status-success: 73 57% 34%;
+    --status-warning: 36 79% 47%;     /* âmbar legível no claro */
+    --status-info: 206 70% 48%;
     --status-danger: 352 71% 51%;
 
-    /* Brand tokens legados (usados em ~600 pontos) remapeados para o escuro:
-       cream → superfícies, strong → olive, hairline → border, ink → creme */
-    --brand-cream: 82 21% 8%;
-    --brand-cream-soft: 80 24% 10%;
-    --brand-strong: 73 50% 37%;
-    --brand-strong-foreground: 67 31% 94%;
-    --brand-ink: 67 31% 94%;
-    --brand-hairline: 81 17% 16%;
+    /* Brand tokens legados: mesmos papéis de antes, na paleta da LP */
+    --brand-cream: 60 30% 95%;
+    --brand-cream-soft: 60 100% 98%;
+    --brand-strong: 73 58% 27%;       /* #5c6f1d CTA sólido */
+    --brand-strong-foreground: 0 0% 100%;
+    --brand-ink: 0 0% 5%;
+    --brand-hairline: 0 0% 90%;
 
-    /* Chrome (topo + sidebar): verde-oliva profundo, distinto do fundo charcoal */
-    --chrome: 78 42% 15%;             /* #2b3616 */
-    --chrome-foreground: 67 31% 94%;
-    --chrome-border: 78 30% 24%;
-    --chrome-accent: 78 36% 21%;      /* hover de itens */
+    /* Chrome do topo: charcoal fino, como o header da LP */
+    --chrome: 0 0% 5%;
+    --chrome-foreground: 60 100% 98%;
+    --chrome-border: 0 0% 12%;
+    --chrome-accent: 0 0% 12%;
 
-    /* Sidebar usa o chrome; item ativo em lime */
-    --sidebar-background: 78 42% 15%;
-    --sidebar-foreground: 67 31% 94%;
-    --sidebar-primary: 69 71% 52%;
-    --sidebar-primary-foreground: 80 27% 4%;
-    --sidebar-accent: 78 36% 21%;
-    --sidebar-accent-foreground: 67 31% 94%;
-    --sidebar-border: 78 30% 24%;
-    --sidebar-ring: 69 71% 52%;
-    --sidebar-active: 69 71% 52%;
+    /* Sidebar: branca, separada do creme por hairline; ativo em verde */
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 0 0% 5%;
+    --sidebar-primary: 73 57% 34%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 60 30% 95%;
+    --sidebar-accent-foreground: 0 0% 5%;
+    --sidebar-border: 0 0% 90%;
+    --sidebar-ring: 73 57% 34%;
+    --sidebar-active: 73 57% 34%;
 
     --complexity-high: 352 71% 51%;
-    --complexity-medium: 36 79% 57%;
-    --complexity-low: 69 71% 52%;
+    --complexity-medium: 36 79% 47%;
+    --complexity-low: 73 57% 34%;
 
-    --chart-1: 69 71% 52%;
-    --chart-2: 73 50% 37%;
-    --chart-3: 82 7% 63%;
-    --chart-4: 206 70% 58%;
-    --chart-5: 36 79% 57%;
+    --chart-1: 73 57% 34%;
+    --chart-2: 73 50% 50%;
+    --chart-3: 75 4% 55%;
+    --chart-4: 206 70% 48%;
+    --chart-5: 36 79% 47%;
+  }
+
+  /* Blocos de texto rico (markdown/prose) lidos dos tokens, sem depender
+     de prose-invert: funcionam em qualquer tema. */
+  .prose {
+    --tw-prose-body: hsl(var(--foreground) / 0.88);
+    --tw-prose-headings: hsl(var(--foreground));
+    --tw-prose-lead: hsl(var(--muted-foreground));
+    --tw-prose-links: hsl(var(--primary));
+    --tw-prose-bold: hsl(var(--foreground));
+    --tw-prose-counters: hsl(var(--muted-foreground));
+    --tw-prose-bullets: hsl(var(--primary));
+    --tw-prose-hr: hsl(var(--border));
+    --tw-prose-quotes: hsl(var(--foreground));
+    --tw-prose-quote-borders: hsl(var(--primary) / 0.4);
+    --tw-prose-captions: hsl(var(--muted-foreground));
+    --tw-prose-code: hsl(var(--foreground));
+    --tw-prose-pre-code: hsl(var(--foreground));
+    --tw-prose-pre-bg: hsl(var(--muted));
+    --tw-prose-th-borders: hsl(var(--border));
+    --tw-prose-td-borders: hsl(var(--border));
   }
 }
 

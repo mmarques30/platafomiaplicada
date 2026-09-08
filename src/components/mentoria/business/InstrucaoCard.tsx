@@ -124,7 +124,7 @@ export function InstrucaoCard({ instrucao, onToggleStatus, isUpdating }: Instruc
             </h4>
             
             {instrucao.descricao && (
-              <div className="text-sm text-muted-foreground mt-1 prose prose-sm prose-invert max-w-none prose-invert">
+              <div className="text-sm text-muted-foreground mt-1 prose prose-sm max-w-none">
                 <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
                   {instrucao.descricao}
                 </ReactMarkdown>
@@ -153,7 +153,7 @@ export function InstrucaoCard({ instrucao, onToggleStatus, isUpdating }: Instruc
                           Prompt Sugerido
                         </span>
                       </div>
-                      <div className="text-sm text-status-info dark:text-status-info/40 prose prose-sm prose-invert max-w-none prose-invert">
+                      <div className="text-sm text-status-info dark:text-status-info/40 prose prose-sm max-w-none">
                         <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
                           {instrucao.prompt_sugerido}
                         </ReactMarkdown>
@@ -177,7 +177,7 @@ export function InstrucaoCard({ instrucao, onToggleStatus, isUpdating }: Instruc
                               <div className="flex-1 min-w-0">
                                 <p className="font-medium text-sm">{passo.titulo}</p>
                                 {passo.descricao && (
-                                  <div className="text-xs text-muted-foreground mt-0.5 prose prose-sm prose-invert max-w-none prose-invert">
+                                  <div className="text-xs text-muted-foreground mt-0.5 prose prose-sm max-w-none">
                                     <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
                                       {passo.descricao}
                                     </ReactMarkdown>
@@ -219,7 +219,7 @@ export function InstrucaoCard({ instrucao, onToggleStatus, isUpdating }: Instruc
                           <span className="text-xs font-semibold text-status-warning dark:text-status-warning uppercase tracking-wide block mb-1">
                             Dicas
                           </span>
-                          <div className="text-sm text-status-warning dark:text-status-warning/40 prose prose-sm prose-invert max-w-none prose-invert">
+                          <div className="text-sm text-status-warning dark:text-status-warning/40 prose prose-sm max-w-none">
                             <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
                               {instrucao.dicas}
                             </ReactMarkdown>
