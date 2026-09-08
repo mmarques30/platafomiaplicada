@@ -17,7 +17,7 @@ import { useCountUp } from "@/hooks/useCountUp";
 
 // ── Types ──
 
-type Plano = "academy" | "business_parceria" | "business_sistemas" | "skills" | null;
+type Plano = "academy" | "business_sistemas" | "insider_free" | null;
 type StatusOnb = "completo" | "em_andamento" | "nao_iniciou";
 
 interface Profile {
@@ -49,13 +49,12 @@ interface UserRow {
 
 const PLANO_LABELS: Record<string, string> = {
   academy: "Academy",
-  business_parceria: "Builder",
-  business_sistemas: "System",
-  skills: "Skills",
+  business_sistemas: "Insider",
+  insider_free: "Insider (não pago)",
 };
 
 function planoLabel(p: Plano) {
-  return p ? PLANO_LABELS[p] ?? "Gratuito" : "Gratuito";
+  return p ? PLANO_LABELS[p] ?? "Sem plano" : "Sem plano";
 }
 
 function calcularStatus(profile: Profile, allEvents: Evento[]): Omit<UserRow, "profile"> {
@@ -66,16 +65,12 @@ function calcularStatus(profile: Profile, allEvents: Evento[]): Omit<UserRow, "p
   const tourFeito = tem("tour_concluido");
   const passosVistos = tem("proximos_passos_vistos");
   const diagnosticoAcademy = tem("diagnostico_iniciado");
-  const diagnosticoSkills = tem("skills_diagnostico_iniciado");
   const trilhaIniciada = tem("trilha_iniciada");
-  const roadmapVisitado = tem("roadmap_visitado");
   const sistemaVisitado = tem("sistema_visitado");
 
   const plano = profile.plano_mentoria;
   const acaoConcluida =
     plano === "academy" ? diagnosticoAcademy :
-    plano === "skills" ? diagnosticoSkills :
-    plano === "business_parceria" ? roadmapVisitado :
     plano === "business_sistemas" ? sistemaVisitado :
     videoVisto;
 
@@ -118,21 +113,18 @@ function getMensagemNotificacao(etapaAtual: string, nome: string | null, plano: 
     return `Olá, ${firstName}! O tour está concluído. Agora veja seus próximos passos personalizados para o plano ${planoLbl}.`;
   if (etapaAtual.includes("Próximos Passos vistos") && plano === "academy")
     return `Olá, ${firstName}! Seus próximos passos estão definidos. Que tal começar pelo Diagnóstico de IA? Leva 15 minutos e personaliza toda sua experiência.`;
-  if (etapaAtual.includes("Próximos Passos vistos") && plano === "skills")
-    return `Olá, ${firstName}! O diagnóstico individual do squad está pendente. Cada membro precisa completar o próprio — você é o primeiro passo.`;
-  if (etapaAtual.includes("Próximos Passos vistos") && (plano === "business_parceria" || plano === "business_sistemas"))
+  if (etapaAtual.includes("Próximos Passos vistos") && plano === "business_sistemas")
     return `Olá, ${firstName}! Seu projeto está configurado. Explore o Roadmap para ver as etapas e o que será entregue.`;
   return `Olá, ${firstName}! Estamos aqui se precisar de ajuda para continuar sua jornada na plataforma.`;
 }
 
-type FilterKey = "todos" | "academy" | "business_parceria" | "business_sistemas" | "skills" | "gratuito" | "parados";
+type FilterKey = "todos" | "academy" | "business_sistemas" | "insider_free" | "sem_plano" | "parados";
 const FILTERS: { key: FilterKey; label: string }[] = [
   { key: "todos", label: "Todos" },
   { key: "academy", label: "Academy" },
-  { key: "business_parceria", label: "Builder" },
-  { key: "business_sistemas", label: "System" },
-  { key: "skills", label: "Skills" },
-  { key: "gratuito", label: "Gratuito" },
+  { key: "business_sistemas", label: "Insider" },
+  { key: "insider_free", label: "Insider (não pago)" },
+  { key: "sem_plano", label: "Sem plano" },
   { key: "parados", label: "Parados 3+ dias" },
 ];
 
@@ -201,7 +193,7 @@ export default function OnboardingMonitor() {
   const filtered = useMemo(() => {
     if (filter === "todos") return rows;
     if (filter === "parados") return rows.filter((r) => r.parado3dias);
-    if (filter === "gratuito") return rows.filter((r) => !r.profile.plano_mentoria);
+    if (filter === "sem_plano") return rows.filter((r) => !r.profile.plano_mentoria);
     return rows.filter((r) => r.profile.plano_mentoria === filter);
   }, [rows, filter]);
 

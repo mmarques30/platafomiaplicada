@@ -38,13 +38,6 @@ export default function MeuDiagnostico() {
       return;
     }
 
-    // Skills -> diagnostico Skills (não Academy)
-    if (effectivePlan === 'skills') {
-      hasRedirected.current = true;
-      navigate('/skills/projeto/diagnostico', { replace: true });
-      return;
-    }
-
     // Academy: SEMPRE vai para o painel com as duas abas (Diagnóstico + Feedback)
     // O painel já mostra o botão "Preencher diagnóstico" se ainda não preencheu
     hasRedirected.current = true;

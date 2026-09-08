@@ -12,7 +12,7 @@ export function EstatisticasProdutos() {
   const produtos = [
     { key: "academy", nome: "Academy", cor: "bg-blue-500" },
     { key: "skills", nome: "Skills", cor: "bg-orange-500" },
-    { key: "business", nome: "Builder", cor: "bg-purple-500" },
+    { key: "business", nome: "Insider", cor: "bg-purple-500" },
   ];
 
   return (

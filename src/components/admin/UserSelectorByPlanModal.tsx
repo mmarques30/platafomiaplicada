@@ -7,11 +7,11 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Search, Building2, User, GraduationCap, Briefcase } from 'lucide-react';
+import { Search, Building2, User, GraduationCap, Sparkles } from 'lucide-react';
 import { useUsers } from '@/hooks/admin/useUsers';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
-type PlanType = 'academy' | 'skills' | 'business_parceria' | 'business_sistemas';
+type PlanType = 'academy' | 'business_sistemas' | 'insider_free';
 
 interface UserSelectorByPlanModalProps {
   open: boolean;
@@ -26,20 +26,15 @@ const planConfig: Record<PlanType, { title: string; icon: React.ReactNode; empty
     icon: <GraduationCap className="h-5 w-5 text-primary" />,
     emptyMessage: 'Nenhum mentorado Academy encontrado',
   },
-  skills: {
-    title: 'Selecionar Mentorado Skills',
-    icon: <Briefcase className="h-5 w-5 text-primary" />,
-    emptyMessage: 'Nenhum mentorado Skills encontrado',
-  },
-  business_parceria: {
-    title: 'Selecionar Mentorado Builder',
-    icon: <Building2 className="h-5 w-5 text-primary" />,
-    emptyMessage: 'Nenhum mentorado Builder encontrado',
-  },
   business_sistemas: {
-    title: 'Selecionar Mentorado System',
+    title: 'Selecionar Cliente Insider',
     icon: <Building2 className="h-5 w-5 text-primary" />,
-    emptyMessage: 'Nenhum mentorado System encontrado',
+    emptyMessage: 'Nenhum cliente Insider encontrado',
+  },
+  insider_free: {
+    title: 'Selecionar Insider (não pago)',
+    icon: <Sparkles className="h-5 w-5 text-primary" />,
+    emptyMessage: 'Nenhum Insider não pago encontrado',
   },
 };
 
@@ -52,14 +47,6 @@ export function UserSelectorByPlanModal({ open, onClose, onSelect, planType }: U
   // Filtrar usuários pelo plano
   const planUsers = useMemo(() => {
     if (!allUsers) return [];
-    
-    // Para Skills, incluir também Business com skills_liberado
-    if (planType === 'skills') {
-      return allUsers.filter(user => 
-        user.plano_mentoria === 'skills' || 
-        ((user.plano_mentoria === 'business_parceria' || user.plano_mentoria === 'business_sistemas') && user.skills_liberado)
-      );
-    }
     
     return allUsers.filter(user => user.plano_mentoria === planType);
   }, [allUsers, planType]);
@@ -97,10 +84,10 @@ export function UserSelectorByPlanModal({ open, onClose, onSelect, planType }: U
   const getPlanIcon = () => {
     switch (planType) {
       case 'academy': return <GraduationCap className="h-4 w-4 text-muted-foreground shrink-0" />;
-      case 'skills': return <Briefcase className="h-4 w-4 text-muted-foreground shrink-0" />;
-      case 'business_parceria': 
       case 'business_sistemas': 
         return <Building2 className="h-4 w-4 text-muted-foreground shrink-0" />;
+      case 'insider_free':
+        return <Sparkles className="h-4 w-4 text-muted-foreground shrink-0" />;
     }
   };
 

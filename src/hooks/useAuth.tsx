@@ -31,7 +31,7 @@ export function useAuth() {
             
             // Se acesso expirado, redirecionar
             if (profile?.is_visitante && profile?.acesso_expirado) {
-              window.location.href = "/acesso-expirado";
+              window.location.href = "/sem-acesso";
               return;
             }
             

@@ -6,9 +6,9 @@ import { ptBR } from "date-fns/locale";
 
 const planoNomes: Record<string, string> = {
   academy: "IAplicada Academy",
-  skills: "IAplicada Skills",
-  business_parceria: "IAplicada Builder",
-  business_sistemas: "IAplicada System",
+  business_parceria: "IAplicada Academy",
+  business_sistemas: "IAplicada Insider",
+  insider_free: "IAplicada Insider",
 };
 
 export function MeuPlanoCard() {

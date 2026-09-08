@@ -1,7 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
-import { useAdminViewContext } from "@/contexts/AdminViewContext";
 
 export type UserRole = "admin" | "equipe" | "mentorado" | "aluno_trilha" | "visitante" | "parceiros" | null;
 
@@ -27,17 +26,6 @@ export function useUserRole() {
     retry: 1,
   });
 
-  // Obter viewAs do context (safe access)
-  let viewAs: string | null = null;
-  let isViewingAs = false;
-  
-  try {
-    const context = useAdminViewContext();
-    viewAs = context.viewAs;
-    isViewingAs = context.isViewingAs;
-  } catch {
-    // Context not available
-  }
 
   const hasRole = (role: UserRole) => {
     if (!roles) return false;
@@ -51,10 +39,8 @@ export function useUserRole() {
   const realIsVisitante = hasRole("visitante");
   const isParceiro = hasRole("parceiros");
 
-  // Se admin está simulando visitante
-  const effectiveIsVisitante = isAdmin && isViewingAs && viewAs === "visitante" 
-    ? true 
-    : realIsVisitante;
+  // Não existe mais simulação de visitante (o acesso gratuito acabou)
+  const effectiveIsVisitante = realIsVisitante;
 
   const hasAccess = isAdmin || isMentorado || isAlunoTrilha || isParceiro || effectiveIsVisitante;
 

@@ -27,10 +27,6 @@ export default function DiagnosticoPainelAcademy() {
       navigate("/trilhas", { replace: true });
       return;
     }
-
-    if (effectivePlan === 'skills') {
-      navigate('/skills/projeto/diagnostico', { replace: true });
-    }
   }, [isVisitante, effectivePlan, planLoading, navigate]);
 
   const isPageLoading = isLoading || planLoading;

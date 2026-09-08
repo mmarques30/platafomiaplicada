@@ -139,7 +139,7 @@ export default function VisualizarFormularios() {
               <SelectContent>
                 <SelectItem value="all">Todos os planos</SelectItem>
                 <SelectItem value="academy">Academy</SelectItem>
-                <SelectItem value="business_parceria">Builder</SelectItem>
+                <SelectItem value="business_sistemas">Insider</SelectItem>
               </SelectContent>
             </Select>
 

@@ -282,8 +282,8 @@ export default function GerenciarUsuários() {
           <SelectContent>
             <SelectItem value="all">Todos os Planos</SelectItem>
             <SelectItem value="academy">Academy</SelectItem>
-            <SelectItem value="business_parceria">Builder</SelectItem>
-            <SelectItem value="business_sistemas">System</SelectItem>
+            <SelectItem value="business_sistemas">Insider</SelectItem>
+            <SelectItem value="insider_free">Insider (não pago)</SelectItem>
             <SelectItem value="none">Sem Plano</SelectItem>
           </SelectContent>
         </Select>
@@ -355,19 +355,16 @@ export default function GerenciarUsuários() {
                       className={`text-xs ${
                         (user as any).plano_mentoria === "academy"
                           ? "border-blue-500 text-blue-700"
-                          : (user as any).plano_mentoria === "skills"
-                          ? "border-orange-500 text-orange-700"
-                          : (user as any).plano_mentoria === "business_parceria"
-                          ? "border-purple-500 text-purple-700"
                           : (user as any).plano_mentoria === "business_sistemas"
                           ? "border-violet-500 text-violet-700"
+                          : (user as any).plano_mentoria === "insider_free"
+                          ? "border-indigo-300 text-indigo-600"
                           : "border-gray-500 text-gray-700"
                       }`}
                     >
                       {(user as any).plano_mentoria === "academy" && "Academy"}
-                      {(user as any).plano_mentoria === "skills" && "Skills"}
-                      {(user as any).plano_mentoria === "business_parceria" && "Builder"}
-                      {(user as any).plano_mentoria === "business_sistemas" && "System"}
+                      {(user as any).plano_mentoria === "business_sistemas" && "Insider"}
+                      {(user as any).plano_mentoria === "insider_free" && "Insider (não pago)"}
                     </Badge>
                   ) : (
                     <Badge variant="outline" className="border-gray-400 text-gray-600 text-xs">

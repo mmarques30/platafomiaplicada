@@ -150,9 +150,8 @@ export function useAdminDashboard() {
       // Calcular distribuição por plano (separando business)
       const distribuicaoPlanos = {
         academy: users?.filter(u => u.plano_mentoria === "academy").length || 0,
-        skills: users?.filter(u => u.plano_mentoria === "skills").length || 0,
-        business_parceria: users?.filter(u => u.plano_mentoria === "business_parceria").length || 0,
         business_sistemas: users?.filter(u => u.plano_mentoria === "business_sistemas").length || 0,
+        insider_free: users?.filter(u => (u.plano_mentoria as string) === "insider_free").length || 0,
         sem_plano: users?.filter(u => !u.plano_mentoria).length || 0,
       };
 

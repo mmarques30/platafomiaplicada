@@ -4,7 +4,7 @@
 -- Agora:
 --   * Não existe mais acesso gratuito. Cadastros gratuitos (is_visitante /
 --     sem plano) permanecem na base, mas o app os direciona para /sem-acesso.
---   * Builder deixa de existir: quem era Builder passa a ser Academy.
+--   * Builder e Skills deixam de existir: quem era Builder ou Skills passa a ser Academy.
 --   * System passa a se chamar Insider (pago). O valor do enum
 --     business_sistemas é mantido para não impactar ninguém que já paga.
 --   * Novo plano insider_free: Insider não pago ("outra visão", a definir).
@@ -55,10 +55,10 @@ BEGIN
 END
 $$;
 
--- 2. Builder (e o alias legado 'business') vira Academy.
+-- 2. Builder, Skills (e o alias legado 'business') viram Academy.
 UPDATE public.profiles
 SET plano_mentoria = 'academy'
-WHERE plano_mentoria::text IN ('business_parceria', 'business');
+WHERE plano_mentoria::text IN ('business_parceria', 'business', 'skills');
 
 -- 3. Alias legado do System vira o valor canônico do Insider pago.
 UPDATE public.profiles

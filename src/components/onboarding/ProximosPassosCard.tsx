@@ -161,22 +161,6 @@ export function ProximosPassosCard({ previewMode, onClose: onCloseExternal }: Pr
       };
     }
 
-    if (effectivePlan === "skills") {
-      return {
-        planoLabel: "Skills",
-        titulo: `O programa Skills começa com você, ${nome}.`,
-        sub: "Cada membro faz seu diagnóstico individual. A IA consolida tudo e gera automaticamente o plano coletivo do squad.",
-        passos: [
-          { status: "feito", titulo: "Equipe configurada no sistema", desc: "Seu squad está ativo. Cada membro já pode acessar a plataforma." },
-          { status: "agora", label: "Faça agora — você primeiro", titulo: "Complete seu Diagnóstico individual", desc: "Leva 15 minutos. Avalia seu uso de IA em 5 dimensões: automação, análise, criação, comunicação e gestão. Cada membro faz o próprio — os dados ficam privados até a consolidação.", cta: "Iniciar meu Diagnóstico →", href: "/skills/diagnostico" },
-          { status: "proximo", label: "Quando todos do squad concluírem", titulo: "A IA gera o Backlog e Roadmap do squad", desc: "Gaps prioritários, projetos recomendados e distribuição por membro — gerados automaticamente. O líder acessa o Painel do Líder para visão consolidada." },
-          { status: "proximo", label: "Semanas 2–12", titulo: "Execute projetos e acompanhe no Painel de Entregas", desc: "Backlog priorizado, roadmap da equipe, entregas por membro e progresso coletivo. Você também pode acessar trilhas Academy para aprendizado individual." },
-        ],
-        ctaLabel: "Iniciar meu Diagnóstico →",
-        ctaHref: "/skills/diagnostico",
-      };
-    }
-
     if (effectivePlan === "business_parceria") {
       const totalEtapas = etapas?.length ?? 0;
       const primeiraEtapa = etapas?.[0]?.titulo ?? "Etapa inicial";
@@ -207,11 +191,11 @@ export function ProximosPassosCard({ previewMode, onClose: onCloseExternal }: Pr
 
     if (effectivePlan === "business_sistemas") {
       return {
-        planoLabel: "System",
+        planoLabel: "Insider",
         titulo: `Seu sistema está sendo construído, ${nome}.`,
         sub: "A IAplicada constrói e entrega seu sistema por etapas. Acompanhe o andamento em Meu Sistema — e use o Academy enquanto isso.",
         passos: [
-          { status: "feito", titulo: "Acesso configurado", desc: "Sua conta System está ativa." },
+          { status: "feito", titulo: "Acesso configurado", desc: "Sua conta Insider está ativa." },
           { status: "agora", label: "Comece por aqui", titulo: "Conheça o Meu Sistema", desc: "Aqui você acompanha cada etapa de construção, documentos entregues e o status do seu projeto. Você será notificado sempre que algo novo for adicionado.", cta: "Ir para Meu Sistema →", href: "/meu-sistema" },
           { status: "proximo", label: "Ao longo do projeto", titulo: "Acompanhe etapas e documentos entregues", desc: "Cada etapa tem documentos e entregas específicas. O progresso é atualizado pela equipe IAplicada conforme o trabalho avança." },
           { status: "proximo", label: "Acesso paralelo — disponível agora", titulo: "Use o Academy enquanto o sistema é construído", desc: "Você tem acesso a trilhas de aprendizado, biblioteca de prompts e ferramentas de IA. Aprenda enquanto seu sistema é entregue.", cta: "Ver trilhas disponíveis →", href: "/trilhas" },
