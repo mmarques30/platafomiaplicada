@@ -293,10 +293,10 @@ export function MarIAnaChatDrawer({ onClose }: MarIAnaChatDrawerProps) {
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: 20, scale: 0.95 }}
       transition={{ duration: 0.2 }}
-      className="fixed bottom-20 right-4 md:bottom-24 md:right-6 z-50 w-[calc(100vw-2rem)] max-w-[380px] h-[500px] max-h-[70vh] bg-card border border-border rounded-2xl shadow-2xl flex flex-col overflow-hidden"
+      className="fixed bottom-20 right-4 md:bottom-24 md:right-6 z-50 w-[calc(100vw-2rem)] max-w-[380px] h-[500px] max-h-[70vh] bg-surface text-foreground border border-border rounded-2xl shadow-2xl flex flex-col overflow-hidden"
     >
       {/* Header */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-border bg-muted/50">
+      <div className="flex items-center gap-3 px-4 py-3 border-b border-border bg-surface">
         <img
           src={mariAvatar}
           alt="MarIAna"
@@ -321,7 +321,7 @@ export function MarIAnaChatDrawer({ onClose }: MarIAnaChatDrawerProps) {
       </div>
 
       {/* Messages */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto p-3 space-y-3">
+      <div ref={scrollRef} className="flex-1 min-w-0 overflow-y-auto overflow-x-hidden bg-background p-3 space-y-3">
         {isLoadingHistory ? (
           <div className="space-y-3 py-4">
             {[1, 2, 3].map((i) => (
@@ -350,7 +350,7 @@ export function MarIAnaChatDrawer({ onClose }: MarIAnaChatDrawerProps) {
                   key={suggestion}
                   onClick={() => sendMessage(suggestion)}
                   disabled={isLoading || isStreaming}
-                  className="w-full text-left text-xs px-3 py-2 rounded-lg border border-border bg-muted/30 hover:bg-muted transition-colors text-foreground/80 hover:text-foreground disabled:opacity-50"
+                  className="w-full text-left text-xs px-3 py-2 rounded-lg border border-border bg-surface hover:border-primary/50 transition-colors text-foreground/80 hover:text-foreground disabled:opacity-50"
                 >
                   {suggestion}
                 </button>
@@ -365,7 +365,7 @@ export function MarIAnaChatDrawer({ onClose }: MarIAnaChatDrawerProps) {
             className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
           >
             <div
-              className={`flex gap-2 items-start max-w-[85%] ${message.role === "user" ? "flex-row-reverse" : ""}`}
+              className={`flex gap-2 items-start max-w-[85%] min-w-0 ${message.role === "user" ? "flex-row-reverse" : ""}`}
             >
               {message.role === "assistant" && (
                 <img
@@ -376,15 +376,15 @@ export function MarIAnaChatDrawer({ onClose }: MarIAnaChatDrawerProps) {
                 />
               )}
               <div
-                className={`rounded-lg px-3 py-2 text-sm ${
+                className={`min-w-0 max-w-full break-words rounded-xl px-3 py-2 text-sm ${
                   message.role === "user"
                     ? "bg-primary text-primary-foreground"
-                    : "bg-muted text-foreground"
+                    : "bg-surface border border-border text-foreground"
                 }`}
               >
                 {message.role === "assistant" ? (
                   <div className="flex items-start gap-1">
-                    <div className="prose prose-xs max-w-none text-sm">
+                    <div className="prose prose-xs max-w-none min-w-0 break-words text-sm [&_pre]:max-w-full [&_pre]:overflow-x-auto [&_table]:block [&_table]:max-w-full [&_table]:overflow-x-auto">
                       <ReactMarkdown
                         remarkPlugins={[remarkGfm]}
                         components={{
@@ -436,7 +436,7 @@ export function MarIAnaChatDrawer({ onClose }: MarIAnaChatDrawerProps) {
                 key={suggestion}
                 onClick={() => sendMessage(suggestion)}
                 disabled={isLoading || isStreaming}
-                className="w-full text-left text-xs px-3 py-2 rounded-lg border border-border bg-muted/30 hover:bg-muted transition-colors text-foreground/80 hover:text-foreground disabled:opacity-50"
+                className="w-full text-left text-xs px-3 py-2 rounded-lg border border-border bg-surface hover:border-primary/50 transition-colors text-foreground/80 hover:text-foreground disabled:opacity-50"
               >
                 {suggestion}
               </button>
@@ -453,7 +453,7 @@ export function MarIAnaChatDrawer({ onClose }: MarIAnaChatDrawerProps) {
                 className="w-7 h-7 rounded-full flex-shrink-0"
                 onError={(e) => { e.currentTarget.src = mariAvatarFallback; }}
               />
-              <div className="bg-muted rounded-lg px-4 py-3 flex items-center gap-1">
+              <div className="bg-surface border border-border rounded-xl px-4 py-3 flex items-center gap-1">
                 {[0, 1, 2].map((i) => (
                   <span
                     key={i}
@@ -471,7 +471,7 @@ export function MarIAnaChatDrawer({ onClose }: MarIAnaChatDrawerProps) {
       </div>
 
       {/* Input */}
-      <div className="p-3 border-t border-border">
+      <div className="p-3 border-t border-border bg-surface">
         <form onSubmit={handleSubmit} className="flex items-center gap-2">
           <Textarea
             ref={inputRef}
@@ -484,7 +484,7 @@ export function MarIAnaChatDrawer({ onClose }: MarIAnaChatDrawerProps) {
               }
             }}
             placeholder="Digite sua mensagem..."
-            className="min-h-[36px] max-h-[80px] resize-none border-0 bg-muted/50 focus-visible:ring-0 focus-visible:ring-offset-0 py-2 text-sm rounded-lg"
+            className="min-h-[36px] max-h-[80px] resize-none border-0 bg-muted focus-visible:ring-0 focus-visible:ring-offset-0 py-2 text-sm rounded-lg"
             disabled={isLoading || isStreaming}
           />
           <Button

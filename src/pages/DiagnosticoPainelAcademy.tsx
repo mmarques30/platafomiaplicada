@@ -86,12 +86,8 @@ export default function DiagnosticoPainelAcademy() {
                   </div>
                   
                   <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                    <Button 
-                      onClick={() => navigate("/diagnostico/formulario")}
-                      className="bg-primary hover:bg-primary/90"
-                    >
-                      <FileText className="h-4 w-4 mr-2" />
-                      Preencher Meu Diagnóstico
+                    <Button size="pill" onClick={() => navigate("/diagnostico/formulario")}>
+                      Preencher meu diagnóstico
                     </Button>
                     
                     {formulario.arquivo_diagnostico_url && (
@@ -124,11 +120,10 @@ export default function DiagnosticoPainelAcademy() {
                       }
                     </p>
                   </div>
-                  <Button 
+                  <Button
+                    size="pill"
                     onClick={() => navigate(isRealAdmin ? "/diagnostico/formulario?edit=1" : "/diagnostico/formulario")}
-                    className="bg-primary hover:bg-primary/90"
                   >
-                    <FileText className="h-4 w-4 mr-2" />
                     Preencher diagnóstico
                   </Button>
                 </div>

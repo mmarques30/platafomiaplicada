@@ -454,7 +454,7 @@ const Chat = () => {
         </header>
 
         {/* Mensagens */}
-        <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-6 md:px-8">
+        <div ref={scrollRef} className="flex-1 min-w-0 overflow-y-auto overflow-x-hidden px-4 py-6 md:px-8">
           {isLoadingHistory && (
             <div className="flex flex-col items-center justify-center py-16">
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
@@ -491,7 +491,7 @@ const Chat = () => {
               >
                 <div
                   className={cn(
-                    "flex max-w-[80%] items-start gap-3",
+                    "flex max-w-[80%] min-w-0 items-start gap-3",
                     message.role === "user" && "flex-row-reverse"
                   )}
                 >
@@ -505,10 +505,10 @@ const Chat = () => {
                       }}
                     />
                   )}
-                  <div className="flex flex-col gap-1">
+                  <div className="flex min-w-0 flex-col gap-1">
                     <div
                       className={cn(
-                        "rounded-2xl px-4 py-2",
+                        "min-w-0 max-w-full break-words rounded-2xl px-4 py-2",
                         message.role === "user"
                           ? "bg-brand-strong text-brand-strong-foreground rounded-br-sm"
                           : "bg-brand-cream-soft text-foreground border border-brand-hairline rounded-bl-sm"
@@ -516,7 +516,7 @@ const Chat = () => {
                     >
                       {message.role === "assistant" ? (
                         <div className="flex items-start gap-1">
-                          <div className="prose prose-sm max-w-none">
+                          <div className="prose prose-sm max-w-none min-w-0 break-words [&_pre]:max-w-full [&_pre]:overflow-x-auto [&_table]:block [&_table]:max-w-full [&_table]:overflow-x-auto">
                             <ReactMarkdown
                               remarkPlugins={[remarkGfm]}
                               components={{

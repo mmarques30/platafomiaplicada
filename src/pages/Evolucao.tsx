@@ -36,11 +36,7 @@ export default function Evolucao() {
 
   return (
     <PageContainer>
-      <PageTitle
-        primary="Meu"
-        secondary="progresso"
-        description="Seu nível, as trilhas em andamento, conquistas e sua posição na comunidade, tudo em um só lugar."
-      />
+      <PageTitle primary="Meu" secondary="progresso" />
 
       <Tabs defaultValue="minha-evolucao" className="w-full">
         <TabsList className="grid h-auto w-full grid-cols-3 gap-1 rounded-full bg-muted p-1 sm:inline-flex sm:w-auto">

@@ -203,29 +203,18 @@ export function DiagnosticoAcademyPanel({ diagnostico }: DiagnosticoAcademyPanel
                     ? "Gerar plano com o que você já compartilhou"
                     : "Gere Seu Plano de Desenvolvimento"}
               </h3>
-              <p className="text-muted-foreground max-w-md mx-auto">
-                {temRespostas
-                  ? "A IA está usando suas respostas atuais — mesmo parciais — pra montar seu plano inicial. Você pode refinar depois preenchendo o que falta."
-                  : "Com base nas informações que você compartilhou, nossa IA irá criar um plano personalizado de aprendizado em IA."}
-              </p>
-            </div>
-            <Button
-              size="lg"
-              onClick={gerarInsight}
-              disabled={isGenerating}
-              className="bg-aplicada-green-700 hover:bg-aplicada-green-800 text-white"
-            >
-              {isGenerating ? (
-                <>
-                  <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                  Gerando diagnóstico...
-                </>
-              ) : (
-                <>
-                  <Sparkles className="h-5 w-5 mr-2" />
-                  {temRespostas ? "Gerar meu plano agora" : "Gerar Meu Diagnóstico com IA"}
-                </>
+              {!temRespostas && (
+                <p className="text-muted-foreground max-w-md mx-auto">
+                  Com base nas informações que você compartilhou, nossa IA irá criar um plano personalizado de aprendizado em IA.
+                </p>
               )}
+            </div>
+            <Button size="pill-lg" onClick={gerarInsight} disabled={isGenerating}>
+              {isGenerating
+                ? "Gerando diagnóstico..."
+                : temRespostas
+                  ? "Gerar meu plano agora"
+                  : "Gerar meu diagnóstico com IA"}
             </Button>
           </div>
         </CardContent>
