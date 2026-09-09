@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Newspaper, Globe, Lightbulb, FileText, ExternalLink, type LucideIcon } from "lucide-react";
 import { format } from "date-fns";
@@ -19,25 +20,16 @@ const TIPO: Record<string, { label: string; icon: LucideIcon }> = {
   material: { label: "Material", icon: FileText },
 };
 
-function dominio(url: string | null): string | null {
-  if (!url) return null;
-  try {
-    return new URL(url).hostname.replace(/^www\./, "");
-  } catch {
-    return null;
-  }
-}
-
 /**
- * Card compacto de conteúdo (Notícias IA, Dicas, Newsletter): capa 16:9 com
- * a imagem do conteúdo ou, na falta dela, o favicon da fonte sobre um fundo
- * neutro; abaixo, título, resumo curto, data e ação.
+ * Card compacto de conteúdo (Notícias IA, Dicas, Newsletter).
+ * Capa 16:9 com a imagem da notícia; sem imagem, a capa vira o resumo.
  */
 export function ConteudoCard({ conteudo, onClick, className }: ConteudoCardProps) {
   const navigate = useNavigate();
+  const [imgQuebrada, setImgQuebrada] = useState(false);
   const tipo = TIPO[conteudo.tipo] ?? TIPO.noticia;
   const Icon = tipo.icon;
-  const host = dominio(conteudo.link_externo);
+  const temImagem = !!conteudo.imagem_url && !imgQuebrada;
 
   const handleClick = onClick ?? (() => navigate(`/central?tab=${conteudo.tipo}`));
 
@@ -49,31 +41,20 @@ export function ConteudoCard({ conteudo, onClick, className }: ConteudoCardProps
         className
       )}
     >
-      {/* Capa */}
+      {/* Capa: imagem da notícia ou, na falta dela, o resumo */}
       <div className="relative aspect-[16/9] w-full overflow-hidden bg-muted">
-        {conteudo.imagem_url ? (
+        {temImagem ? (
           <img
-            src={conteudo.imagem_url}
+            src={conteudo.imagem_url as string}
             alt=""
             loading="lazy"
+            referrerPolicy="no-referrer"
+            onError={() => setImgQuebrada(true)}
             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
           />
         ) : (
-          <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-gradient-to-br from-muted to-card">
-            {host ? (
-              <img
-                src={`https://www.google.com/s2/favicons?sz=128&domain_url=${host}`}
-                alt=""
-                loading="lazy"
-                className="h-12 w-12 rounded-xl object-contain"
-                onError={(e) => {
-                  e.currentTarget.style.display = "none";
-                }}
-              />
-            ) : (
-              <Icon className="h-8 w-8 text-primary" strokeWidth={1.5} />
-            )}
-            {host && <span className="text-[11px] text-muted-foreground">{host}</span>}
+          <div className="flex h-full w-full items-start bg-gradient-to-br from-muted to-card px-4 pb-3 pt-11">
+            <p className="line-clamp-3 text-[13px] leading-snug text-foreground/85">{conteudo.resumo}</p>
           </div>
         )}
 
@@ -93,7 +74,9 @@ export function ConteudoCard({ conteudo, onClick, className }: ConteudoCardProps
         <h3 className="line-clamp-2 text-sm font-semibold leading-snug text-foreground group-hover:text-primary">
           {conteudo.titulo}
         </h3>
-        {conteudo.resumo && <p className="line-clamp-2 text-xs text-muted-foreground">{conteudo.resumo}</p>}
+        {temImagem && conteudo.resumo && (
+          <p className="line-clamp-2 text-xs text-muted-foreground">{conteudo.resumo}</p>
+        )}
         <div className="mt-auto flex items-center justify-between pt-2 text-[11px] text-muted-foreground">
           <span>{format(new Date(conteudo.created_at), "dd MMM yyyy", { locale: ptBR })}</span>
           {conteudo.link_externo && (

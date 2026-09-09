@@ -4,6 +4,7 @@ import { Newspaper, Globe, Lightbulb, ArrowRight } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useConteudosDashboard, TipoConteudo } from "@/hooks/useConteudosDashboard";
 import { ConteudoCard } from "./ConteudoCard";
+import { useCapasConteudo } from "@/hooks/useCapasConteudo";
 import { Link } from "react-router-dom";
 
 const tabs: { value: TipoConteudo; label: string; icon: typeof Globe }[] = [
@@ -15,6 +16,7 @@ const tabs: { value: TipoConteudo; label: string; icon: typeof Globe }[] = [
 export function CentralConteudo() {
   const [activeTab, setActiveTab] = useState<TipoConteudo>("noticia");
   const { data: conteudos, isLoading } = useConteudosDashboard(activeTab);
+  useCapasConteudo(conteudos);
 
   return (
     <section className="rounded-2xl border border-border bg-card p-4 md:p-6">

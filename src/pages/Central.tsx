@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useConteudosDashboard, TipoConteudo, ConteudoDashboard } from "@/hooks/useConteudosDashboard";
+import { useCapasConteudo } from "@/hooks/useCapasConteudo";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { PageTitle } from "@/components/shared/PageTitle";
 import { PageContainer } from "@/components/shared/PageContainer";
@@ -98,6 +99,7 @@ export default function Central() {
       ),
     [newsletters, noticias, dicas]
   );
+  useCapasConteudo(allConteudos);
 
   return (
     <PageContainer>
