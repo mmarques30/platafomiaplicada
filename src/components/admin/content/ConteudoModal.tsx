@@ -24,6 +24,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 import {
   useCreateConteudo,
   useUpdateConteudo,
@@ -55,6 +56,33 @@ export function ConteudoModal({ open, onClose, conteudo }: ConteudoModalProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [isFormatting, setIsFormatting] = useState(false);
   const [imagemPreview, setImagemPreview] = useState<string | null>(null);
+  const [buscandoCapa, setBuscandoCapa] = useState(false);
+
+  // Busca a imagem da notícia (og:image) a partir do link externo
+  const handleBuscarCapa = async () => {
+    const link = watch('link_externo');
+    if (!link) {
+      toast.error("Informe o link externo primeiro");
+      return;
+    }
+    setBuscandoCapa(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("capa-conteudo", { body: { url: link } });
+      if (error) throw error;
+      if (data?.image) {
+        setImagemPreview(data.image);
+        setValue('imagem_url', data.image);
+        toast.success("Imagem encontrada no link");
+      } else {
+        toast.info("O site não expõe imagem de capa. Envie uma imagem manualmente.");
+      }
+    } catch (e) {
+      console.error(e);
+      toast.error("Não foi possível buscar a imagem do link");
+    } finally {
+      setBuscandoCapa(false);
+    }
+  };
   const [pdfFileName, setPdfFileName] = useState<string | null>(null);
   const [galeriaImagens, setGaleriaImagens] = useState<string[]>([]);
   const [arquivosUrl, setArquivosUrl] = useState<{ nome: string; url: string }[]>([]);
@@ -652,11 +680,17 @@ export function ConteudoModal({ open, onClose, conteudo }: ConteudoModalProps) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Link Externo</Label>
-                  <Input
-                    {...register('link_externo')}
-                    placeholder="https://..."
-                    type="url"
-                  />
+                  <div className="flex gap-2">
+                    <Input
+                      {...register('link_externo')}
+                      placeholder="https://..."
+                      type="url"
+                    />
+                    <Button type="button" variant="outline" onClick={handleBuscarCapa} disabled={buscandoCapa} className="shrink-0">
+                      {buscandoCapa ? <Loader2 className="h-4 w-4 animate-spin" /> : <ImageIcon className="h-4 w-4" />}
+                      <span className="ml-2 hidden sm:inline">Buscar imagem</span>
+                    </Button>
+                  </div>
                 </div>
 
                 <div className="space-y-2">
