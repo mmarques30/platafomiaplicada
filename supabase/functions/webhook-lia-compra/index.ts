@@ -95,6 +95,33 @@ Deno.serve(async (req) => {
 
     const logId = logData?.id;
 
+    // 6.1 Idempotência: a mesma cobrança (bill_id) já processada não roda de
+    // novo. Reenvios da Lia repetiam o fluxo inteiro e, para usuário
+    // existente, resetavam a senha e reativavam a troca obrigatória.
+    if (billId) {
+      const { data: jaProcessado } = await supabaseAdmin
+        .from("webhook_lia_logs")
+        .select("id")
+        .eq("bill_id", billId)
+        .in("status", ["processed", "skipped_already_active"])
+        .neq("id", logId ?? "00000000-0000-0000-0000-000000000000")
+        .limit(1)
+        .maybeSingle();
+      if (jaProcessado) {
+        console.log("Cobrança já processada anteriormente, ignorando reenvio:", billId);
+        if (logId) {
+          await supabaseAdmin
+            .from("webhook_lia_logs")
+            .update({ status: "ignored_duplicate" })
+            .eq("id", logId);
+        }
+        return new Response(
+          JSON.stringify({ success: true, message: "Cobrança já processada" }),
+          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    }
+
     // 7. Verificar se e um evento de pagamento confirmado
     const isPaid = eventType === "paid"
       || eventType === "bill.paid"
@@ -141,6 +168,8 @@ Deno.serve(async (req) => {
     let userId: string;
     let isExistingUser = false;
     let userAction = "";
+    // Novo usuário nasce com a senha padrão; existente só se nunca entrou.
+    let senhaResetada = true;
 
     // Tentar criar novo usuario
     const { data: userData, error: userError } = await supabaseAdmin.auth.admin.createUser({
@@ -163,24 +192,32 @@ Deno.serve(async (req) => {
       ) {
         console.log("Email ja existe, buscando usuario existente:", customerEmail);
 
-        // Buscar direto na tabela profiles pelo email (evita limite de 1000 do listUsers)
+        // Buscar na tabela profiles pelo email, ignorando maiúsculas/minúsculas
+        // (o cadastro anterior pode ter sido salvo como "Nome@gmail.com").
         const { data: profileData, error: profileSearchError } = await supabaseAdmin
           .from("profiles")
           .select("id")
-          .eq("email", customerEmail)
+          .ilike("email", customerEmail)
+          .limit(1)
           .maybeSingle();
 
         let existingUser: { id: string } | null = null;
 
         if (profileSearchError || !profileData) {
-          // Fallback: tenta listUsers para casos raros
+          // Fallback: percorre o auth em páginas (o padrão do listUsers é só 50)
           console.log("Profile nao encontrado por email, tentando listUsers como fallback");
-          const { data: listData } = await supabaseAdmin.auth.admin.listUsers();
-          const foundUser = listData?.users.find(u => u.email?.toLowerCase() === customerEmail);
-          if (!foundUser) {
+          let page = 1;
+          while (!existingUser) {
+            const { data: listData, error: listError } = await supabaseAdmin.auth.admin.listUsers({ page, perPage: 1000 });
+            if (listError) throw listError;
+            const foundUser = listData?.users.find((u) => u.email?.toLowerCase() === customerEmail);
+            if (foundUser) existingUser = { id: foundUser.id };
+            else if (!listData?.users?.length || listData.users.length < 1000) break;
+            else page += 1;
+          }
+          if (!existingUser) {
             throw new Error("Email reportado como existente mas usuario nao encontrado no auth nem em profiles");
           }
-          existingUser = { id: foundUser.id };
         } else {
           existingUser = { id: profileData.id };
         }
@@ -225,12 +262,22 @@ Deno.serve(async (req) => {
           );
         }
 
-        // Resetar senha para padrao (facilitar primeiro acesso)
-        await supabaseAdmin.auth.admin.updateUserById(userId, {
-          password: DEFAULT_PASSWORD,
-        });
-
-        console.log("Usuario existente encontrado e senha resetada:", userId);
+        // Só reseta a senha para o padrão se a pessoa nunca entrou na
+        // plataforma. Quem já fez login mantém a senha atual (e não recebe a
+        // troca obrigatória de novo); garantimos apenas o e-mail confirmado.
+        const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(userId);
+        const jaEntrou = !!authUser?.user?.last_sign_in_at;
+        if (jaEntrou) {
+          await supabaseAdmin.auth.admin.updateUserById(userId, { email_confirm: true });
+          console.log("Usuario existente ja acessou a plataforma; senha mantida:", userId);
+        } else {
+          await supabaseAdmin.auth.admin.updateUserById(userId, {
+            password: DEFAULT_PASSWORD,
+            email_confirm: true,
+          });
+          senhaResetada = true;
+          console.log("Usuario existente encontrado e senha resetada:", userId);
+        }
       } else {
         throw userError;
       }
@@ -265,9 +312,12 @@ Deno.serve(async (req) => {
     const profileUpdate: Record<string, unknown> = {
       plano_mentoria: "academy",
       email: customerEmail,
-      senha_temporaria: true,
-      primeiro_acesso: true,
+      conta_ativa: true,
     };
+    if (senhaResetada) {
+      profileUpdate.senha_temporaria = true;
+      profileUpdate.primeiro_acesso = true;
+    }
 
     if (customerName) {
       profileUpdate.nome_completo = customerName;

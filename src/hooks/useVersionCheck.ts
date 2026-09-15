@@ -19,6 +19,30 @@ import { toast } from "sonner";
  * Não exige qualquer config de build — funciona com o hash que o Vite já
  * emite por padrão.
  */
+/**
+ * Recarrega a página garantindo a versão nova: remove os service workers e
+ * os caches do app antes do reload. Sem isso, o reload servia o index.html
+ * antigo do cache do PWA e o aviso "Nova versão disponível" voltava logo
+ * em seguida, mesmo depois de "atualizar".
+ */
+async function recarregarSemCache() {
+  try {
+    if ("serviceWorker" in navigator) {
+      const regs = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.map((r) => r.unregister()));
+    }
+    if ("caches" in window) {
+      const keys = await caches.keys();
+      await Promise.all(keys.map((k) => caches.delete(k)));
+    }
+  } catch {
+    // segue para o reload mesmo se a limpeza falhar
+  }
+  const url = new URL(window.location.href);
+  url.searchParams.set("v", String(Date.now()));
+  window.location.replace(url.toString());
+}
+
 export function useVersionCheck(options?: { intervalMs?: number; enabled?: boolean }) {
   const intervalMs = options?.intervalMs ?? 60_000;
   const enabled = options?.enabled ?? true;
@@ -66,8 +90,7 @@ export function useVersionCheck(options?: { intervalMs?: number; enabled?: boole
             action: {
               label: "Atualizar agora",
               onClick: () => {
-                // Reload com cache invalidation forçada
-                window.location.reload();
+                void recarregarSemCache();
               },
             },
             duration: Infinity,
