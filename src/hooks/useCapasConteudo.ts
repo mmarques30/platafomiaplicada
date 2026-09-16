@@ -23,11 +23,16 @@ function salvarTentadas(ids: Set<string>) {
   }
 }
 
+/** Capa já copiada para o nosso storage (não depende do site de origem). */
+export function capaHospedada(url: string | null | undefined): boolean {
+  return !!url && url.includes("/storage/v1/object/public/conteudos-dashboard/");
+}
+
 /**
- * Para conteúdos sem imagem de capa mas com link, pede à edge function
- * `capa-conteudo` que descubra a imagem da notícia (og:image) e grave no
- * banco. Ao terminar, invalida a query para os cards trocarem o resumo pela
- * imagem.
+ * Para conteúdos com link cuja capa está vazia ou ainda aponta para um site
+ * externo, pede à edge function `capa-conteudo` que descubra a imagem da
+ * notícia, guarde uma cópia no storage e grave no banco. Ao terminar,
+ * invalida a query para os cards trocarem o resumo pela imagem.
  */
 export function useCapasConteudo(conteudos: ConteudoDashboard[] | undefined) {
   const queryClient = useQueryClient();
@@ -36,7 +41,7 @@ export function useCapasConteudo(conteudos: ConteudoDashboard[] | undefined) {
     if (!conteudos || conteudos.length === 0) return;
     const tentadas = lerTentadas();
     const pendentes = conteudos
-      .filter((c) => !c.imagem_url && c.link_externo && !tentadas.has(c.id))
+      .filter((c) => c.link_externo && !capaHospedada(c.imagem_url) && !tentadas.has(c.id))
       .map((c) => c.id)
       .slice(0, 10);
     if (pendentes.length === 0) return;
