@@ -74,7 +74,7 @@ export function ConteudoModal({ open, onClose, conteudo }: ConteudoModalProps) {
         setValue('imagem_url', data.image);
         toast.success("Imagem encontrada no link");
       } else {
-        toast.info("O site não expõe imagem de capa. Envie uma imagem manualmente.");
+        toast.info("Não foi possível obter uma imagem desse link. Envie uma imagem manualmente.");
       }
     } catch (e) {
       console.error(e);
