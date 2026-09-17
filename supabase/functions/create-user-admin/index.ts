@@ -79,7 +79,7 @@ Deno.serve(async (req) => {
     console.log(`Admin ${user.id} creating user:`, { email, nomeCompleto, roles: userRoles, planoMentoria, origemConsultoria, empresaConsultoria, skillsLiberado, equipeId, novaEquipe, papelEquipe })
 
     // Validar planoMentoria
-    const planosValidos = ['academy', 'skills', 'business_parceria', 'business_sistemas'];
+    const planosValidos = ['academy', 'skills', 'business_parceria', 'insider_business'];
     if (planoMentoria && !planosValidos.includes(planoMentoria)) {
       throw new Error(`Plano de mentoria inválido. Valores aceitos: ${planosValidos.join(', ')}`)
     }
@@ -217,7 +217,7 @@ Deno.serve(async (req) => {
       updateData.empresa_consultoria = empresaConsultoria
     }
     
-    if (effectivePlanoMentoria === 'business_parceria' || effectivePlanoMentoria === 'business_sistemas') {
+    if (effectivePlanoMentoria === 'business_parceria' || effectivePlanoMentoria === 'insider_business') {
       updateData.skills_liberado = skillsLiberado ?? false
     }
 
@@ -359,11 +359,11 @@ Deno.serve(async (req) => {
 
     // Enviar e-mail de boas-vindas (via n8n, com fallback Zapier — ver _shared/welcomeEmail.ts).
     // Só faz sentido quando há um plano ativo (Academy/Builder/System).
-    const isBusiness = effectivePlanoMentoria === 'business_parceria' || effectivePlanoMentoria === 'business_sistemas';
+    const isBusiness = effectivePlanoMentoria === 'business_parceria' || effectivePlanoMentoria === 'insider_business';
     const isAcademy = effectivePlanoMentoria === 'academy';
 
     const planoLabel = isBusiness
-      ? (effectivePlanoMentoria === 'business_sistemas' ? 'System' : 'Builder')
+      ? (effectivePlanoMentoria === 'insider_business' ? 'System' : 'Builder')
       : isAcademy
         ? 'Academy'
         : 'Gratuito';

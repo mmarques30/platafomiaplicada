@@ -1,9 +1,9 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
 /** Visões que o admin pode simular. Gratuito, Builder e Skills deixaram de existir. */
-export type AdminViewMode = "academy" | "business_sistemas" | "insider_free" | null;
+export type AdminViewMode = "academy" | "insider_business" | "insider_convidado" | null;
 
-const VALID_VIEW_MODES: AdminViewMode[] = ["academy", "business_sistemas", "insider_free"];
+const VALID_VIEW_MODES: AdminViewMode[] = ["academy", "insider_business", "insider_convidado"];
 
 interface AdminViewContextType {
   viewAs: AdminViewMode;

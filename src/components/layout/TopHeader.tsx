@@ -93,7 +93,7 @@ export function TopHeader() {
         <div className="fixed top-0 left-0 right-0 bg-status-warning text-charcoal text-center py-2 z-[60] text-sm font-medium flex items-center justify-center gap-4">
           <span>
             <Eye className="h-4 w-4 inline mr-1" /> Visualizando como: <strong>
-              {`${impersonatedUserName} (${viewAs === 'academy' ? 'Academy' : viewAs === 'business_sistemas' ? 'Insider Pago' : 'Insider Free'})`}
+              {`${impersonatedUserName} (${viewAs === 'academy' ? 'Academy' : viewAs === 'insider_business' ? 'Insider Business' : 'Insider Convidado'})`}
             </strong>
           </span>
           <Button 

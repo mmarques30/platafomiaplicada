@@ -33,7 +33,7 @@ export function MainLayout() {
   const environmentContext = useEnvironmentSafe();
   const { isViewingAs } = useAdminViewContext();
   const { effectivePlan } = useEffectivePlan(isAdmin, isLoading);
-  const isBusinessPlan = effectivePlan === 'business_parceria' || effectivePlan === 'business_sistemas';
+  const isBusinessPlan = effectivePlan === 'business_parceria' || effectivePlan === 'insider_business';
 
   // O ambiente é resolvido automaticamente pelo EnvironmentProvider a partir
   // do plano do usuário (não existe mais tela de seleção). Enquanto plano e
@@ -53,7 +53,7 @@ export function MainLayout() {
     if (
       !isLoading &&
       profile?.primeiro_acesso === true &&
-      (profile?.plano_mentoria === "business_parceria" || profile?.plano_mentoria === "business_sistemas")
+      (profile?.plano_mentoria === "business_parceria" || profile?.plano_mentoria === "insider_business")
     ) {
       navigate("/welcome-business", { replace: true });
     }

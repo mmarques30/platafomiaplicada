@@ -59,7 +59,7 @@ export default function VisualizarFormularios() {
   // Contadores
   const totalAcademy = formularios?.filter((f: any) => f.profiles?.plano_mentoria === "academy").length || 0;
   const totalSkills = formularios?.filter((f: any) => f.profiles?.plano_mentoria === "skills").length || 0;
-  const totalBusiness = formularios?.filter((f: any) => f.profiles?.plano_mentoria === "business_parceria" || f.profiles?.plano_mentoria === "business_sistemas").length || 0;
+  const totalBusiness = formularios?.filter((f: any) => f.profiles?.plano_mentoria === "business_parceria" || f.profiles?.plano_mentoria === "insider_business").length || 0;
   const totalCompletos = formularios?.filter((f: any) => f.completado).length || 0;
 
   const getPlanoBadgeColor = (plano: string) => {
@@ -69,7 +69,7 @@ export default function VisualizarFormularios() {
       case "skills":
         return "bg-status-warning/10 text-status-warning border-status-warning/20";
       case "business_parceria":
-      case "business_sistemas":
+      case "insider_business":
       default:
         return "bg-card/10 text-muted-foreground border-foreground/30/20";
     }
@@ -139,7 +139,7 @@ export default function VisualizarFormularios() {
               <SelectContent>
                 <SelectItem value="all">Todos os planos</SelectItem>
                 <SelectItem value="academy">Academy</SelectItem>
-                <SelectItem value="business_sistemas">Insider</SelectItem>
+                <SelectItem value="insider_business">Insider</SelectItem>
               </SelectContent>
             </Select>
 

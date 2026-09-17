@@ -6,12 +6,12 @@ import { useAdminViewContext, AdminViewMode } from "@/contexts/AdminViewContext"
 /**
  * Planos gravados em profiles.plano_mentoria.
  * - academy: aluno Academy (ex-Builder e ex-Skills migram para cá)
- * - business_sistemas: Insider pago (projeto em andamento)
- * - insider_free: Insider não pago
+ * - insider_business: Insider Business (projeto em andamento)
+ * - insider_convidado: Insider não pago
  * - business_parceria: legado (Builder), tratado como Academy até a migração rodar.
  * O recurso Skills (equipes e diagnóstico) continua via skills_liberado no Insider.
  */
-export type UserPlan = "academy" | "business_parceria" | "business_sistemas" | "insider_free" | null;
+export type UserPlan = "academy" | "business_parceria" | "insider_business" | "insider_convidado" | null;
 
 export function useUserPlan() {
   const { user, loading: authLoading } = useAuth();
@@ -58,11 +58,11 @@ export function useUserPlan() {
     
     switch (product) {
       case "trilhas": // academy - base para todos
-        return ["academy", "business_parceria", "business_sistemas"].includes(plan);
+        return ["academy", "business_parceria", "insider_business"].includes(plan);
       case "skills": // plano Skills não existe mais
         return false;
       case "business": // ambos os tipos business
-        return plan === "business_parceria" || plan === "business_sistemas";
+        return plan === "business_parceria" || plan === "insider_business";
       default:
         return false;
     }
@@ -70,9 +70,9 @@ export function useUserPlan() {
 
   // Helpers para tipos específicos de Business
   const isBusinessParceria = plan === "business_parceria";
-  const isBusinessSistemas = plan === "business_sistemas";
+  const isBusinessSistemas = plan === "insider_business";
   const isAnyBusiness = isBusinessParceria || isBusinessSistemas;
-  const isInsiderFree = plan === "insider_free";
+  const isInsiderFree = plan === "insider_convidado";
 
   return {
     plan,
@@ -127,11 +127,11 @@ export function useEffectivePlan(isAdmin: boolean, isAdminLoading: boolean = fal
     // Business (ambos) = business + academy
     switch (product) {
       case "trilhas": // academy - base para todos
-        return ["academy", "business_parceria", "business_sistemas"].includes(currentPlan);
+        return ["academy", "business_parceria", "insider_business"].includes(currentPlan);
       case "skills": // plano Skills não existe mais
         return false;
       case "business": // ambos os tipos business
-        return currentPlan === "business_parceria" || currentPlan === "business_sistemas";
+        return currentPlan === "business_parceria" || currentPlan === "insider_business";
       default:
         return false;
     }
@@ -149,10 +149,10 @@ export function useEffectivePlan(isAdmin: boolean, isAdminLoading: boolean = fal
       hasEffectiveAccessTo,
       isLoading,
       // Flags efetivas (baseadas na simulação)
-      isBusiness: viewAs === "business_sistemas",
+      isBusiness: viewAs === "insider_business",
       isBusinessParceria: false,
-      isBusinessSistemas: viewAs === "business_sistemas",
-      isInsiderFree: viewAs === "insider_free",
+      isBusinessSistemas: viewAs === "insider_business",
+      isInsiderFree: viewAs === "insider_convidado",
       isSkills: false,
       isAcademy: viewAs === "academy",
       isVisitante: false,

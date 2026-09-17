@@ -118,7 +118,7 @@ export function useCreateUser() {
           nomeCompleto, 
           roles,
           planoMentoria,
-          skillsLiberado: (planoMentoria === "business_parceria" || planoMentoria === "business_sistemas") ? skillsLiberado : false,
+          skillsLiberado: (planoMentoria === "business_parceria" || planoMentoria === "insider_business") ? skillsLiberado : false,
           equipeId,
           novaEquipe,
           papelEquipe,
@@ -184,7 +184,7 @@ export function useUpdateUser() {
         profissao?: string | null;
         idade?: number | null;
         linkedin?: string | null;
-        plano_mentoria?: "academy" | "business_sistemas" | "insider_free" | null;
+        plano_mentoria?: "academy" | "insider_business" | "insider_convidado" | null;
         data_expiracao_acesso?: string | null;
         conta_ativa?: boolean;
         roles?: AppRole[];

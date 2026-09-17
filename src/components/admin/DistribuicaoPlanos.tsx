@@ -4,23 +4,23 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 interface DistribuicaoPlanosProps {
   distribuicao: {
     academy: number;
-    business_sistemas: number;
-    insider_free: number;
+    insider_business: number;
+    insider_convidado: number;
     sem_plano: number;
   };
 }
 
 const COLORS = {
   academy: "#22c55e",
-  business_sistemas: "#6366f1",
-  insider_free: "#a5b4fc",
+  insider_business: "#6366f1",
+  insider_convidado: "#a5b4fc",
   sem_plano: "#6b7280",
 };
 
 const LABELS = {
   academy: "Academy",
-  business_sistemas: "Insider Pago",
-  insider_free: "Insider Free",
+  insider_business: "Insider Business",
+  insider_convidado: "Insider Convidado",
   sem_plano: "Sem Plano",
 };
 

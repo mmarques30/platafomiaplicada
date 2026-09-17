@@ -6,15 +6,16 @@ import { useAuth } from "@/hooks/useAuth";
 /**
  * Ambientes da plataforma.
  *
- * - academy          → alunos do Academy (inclui ex-Builder e ex-Skills)
- * - business_sistemas → Insider pago (projeto em andamento; tem Academy também)
- * - insider_free     → Insider não pago ("outra visão", ainda a definir)
+ * - academy           → aluno do Academy (inclui ex-Builder e ex-Skills)
+ * - insider_business  → cliente Insider: tem Academy, Insiders e Meu projeto
+ * - insider_convidado → não é cliente: tem o espaço Insiders, e o painel do
+ *                       programa quando a equipe lhe dá um papel
  *
- * Não existe mais ambiente Gratuito nem Builder. A chave `business_sistemas`
- * foi mantida para o Insider pago porque é o valor gravado em
- * profiles.plano_mentoria e em menu_config.planos_permitidos.
+ * Não existe mais ambiente Gratuito nem Builder. As chaves são os mesmos
+ * valores gravados em profiles.plano_mentoria e em
+ * menu_config.planos_permitidos.
  */
-export type Environment = "academy" | "business_sistemas" | "insider_free";
+export type Environment = "academy" | "insider_business" | "insider_convidado";
 
 interface EnvironmentContextType {
   currentEnvironment: Environment | null;
@@ -49,13 +50,13 @@ export const ENVIRONMENT_CONFIG: Record<Environment, {
     color: "hsl(73, 55%, 46%)", // #c8e040
     description: "Trilhas completas + diagnóstico + evolução",
   },
-  business_sistemas: {
+  insider_business: {
     label: "Insider",
     icon: "Wrench",
     color: "hsl(45, 93%, 47%)",
     description: "Acompanhamento do projeto que a IAplicada constrói",
   },
-  insider_free: {
+  insider_convidado: {
     label: "Insider",
     icon: "Sparkles",
     color: "hsl(45, 93%, 47%)",
@@ -63,23 +64,23 @@ export const ENVIRONMENT_CONFIG: Record<Environment, {
   },
 };
 
-const ALL_ENVIRONMENTS: Environment[] = ["academy", "business_sistemas", "insider_free"];
+const ALL_ENVIRONMENTS: Environment[] = ["academy", "insider_business", "insider_convidado"];
 
 /**
  * Ambientes a que um plano dá acesso.
  *
  * Valores legados continuam entrando (a migração no banco converte
  * business_parceria/business/skills → academy e business_iaplicada →
- * business_sistemas, mas o app trata os dois casos para não deixar
+ * insider_business, mas o app trata os dois casos para não deixar
  * ninguém pago de fora caso a migração ainda não tenha rodado).
  */
 export function environmentsForPlan(plan: UserPlan | string | null): Environment[] {
   switch (plan) {
-    case "business_sistemas":
+    case "insider_business":
     case "business_iaplicada":
-      return ["academy", "business_sistemas"];
-    case "insider_free":
-      return ["insider_free"];
+      return ["academy", "insider_business"];
+    case "insider_convidado":
+      return ["insider_convidado"];
     case "academy":
     case "skills":
     case "business_parceria":
@@ -99,10 +100,10 @@ export function resolveDefaultEnvironment(
   plan: UserPlan | string | null,
 ): Environment | null {
   const preferred = environmentsForPlan(plan);
-  // Insider pago entra no Insider (não no Academy).
+  // Insider Business entra no Insider (não no Academy).
   const planEnvironment =
-    plan === "business_sistemas" || plan === "business_iaplicada"
-      ? "business_sistemas"
+    plan === "insider_business" || plan === "business_iaplicada"
+      ? "insider_business"
       : preferred[0] ?? null;
 
   if (planEnvironment && availableEnvironments.includes(planEnvironment)) {
@@ -131,7 +132,7 @@ export function EnvironmentProvider({ children }: { children: ReactNode }) {
     if (isAdmin) return [...ALL_ENVIRONMENTS];
 
     // Equipe e parceiros operam os projetos: Academy + Insider
-    if (isEquipe || isParceiro) return ["academy", "business_sistemas"];
+    if (isEquipe || isParceiro) return ["academy", "insider_business"];
 
     // Cadastro gratuito (visitante) não tem mais acesso à plataforma
     if (isVisitante) return [];

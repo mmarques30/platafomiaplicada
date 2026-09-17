@@ -27,8 +27,8 @@ interface NovoUsuarioModalProps {
 
 const PLANOS = [
   { value: "academy", label: "Academy", description: "B2C Individual - Acesso às trilhas" },
-  { value: "business_sistemas", label: "Insider Pago", description: "Pago - IAplicada constrói, cliente acompanha (tem Academy)" },
-  { value: "insider_free", label: "Insider Free", description: "Sem projeto contratado - visão Insider" },
+  { value: "insider_business", label: "Insider Business", description: "Pago - IAplicada constrói, cliente acompanha (tem Academy)" },
+  { value: "insider_convidado", label: "Insider Convidado", description: "Sem projeto contratado - visão Insider" },
 ];
 
 export function NovoUsuarioModal({ open, onOpenChange }: NovoUsuarioModalProps) {
@@ -84,7 +84,7 @@ export function NovoUsuarioModal({ open, onOpenChange }: NovoUsuarioModalProps) 
       nomeCompleto,
       roles: selectedRoles,
       planoMentoria: selectedPlano || null,
-      skillsLiberado: (selectedPlano === "business_parceria" || selectedPlano === "business_sistemas") ? skillsLiberado : false,
+      skillsLiberado: (selectedPlano === "business_parceria" || selectedPlano === "insider_business") ? skillsLiberado : false,
       // Skills team data
       equipeId: selectedPlano === "skills" ? skillsEquipeData.equipeId : null,
       novaEquipe: selectedPlano === "skills" ? skillsEquipeData.novaEquipe : null,

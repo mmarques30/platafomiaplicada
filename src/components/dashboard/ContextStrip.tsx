@@ -16,8 +16,8 @@ import { ptBR } from "date-fns/locale";
 const PLAN_LABELS: Record<string, string> = {
   academy: "Academy",
   business_parceria: "Academy",
-  business_sistemas: "Insider",
-  insider_free: "Insider",
+  insider_business: "Insider",
+  insider_convidado: "Insider",
 };
 
 const DAY_ABBR: Record<string, string> = {

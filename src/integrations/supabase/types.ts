@@ -6457,8 +6457,8 @@ export type Database = {
         | "business"
         | "business_iaplicada"
         | "business_parceria"
-        | "business_sistemas"
-        | "insider_free"
+        | "insider_business"
+        | "insider_convidado"
       status_projeto:
         | "planejamento"
         | "em_andamento"
@@ -6608,7 +6608,7 @@ export const Constants = {
         "business",
         "business_iaplicada",
         "business_parceria",
-        "business_sistemas",
+        "insider_business",
       ],
       status_projeto: [
         "planejamento",

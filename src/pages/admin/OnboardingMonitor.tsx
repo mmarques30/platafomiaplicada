@@ -17,7 +17,7 @@ import { useCountUp } from "@/hooks/useCountUp";
 
 // ── Types ──
 
-type Plano = "academy" | "business_sistemas" | "insider_free" | null;
+type Plano = "academy" | "insider_business" | "insider_convidado" | null;
 type StatusOnb = "completo" | "em_andamento" | "nao_iniciou";
 
 interface Profile {
@@ -49,8 +49,8 @@ interface UserRow {
 
 const PLANO_LABELS: Record<string, string> = {
   academy: "Academy",
-  business_sistemas: "Insider Pago",
-  insider_free: "Insider Free",
+  insider_business: "Insider Business",
+  insider_convidado: "Insider Convidado",
 };
 
 function planoLabel(p: Plano) {
@@ -71,7 +71,7 @@ function calcularStatus(profile: Profile, allEvents: Evento[]): Omit<UserRow, "p
   const plano = profile.plano_mentoria;
   const acaoConcluida =
     plano === "academy" ? diagnosticoAcademy :
-    plano === "business_sistemas" ? sistemaVisitado :
+    plano === "insider_business" ? sistemaVisitado :
     videoVisto;
 
   const etapaAtual =
@@ -113,17 +113,17 @@ function getMensagemNotificacao(etapaAtual: string, nome: string | null, plano: 
     return `Olá, ${firstName}! O tour está concluído. Agora veja seus próximos passos personalizados para o plano ${planoLbl}.`;
   if (etapaAtual.includes("Próximos Passos vistos") && plano === "academy")
     return `Olá, ${firstName}! Seus próximos passos estão definidos. Que tal começar pelo Diagnóstico de IA? Leva 15 minutos e personaliza toda sua experiência.`;
-  if (etapaAtual.includes("Próximos Passos vistos") && plano === "business_sistemas")
+  if (etapaAtual.includes("Próximos Passos vistos") && plano === "insider_business")
     return `Olá, ${firstName}! Seu projeto está configurado. Explore o Roadmap para ver as etapas e o que será entregue.`;
   return `Olá, ${firstName}! Estamos aqui se precisar de ajuda para continuar sua jornada na plataforma.`;
 }
 
-type FilterKey = "todos" | "academy" | "business_sistemas" | "insider_free" | "sem_plano" | "parados";
+type FilterKey = "todos" | "academy" | "insider_business" | "insider_convidado" | "sem_plano" | "parados";
 const FILTERS: { key: FilterKey; label: string }[] = [
   { key: "todos", label: "Todos" },
   { key: "academy", label: "Academy" },
-  { key: "business_sistemas", label: "Insider Pago" },
-  { key: "insider_free", label: "Insider Free" },
+  { key: "insider_business", label: "Insider Business" },
+  { key: "insider_convidado", label: "Insider Convidado" },
   { key: "sem_plano", label: "Sem plano" },
   { key: "parados", label: "Parados 3+ dias" },
 ];

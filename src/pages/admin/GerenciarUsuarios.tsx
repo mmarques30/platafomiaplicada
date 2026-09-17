@@ -282,8 +282,8 @@ export default function GerenciarUsuários() {
           <SelectContent>
             <SelectItem value="all">Todos os Planos</SelectItem>
             <SelectItem value="academy">Academy</SelectItem>
-            <SelectItem value="business_sistemas">Insider Pago</SelectItem>
-            <SelectItem value="insider_free">Insider Free</SelectItem>
+            <SelectItem value="insider_business">Insider Business</SelectItem>
+            <SelectItem value="insider_convidado">Insider Convidado</SelectItem>
             <SelectItem value="none">Sem Plano</SelectItem>
           </SelectContent>
         </Select>
@@ -355,16 +355,16 @@ export default function GerenciarUsuários() {
                       className={`text-xs ${
                         (user as any).plano_mentoria === "academy"
                           ? "border-status-info text-status-info"
-                          : (user as any).plano_mentoria === "business_sistemas"
+                          : (user as any).plano_mentoria === "insider_business"
                           ? "border-secondary text-secondary"
-                          : (user as any).plano_mentoria === "insider_free"
+                          : (user as any).plano_mentoria === "insider_convidado"
                           ? "border-status-info/40 text-status-info"
                           : "border-foreground/30 text-foreground"
                       }`}
                     >
                       {(user as any).plano_mentoria === "academy" && "Academy"}
-                      {(user as any).plano_mentoria === "business_sistemas" && "Insider Pago"}
-                      {(user as any).plano_mentoria === "insider_free" && "Insider Free"}
+                      {(user as any).plano_mentoria === "insider_business" && "Insider Business"}
+                      {(user as any).plano_mentoria === "insider_convidado" && "Insider Convidado"}
                     </Badge>
                   ) : (
                     <Badge variant="outline" className="border-border text-muted-foreground text-xs">

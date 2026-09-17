@@ -42,7 +42,7 @@ import { adminTheme } from "@/components/admin/adminTheme";
 
 const PLANOS_DISPONIVEIS = [
   { value: "academy", label: "Academy" },
-  { value: "business_sistemas", label: "Insider" },
+  { value: "insider_business", label: "Insider" },
 ];
 
 const TIPOS_PENDENCIA = [
@@ -76,7 +76,7 @@ export function GerenciarPendencias() {
     titulo: "",
     descricao: "",
     link: "",
-    planos_aplicaveis: ["academy", "business_sistemas"],
+    planos_aplicaveis: ["academy", "insider_business"],
     ordem: 0,
   });
 
@@ -88,7 +88,7 @@ export function GerenciarPendencias() {
         titulo: pendencia.titulo,
         descricao: pendencia.descricao || "",
         link: pendencia.link,
-        planos_aplicaveis: pendencia.planos_aplicaveis || ["academy", "business_sistemas"],
+        planos_aplicaveis: pendencia.planos_aplicaveis || ["academy", "insider_business"],
         ordem: pendencia.ordem,
       });
     } else {
@@ -98,7 +98,7 @@ export function GerenciarPendencias() {
         titulo: "",
         descricao: "",
         link: "",
-        planos_aplicaveis: ["academy", "business_sistemas"],
+        planos_aplicaveis: ["academy", "insider_business"],
         ordem: (pendencias?.length || 0) + 1,
       });
     }
@@ -113,7 +113,7 @@ export function GerenciarPendencias() {
       titulo: "",
       descricao: "",
       link: "",
-      planos_aplicaveis: ["academy", "business_sistemas"],
+      planos_aplicaveis: ["academy", "insider_business"],
       ordem: 0,
     });
   };
