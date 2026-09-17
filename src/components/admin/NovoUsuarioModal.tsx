@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   Dialog,
   DialogContent,
@@ -11,98 +10,66 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Switch } from "@/components/ui/switch";
 import { Card } from "@/components/ui/card";
 import { useCreateUser } from "@/hooks/admin/useUsers";
-import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { SkillsEquipeSelector, type SkillsEquipeData } from "./SkillsEquipeSelector";
+import { PLANOS, type Plano } from "@/lib/planos";
 
-type AppRole = "admin" | "equipe" | "mentorado" | "aluno_trilha" | "parceiros";
+/**
+ * Cadastro de usuário pelo admin.
+ *
+ * Dois eixos, e só dois:
+ *
+ * - O PLANO diz o que a pessoa tem: Academy, Insider Business ou Insider
+ *   Convidado. Quem tem plano é cliente, e o papel de cliente no banco
+ *   (aluno_trilha) é atribuído pelo servidor a partir do plano. Ninguém marca
+ *   "aluno" ou "mentorado" na mão: isso era o resquício de quando Builder,
+ *   Skills e mentoria eram produtos separados.
+ *
+ * - As PERMISSÕES são de equipe: Administrador e Equipe. Quem trabalha na
+ *   IAplicada pode não ter plano nenhum.
+ *
+ * Antes, o plano só destravava se "Mentorado" estivesse marcado, e a lista de
+ * papéis tinha cinco opções, três delas de produtos que não existem mais.
+ */
+
+type PermissaoEquipe = "admin" | "equipe";
 
 interface NovoUsuarioModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-const PLANOS = [
-  { value: "academy", label: "Academy", description: "B2C Individual - Acesso às trilhas" },
-  { value: "insider_business", label: "Insider Business", description: "Pago - IAplicada constrói, cliente acompanha (tem Academy)" },
-  { value: "insider_convidado", label: "Insider Convidado", description: "Sem projeto contratado - visão Insider" },
-];
 
 export function NovoUsuarioModal({ open, onOpenChange }: NovoUsuarioModalProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [nomeCompleto, setNomeCompleto] = useState("");
-  const [selectedRoles, setSelectedRoles] = useState<AppRole[]>([]);
-  const [selectedPlano, setSelectedPlano] = useState<string>("");
-  const [skillsLiberado, setSkillsLiberado] = useState(false);
-  const [skillsEquipeData, setSkillsEquipeData] = useState<SkillsEquipeData>({
-    equipeId: null,
-    novaEquipe: null,
-    papelEquipe: "membro",
-  });
-  
+  const [permissoes, setPermissoes] = useState<PermissaoEquipe[]>([]);
+  const [plano, setPlano] = useState<Plano | null>(null);
   const createUser = useCreateUser();
 
-  const toggleRole = (role: AppRole) => {
-    setSelectedRoles(prev => {
-      const newRoles = prev.includes(role)
-        ? prev.filter(r => r !== role)
-        : [...prev, role];
-      
-      if (!newRoles.includes("mentorado")) {
-        setSelectedPlano("");
-      }
-      
-      return newRoles;
-    });
-  };
+  const alternar = (p: PermissaoEquipe) =>
+    setPermissoes((atual) => (atual.includes(p) ? atual.filter((x) => x !== p) : [...atual, p]));
 
-  const isSkillsValid = () => {
-    if (selectedPlano !== "skills") return true;
-    
-    // Must have either existing team or valid new team data
-    if (skillsEquipeData.equipeId) return true;
-    if (skillsEquipeData.novaEquipe?.nome && skillsEquipeData.novaEquipe?.empresa) return true;
-    
-    return false;
-  };
+  // Sem plano e sem permissão a pessoa não entra em lugar nenhum.
+  const podeCriar = Boolean(plano) || permissoes.length > 0;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (selectedPlano === "skills" && !isSkillsValid()) {
-      toast.error("Para o plano Skills, é obrigatório selecionar ou criar uma equipe.");
-      return;
-    }
-
+    if (!podeCriar) return;
     await createUser.mutateAsync({
       email,
       password,
       nomeCompleto,
-      roles: selectedRoles,
-      planoMentoria: selectedPlano || null,
-      skillsLiberado: (selectedPlano === "business_parceria" || selectedPlano === "insider_business") ? skillsLiberado : false,
-      // Skills team data
-      equipeId: selectedPlano === "skills" ? skillsEquipeData.equipeId : null,
-      novaEquipe: selectedPlano === "skills" ? skillsEquipeData.novaEquipe : null,
-      papelEquipe: selectedPlano === "skills" ? skillsEquipeData.papelEquipe : undefined,
+      roles: permissoes,
+      planoMentoria: plano,
     });
-
-    // Resetar form
     setEmail("");
     setPassword("");
     setNomeCompleto("");
-    setSelectedRoles([]);
-    setSelectedPlano("");
-    setSkillsLiberado(false);
-    setSkillsEquipeData({
-      equipeId: null,
-      novaEquipe: null,
-      papelEquipe: "membro",
-    });
+    setPermissoes([]);
+    setPlano(null);
     onOpenChange(false);
   };
 
@@ -110,24 +77,23 @@ export function NovoUsuarioModal({ open, onOpenChange }: NovoUsuarioModalProps) 
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Criar Novo Usuário</DialogTitle>
+          <DialogTitle>Novo usuário</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-4">
             <div>
-              <Label htmlFor="nome">Nome Completo</Label>
+              <Label htmlFor="nome">Nome completo</Label>
               <Input
                 id="nome"
                 value={nomeCompleto}
                 onChange={(e) => setNomeCompleto(e.target.value)}
-                placeholder="Digite o nome completo"
+                placeholder="Nome da pessoa"
                 required
               />
             </div>
-
             <div>
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">E-mail</Label>
               <Input
                 id="email"
                 type="email"
@@ -137,128 +103,89 @@ export function NovoUsuarioModal({ open, onOpenChange }: NovoUsuarioModalProps) 
                 required
               />
             </div>
-
             <div>
-              <Label htmlFor="password">Senha Temporária</Label>
+              <Label htmlFor="password">Senha temporária</Label>
               <Input
                 id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Digite uma senha temporária"
+                placeholder="A pessoa troca no primeiro acesso"
                 required
               />
-              <p className="text-sm text-foreground/60 mt-1">
-                O usuário poderá alterar esta senha em Configurações
-              </p>
             </div>
           </div>
 
           <div>
-            <Label className="mb-3 block">Permissões (Roles)</Label>
+            <Label className="mb-3 block">Plano</Label>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+              {PLANOS.map((opcao) => {
+                const ativo = plano === opcao.value;
+                return (
+                  <Card
+                    key={opcao.value}
+                    role="radio"
+                    aria-checked={ativo}
+                    tabIndex={0}
+                    onClick={() => setPlano(ativo ? null : opcao.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        setPlano(ativo ? null : opcao.value);
+                      }
+                    }}
+                    className={cn(
+                      "cursor-pointer p-4 transition-colors",
+                      ativo ? "border-primary bg-primary/10" : "hover:border-primary/50",
+                    )}
+                  >
+                    <p className="mb-1 text-sm font-semibold text-foreground">{opcao.label}</p>
+                    <p className="text-xs text-muted-foreground">{opcao.description}</p>
+                  </Card>
+                );
+              })}
+            </div>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Quem tem plano é cliente. O acesso ao conteúdo vem daqui; clique de novo para
+              desmarcar.
+            </p>
+          </div>
+
+          <div>
+            <Label className="mb-3 block">Permissões de equipe</Label>
             <div className="space-y-2">
               <div className="flex items-center space-x-2">
                 <Checkbox
-                  id="admin"
-                  checked={selectedRoles.includes("admin")}
-                  onCheckedChange={() => toggleRole("admin")}
+                  id="perm-admin"
+                  checked={permissoes.includes("admin")}
+                  onCheckedChange={() => alternar("admin")}
                 />
-                <Label htmlFor="admin" className="cursor-pointer">
+                <Label htmlFor="perm-admin" className="cursor-pointer">
                   Administrador
                 </Label>
               </div>
               <div className="flex items-center space-x-2">
                 <Checkbox
-                  id="equipe"
-                  checked={selectedRoles.includes("equipe")}
-                  onCheckedChange={() => toggleRole("equipe")}
+                  id="perm-equipe"
+                  checked={permissoes.includes("equipe")}
+                  onCheckedChange={() => alternar("equipe")}
                 />
-                <Label htmlFor="equipe" className="cursor-pointer">
+                <Label htmlFor="perm-equipe" className="cursor-pointer">
                   Equipe
                 </Label>
               </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="mentorado"
-                  checked={selectedRoles.includes("mentorado")}
-                  onCheckedChange={() => toggleRole("mentorado")}
-                />
-                <Label htmlFor="mentorado" className="cursor-pointer">
-                  Mentorado
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="aluno_trilha"
-                  checked={selectedRoles.includes("aluno_trilha")}
-                  onCheckedChange={() => toggleRole("aluno_trilha")}
-                />
-                <Label htmlFor="aluno_trilha" className="cursor-pointer">
-                  Aluno da Trilha
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="parceiros"
-                  checked={selectedRoles.includes("parceiros")}
-                  onCheckedChange={() => toggleRole("parceiros")}
-                />
-                <Label htmlFor="parceiros" className="cursor-pointer">
-                  Parceiro
-                </Label>
-              </div>
             </div>
-          </div>
-
-          <div>
-            <Label className="mb-3 block">Produto / Plano (opcional)</Label>
-            <div className="grid grid-cols-2 gap-3">
-              {PLANOS.map((plano) => (
-                <Card
-                  key={plano.value}
-                  className={cn(
-                    "p-4 cursor-pointer transition-colors",
-                    selectedPlano === plano.value
-                      ? "border-primary bg-primary/10"
-                      : "hover:border-primary/50"
-                  )}
-                  onClick={() => setSelectedPlano(plano.value)}
-                >
-                  <h4 className={cn(
-                    "font-semibold mb-1 text-sm",
-                    selectedPlano === plano.value 
-                      ? "text-foreground" 
-                      : "text-card-foreground"
-                  )}>
-                    {plano.label}
-                  </h4>
-                  <p className={cn(
-                    "text-xs",
-                    selectedPlano === plano.value 
-                      ? "text-foreground/70"
-                      : "text-card-foreground/70"
-                  )}>
-                    {plano.description}
-                  </p>
-                </Card>
-              ))}
-            </div>
-            <p className="text-sm text-muted-foreground mt-2">
-              Selecione o produto/plano que este usuário terá acesso
+            <p className="mt-2 text-sm text-muted-foreground">
+              Só para quem trabalha na IAplicada. Cliente não precisa de permissão.
             </p>
-            
           </div>
 
           <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-            >
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancelar
             </Button>
-            <Button type="submit" disabled={createUser.isPending || (selectedPlano === "skills" && !isSkillsValid())}>
-              {createUser.isPending ? "Criando..." : "Criar Usuário"}
+            <Button type="submit" disabled={createUser.isPending || !podeCriar}>
+              {createUser.isPending ? "Criando..." : "Criar usuário"}
             </Button>
           </DialogFooter>
         </form>

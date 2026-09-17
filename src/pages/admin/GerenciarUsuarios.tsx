@@ -161,14 +161,16 @@ export default function GerenciarUsuários() {
     switch (role) {
       case "admin":
         return "Admin";
-      case "mentorado":
-        return "Mentorado";
-      case "aluno_trilha":
-        return "Aluno Trilha";
-      case "parceiros":
-        return "Parceiro";
       case "equipe":
         return "Equipe";
+      case "aluno_trilha":
+        return "Cliente";
+      // Papéis de produtos que não existem mais. Quem tem, continua tendo,
+      // porque a RLS de conteúdo aceita mentorado; só não se atribui mais.
+      case "mentorado":
+        return "Cliente (mentoria)";
+      case "parceiros":
+        return "Parceiro (legado)";
       default:
         return role;
     }
@@ -258,12 +260,10 @@ export default function GerenciarUsuários() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Todos</SelectItem>
-            <SelectItem value="admin">Admin</SelectItem>
-            <SelectItem value="mentorado">Mentorado</SelectItem>
-            <SelectItem value="aluno_trilha">Aluno Trilha</SelectItem>
-            <SelectItem value="parceiros">Parceiro</SelectItem>
+            <SelectItem value="admin">Administrador</SelectItem>
             <SelectItem value="equipe">Equipe</SelectItem>
-            <SelectItem value="none">Sem Role</SelectItem>
+            <SelectItem value="aluno_trilha">Cliente</SelectItem>
+            <SelectItem value="none">Sem permissão</SelectItem>
           </SelectContent>
         </Select>
         <Select value={planoFilter} onValueChange={setPlanoFilter}>
@@ -329,7 +329,7 @@ export default function GerenciarUsuários() {
                 <TableCell className={adminTheme.tableCell}>
                   <div className="flex gap-1 flex-wrap">
                     {user.roles.length === 0 ? (
-                      <Badge variant="outline" className="text-xs">Sem role</Badge>
+                      <Badge variant="outline" className="text-xs">Sem permissão</Badge>
                     ) : (
                       user.roles.map((role) => (
                         <Badge key={role} variant={getRoleBadgeVariant(role)} className="text-xs">

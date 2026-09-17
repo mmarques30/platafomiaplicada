@@ -27,7 +27,7 @@ export function escapeHtml(input: unknown): string {
     .replace(/'/g, "&#39;");
 }
 
-// Copy específico por produto — Academy, Builder e System são produtos
+// Copy por plano. Academy, Insider Business e Insider Convidado são acessos
 // diferentes e merecem uma mensagem própria. Enxuto de propósito.
 interface VariantCopy {
   intro: string;
@@ -41,15 +41,15 @@ const VARIANT_COPY: Record<string, VariantCopy> = {
     cta: "Acessar o Academy",
     dica: 'Comece pela primeira trilha em "Aprender".',
   },
-  business_parceria: {
-    intro: "Seu acesso ao <strong>IAplicada Builder</strong> está pronto. Sua mentoria começa agora.",
-    cta: "Acessar o Builder",
-    dica: 'Faça seu Diagnóstico e veja seu roadmap em "Mentoria".',
-  },
   insider_business: {
-    intro: "Seu acesso ao <strong>IAplicada System</strong> está pronto. A IAplicada constrói e você acompanha.",
-    cta: "Acessar o System",
-    dica: 'Acompanhe o andamento do projeto em "Meu Projeto".',
+    intro: "Seu acesso de <strong>Insider da IAplicada</strong> está pronto. Conteúdo, encontros ao vivo e o programa Indica, num lugar só.",
+    cta: "Entrar na plataforma",
+    dica: 'Comece por "Aprender" e confira o próximo encontro Insider no início.',
+  },
+  insider_convidado: {
+    intro: "Você foi convidado para o espaço <strong>Insider da IAplicada</strong>. Seu acesso está pronto.",
+    cta: "Entrar na plataforma",
+    dica: 'Comece por "Início" e veja o programa Indica no menu.',
   },
 };
 
@@ -181,8 +181,8 @@ export async function sendWelcomeEmail(opts: {
   email: string;
   nome: string;
   senha: string;
-  plano: string; // ex.: academy | business_parceria | insider_business
-  planoLabel: string; // ex.: Academy | Builder | System
+  plano: string; // academy | insider_business | insider_convidado
+  planoLabel: string; // Academy | Insider Business | Insider Convidado
   acao: string; // new_user_created | existing_user_updated
 }): Promise<WelcomeEmailResult> {
   const plataformaUrl = Deno.env.get("PLATAFORMA_URL") || "https://plataforma.iaplicada.com";

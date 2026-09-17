@@ -2,7 +2,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-type AppRole = "admin" | "equipe" | "mentorado" | "aluno_trilha" | "parceiros";
+// O que o admin marca é permissão de equipe. aluno_trilha (cliente) é derivado do plano.
+type AppRole = "admin" | "equipe" | "aluno_trilha";
 
 export function useUsers() {
   return useQuery({
@@ -10,7 +11,7 @@ export function useUsers() {
     queryFn: async () => {
       const { data: profiles, error: profilesError } = await supabase
         .from("profiles")
-        .select("*, plano_mentoria, email_acesso_enviado, adicionado_grupo_whatsapp, skills_liberado")
+        .select("*, plano_mentoria, email_acesso_enviado, adicionado_grupo_whatsapp")
         .eq("is_visitante", false)
         .order("created_at", { ascending: false });
 
@@ -95,36 +96,16 @@ export function useCreateUser() {
       nomeCompleto,
       roles,
       planoMentoria,
-      skillsLiberado,
-      equipeId,
-      novaEquipe,
-      papelEquipe,
     }: {
       email: string;
       password: string;
       nomeCompleto: string;
       roles: AppRole[];
       planoMentoria?: string | null;
-      skillsLiberado?: boolean;
-      equipeId?: string | null;
-      novaEquipe?: { nome: string; empresa: string } | null;
-      papelEquipe?: "lider" | "membro";
     }) => {
-      // Chamar edge function ao invés de fazer diretamente
       const { data, error } = await supabase.functions.invoke("create-user-admin", {
-        body: { 
-          email, 
-          password, 
-          nomeCompleto, 
-          roles,
-          planoMentoria,
-          skillsLiberado: (planoMentoria === "business_parceria" || planoMentoria === "insider_business") ? skillsLiberado : false,
-          equipeId,
-          novaEquipe,
-          papelEquipe,
-        },
+        body: { email, password, nomeCompleto, roles, planoMentoria },
       });
-
       if (error) {
         // FunctionsHttpError do supabase-js v2 expõe a Response em error.context.
         // Lê o body como texto e tenta extrair { error } JSON — caso contrário
@@ -155,7 +136,6 @@ export function useCreateUser() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-users"] });
-      queryClient.invalidateQueries({ queryKey: ["admin-equipes-skills"] });
       toast.success("Usuário criado com sucesso!");
     },
     onError: (error: any) => {
@@ -188,7 +168,6 @@ export function useUpdateUser() {
         data_expiracao_acesso?: string | null;
         conta_ativa?: boolean;
         roles?: AppRole[];
-        skills_liberado?: boolean;
         google_login_autorizado?: boolean;
       };
     }) => {
@@ -305,53 +284,6 @@ export function useDeleteUser() {
     },
     onError: (error: any) => {
       toast.error("Erro ao excluir usuário: " + error.message);
-    },
-  });
-}
-
-export function useImportUsersBatch() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({
-      users,
-      planoMentoria,
-      roles,
-      equipeId,
-      novaEquipe,
-    }: {
-      users: Array<{
-        email: string;
-        nomeCompleto: string;
-        password: string;
-      }>;
-      planoMentoria?: string;
-      roles?: AppRole[];
-      equipeId?: string | null;
-      novaEquipe?: { nome: string; empresa: string } | null;
-    }) => {
-      const { data, error } = await supabase.functions.invoke("import-users-batch", {
-        body: { 
-          users, 
-          planoMentoria,
-          roles,
-          equipeId,
-          novaEquipe,
-        },
-      });
-
-      if (error) throw error;
-      if (data?.error) throw new Error(data.error);
-      
-      return data;
-    },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
-      queryClient.invalidateQueries({ queryKey: ["admin-equipes-skills"] });
-      toast.success(`${data.imported} usuários importados com sucesso! ${data.failed > 0 ? `(${data.failed} falharam)` : ''}`);
-    },
-    onError: (error) => {
-      toast.error("Erro ao importar usuários: " + error.message);
     },
   });
 }

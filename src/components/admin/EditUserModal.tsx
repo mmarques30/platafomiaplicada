@@ -16,17 +16,16 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon, Key, Trash2 } from "lucide-react";
+import { CalendarIcon, Key } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useUpdateUser, useResetUserPassword } from "@/hooks/admin/useUsers";
-import { useUserSkillsMembro, useUpdateUserSkillsMembro, useRemoveUserSkillsMembro } from "@/hooks/admin/useEquipesSkillsAdmin";
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { SkillsEquipeSelector, SkillsEquipeData } from "./SkillsEquipeSelector";
 
-type AppRole = "admin" | "equipe" | "mentorado" | "aluno_trilha" | "parceiros";
+// As permissões que se marcam. O papel de cliente (aluno_trilha) vem do plano.
+type AppRole = "admin" | "equipe";
 
 // Verifica se o email é do Google (@gmail.com ou @googlemail.com)
 function isGoogleEmail(email: string): boolean {
@@ -50,24 +49,16 @@ interface EditUserModalProps {
     origem_consultoria?: boolean;
     empresa_consultoria?: string;
     roles: string[];
-    skills_liberado?: boolean;
     google_login_autorizado?: boolean;
   } | null;
 }
 
-const PLANOS = [
-  { value: "academy", label: "Academy", description: "B2C Individual - Acesso às trilhas" },
-  { value: "insider_business", label: "Insider Business", description: "Pago - IAplicada constrói, cliente acompanha (tem Academy)" },
-  { value: "insider_convidado", label: "Insider Convidado", description: "Sem projeto contratado - visão Insider" },
-];
+import { PLANOS } from "@/lib/planos";
 
 export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) {
   const { register, handleSubmit, reset, setValue, watch } = useForm();
   const updateUser = useUpdateUser();
   const resetPassword = useResetUserPassword();
-  const updateSkillsMembro = useUpdateUserSkillsMembro();
-  const removeSkillsMembro = useRemoveUserSkillsMembro();
-  const { data: userSkillsMembro, isLoading: loadingSkillsMembro } = useUserSkillsMembro(user?.id);
   
   const [selectedRoles, setSelectedRoles] = useState<AppRole[]>([]);
   const [selectedPlano, setSelectedPlano] = useState<"academy" | "insider_business" | "insider_convidado" | null>(null);
@@ -75,37 +66,7 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
   const [contaAtiva, setContaAtiva] = useState(true);
   const [novaSenha, setNovaSenha] = useState("");
   const [forcarTroca, setForcarTroca] = useState(false);
-  const [skillsLiberado, setSkillsLiberado] = useState(false);
   const [googleLoginAutorizado, setGoogleLoginAutorizado] = useState(false);
-  const [skillsEquipeData, setSkillsEquipeData] = useState<SkillsEquipeData>({
-    equipeId: null,
-    novaEquipe: null,
-    papelEquipe: "membro",
-  });
-  const [cargo, setCargo] = useState("");
-  const [nomeEmpresa, setNomeEmpresa] = useState("");
-
-  // Buscar nome_empresa do contrato business
-  const { data: contratoBusiness } = useQuery({
-    queryKey: ["contrato-business-nome", user?.id],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("contratos_business")
-        .select("id, nome_empresa")
-        .eq("user_id", user!.id)
-        .maybeSingle();
-      return data;
-    },
-    enabled: !!user?.id,
-  });
-
-  useEffect(() => {
-    if (contratoBusiness) {
-      setNomeEmpresa(contratoBusiness.nome_empresa || "");
-    } else {
-      setNomeEmpresa("");
-    }
-  }, [contratoBusiness]);
 
   useEffect(() => {
     if (user) {
@@ -115,33 +76,13 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
       setValue("idade", user.idade || "");
       setValue("linkedin", user.linkedin || "");
       
-      setSelectedRoles(user.roles as AppRole[]);
+      setSelectedRoles((user.roles as string[]).filter((r): r is AppRole => r === "admin" || r === "equipe"));
       setSelectedPlano((user.plano_mentoria as "academy" | "insider_business" | "insider_convidado") || null);
       setDataExpiracao(user.data_expiracao_acesso ? new Date(user.data_expiracao_acesso) : undefined);
       setContaAtiva(user.conta_ativa ?? true);
-      setSkillsLiberado(user.skills_liberado ?? false);
       setGoogleLoginAutorizado(user.google_login_autorizado ?? false);
     }
   }, [user, setValue]);
-
-  // Carregar dados do vínculo Skills existente
-  useEffect(() => {
-    if (userSkillsMembro) {
-      setSkillsEquipeData({
-        equipeId: userSkillsMembro.equipe_id,
-        novaEquipe: null,
-        papelEquipe: (userSkillsMembro.papel as "lider" | "membro") || "membro",
-      });
-      setCargo(userSkillsMembro.cargo || "");
-    } else {
-      setSkillsEquipeData({
-        equipeId: null,
-        novaEquipe: null,
-        papelEquipe: "membro",
-      });
-      setCargo("");
-    }
-  }, [userSkillsMembro]);
 
   const toggleRole = (role: AppRole) => {
     setSelectedRoles(prev =>
@@ -154,7 +95,10 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
   const onSubmit = async (data: any) => {
     if (!user) return;
 
-    // Atualizar dados gerais do usuário
+    // Quem tem plano é cliente: aluno_trilha entra sozinho. Quem já tinha
+    // mentorado (cliente da mentoria antiga) segue funcionando, porque a RLS
+    // de conteúdo aceita qualquer um dos dois.
+    const roles = [...selectedRoles, ...(selectedPlano ? (["aluno_trilha"] as const) : [])];
     await updateUser.mutateAsync({
       userId: user.id,
       updates: {
@@ -163,39 +107,13 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
         profissao: data.profissao || null,
         idade: data.idade ? parseInt(data.idade) : null,
         linkedin: data.linkedin || null,
-        plano_mentoria: selectedPlano as any,
+        plano_mentoria: selectedPlano,
         data_expiracao_acesso: dataExpiracao?.toISOString() || null,
         conta_ativa: contaAtiva,
-        roles: selectedRoles,
-        skills_liberado: (selectedPlano === "insider_business") ? skillsLiberado : false,
+        roles,
         google_login_autorizado: googleLoginAutorizado,
       },
     });
-
-    // Atualizar vínculo Skills quando configuração está visível e há dados de equipe
-    const isAnyBusiness = selectedPlano === "insider_business";
-    const shouldUpdateSkills = (isAnyBusiness && skillsLiberado) && 
-                               (skillsEquipeData.equipeId || skillsEquipeData.novaEquipe);
-    
-    if (shouldUpdateSkills) {
-      await updateSkillsMembro.mutateAsync({
-        userId: user.id,
-        equipeId: skillsEquipeData.equipeId,
-        novaEquipe: skillsEquipeData.novaEquipe,
-        papelEquipe: skillsEquipeData.papelEquipe,
-        cargo,
-      });
-    }
-
-    // Atualizar nome_empresa no contrato business
-    const isBusinessPlan = selectedPlano === "insider_business";
-    if (isBusinessPlan && contratoBusiness?.id) {
-      await supabase
-        .from("contratos_business")
-        .update({ nome_empresa: nomeEmpresa || null })
-        .eq("id", contratoBusiness.id);
-    }
-
     onOpenChange(false);
   };
 
@@ -212,19 +130,8 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
     setForcarTroca(false);
   };
 
-  const handleRemoveSkillsVinculo = async () => {
-    if (!user) return;
-    await removeSkillsMembro.mutateAsync(user.id);
-  };
 
   if (!user) return null;
-
-  const hasSkillsVinculo = !!userSkillsMembro;
-  
-  // Mostrar configuração Skills quando plano é Skills OU qualquer Business com Skills liberado
-  const isAnyBusinessPlan = selectedPlano === "insider_business";
-  // Produto Skills descontinuado: nunca exibir configuração/toggle de Skills.
-  const showSkillsConfig = false;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -268,27 +175,12 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
                   <Input id="linkedin" {...register("linkedin")} placeholder="https://linkedin.com/in/..." />
                 </div>
 
-                {/* Nome da Empresa - visível para planos Business */}
-                {(selectedPlano === "insider_business") && (
-                  <div>
-                    <Label htmlFor="nome_empresa">Nome da Empresa (exibição no projeto)</Label>
-                    <Input
-                      id="nome_empresa"
-                      value={nomeEmpresa}
-                      onChange={(e) => setNomeEmpresa(e.target.value)}
-                      placeholder="Nome fantasia / nome curto para exibição"
-                    />
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Este nome aparece no título "Projeto [Nome]"
-                    </p>
-                  </div>
-                )}
               </div>
             </TabsContent>
 
             <TabsContent value="acesso" className="space-y-4">
               <div>
-                <Label className="mb-3 block">Permissões (Roles)</Label>
+                <Label className="mb-3 block">Permissões de equipe</Label>
                 <div className="space-y-2">
                   <div className="flex items-center space-x-2">
                     <Checkbox
@@ -305,30 +197,6 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
                       onCheckedChange={() => toggleRole("equipe")}
                     />
                     <Label htmlFor="role-equipe" className="cursor-pointer">Equipe</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="role-mentorado"
-                      checked={selectedRoles.includes("mentorado")}
-                      onCheckedChange={() => toggleRole("mentorado")}
-                    />
-                    <Label htmlFor="role-mentorado" className="cursor-pointer">Mentorado</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="role-aluno"
-                      checked={selectedRoles.includes("aluno_trilha")}
-                      onCheckedChange={() => toggleRole("aluno_trilha")}
-                    />
-                    <Label htmlFor="role-aluno" className="cursor-pointer">Aluno da Trilha</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="role-parceiro"
-                      checked={selectedRoles.includes("parceiros")}
-                      onCheckedChange={() => toggleRole("parceiros")}
-                    />
-                    <Label htmlFor="role-parceiro" className="cursor-pointer">Parceiro</Label>
                   </div>
                 </div>
               </div>
@@ -390,54 +258,6 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
                 
               </div>
 
-              {/* Configuração Skills - aparece quando plano é Skills ou Business com Skills liberado */}
-              {showSkillsConfig && (
-                <div className="space-y-4 p-4 bg-muted/30 rounded-lg border">
-                  <div className="flex items-center justify-between">
-                    <Label className="text-sm font-medium">Configuração Skills</Label>
-                    {hasSkillsVinculo && (
-                      <Button
-                        type="button"
-                        variant="destructive"
-                        size="sm"
-                        onClick={handleRemoveSkillsVinculo}
-                        disabled={removeSkillsMembro.isPending}
-                      >
-                        <Trash2 className="h-4 w-4 mr-1" />
-                        Remover Vínculo
-                      </Button>
-                    )}
-                  </div>
-                  
-                  {loadingSkillsMembro ? (
-                    <div className="py-4 text-center text-muted-foreground text-sm">
-                      Carregando...
-                    </div>
-                  ) : (
-                    <>
-                      <SkillsEquipeSelector
-                        value={skillsEquipeData}
-                        onChange={setSkillsEquipeData}
-                        showLiderOption={true}
-                      />
-
-                      <div>
-                        <Label htmlFor="cargo-skills">Cargo na Empresa</Label>
-                        <Input
-                          id="cargo-skills"
-                          value={cargo}
-                          onChange={(e) => setCargo(e.target.value)}
-                          placeholder="Ex: Analista de Marketing"
-                          className="mt-1"
-                        />
-                        <p className="text-xs text-muted-foreground mt-1">
-                          Cargo/função do colaborador na empresa (opcional)
-                        </p>
-                      </div>
-                    </>
-                  )}
-                </div>
-              )}
 
               <div>
                 <Label className="mb-2 block">Data de Expiração do Acesso</Label>
@@ -551,8 +371,8 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                 Cancelar
               </Button>
-              <Button type="submit" disabled={updateUser.isPending || updateSkillsMembro.isPending}>
-                {(updateUser.isPending || updateSkillsMembro.isPending) ? "Salvando..." : "Salvar Alterações"}
+              <Button type="submit" disabled={updateUser.isPending}>
+                {updateUser.isPending ? "Salvando..." : "Salvar Alterações"}
               </Button>
             </DialogFooter>
           </form>
