@@ -11,12 +11,17 @@ import { CentralConteudo } from "@/components/dashboard/CentralConteudo";
 import { CentralConteudoGratuito } from "@/components/dashboard/CentralConteudoGratuito";
 import { RankingTicker } from "@/components/dashboard/RankingTicker";
 import { RankingTickerGratuito } from "@/components/dashboard/RankingTickerGratuito";
-import { WeeklyProgressCard } from "@/components/dashboard/WeeklyProgressCard";
+import { ContinuarDeOndeParou } from "@/components/dashboard/ContinuarDeOndeParou";
+import { SuasTrilhas } from "@/components/dashboard/SuasTrilhas";
+import { ProximoEncontro } from "@/components/dashboard/ProximoEncontro";
+import { PerguntarMarIAna } from "@/components/dashboard/PerguntarMarIAna";
+import { ComunidadeRecente } from "@/components/dashboard/ComunidadeRecente";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { PWAInstallBanner } from "@/components/shared/PWAInstallBanner";
 import { PageSkeleton } from "@/components/shared/PageSkeleton";
+import { PageContainer } from "@/components/shared/PageContainer";
 import { DashboardUrgencias } from "@/components/dashboard/DashboardUrgencias";
 import { BriefingSemanal } from "@/components/dashboard/BriefingSemanal";
 
@@ -52,58 +57,68 @@ export default function Dashboard() {
     return <PageSkeleton variant="dashboard" />;
   }
 
+  if (isVisitante) {
+    return (
+      <PageContainer>
+        <WelcomeHeader />
+        <PWAInstallBanner />
+        <CentralConteudoGratuito />
+        <RankingTickerGratuito />
+      </PageContainer>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-background">
-      <main className="w-full space-y-6 px-4 pt-6 pb-8 md:space-y-8 md:px-8 md:pt-6 md:pb-10 lg:px-12 lg:pt-8 lg:pb-12">
-        {isVisitante ? (
-          <div className="space-y-6">
-            <WelcomeHeader />
-            <PWAInstallBanner />
-            <CentralConteudoGratuito />
-            <RankingTickerGratuito />
-          </div>
-        ) : (
-          <>
-            {mostrarAvisoSenha && (
-              <Alert className="border-2 border-primary bg-primary/5 shadow-md">
-                <AlertCircle className="h-4 w-4 text-primary" />
-                <AlertDescription className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <strong className="text-primary">Senha temporária detectada:</strong> Por segurança, recomendamos que você{" "}
-                    <Link
-                      to="/configuracoes"
-                      className="underline font-semibold text-primary hover:text-primary/80 transition-colors"
-                    >
-                      altere sua senha em Configurações
-                    </Link>
-                    .
-                  </div>
-                  <Link to="/configuracoes">
-                    <Button variant="ghost" size="sm" className="ml-4 hover:bg-primary/10">
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </Link>
-                </AlertDescription>
-              </Alert>
-            )}
+    <PageContainer>
+      {mostrarAvisoSenha && (
+        <Alert className="border-primary/40 bg-primary/5">
+          <AlertCircle className="h-4 w-4 text-primary" />
+          <AlertDescription className="flex items-center justify-between">
+            <div className="flex-1">
+              <strong className="text-primary">Senha temporária detectada:</strong> Por segurança,
+              recomendamos que você{" "}
+              <Link
+                to="/configuracoes"
+                className="font-semibold text-primary underline transition-colors hover:text-primary/80"
+              >
+                altere sua senha em Configurações
+              </Link>
+              .
+            </div>
+            <Link to="/configuracoes">
+              <Button variant="ghost" size="sm" className="ml-4">
+                <X className="h-4 w-4" />
+              </Button>
+            </Link>
+          </AlertDescription>
+        </Alert>
+      )}
 
-            <WelcomeHeader />
+      <WelcomeHeader />
 
-            {/* Layout linear single-column. Ordem prioriza ação imediata em cima
-               (briefing + urgências), depois progresso e onboarding condicional,
-               depois consumo de conteúdo e ranking, comunidade no fim. Banner PWA
-               desce pro último por ser infra, não ação. */}
-            <BriefingSemanal />
-            <DashboardUrgencias />
-            <AcademyWelcomeCard />
-            <WeeklyProgressCard />
-            <CentralConteudo />
-            <RankingTicker />
-            {novidadesSemana && <NovidadesSemana />}
-            <PWAInstallBanner />
-          </>
-        )}
-      </main>
-    </div>
+      {/* Duas colunas a partir de lg: à esquerda o que a pessoa vai fazer
+          agora, à direita o contexto (encontro, MarIAna, comunidade). Abaixo
+          de lg tudo empilha na mesma ordem de prioridade. */}
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-6">
+        <div className="flex flex-col gap-4 md:gap-6">
+          <BriefingSemanal />
+          <DashboardUrgencias />
+          <AcademyWelcomeCard />
+          <ContinuarDeOndeParou />
+          <SuasTrilhas />
+          <CentralConteudo />
+        </div>
+
+        <aside className="flex flex-col gap-4 md:gap-6">
+          <ProximoEncontro />
+          <PerguntarMarIAna />
+          <ComunidadeRecente />
+        </aside>
+      </div>
+
+      <RankingTicker />
+      {novidadesSemana && <NovidadesSemana />}
+      <PWAInstallBanner />
+    </PageContainer>
   );
 }

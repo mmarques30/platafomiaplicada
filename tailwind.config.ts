@@ -187,6 +187,7 @@ export default {
         'fade-in': 'fadeIn 0.4s ease-out',
         'slide-up': 'slideUp 0.3s ease-out',
         shimmer: 'shimmer 2.2s linear infinite',
+        'skeleton-pulse': 'skeleton-pulse 1.4s ease-in-out infinite',
       },
     },
   },
