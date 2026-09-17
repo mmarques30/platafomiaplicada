@@ -19,7 +19,6 @@ import { VisitorExpirationNotice } from "@/components/shared/VisitorExpirationNo
 import { TrocarSenhaModal } from "@/components/auth/TrocarSenhaModal";
 import { useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
-import { AnimatePresence } from "framer-motion";
 import { PageTransition } from "@/components/ui/PageTransition";
 
 export function MainLayout() {
@@ -84,11 +83,9 @@ export function MainLayout() {
           <AppSidebar />
           <div className="flex-1 flex flex-col relative z-[1] min-w-0">
             <main className="flex-1 overflow-x-hidden">
-              <AnimatePresence mode="wait">
-                <PageTransition key={location.pathname}>
-                  <Outlet />
-                </PageTransition>
-              </AnimatePresence>
+              <PageTransition key={location.pathname}>
+                <Outlet />
+              </PageTransition>
             </main>
           </div>
           {(!isLoading && !isVisitante) && <MarIAnaFloatingButton />}

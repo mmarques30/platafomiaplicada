@@ -109,7 +109,12 @@ export default function BibliotecaPrompts() {
 
   return (
     <PageContainer>
-      <PageTitle primary="Biblioteca" secondary="de prompts" eyebrow="Recursos" />
+      <PageTitle
+        primary="Biblioteca"
+        secondary="de prompts"
+        eyebrow="Recursos"
+        description="Prompts testados e prontos para copiar, organizados por objetivo e por ferramenta."
+      />
 
       {/* Barra de Busca e Filtros Dropdown */}
       <div className="flex flex-col md:flex-row gap-3">

@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from "react";
-import { flushSync } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Send, Maximize2, MessageSquarePlus } from "lucide-react";
@@ -15,6 +14,7 @@ import { useUserProfile } from "@/hooks/useUserProfile";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useEffectivePlan } from "@/hooks/useUserPlan";
 import { MarcaIAplicada } from "@/components/shared/MarcaIAplicada";
+import { lerFluxoResposta } from "@/lib/fluxoResposta";
 
 interface Message {
   role: "user" | "assistant";
@@ -148,93 +148,25 @@ export function MarIAnaChatDrawer({ onClose }: MarIAnaChatDrawerProps) {
         throw new Error(errorData.error || `Erro ${response.status}`);
       }
 
-      const reader = response.body?.getReader();
-      const decoder = new TextDecoder();
-      let assistantContent = "";
-      let textBuffer = "";
-
-      if (reader) {
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-
-          textBuffer += decoder.decode(value, { stream: true });
-
-          let newlineIndex: number;
-          while ((newlineIndex = textBuffer.indexOf("\n")) !== -1) {
-            let line = textBuffer.slice(0, newlineIndex);
-            textBuffer = textBuffer.slice(newlineIndex + 1);
-
-            if (line.endsWith("\r")) line = line.slice(0, -1);
-            if (line.startsWith(":") || line.trim() === "") continue;
-            if (!line.startsWith("data: ")) continue;
-
-            const jsonStr = line.slice(6).trim();
-            if (jsonStr === "[DONE]") continue;
-
-            try {
-              const parsed = JSON.parse(jsonStr);
-              const content = parsed.choices?.[0]?.delta?.content;
-
-              if (content) {
-                assistantContent += content;
-
-                if (!isStreaming) {
-                  setIsLoading(false);
-                  setIsStreaming(true);
-                }
-
-                flushSync(() => {
-                  setMessages((prev) => {
-                    const newMessages = [...prev];
-                    if (newMessages[newMessages.length - 1]?.role === "assistant") {
-                      newMessages[newMessages.length - 1].content = assistantContent;
-                    } else {
-                      newMessages.push({ role: "assistant", content: assistantContent });
-                    }
-                    return newMessages;
-                  });
-                });
-              }
-            } catch {
-              textBuffer = line + "\n" + textBuffer;
-              break;
+      const assistantContent = await lerFluxoResposta(response.body, {
+        aoReceber: (texto) => {
+          setMessages((prev) => {
+            const atualizadas = [...prev];
+            const ultima = atualizadas[atualizadas.length - 1];
+            if (ultima?.role === "assistant") {
+              atualizadas[atualizadas.length - 1] = { ...ultima, content: texto };
+            } else {
+              atualizadas.push({ role: "assistant", content: texto });
             }
-          }
-        }
-
-        // Flush remaining buffer
-        if (textBuffer.trim()) {
-          for (let raw of textBuffer.split("\n")) {
-            if (!raw) continue;
-            if (raw.endsWith("\r")) raw = raw.slice(0, -1);
-            if (raw.startsWith(":") || raw.trim() === "") continue;
-            if (!raw.startsWith("data: ")) continue;
-            const jsonStr = raw.slice(6).trim();
-            if (jsonStr === "[DONE]") continue;
-            try {
-              const parsed = JSON.parse(jsonStr);
-              const content = parsed.choices?.[0]?.delta?.content;
-              if (content) {
-                assistantContent += content;
-                flushSync(() => {
-                  setMessages((prev) => {
-                    const newMessages = [...prev];
-                    if (newMessages[newMessages.length - 1]?.role === "assistant") {
-                      newMessages[newMessages.length - 1].content = assistantContent;
-                    } else {
-                      newMessages.push({ role: "assistant", content: assistantContent });
-                    }
-                    return newMessages;
-                  });
-                });
-              }
-            } catch {
-              // ignore
-            }
-          }
-        }
-      }
+            return atualizadas;
+          });
+        },
+        aoComecar: () => {
+          setIsLoading(false);
+          setIsStreaming(true);
+        },
+        controle: abortControllerRef.current,
+      });
 
       // Save only the 2 new messages
       if (assistantContent) {
@@ -247,10 +179,14 @@ export function MarIAnaChatDrawer({ onClose }: MarIAnaChatDrawerProps) {
       setIsStreaming(false);
     } catch (error: any) {
       console.error("Erro ao enviar mensagem:", error);
-      setMessages((prev) => prev.slice(0, -1));
+      // Só desfaz a pergunta se nada tiver chegado. Com uma resposta pela
+      // metade na tela, apagar removia o pedaço que a pessoa já estava lendo.
+      setMessages((prev) =>
+        prev[prev.length - 1]?.role === "user" ? prev.slice(0, -1) : prev,
+      );
 
       if (error.name === "AbortError") {
-        toast.error("Requisição cancelada por timeout.");
+        toast.error("A resposta parou de chegar e a conversa foi encerrada. Tente de novo.");
       } else if (error.message.includes("Failed to fetch")) {
         toast.error("Erro de conexão. Verifique sua internet.");
       } else {

@@ -54,7 +54,7 @@ export default function IACopieUse() {
         <PageTitle
           primary="Modelos"
           secondary="prontos"
-          description="Fluxos de IA que já rodam em operações reais, prontos para você copiar, trocar os dados pelos seus e colocar para funcionar hoje. Cada um diz o que resolve, em que ferramenta roda e o que você precisa ter em mãos antes de começar."
+          description="Fluxos de IA que já rodam em operações reais, prontos para copiar, trocar pelos seus dados e colocar para funcionar hoje."
         />
       </div>
 
