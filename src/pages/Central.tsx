@@ -11,13 +11,11 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { PageTitle } from "@/components/shared/PageTitle";
 import { PageContainer } from "@/components/shared/PageContainer";
 import { ConteudoCard } from "@/components/dashboard/ConteudoCard";
-import { CriadoresComunidadeTab } from "@/components/comunidade/CriadoresComunidadeTab";
 import { GRUPOS, tipoInfo, tempoLeitura } from "@/lib/conteudoTipos";
 
 const tabs = [
   { value: "todos", label: "Todos", icon: LayoutGrid },
   ...GRUPOS.map((g) => ({ value: g.value, label: g.label, icon: tipoInfo(g.tipos[0]).icon })),
-  { value: "criadores", label: "Criadores", icon: Users },
 ];
 
 const validTabs = tabs.map((t) => t.value);
@@ -127,9 +125,6 @@ export default function Central() {
           </TabsContent>
         ))}
 
-        <TabsContent value="criadores" className="mt-6">
-          <CriadoresComunidadeTab />
-        </TabsContent>
       </Tabs>
 
       {/* Detalhe do conteúdo */}

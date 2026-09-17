@@ -187,13 +187,6 @@ export default function BibliotecaPrompts() {
         )}
       </div>
 
-      {/* Contador de Resultados */}
-      {!isLoading && filteredPrompts && (
-        <p className="text-sm text-muted-foreground">
-          Mostrando {visiblePrompts.length} de {filteredPrompts.length} {filteredPrompts.length === 1 ? 'prompt' : 'prompts'}
-        </p>
-      )}
-
       {/* Lista de Prompts */}
       {isLoading ? (
         <Card>
@@ -255,6 +248,14 @@ export default function BibliotecaPrompts() {
             <p className="text-muted-foreground">Nenhum prompt encontrado</p>
           </CardContent>
         </Card>
+      )}
+
+      {/* O somatório é referência, não manchete: fica no rodapé da lista. */}
+      {!isLoading && filteredPrompts && filteredPrompts.length > 0 && (
+        <p className="pt-2 text-center text-xs text-muted-foreground/70">
+          {visiblePrompts.length} de {filteredPrompts.length}{" "}
+          {filteredPrompts.length === 1 ? "prompt" : "prompts"}
+        </p>
       )}
     </PageContainer>
   );

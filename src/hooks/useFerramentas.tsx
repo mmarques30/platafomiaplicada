@@ -24,8 +24,11 @@ export function useIACopieUse() {
 // Critérios (definidos com a mentora):
 //   - Relevância de mercado .......... peso 30%
 //   - Atualidade dos modelos ......... peso 20%  ("últimos modelos")
-//   - Avaliação da mentora ........... peso 30%
-//   - Avaliação da comunidade ........ peso 20%  (ponderada pela confiança = nº de votos)
+//   - Avaliação da mentora ........... peso 50%
+//
+// A avaliação da comunidade saiu da conta: a biblioteca passa a ser uma lista
+// curada, só com o que a mentora indica. Os 20% que ela tinha foram para a
+// avaliação da mentora, que agora responde por metade do score.
 //
 // Os pesos são normalizados apenas entre os critérios que possuem valor,
 // para que o ranking degrade de forma elegante enquanto a mentora ainda não
@@ -33,25 +36,17 @@ export function useIACopieUse() {
 function calcularScoreRanking(ferramenta: {
   avaliacao?: number | null;
   avaliacao_mari?: number | null;
-  avaliacao_comunidade?: number | null;
-  total_avaliacoes_comunidade?: number | null;
   relevancia_mercado?: number | null;
   recencia_modelo?: number | null;
 }): number {
   const relevanciaMercado = ferramenta.relevancia_mercado || 0;
   const recenciaModelo = ferramenta.recencia_modelo || 0;
   const avaliacaoMentora = ferramenta.avaliacao_mari ?? ferramenta.avaliacao ?? 0;
-  const avaliacaoComunidade = ferramenta.avaliacao_comunidade || 0;
-  const totalAvaliacoes = ferramenta.total_avaliacoes_comunidade || 0;
-
-  // Confiança da comunidade: mais votos = mais peso (saturando em 5 votos).
-  const confiancaComunidade = Math.min(1, totalAvaliacoes / 5);
 
   const fatores = [
     { valor: relevanciaMercado, peso: 0.3 },
     { valor: recenciaModelo, peso: 0.2 },
-    { valor: avaliacaoMentora, peso: 0.3 },
-    { valor: avaliacaoComunidade, peso: 0.2 * confiancaComunidade },
+    { valor: avaliacaoMentora, peso: 0.5 },
   ].filter((f) => f.valor > 0 && f.peso > 0);
 
   if (fatores.length === 0) return 0;

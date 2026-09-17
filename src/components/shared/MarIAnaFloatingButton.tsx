@@ -23,9 +23,9 @@ export function MarIAnaFloatingButton() {
         <button
           data-tour="mariana-button"
           onClick={handleOpenManual}
-          className="fixed bottom-4 right-4 z-50 flex h-14 w-14 items-center justify-center rounded-full border border-border bg-card shadow-elevated ring-2 ring-primary/40 transition-transform duration-150 hover:scale-105 md:bottom-6 md:right-6"
+          className="fixed bottom-4 right-4 z-50 flex h-16 w-16 items-center justify-center rounded-full border border-border bg-card shadow-elevated ring-2 ring-primary/40 transition-transform duration-150 hover:scale-105 md:bottom-6 md:right-6"
         >
-          <img src={logoSimbolo} alt="Abrir a MarIAna" className="h-9 w-9 object-contain" />
+          <img src={logoSimbolo} alt="Abrir a MarIAna" className="h-11 w-11 object-contain" />
         </button>
       )}
     </>

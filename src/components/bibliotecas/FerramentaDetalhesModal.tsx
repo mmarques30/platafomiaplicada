@@ -3,10 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { RatingStars } from "@/components/shared/RatingStars";
 import { ToolLogo } from "@/components/shared/ToolLogo";
-import { ExternalLink, CheckCircle, AlertCircle, Star, Users } from "lucide-react";
+import { ExternalLink, CheckCircle, AlertCircle, Star } from "lucide-react";
 import { useFerramentaRating } from "@/hooks/useFerramentaRating";
-import { useUserRole } from "@/hooks/useUserRole";
-import { useAuth } from "@/hooks/useAuth";
 
 interface FerramentaDetalhesModalProps {
   ferramenta: any;
@@ -14,9 +12,7 @@ interface FerramentaDetalhesModalProps {
 }
 
 export function FerramentaDetalhesModal({ ferramenta, onClose }: FerramentaDetalhesModalProps) {
-  const { user } = useAuth();
-  const { isVisitante, isMentorado } = useUserRole();
-  const { userRating, stats, isAdmin, rate, isRating } = useFerramentaRating(ferramenta?.id);
+  const { stats, isAdmin, rate, isRating } = useFerramentaRating(ferramenta?.id);
 
   if (!ferramenta) return null;
 
@@ -33,11 +29,9 @@ export function FerramentaDetalhesModal({ ferramenta, onClose }: FerramentaDetal
     gratuito,
   } = ferramenta;
 
-  // Verificar se usuário pode avaliar (mentorado ou admin, não visitante)
-  const canRate = user && !isVisitante && (isMentorado || isAdmin);
-
+  // Só a mentora dá nota. Mentorado e visitante leem a indicação.
   const handleRate = (nota: number) => {
-    if (!canRate || isRating) return;
+    if (!isAdmin || isRating) return;
     rate(nota);
   };
 
@@ -62,102 +56,37 @@ export function FerramentaDetalhesModal({ ferramenta, onClose }: FerramentaDetal
           </div>
         </DialogHeader>
 
-        {/* Avaliação do Mentor (Admin) */}
-        <div className="flex items-center gap-3 mb-4">
-          <span className="text-sm text-muted-foreground">Avaliação do Mentor (peso 60%):</span>
+        {/* A indicação é da mentora, e só dela.
+            Antes havia um bloco de avaliação da comunidade com peso de 40% no
+            ranking, e qualquer membro votava. A biblioteca passa a ser uma
+            lista curada: o mentorado lê a indicação, e quem dá a nota é a
+            mentora, pelo admin. */}
+        <div className="mb-6 flex flex-wrap items-center gap-3 rounded-lg border bg-muted/30 p-4">
+          <span className="text-sm text-muted-foreground">Indicação da Mari</span>
           <RatingStars rating={stats?.avaliacao || avaliacao || 0} size="lg" />
+
           {isAdmin && (
-            <span className="text-xs text-primary font-medium">(Você pode alterar abaixo)</span>
-          )}
-        </div>
-
-        {/* Avaliação da Comunidade */}
-        <div className="p-4 rounded-lg border bg-muted/30 mb-6">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <Users className="w-4 h-4 text-muted-foreground" />
-              <span className="font-medium">Avaliação da Comunidade (peso 40%)</span>
-            </div>
-            {stats && stats.total_avaliacoes_comunidade > 0 && (
-              <span className="text-sm text-muted-foreground">
-                {stats.total_avaliacoes_comunidade} {stats.total_avaliacoes_comunidade === 1 ? 'avaliação' : 'avaliações'}
-              </span>
-            )}
-          </div>
-
-          {stats && stats.total_avaliacoes_comunidade > 0 ? (
-            <div className="flex items-center gap-2 mb-4">
-              <div className="flex items-center gap-1">
-                {[1, 2, 3, 4, 5].map((star) => (
+            <div className="flex w-full items-center gap-2 border-t pt-3">
+              <span className="text-xs text-muted-foreground">Sua nota:</span>
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                  key={star}
+                  onClick={() => handleRate(star)}
+                  disabled={isRating}
+                  className="p-1 transition-transform hover:scale-110 disabled:opacity-50"
+                  aria-label={`Dar nota ${star}`}
+                >
                   <Star
-                    key={star}
-                    className={`w-5 h-5 ${
-                      star <= Math.round(stats.avaliacao_comunidade || 0)
+                    className={`h-6 w-6 cursor-pointer ${
+                      star <= (stats?.avaliacao || 0)
                         ? "fill-status-warning text-status-warning"
-                        : "text-muted"
+                        : "text-muted hover:text-status-warning"
                     }`}
                   />
-                ))}
-              </div>
-              <span className="text-lg font-semibold">
-                {(stats.avaliacao_comunidade || 0).toFixed(1)}
-              </span>
+                </button>
+              ))}
             </div>
-          ) : (
-            <p className="text-sm text-muted-foreground mb-4">Nenhuma avaliação ainda</p>
           )}
-
-          {/* Seção para avaliar - Admin avalia como Mentor, Mentorado como Comunidade */}
-          {canRate ? (
-            <div className="pt-3 border-t">
-              <p className="text-sm text-muted-foreground mb-2">
-                {isAdmin ? (
-                  <>
-                    <span className="font-medium text-primary">Avaliação do Mentor:</span>
-                    {" "}(Esta avaliação tem peso de 60% no ranking)
-                  </>
-                ) : (
-                  userRating ? "Sua avaliação:" : "Avalie esta ferramenta:"
-                )}
-              </p>
-              <div className="flex items-center gap-1">
-                {[1, 2, 3, 4, 5].map((star) => {
-                  // Admin vê a avaliação do mentor, Mentorado vê sua própria avaliação
-                  const currentRating = isAdmin 
-                    ? (stats?.avaliacao || 0) 
-                    : (userRating?.nota || 0);
-                  
-                  return (
-                    <button
-                      key={star}
-                      onClick={() => handleRate(star)}
-                      disabled={isRating}
-                      className="p-1 hover:scale-110 transition-transform disabled:opacity-50"
-                    >
-                      <Star
-                        className={`w-6 h-6 cursor-pointer ${
-                          star <= currentRating
-                            ? "fill-status-warning text-status-warning"
-                            : "text-muted hover:text-status-warning"
-                        }`}
-                      />
-                    </button>
-                  );
-                })}
-              </div>
-              {isAdmin && (
-                <p className="text-xs text-muted-foreground mt-2">
-                  Sua avaliação define a nota do mentor para esta ferramenta.
-                </p>
-              )}
-            </div>
-          ) : isVisitante ? (
-            <div className="pt-3 border-t">
-              <p className="text-sm text-muted-foreground">
-                💡 Adquira um plano para avaliar ferramentas
-              </p>
-            </div>
-          ) : null}
         </div>
 
         {/* Seção: Objetivo */}

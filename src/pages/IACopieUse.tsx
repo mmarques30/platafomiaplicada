@@ -13,7 +13,8 @@ import {
 import { useIACopieUse } from "@/hooks/useFerramentas";
 import { IACopieUseCard } from "@/components/bibliotecas/IACopieUseCard";
 import { IACopieUseDetalhesModal } from "@/components/bibliotecas/IACopieUseDetalhesModal";
-import { Sparkles, Search, LayoutGrid, List } from "lucide-react";
+import { Sparkles, Search } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { IACopieUseRow } from "@/components/bibliotecas/IACopieUseRow";
 import { PageTitle } from "@/components/shared/PageTitle";
 import { PageContainer } from "@/components/shared/PageContainer";
@@ -50,10 +51,11 @@ export default function IACopieUse() {
   return (
     <PageContainer>
       <div className="mb-6 md:mb-8">
-        <PageTitle primary="Modelos" secondary="prontos" eyebrow="Recursos" />
-        <p className="text-sm md:text-base text-muted-foreground mt-1">
-          Ferramentas de IA prontas para você copiar e usar
-        </p>
+        <PageTitle
+          primary="Modelos"
+          secondary="prontos"
+          description="Fluxos de IA que já rodam em operações reais, prontos para você copiar, trocar os dados pelos seus e colocar para funcionar hoje. Cada um diz o que resolve, em que ferramenta roda e o que você precisa ter em mãos antes de começar."
+        />
       </div>
 
       <div className="flex flex-col sm:flex-row gap-4 mb-6">
@@ -90,30 +92,16 @@ export default function IACopieUse() {
         </Select>
       </div>
 
-      {/* Results counter + view toggle */}
-      {filteredIAs && (
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-muted-foreground">
-            {filteredIAs.length} {filteredIAs.length === 1 ? 'resultado' : 'resultados'} encontrados
-          </p>
-          <div className="flex items-center gap-1">
-            <Button
-              variant={viewMode === "cards" ? "default" : "ghost"}
-              size="icon"
-              onClick={() => setViewMode("cards")}
-            >
-              <LayoutGrid className="w-4 h-4" />
-            </Button>
-            <Button
-              variant={viewMode === "tabela" ? "default" : "ghost"}
-              size="icon"
-              onClick={() => setViewMode("tabela")}
-            >
-              <List className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
-      )}
+      {/* Escolha da visão: duas abas, no mesmo peso do resto da página.
+          Eram dois botões de ícone, e o ativo vinha com o lime cheio do
+          botão primário — um alternador de visualização gritando mais que o
+          conteúdo. */}
+      <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as "cards" | "tabela")}>
+        <TabsList>
+          <TabsTrigger value="cards">Cartões</TabsTrigger>
+          <TabsTrigger value="tabela">Lista</TabsTrigger>
+        </TabsList>
+      </Tabs>
 
       {isLoading ? (
         viewMode === "cards" ? (
@@ -192,6 +180,13 @@ export default function IACopieUse() {
             </p>
           </CardContent>
         </Card>
+      )}
+
+      {!isLoading && filteredIAs && filteredIAs.length > 0 && (
+        <p className="pt-2 text-center text-xs text-muted-foreground/70">
+          {visibleIAs?.length} de {filteredIAs.length}{" "}
+          {filteredIAs.length === 1 ? "modelo" : "modelos"}
+        </p>
       )}
 
       <IACopieUseDetalhesModal
