@@ -157,9 +157,9 @@ update public.contratos_business c
 -- PASSO 6 · Conta interna no plano pago -> equipe
 --
 -- maria.tech@iaplicada.com é conta da IAplicada e estava contando como
--- Insider Pago. Vira equipe e sai do plano de cliente. O papel `equipe`
+-- Insider Business. Vira equipe e sai do plano de cliente. O papel `equipe`
 -- mantém o acesso à plataforma e ao painel interno.
--- Os outros quatro Insider Pago sem contrato continuam como estão.
+-- Os outros quatro Insider Business sem contrato continuam como estão.
 -- ============================================================================
 
 insert into public.user_roles (user_id, role)

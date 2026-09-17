@@ -11,8 +11,8 @@ interface SidebarUserCardProps {
 const planoLabel: Record<string, string> = {
   academy: "Academy",
   business_parceria: "Academy",
-  business_sistemas: "Insider",
-  insider_free: "Insider",
+  insider_business: "Insider",
+  insider_convidado: "Insider",
 };
 
 export function SidebarUserCard({ nome, plano, progresso, collapsed }: SidebarUserCardProps) {

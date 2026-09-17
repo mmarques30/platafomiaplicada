@@ -31,7 +31,7 @@ export default function MeuDiagnostico() {
       return;
     }
 
-    // Insider pago -> diagnóstico da mentoria (painel do projeto)
+    // Insider Business -> diagnóstico da mentoria (painel do projeto)
     if (isBusinessSistemas) {
       hasRedirected.current = true;
       navigate('/mentoria/diagnostico', { replace: true });

@@ -189,7 +189,7 @@ export function ProximosPassosCard({ previewMode, onClose: onCloseExternal }: Pr
       };
     }
 
-    if (effectivePlan === "business_sistemas") {
+    if (effectivePlan === "insider_business") {
       return {
         planoLabel: "Insider",
         titulo: `Seu sistema está sendo construído, ${nome}.`,

@@ -22,7 +22,7 @@ const TAB_CLASS = "sm:px-5";
 /**
  * "Meu progresso" — visão única da Academy. Ex-Builder e ex-Skills (hoje
  * Academy) e a equipe caem aqui; o painel antigo de mentoria ficou
- * restrito ao Insider pago.
+ * restrito ao Insider Business.
  */
 export default function Evolucao() {
   const { data: ranking, isLoading: loadingRanking } = useRankingComunidade();

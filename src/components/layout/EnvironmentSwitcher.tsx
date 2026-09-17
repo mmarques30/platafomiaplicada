@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils";
 
 /**
  * Alternador de ambiente no topo. Só aparece para quem tem mais de um
- * ambiente (ex.: Insider pago, que também tem Academy). Lista apenas os
+ * ambiente (ex.: Insider Business, que também tem Academy). Lista apenas os
  * ambientes disponíveis — não existe mais "ambiente bloqueado" nem tela
  * de seleção.
  */

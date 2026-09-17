@@ -74,7 +74,7 @@ export default function Mentoria() {
     { numero: 4, label: 'Certificado', status: 'proximo' as const },
   ];
   
-  // O painel de mentoria ficou restrito ao Insider pago (projeto em
+  // O painel de mentoria ficou restrito ao Insider Business (projeto em
   // andamento). Todo o resto — Academy, ex-Builder, ex-Skills e a equipe sem
   // "Ver como" — usa a visão "Meu progresso" da Academy (/evolucao).
   const usaVisaoAcademy = !roleLoading && !planLoading && !isBusinessSistemas;

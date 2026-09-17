@@ -89,7 +89,7 @@ export function MarIAnaChatDrawer({ onClose }: MarIAnaChatDrawerProps) {
     if (localStorage.getItem(`mariana_iniciada_${user.id}`)) return;
 
     let msg: string;
-    if (effectivePlan === 'business_parceria' || effectivePlan === 'business_sistemas') {
+    if (effectivePlan === 'business_parceria' || effectivePlan === 'insider_business') {
       msg = `Olá, ${firstName}! Sou a MarIAna. Já tenho contexto do seu projeto e vou te acompanhar ao longo da jornada. Se tiver dúvidas sobre suas etapas, sessões ou entregas, é só me chamar.`;
     } else {
       msg = `Olá, ${firstName}! Sou a MarIAna, sua assistente de IA aqui na plataforma. Estou aqui para te ajudar a tirar o máximo das trilhas e te orientar na jornada. Por onde você quer começar?`;

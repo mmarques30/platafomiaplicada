@@ -46,7 +46,7 @@ const VARIANT_COPY: Record<string, VariantCopy> = {
     cta: "Acessar o Builder",
     dica: 'Faça seu Diagnóstico e veja seu roadmap em "Mentoria".',
   },
-  business_sistemas: {
+  insider_business: {
     intro: "Seu acesso ao <strong>IAplicada System</strong> está pronto. A IAplicada constrói e você acompanha.",
     cta: "Acessar o System",
     dica: 'Acompanhe o andamento do projeto em "Meu Projeto".',
@@ -181,7 +181,7 @@ export async function sendWelcomeEmail(opts: {
   email: string;
   nome: string;
   senha: string;
-  plano: string; // ex.: academy | business_parceria | business_sistemas
+  plano: string; // ex.: academy | business_parceria | insider_business
   planoLabel: string; // ex.: Academy | Builder | System
   acao: string; // new_user_created | existing_user_updated
 }): Promise<WelcomeEmailResult> {

@@ -16,12 +16,12 @@ interface AdminViewSelectorProps {
   isAdmin: boolean;
 }
 
-type PlanType = 'academy' | 'business_sistemas' | 'insider_free';
+type PlanType = 'academy' | 'insider_business' | 'insider_convidado';
 
 const viewOptions: { mode: AdminViewMode; label: string; icon: React.ReactNode }[] = [
   { mode: "academy", label: "Academy", icon: <GraduationCap className="h-4 w-4" /> },
-  { mode: "business_sistemas", label: "Insider Pago", icon: <Building2 className="h-4 w-4" /> },
-  { mode: "insider_free", label: "Insider Free", icon: <Sparkles className="h-4 w-4" /> },
+  { mode: "insider_business", label: "Insider Business", icon: <Building2 className="h-4 w-4" /> },
+  { mode: "insider_convidado", label: "Insider Convidado", icon: <Sparkles className="h-4 w-4" /> },
 ];
 
 export function AdminViewSelector({ isAdmin }: AdminViewSelectorProps) {

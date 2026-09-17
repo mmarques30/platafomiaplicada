@@ -11,7 +11,7 @@ import { Search, Building2, User, GraduationCap, Sparkles } from 'lucide-react';
 import { useUsers } from '@/hooks/admin/useUsers';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
-type PlanType = 'academy' | 'business_sistemas' | 'insider_free';
+type PlanType = 'academy' | 'insider_business' | 'insider_convidado';
 
 interface UserSelectorByPlanModalProps {
   open: boolean;
@@ -26,15 +26,15 @@ const planConfig: Record<PlanType, { title: string; icon: React.ReactNode; empty
     icon: <GraduationCap className="h-5 w-5 text-primary" />,
     emptyMessage: 'Nenhum mentorado Academy encontrado',
   },
-  business_sistemas: {
-    title: 'Selecionar Insider Pago',
+  insider_business: {
+    title: 'Selecionar Insider Business',
     icon: <Building2 className="h-5 w-5 text-primary" />,
-    emptyMessage: 'Nenhum Insider Pago encontrado',
+    emptyMessage: 'Nenhum Insider Business encontrado',
   },
-  insider_free: {
-    title: 'Selecionar Insider Free',
+  insider_convidado: {
+    title: 'Selecionar Insider Convidado',
     icon: <Sparkles className="h-5 w-5 text-primary" />,
-    emptyMessage: 'Nenhum Insider Free encontrado',
+    emptyMessage: 'Nenhum Insider Convidado encontrado',
   },
 };
 
@@ -84,9 +84,9 @@ export function UserSelectorByPlanModal({ open, onClose, onSelect, planType }: U
   const getPlanIcon = () => {
     switch (planType) {
       case 'academy': return <GraduationCap className="h-4 w-4 text-muted-foreground shrink-0" />;
-      case 'business_sistemas': 
+      case 'insider_business': 
         return <Building2 className="h-4 w-4 text-muted-foreground shrink-0" />;
-      case 'insider_free':
+      case 'insider_convidado':
         return <Sparkles className="h-4 w-4 text-muted-foreground shrink-0" />;
     }
   };

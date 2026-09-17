@@ -81,7 +81,7 @@ export function useSkillsLider() {
   }
 
   // Admin pode visualizar em modo simulação Skills
-  const canAccess = isLider || (isAdmin && isViewingAs && (viewAs === "skills" || viewAs === "business_sistemas"));
+  const canAccess = isLider || (isAdmin && isViewingAs && (viewAs === "skills" || viewAs === "insider_business"));
 
   // equipeId já vem resolvido do useSkillsMembro (inclui fallback admin)
   const equipeId = membroEquipeId;

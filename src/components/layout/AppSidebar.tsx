@@ -63,14 +63,14 @@ export function AppSidebar() {
   };
 
   // Em modo simulação, o EnvironmentSwitcher fica oculto; então garantimos que o filtro de menus
-  // acompanhe o plano simulado. Ambientes atuais: academy, business_sistemas (Insider pago)
-  // e insider_free (Insider não pago). Gratuito, Builder e Skills não existem mais.
+  // acompanhe o plano simulado. Ambientes atuais: academy, insider_business (Insider Business)
+  // e insider_convidado (Insider não pago). Gratuito, Builder e Skills não existem mais.
   const effectiveEnvironment = (() => {
     if (!isViewingAs) {
       // Fallback: se nenhum ambiente selecionado, inferir do plano
       if (!currentEnvironment) {
-        if (effectivePlan === 'business_sistemas') return 'business_sistemas';
-        if (effectivePlan === 'insider_free') return 'insider_free';
+        if (effectivePlan === 'insider_business') return 'insider_business';
+        if (effectivePlan === 'insider_convidado') return 'insider_convidado';
         // Builder (legado) cai no Academy
         if (effectivePlan === 'business_parceria' || effectivePlan === 'academy') return 'academy';
         return null;
@@ -82,10 +82,10 @@ export function AppSidebar() {
     switch (viewAs) {
       case "academy":
         return "academy";
-      case "business_sistemas":
-        return "business_sistemas";
-      case "insider_free":
-        return "insider_free";
+      case "insider_business":
+        return "insider_business";
+      case "insider_convidado":
+        return "insider_convidado";
       default:
         return currentEnvironment;
     }
@@ -94,8 +94,8 @@ export function AppSidebar() {
   const sidebarMenus = getSidebarMenus(effectivePlan, effectiveEnvironment);
   
   // Detectar se é Business Sistemas (para filtros especiais)
-  const isBusinessSistemasEnv = effectiveEnvironment === 'business_sistemas' 
-    || effectivePlan === 'business_sistemas';
+  const isBusinessSistemasEnv = effectiveEnvironment === 'insider_business' 
+    || effectivePlan === 'insider_business';
   
   // Pegar todos os menus principais (sem parent_key)
   // Excluir "Comunicações" (interacoes) do sidebar - agora está no menu superior
@@ -149,7 +149,7 @@ export function AppSidebar() {
   const getMenuUrl = (menu: { menu_key: string; url: string | null }) => {
     if (menu.menu_key === 'meu_progresso') {
       // "Meu progresso" é sempre a visão Academy (/evolucao). O painel antigo
-      // de mentoria (/mentoria) fica restrito ao Insider pago, que nem vê
+      // de mentoria (/mentoria) fica restrito ao Insider Business, que nem vê
       // este menu. Ex-Builder e ex-Skills (hoje Academy) caem aqui.
       return '/evolucao';
     }

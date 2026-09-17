@@ -49,9 +49,9 @@ export function useMenuConfig() {
   const getSidebarMenus = (userPlan?: string | null, currentEnvironment?: string | null) => {
   // Menus a ocultar quando em ambiente específico
     const hiddenByEnvironment: Record<string, string[]> = {
-      // Insider pago (business_sistemas): cliente acompanha o projeto.
+      // Insider Business (insider_business): cliente acompanha o projeto.
       // Sem trilhas/calendário/progresso de mentoria, sem Skills e Squad.
-      business_sistemas: [
+      insider_business: [
         'trilhas', 'trilhas_skills', 'calendario',
         'evolucao', 'meu_diagnostico', 'minhas_duvidas',
         'meu_progresso', 'meu_progresso_visao_geral', 'meu_progresso_roadmap',
@@ -64,7 +64,7 @@ export function useMenuConfig() {
 
       // Insider não pago: a "outra visão" ainda vai ser definida. Por ora
       // esconde tudo que depende de projeto contratado ou de plano pago.
-      insider_free: [
+      insider_convidado: [
         'trilhas', 'trilhas_skills', 'calendario',
         'evolucao', 'meu_diagnostico', 'minhas_duvidas',
         'meu_progresso', 'meu_progresso_visao_geral', 'meu_progresso_roadmap',
@@ -104,9 +104,9 @@ export function useMenuConfig() {
       // Aliases para compatibilidade entre chaves legadas e novas
       const PLAN_ALIASES: Record<string, string[]> = {
         'business_parceria': ['business_parceria', 'business'],
-        'business_sistemas': ['business_sistemas', 'business_iaplicada'],
+        'insider_business': ['insider_business', 'business_iaplicada'],
         'business': ['business', 'business_parceria'],
-        'business_iaplicada': ['business_iaplicada', 'business_sistemas'],
+        'business_iaplicada': ['business_iaplicada', 'insider_business'],
       };
       
       const matchesPlan = (plan: string) => {
@@ -119,7 +119,7 @@ export function useMenuConfig() {
       // Fallback: verificar plano do usuário
       return matchesPlan(userPlan);
     }).map(m => {
-      if (m.menu_key === 'meu_sistema' && currentEnvironment === 'business_sistemas') {
+      if (m.menu_key === 'meu_sistema' && currentEnvironment === 'insider_business') {
         return { ...m, label: 'Meu Projeto' };
       }
       return m;

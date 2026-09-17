@@ -42,8 +42,8 @@ interface VisaoGeralTabProps {
     };
     distribuicaoPlanos: {
       academy: number;
-      business_sistemas: number;
-      insider_free: number;
+      insider_business: number;
+      insider_convidado: number;
       sem_plano: number;
     };
     mari: {
