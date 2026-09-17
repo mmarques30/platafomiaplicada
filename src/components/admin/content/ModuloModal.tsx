@@ -46,17 +46,17 @@ export function ModuloModal({ open, onOpenChange, modulo }: ModuloModalProps) {
 
   // Buscar trilha do módulo selecionado para validação
   const { data: trilha } = useQuery({
-    queryKey: ["trilha-do-modulo", watch("trilha_id")],
+    queryKey: ["trilha-do-modulo", trilhaId],
     queryFn: async () => {
-      if (!watch("trilha_id")) return null;
+      if (!trilhaId) return null;
       const { data } = await supabase
         .from("trilhas")
         .select("visivel_mentorados")
-        .eq("id", watch("trilha_id"))
+        .eq("id", trilhaId)
         .single();
       return data;
     },
-    enabled: !!watch("trilha_id")
+    enabled: !!trilhaId
   });
 
   useEffect(() => {

@@ -645,12 +645,6 @@ iframe:focus {
   margin-bottom: 0.25rem;
 }
 
-/* Modo Foco */
-body.modo-foco [data-sidebar] { display: none !important; }
-body.modo-foco [data-welcome-kpis] { display: none; }
-body.modo-foco [data-ranking-ticker] { display: none; }
-body.modo-foco [data-novidades] { display: none; }
-body.modo-foco main { max-width: 720px; margin: 0 auto; padding: 0 24px; }
 /* ============================================
    Acesso inicial (/auth) — branding iaplicada.com
    Fundo charcoal + quadriculado, lime/olive, Instrument Serif italic.
@@ -1036,13 +1030,13 @@ body.modo-foco main { max-width: 720px; margin: 0 auto; padding: 0 24px; }
     inset: 0;
     z-index: 0;
     pointer-events: none;
-    opacity: 0.5;
+    opacity: 1;
     background-image:
-      linear-gradient(hsl(var(--primary) / 0.05) 1px, transparent 1px),
-      linear-gradient(90deg, hsl(var(--primary) / 0.05) 1px, transparent 1px);
+      linear-gradient(hsl(var(--primary) / 0.1) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--primary) / 0.1) 1px, transparent 1px);
     background-size: 64px 64px;
-    -webkit-mask-image: radial-gradient(110% 90% at 50% 0%, #000 10%, transparent 75%);
-    mask-image: radial-gradient(110% 90% at 50% 0%, #000 10%, transparent 75%);
+    -webkit-mask-image: radial-gradient(125% 105% at 50% 0%, #000 25%, transparent 88%);
+    mask-image: radial-gradient(125% 105% at 50% 0%, #000 25%, transparent 88%);
     animation: atmosfera-deriva 40s linear infinite;
   }
 

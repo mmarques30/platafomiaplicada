@@ -13,6 +13,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useMentoriaContext } from "@/hooks/useMentoriaContext";
 import { useUserProfile } from "@/hooks/useUserProfile";
+import { useSidebar } from "@/components/ui/sidebar";
+import { cn } from "@/lib/utils";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useEffectivePlan } from "@/hooks/useUserPlan";
 import mariAvatar from "@/assets/mari-avatar-new.png";
@@ -41,6 +43,8 @@ export function MarIAnaChatDrawer({ onClose }: MarIAnaChatDrawerProps) {
   const isMentoriaPage = pathname.startsWith("/mentoria");
   const { contextText, proactiveMessage } = useMentoriaContext({ enabled: isMentoriaPage });
   const { profile } = useUserProfile();
+  const { state: sidebarState } = useSidebar();
+  const sidebarAberta = sidebarState === "expanded";
   const { isAdmin, isLoading: roleLoading } = useUserRole();
   const { effectivePlan } = useEffectivePlan(isAdmin, roleLoading);
   const firstName = profile?.nome_completo?.split(' ')?.[0] ?? 'por aqui';
@@ -293,7 +297,12 @@ export function MarIAnaChatDrawer({ onClose }: MarIAnaChatDrawerProps) {
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: 20, scale: 0.95 }}
       transition={{ duration: 0.2 }}
-      className="fixed bottom-20 right-4 md:bottom-24 md:right-6 z-50 w-[calc(100vw-2rem)] max-w-[380px] h-[500px] max-h-[70vh] bg-surface text-foreground border border-border rounded-2xl shadow-2xl flex flex-col overflow-hidden"
+      className={cn(
+        "fixed bottom-20 left-4 right-4 z-50 flex h-[500px] max-h-[70vh] flex-col overflow-hidden",
+        "rounded-card border border-border bg-surface text-foreground shadow-elevated",
+        "md:bottom-24 md:right-auto md:w-[380px]",
+        sidebarAberta ? "md:left-[17rem]" : "md:left-[4.25rem]",
+      )}
     >
       {/* Header */}
       <div className="flex items-center gap-3 px-4 py-3 border-b border-border bg-surface">

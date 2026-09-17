@@ -18,7 +18,6 @@ import { PerguntarMarIAna } from "@/components/dashboard/PerguntarMarIAna";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useUserProfile } from "@/hooks/useUserProfile";
-import { PWAInstallBanner } from "@/components/shared/PWAInstallBanner";
 import { PageSkeleton } from "@/components/shared/PageSkeleton";
 import { PageContainer } from "@/components/shared/PageContainer";
 import { DashboardUrgencias } from "@/components/dashboard/DashboardUrgencias";
@@ -60,7 +59,6 @@ export default function Dashboard() {
     return (
       <PageContainer>
         <WelcomeHeader />
-        <PWAInstallBanner />
         <CentralConteudoGratuito />
         <RankingTickerGratuito />
       </PageContainer>
@@ -116,7 +114,6 @@ export default function Dashboard() {
 
       <RankingTicker />
       {novidadesSemana && <NovidadesSemana />}
-      <PWAInstallBanner />
     </PageContainer>
   );
 }

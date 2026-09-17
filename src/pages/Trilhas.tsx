@@ -1,9 +1,8 @@
-import { TodasAsTrilhas } from "@/components/dashboard/TodasAsTrilhas";
+import { GradeTrilhas } from "@/components/trilhas/GradeTrilhas";
 import { useUserRole } from "@/hooks/useUserRole";
 import { Link } from "react-router-dom";
 import { Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { PWAInstallBanner } from "@/components/shared/PWAInstallBanner";
 import { WelcomeHeader } from "@/components/dashboard/WelcomeHeader";
 import { CentralConteudoGratuito } from "@/components/dashboard/CentralConteudoGratuito";
 import { RankingTickerGratuito } from "@/components/dashboard/RankingTickerGratuito";
@@ -30,8 +29,6 @@ export default function Trilhas() {
               Ter acesso ao Academy
             </Link>
           </Button>
-
-          <PWAInstallBanner />
           <CentralConteudoGratuito />
           <RankingTickerGratuito />
         </div>
@@ -41,9 +38,9 @@ export default function Trilhas() {
             primary="Trilhas"
             secondary="de aprendizado"
             eyebrow="Academy"
-            description="Aplica IA na rotina — uma trilha por workflow, semana a semana."
+            description="Aplica IA na rotina: uma trilha por workflow, semana a semana."
           />
-          <TodasAsTrilhas />
+          <GradeTrilhas />
         </>
       )}
     </PageContainer>

@@ -1,5 +1,4 @@
 import { useAdminDashboard } from "@/hooks/useAdminDashboard";
-import { PWAInstallBanner } from "@/components/shared/PWAInstallBanner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { VisaoGeralTab } from "@/components/admin/dashboard/VisaoGeralTab";
@@ -47,8 +46,6 @@ export default function AdminDashboard() {
         <LayoutDashboard className={adminTheme.pageIcon} />
         <h1 className={adminTheme.pageTitle}>Dashboard Administrativo</h1>
       </div>
-
-      <PWAInstallBanner />
 
       <Tabs defaultValue="visao-geral" className="space-y-4">
         <TabsList className={adminTheme.tabsList}>

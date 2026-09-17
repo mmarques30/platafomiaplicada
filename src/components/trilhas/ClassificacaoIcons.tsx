@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { motion, type TargetAndTransition } from "framer-motion";
 import { BookOpen, Zap, Cog, Rocket, Clock, Sparkles, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -21,7 +21,7 @@ const ICON_MAP: Record<string, IconConfig> = {
   "Rotina": { icon: Clock, label: "Rotina" },
 };
 
-const ANIMATION_VARIANTS: Record<string, any> = {
+const ANIMATION_VARIANTS: Record<string, TargetAndTransition> = {
   "Aprendizado Inicial": {
     scale: [1, 1.15, 1],
     opacity: [0.85, 1, 0.85],
