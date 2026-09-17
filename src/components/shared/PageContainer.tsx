@@ -17,7 +17,7 @@ interface PageContainerProps {
  */
 export function PageContainer({ children, className, size = "default" }: PageContainerProps) {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="relative z-[1] min-h-screen">
       <main
         className={cn(
           "w-full space-y-6 px-4 pt-6 pb-8 md:space-y-8 md:px-8 md:pt-6 md:pb-10 lg:space-y-10 lg:px-12 lg:pt-8 lg:pb-12",

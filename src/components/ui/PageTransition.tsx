@@ -1,18 +1,16 @@
 import { motion } from "framer-motion";
 import { ReactNode } from "react";
 
+import { entradaPagina, aoMontar } from "@/lib/motion";
+
 interface PageTransitionProps {
   children: ReactNode;
 }
 
+/** Entrada de página: 10px e fade, na curva do resto da plataforma. */
 export function PageTransition({ children }: PageTransitionProps) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 6 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -4 }}
-      transition={{ duration: 0.15, ease: "easeOut" }}
-    >
+    <motion.div variants={entradaPagina} {...aoMontar}>
       {children}
     </motion.div>
   );

@@ -77,10 +77,10 @@ export function MainLayout() {
       <SidebarProvider>
         <TopHeader />
         <div className={cn(
-          "min-h-screen flex w-full bg-background",
+          "relative min-h-screen flex w-full",
           isAdmin && isViewingAs ? "pt-24" : "pt-14"
         )}>
-          <div className="dot-grid-bg" />
+          <div className="atmosfera" aria-hidden="true" />
           <AppSidebar />
           <div className="flex-1 flex flex-col relative z-[1] min-w-0">
             <main className="flex-1 overflow-x-hidden">

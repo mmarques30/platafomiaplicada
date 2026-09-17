@@ -14,8 +14,12 @@ export default {
     },
     extend: {
       fontFamily: {
+        /* Quatro papéis fixos: serif no display, tight no título de bloco,
+           Inter no corpo, mono no rótulo e no dado. */
         sans: ['Inter', 'system-ui', 'sans-serif'],
+        tight: ['Inter Tight', 'Inter', 'system-ui', 'sans-serif'],
         serif: ['Instrument Serif', 'Georgia', 'serif'],
+        mono: ['JetBrains Mono', 'ui-monospace', 'Menlo', 'monospace'],
       },
       letterSpacing: {
         tighter: '-0.02em',
@@ -35,9 +39,19 @@ export default {
           accent: "hsl(var(--chrome-accent))",
         },
         /* Paleta iaplicada.com */
-        lime: "hsl(var(--lime))",
-        olive: "hsl(var(--olive))",
-        sage: "hsl(var(--sage))",
+        lime: {
+          DEFAULT: "hsl(var(--lime))",
+          glow: "hsl(var(--lime-glow))",
+        },
+        olive: {
+          DEFAULT: "hsl(var(--olive))",
+          deep: "hsl(var(--olive-deep))",
+        },
+        sage: {
+          DEFAULT: "hsl(var(--sage))",
+          dim: "hsl(var(--sage-dim))",
+        },
+        amber: "hsl(var(--amber))",
         charcoal: "hsl(var(--charcoal))",
         status: {
           success: "hsl(var(--status-success))",
@@ -109,11 +123,11 @@ export default {
             200: "hsl(var(--secondary) / <alpha-value>)",
             100: "hsl(var(--muted) / <alpha-value>)",
           },
-          dark: "hsl(72, 6%, 18%)",     /* #2F302B - Dark base */
-          light: "hsl(0, 0%, 100%)",    /* #FFFFFF */
-          gray: "hsl(72, 6%, 18%)",     /* #2F302B */
-          cream: "hsl(63, 45%, 94%)",   /* #F6F7E9 - Off-white */
-          text: "hsl(63, 48%, 91%)",    /* #E9EBC6 - Text on dark */
+          dark: "hsl(var(--surface))",
+          light: "hsl(var(--card))",
+          gray: "hsl(var(--surface))",
+          cream: "hsl(var(--brand-cream))",
+          text: "hsl(var(--foreground))",
         },
         complexity: {
           high: "hsl(var(--complexity-high))",
@@ -123,8 +137,19 @@ export default {
       },
       borderRadius: {
         lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        md: "calc(var(--radius) - 4px)",
+        sm: "calc(var(--radius) - 8px)",
+        card: "20px",
+      },
+      boxShadow: {
+        /* Duas sombras nomeadas, vindas do site, mais o brilho do foco. */
+        card: "0 1px 2px 0 rgb(0 0 0 / 0.4), 0 1px 0 0 hsl(var(--border) / 0.6)",
+        elevated: "0 30px 60px -20px rgb(0 0 0 / 0.6), 0 8px 20px -8px rgb(0 0 0 / 0.4)",
+        glow: "0 0 0 1px hsl(var(--primary) / 0.35), 0 10px 30px -12px hsl(var(--primary) / 0.45)",
+      },
+      backgroundImage: {
+        "gradient-hero": "radial-gradient(ellipse 80% 55% at 50% 0%, hsl(77 32% 8%) 0%, hsl(var(--background)) 65%)",
+        "gradient-lime": "linear-gradient(180deg, hsl(var(--lime-glow)) 0%, hsl(var(--lime)) 100%)",
       },
       spacing: {
         '18': '4.5rem',
@@ -151,12 +176,17 @@ export default {
           "0%, 100%": { opacity: "0.4" },
           "50%": { opacity: "0.8" },
         },
+        shimmer: {
+          "0%": { backgroundPosition: "-200% 0" },
+          "100%": { backgroundPosition: "200% 0" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         'fade-in': 'fadeIn 0.4s ease-out',
         'slide-up': 'slideUp 0.3s ease-out',
+        shimmer: 'shimmer 2.2s linear infinite',
       },
     },
   },

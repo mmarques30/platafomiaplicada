@@ -190,7 +190,7 @@ export default function VideoPlayer() {
   }
 
   return (
-    <PageContainer className="cards-light">
+    <PageContainer>
         <Breadcrumb className="mb-6">
           <BreadcrumbList>
             <BreadcrumbItem>
