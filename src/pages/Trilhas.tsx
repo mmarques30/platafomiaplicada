@@ -3,7 +3,6 @@ import { useUserRole } from "@/hooks/useUserRole";
 import { Link } from "react-router-dom";
 import { Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { PWAInstallBanner } from "@/components/shared/PWAInstallBanner";
 import { WelcomeHeader } from "@/components/dashboard/WelcomeHeader";
 import { CentralConteudoGratuito } from "@/components/dashboard/CentralConteudoGratuito";
 import { RankingTickerGratuito } from "@/components/dashboard/RankingTickerGratuito";
@@ -30,8 +29,6 @@ export default function Trilhas() {
               Ter acesso ao Academy
             </Link>
           </Button>
-
-          <PWAInstallBanner />
           <CentralConteudoGratuito />
           <RankingTickerGratuito />
         </div>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Bell, ChevronDown, RefreshCw, Home, BookOpen, Library, Eye, Maximize2, Minimize2 } from "lucide-react";
+import { Bell, ChevronDown, Eye, LogOut, RefreshCw, Settings, Smartphone, User } from "lucide-react";
 import logoMarcaCompleta from "@/assets/logo-auth-fundo-escuro.png";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -20,6 +20,7 @@ import { useEffectivePlan } from "@/hooks/useUserPlan";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { useAvisosAtivosCount } from "@/hooks/useAvisosPublicos";
+import { usePWAInstall } from "@/hooks/usePWAInstall";
 import { useProdutosAtivos } from "@/hooks/admin/useProdutos";
 import { useAdminViewContext } from "@/contexts/AdminViewContext";
 import { cn } from "@/lib/utils";
@@ -44,20 +45,6 @@ export function TopHeader() {
   
   const [isScrolled, setIsScrolled] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  const [modoFoco, setModoFoco] = useState(() => sessionStorage.getItem('modo_foco') === 'true');
-
-  const toggleFoco = () => {
-    const novo = !modoFoco;
-    setModoFoco(novo);
-    sessionStorage.setItem('modo_foco', String(novo));
-    document.body.classList.toggle('modo-foco', novo);
-  };
-
-  // Restaurar classe no body ao montar
-  useEffect(() => {
-    if (modoFoco) document.body.classList.add('modo-foco');
-    return () => document.body.classList.remove('modo-foco');
-  }, []);
   
   useEffect(() => {
     const handleScroll = () => {
@@ -68,10 +55,17 @@ export function TopHeader() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
   
-  const isCursosActive = ['/trilhas', '/mentoria', '/lab', '/skills'].some(path => location.pathname.startsWith(path));
-  const isComunicacoesActive = ['/chat', '/notificacoes', '/avisos'].some(path => location.pathname.startsWith(path));
-
   const { data: avisosCount } = useAvisosAtivosCount();
+  const temAvisos = !!avisosCount && avisosCount > 0;
+
+  /* Instalar o app virou um ícone ao lado do perfil. No iOS não existe
+     prompt nativo, então ali a gente manda para a página que ensina. */
+  const { canInstall, isInstalled, deviceType, triggerInstall } = usePWAInstall();
+  const podeInstalar = !isInstalled && (canInstall || deviceType === "ios");
+  const instalarApp = () => {
+    if (canInstall) void triggerInstall();
+    else navigate("/instalar");
+  };
 
   const handleLogout = async () => {
     await signOut();
@@ -136,175 +130,86 @@ export function TopHeader() {
 
         </div>
 
-        {/* CENTER: Horizontal Navigation - centralizado na viewport com posição absoluta */}
-        <nav className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden lg:flex items-center gap-8">
-          <NavLink 
-            to="/" 
-            end
-            className={({ isActive }) => cn(
-              "text-sm font-medium transition-colors",
-              isActive ? "text-lime font-semibold" : "text-white/60 hover:text-white"
-            )}
-          >
-            Página Inicial
-          </NavLink>
-          
-          {/* Dropdown Cursos - oculto para todos os planos (usam Environment Switcher) */}
-          {!isVisitante && !isAcademy && !isSkills && !isBusiness && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="ghost" 
-                  className={cn(
-                    "text-sm font-medium h-auto p-0 transition-colors hover:bg-transparent",
-                    isCursosActive ? "text-lime font-semibold" : "text-white/60 hover:text-white"
-                  )}
-                >
-                  Cursos
-                  <ChevronDown className="ml-1 h-4 w-4" strokeWidth={1.5} />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="center" className="w-56 bg-popover border-border">
-                {/* Academy: sempre visível, é o acesso base para todos os planos */}
-                {hasEffectiveAccessTo("trilhas") && (
-                  <DropdownMenuItem asChild>
-                    <Link to="/trilhas" className="cursor-pointer">
-                      Academy
-                    </Link>
-                  </DropdownMenuItem>
-                )}
-                
-                {/* Builder: só aparece se TEM acesso business */}
-                {hasEffectiveAccessTo("business") && isProdutoAtivo("business") && (
-                  <DropdownMenuItem asChild>
-                    <Link to="/mentoria" className="cursor-pointer">
-                      Builder
-                    </Link>
-                  </DropdownMenuItem>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
-          
-          {/* Chat AI (antes "Comunicações") */}
-          {!isVisitante && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="ghost" 
-                  className={cn(
-                    "text-sm font-medium h-auto p-0 transition-colors hover:bg-transparent",
-                    isComunicacoesActive ? "text-lime font-semibold" : "text-white/60 hover:text-white"
-                  )}
-                >
-                  Chat AI
-                  <ChevronDown className="ml-1 h-4 w-4" strokeWidth={1.5} />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="center" className="w-56 bg-popover border-border">
-                <DropdownMenuItem asChild>
-                  <Link to="/chat" className="cursor-pointer">
-                    Chat MarIAna
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/notificacoes" className="cursor-pointer">
-                    Avisos
-                  </Link>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
-        </nav>
 
-        {/* RIGHT: Environment Switcher + Admin View Selector + Refresh + Notifications + Avatar */}
+        {/* RIGHT: ambiente + instalar + perfil. Tudo que era botão solto
+            (atualizar, avisos, modo foco) virou opção dentro do perfil. */}
         <div className="absolute right-0 top-0 h-full flex items-center gap-1 pr-4">
           {/* Evita badges duplicados: para Admin mantemos apenas o "Ver como..." */}
           {!isAdmin && <EnvironmentSwitcher />}
           {isAdmin && <AdminViewSelector isAdmin={isAdmin} />}
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className={`hidden md:flex h-9 w-9 transition-colors ${modoFoco ? 'bg-lime/20 text-lime' : 'text-white/70 hover:text-white hover:bg-white/10'}`}
-                  onClick={toggleFoco}
-                >
-                  {modoFoco ? <Minimize2 className="h-5 w-5" strokeWidth={1.5} /> : <Maximize2 className="h-5 w-5" strokeWidth={1.5} />}
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="bottom">
-                <p>{modoFoco ? 'Sair do modo foco' : 'Modo foco'}</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost" 
-                  size="icon" 
-                  className="h-9 w-9 text-white/70 hover:text-white hover:bg-white/10"
-                  onClick={forceFullAppReload}
-                >
-                  <RefreshCw className="h-5 w-5" strokeWidth={1.5} />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="bottom">
-                <p>Atualizar app</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-          
-          <Button
-            variant="ghost" 
-            size="icon" 
-            className="relative h-9 w-9 text-white/70 hover:text-white hover:bg-white/10"
-            onClick={() => navigate("/notificacoes")}
-          >
-            <Bell className="h-5 w-5" strokeWidth={1.5} />
-            {avisosCount && avisosCount > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-brand-strong flex items-center justify-center text-[10px] font-semibold text-brand-strong-foreground">
-                {avisosCount > 9 ? "9+" : avisosCount}
-              </span>
-            )}
-          </Button>
-          
+
+          {podeInstalar && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-9 w-9 text-white/70 hover:bg-white/10 hover:text-white"
+                    onClick={instalarApp}
+                    aria-label="Instalar o app"
+                  >
+                    <Smartphone className="h-5 w-5" strokeWidth={1.5} />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">
+                  <p>Instalar o app</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="gap-2 h-auto px-2 py-1.5 text-white hover:text-white hover:bg-white/10">
+              <Button variant="ghost" className="relative gap-2 h-auto px-2 py-1.5 text-white hover:text-white hover:bg-white/10">
                 <Avatar className="h-8 w-8 border border-white/20">
                   <AvatarImage src={profile?.avatar_url || ""} />
                   <AvatarFallback className="bg-primary text-primary-foreground text-xs font-medium">
                     {getInitials(user?.email, profile?.nome_completo)}
                   </AvatarFallback>
                 </Avatar>
+                {temAvisos && (
+                  <span className="absolute left-7 top-1 h-2.5 w-2.5 rounded-full bg-primary ring-2 ring-chrome" />
+                )}
                 <span className="hidden md:block text-sm font-medium text-white">
                   {firstName}
                 </span>
                 <ChevronDown className="h-4 w-4 text-white/60" strokeWidth={1.5} />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-52 bg-popover border-border">
-              <DropdownMenuLabel className="font-medium">Minha Conta</DropdownMenuLabel>
+            <DropdownMenuContent align="end" className="w-56 bg-popover border-border">
+              <DropdownMenuLabel className="font-medium">Minha conta</DropdownMenuLabel>
               <DropdownMenuSeparator className="bg-border" />
               <DropdownMenuItem asChild>
                 <Link to="/perfil" className="cursor-pointer">
+                  <User className="mr-2 h-4 w-4" />
                   Perfil
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
+                <Link to="/notificacoes" className="cursor-pointer">
+                  <Bell className="mr-2 h-4 w-4" />
+                  Avisos
+                  {temAvisos && (
+                    <span className="ml-auto rounded-full bg-primary px-1.5 py-0.5 text-[10px] font-semibold text-primary-foreground">
+                      {avisosCount! > 9 ? "9+" : avisosCount}
+                    </span>
+                  )}
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
                 <Link to="/configuracoes" className="cursor-pointer">
+                  <Settings className="mr-2 h-4 w-4" />
                   Configurações
                 </Link>
               </DropdownMenuItem>
+              <DropdownMenuSeparator className="bg-border" />
               <DropdownMenuItem onClick={forceFullAppReload} className="cursor-pointer">
                 <RefreshCw className="mr-2 h-4 w-4" />
                 Atualizar app
               </DropdownMenuItem>
-              <DropdownMenuSeparator className="bg-border" />
               <DropdownMenuItem onClick={handleLogout} className="text-destructive cursor-pointer">
+                <LogOut className="mr-2 h-4 w-4" />
                 Sair
               </DropdownMenuItem>
             </DropdownMenuContent>
