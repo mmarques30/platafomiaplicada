@@ -1,4 +1,4 @@
-import { TodasAsTrilhas } from "@/components/dashboard/TodasAsTrilhas";
+import { GradeTrilhas } from "@/components/trilhas/GradeTrilhas";
 import { useUserRole } from "@/hooks/useUserRole";
 import { Link } from "react-router-dom";
 import { Zap } from "lucide-react";
@@ -41,9 +41,9 @@ export default function Trilhas() {
             primary="Trilhas"
             secondary="de aprendizado"
             eyebrow="Academy"
-            description="Aplica IA na rotina — uma trilha por workflow, semana a semana."
+            description="Aplica IA na rotina: uma trilha por workflow, semana a semana."
           />
-          <TodasAsTrilhas />
+          <GradeTrilhas />
         </>
       )}
     </PageContainer>
