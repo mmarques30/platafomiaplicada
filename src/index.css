@@ -15,54 +15,10 @@
   transform: scale(0.998);
 }
 
-/* Fundo das páginas autenticadas: creme liso (sem grade) */
-/* Escopo claro: dentro de .cards-light (bibliotecas, métodos, prompts,
-   ferramentas e player de vídeo) os cards voltam a ser brancos sobre a
-   página cinza, com os tokens claros. Card aninhado: cinza bem leve. */
-.cards-light .bg-card,
-.cards-light .card-dark {
-  color-scheme: light;
-  --background: 0 0% 96%;
-  --foreground: 0 0% 5%;
-  --card: 0 0% 100%;
-  --card-foreground: 0 0% 5%;
-  --surface: 0 0% 100%;
-  --muted: 0 0% 94%;
-  --muted-foreground: 0 0% 40%;
-  --accent: 0 0% 93%;
-  --accent-foreground: 0 0% 5%;
-  --secondary: 73 30% 92%;
-  --secondary-foreground: 0 0% 5%;
-  --border: 0 0% 90%;
-  --input: 0 0% 88%;
-  --primary: 73 57% 34%;
-  --primary-foreground: 0 0% 100%;
-  --ring: 73 57% 34%;
-  --lime: 73 50% 50%;
-  --brand-strong: 73 58% 27%;
-  --brand-strong-foreground: 0 0% 100%;
-  --brand-cream: 0 0% 95%;
-  --brand-cream-soft: 0 0% 98%;
-  --brand-hairline: 0 0% 90%;
-  --brand-ink: 0 0% 5%;
-  --sage: 0 0% 40%;
-  --charcoal: 0 0% 5%;
-  --status-success: 73 57% 34%;
-  --status-warning: 36 79% 47%;
-  --status-info: 206 70% 48%;
-  --status-danger: 352 71% 51%;
-  --chart-1: 73 57% 34%;
-  --chart-2: 73 50% 50%;
-  --chart-3: 75 4% 55%;
-}
-.cards-light .bg-card .bg-card,
-.cards-light .bg-card .card-dark {
-  --card: 0 0% 97%;
-  --surface: 0 0% 100%;
-}
-
+/* Malha de pontos: textura de fundo em superfícies escuras. */
 .dot-grid-bg {
-  display: none;
+  background-image: radial-gradient(hsl(var(--foreground) / 0.07) 1px, transparent 1px);
+  background-size: 22px 22px;
 }
 
 /* Auth page subtle animations */
@@ -117,132 +73,110 @@
    ============================================ */
 
 @layer base {
+  /* Tema único, lido do CSS de iaplicada.com. Um só modo: :root e .dark
+     carregam os mesmos valores, porque a plataforma agora é escura como o
+     site. Quem consome é todo componente que já usa bg-card, text-foreground
+     e afins — por isso a virada acontece aqui e chega em todas as telas. */
   :root,
   .dark {
-    /* Superfícies */
-    --background: 0 0% 96%;           /* #f5f5f5 neutro, menos branco */
-    --surface: 0 0% 100%;             /* branco (inputs, faixas fora de cards) */
-    --foreground: 0 0% 5%;            /* #0d0d0d cocoa */
+    color-scheme: dark;
 
-    /* Cards escuros e modernos (grafite) sobre a página clara */
-    --card: 0 0% 7%;                  /* #121212 escuro neutro, como o topo */
-    --card-foreground: 0 0% 96%;
+    /* Superfícies — cinco camadas de profundidade */
+    --background: 80 43% 3%;          /* #080a04 ink: a página */
+    --surface: 78 36% 5%;             /* #101309: rails, inputs, abas */
+    --card: 75 27% 9%;                /* #191c10: card comum */
+    --card-foreground: 67 27% 94%;
+    --foreground: 67 27% 94%;         /* #f2f3ea bone */
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 5%;
+    --popover: 77 25% 11%;            /* #1f2315: elevado (menu, modal) */
+    --popover-foreground: 67 27% 94%;
 
-    /* Primary: verde-oliva escuro dos CTAs da LP (texto branco) */
-    --primary: 73 57% 34%;            /* #738925 */
-    --primary-foreground: 0 0% 100%;
+    /* Primary: o lime do site, sobre texto quase preto */
+    --primary: 71 100% 37%;           /* #9bbf00 */
+    --primary-foreground: 80 43% 3%;
 
-    /* Secondary: verde claro de apoio (texto cocoa) */
-    --secondary: 73 30% 92%;
-    --secondary-foreground: 0 0% 5%;
+    --secondary: 77 25% 11%;
+    --secondary-foreground: 67 27% 94%;
 
-    /* Muted */
-    --muted: 0 0% 94%;
-    --muted-foreground: 0 0% 40%;
+    --muted: 77 25% 11%;
+    --muted-foreground: 67 4% 58%;    /* #989990 sage */
 
-    /* Accent: hover de menus/itens */
-    --accent: 0 0% 93%;
-    --accent-foreground: 0 0% 5%;
+    --accent: 77 25% 14%;             /* hover de menu e item de lista */
+    --accent-foreground: 67 27% 94%;
 
-    --destructive: 352 71% 51%;       /* #db2b42 alerta da LP */
+    --destructive: 352 71% 51%;       /* #db2b42 */
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 90%;               /* #e5e5e5 */
-    --input: 0 0% 88%;
-    --ring: 73 57% 34%;
+    --border: 80 14% 16%;             /* #2c3024 hairline */
+    --input: 80 14% 16%;
+    --ring: 71 100% 37%;
 
-    --radius: 0.75rem;
+    --radius: 1rem;
 
     /* Paleta de marca (nomeada) */
-    --lime: 73 50% 50%;               /* #afc040 brand */
-    --olive: 73 57% 34%;              /* #738925 */
-    --sage: 0 0% 40%;
-    --charcoal: 0 0% 5%;
+    --lime: 71 100% 37%;              /* #9bbf00 */
+    --lime-glow: 67 100% 44%;         /* #c3de00 */
+    --olive: 75 100% 27%;             /* #668800 */
+    --olive-deep: 77 100% 17%;        /* #3e5700 */
+    --sage: 67 4% 58%;
+    --sage-dim: 78 5% 43%;            /* #6f7268 */
+    --amber: 46 60% 47%;              /* #c9a227 */
+    --charcoal: 67 27% 94%;           /* papel legado: cor de texto forte */
 
     /* Status */
-    --status-success: 73 57% 34%;
-    --status-warning: 36 79% 47%;     /* âmbar legível no claro */
-    --status-info: 206 70% 48%;
+    --status-success: 71 100% 37%;
+    --status-warning: 46 60% 47%;
+    --status-info: 206 70% 58%;
     --status-danger: 352 71% 51%;
 
-    /* Brand tokens legados: mesmos papéis de antes, na paleta da LP */
-    --brand-cream: 0 0% 95%;
-    --brand-cream-soft: 0 0% 98%;
-    --brand-strong: 73 58% 27%;       /* #5c6f1d CTA sólido */
-    --brand-strong-foreground: 0 0% 100%;
-    --brand-ink: 0 0% 5%;
-    --brand-hairline: 0 0% 90%;
+    /* Brand tokens legados: mesmos papéis, na paleta escura */
+    --brand-cream: 75 27% 9%;
+    --brand-cream-soft: 78 36% 5%;
+    --brand-strong: 71 100% 37%;
+    --brand-strong-foreground: 80 43% 3%;
+    --brand-ink: 67 27% 94%;
+    --brand-hairline: 80 14% 16%;
 
-    /* Chrome do topo: charcoal fino, como o header da LP */
-    --chrome: 0 0% 5%;
-    --chrome-foreground: 0 0% 100%;
-    --chrome-border: 0 0% 12%;
-    --chrome-accent: 0 0% 12%;
+    /* Chrome do topo: agora rente ao fundo, separado por hairline */
+    --chrome: 78 36% 5%;
+    --chrome-foreground: 67 27% 94%;
+    --chrome-border: 80 14% 16%;
+    --chrome-accent: 77 25% 11%;
 
-    /* Sidebar: branca, separada do creme por hairline; ativo em verde */
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 0 0% 5%;
-    --sidebar-primary: 73 57% 34%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 0 0% 95%;
-    --sidebar-accent-foreground: 0 0% 5%;
-    --sidebar-border: 0 0% 90%;
-    --sidebar-ring: 73 57% 34%;
-    --sidebar-active: 73 57% 34%;
+    /* Sidebar: superfície, com o item ativo em lime */
+    --sidebar-background: 78 36% 5%;
+    --sidebar-foreground: 67 27% 94%;
+    --sidebar-primary: 71 100% 37%;
+    --sidebar-primary-foreground: 80 43% 3%;
+    --sidebar-accent: 77 25% 11%;
+    --sidebar-accent-foreground: 67 27% 94%;
+    --sidebar-border: 80 14% 16%;
+    --sidebar-ring: 71 100% 37%;
+    --sidebar-active: 71 100% 37%;
 
     --complexity-high: 352 71% 51%;
-    --complexity-medium: 36 79% 47%;
-    --complexity-low: 73 57% 34%;
+    --complexity-medium: 46 60% 47%;
+    --complexity-low: 71 100% 37%;
 
-    --chart-1: 73 57% 34%;
-    --chart-2: 73 50% 50%;
-    --chart-3: 75 4% 55%;
-    --chart-4: 206 70% 48%;
-    --chart-5: 36 79% 47%;
+    --chart-1: 71 100% 37%;
+    --chart-2: 67 100% 44%;
+    --chart-3: 67 4% 58%;
+    --chart-4: 206 70% 58%;
+    --chart-5: 46 60% 47%;
   }
 
-  /* Escopo escuro dos cards: tudo que estiver dentro de um .bg-card (Card,
-     WelcomeHeader, etc.) passa a ler estes tokens — texto creme, bordas e
-     superfícies grafite, botão primário em lime. Popovers/dialogs em portal
-     ficam fora do escopo e continuam claros. */
+  /* Dentro de um card, tudo sobe uma camada: o fundo do card vira o "chão",
+     o card aninhado e os menus ficam um passo mais claros. É só elevação —
+     não existe mais inversão de tema como no remendo anterior. */
   .bg-card,
   .card-dark {
-    color-scheme: dark;
-    --background: 0 0% 10%;           /* inputs e faixas dentro do card */
-    --foreground: 0 0% 96%;
-    --card: 0 0% 11%;                 /* card aninhado: um passo mais claro */
-    --card-foreground: 0 0% 96%;
-    --surface: 0 0% 11%;
-    --muted: 0 0% 14%;
-    --muted-foreground: 0 0% 66%;
-    --accent: 0 0% 15%;
-    --accent-foreground: 0 0% 96%;
-    --secondary: 73 25% 22%;
-    --secondary-foreground: 0 0% 96%;
-    --border: 0 0% 18%;
-    --input: 0 0% 22%;
-    --primary: 69 71% 52%;            /* lime */
-    --primary-foreground: 80 27% 4%;
-    --ring: 69 71% 52%;
-    --lime: 68 77% 63%;
-    --brand-strong: 73 50% 50%;       /* #afc040 */
-    --brand-strong-foreground: 80 27% 4%;
-    --brand-cream: 0 0% 12%;
-    --brand-cream-soft: 0 0% 10%;
-    --brand-hairline: 0 0% 18%;
-    --brand-ink: 0 0% 96%;
-    --sage: 0 0% 66%;
-    --charcoal: 0 0% 96%;
-    --status-success: 69 71% 52%;
-    --status-warning: 36 79% 57%;
-    --status-info: 206 70% 58%;
-    --status-danger: 352 71% 56%;
-    --chart-1: 69 71% 52%;
-    --chart-2: 73 50% 50%;
-    --chart-3: 0 0% 66%;
+    --background: 75 27% 9%;
+    --surface: 77 25% 11%;
+    --card: 77 25% 11%;
+    --muted: 77 25% 14%;
+    --accent: 77 25% 17%;
+    --border: 80 14% 19%;
+    --input: 80 14% 19%;
   }
 
 }
@@ -316,6 +250,16 @@
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     letter-spacing: -0.005em;
     overflow-x: hidden;
+    /* O mesmo halo do topo do site, fixo atrás de tudo. */
+    background-image: radial-gradient(ellipse 80% 55% at 50% 0%, hsl(77 32% 8%) 0%, hsl(var(--background)) 65%);
+    background-attachment: fixed;
+  }
+
+  /* Foco por teclado visível em qualquer controle. */
+  :where(a, button, input, select, textarea, [tabindex]):focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+    border-radius: 4px;
   }
 
 
@@ -382,12 +326,12 @@
   
   /* AI Message Container - Dark professional style */
   .ai-message-container {
-    background-color: hsl(72 6% 18%);
-    color: hsl(63 48% 91%);
+    background-color: hsl(var(--surface));
+    color: hsl(var(--foreground) / 0.9);
     border-radius: 0.75rem;
     padding: 1.5rem;
     line-height: 1.7;
-    border: 1px solid hsl(72 6% 25%);
+    border: 1px solid hsl(var(--border));
   }
 
   .ai-message-container p {
@@ -405,13 +349,13 @@
 
   .ai-message-container strong,
   .ai-message-container b {
-    color: hsl(73 54% 39%);
+    color: hsl(var(--primary));
     font-weight: 600;
   }
 
   .ai-message-container em,
   .ai-message-container i {
-    color: hsl(73 54% 39%);
+    color: hsl(var(--primary));
   }
 
   .ai-message-container h1,
@@ -420,7 +364,7 @@
   .ai-message-container h4,
   .ai-message-container h5,
   .ai-message-container h6 {
-    color: hsl(73 37% 58%);
+    color: hsl(var(--foreground));
     font-weight: 500;
     margin-top: 1.25rem;
     margin-bottom: 0.75rem;
@@ -437,7 +381,7 @@
 
   .ai-message-container ol,
   .ai-message-container ul {
-    color: hsl(63 48% 91%);
+    color: hsl(var(--foreground) / 0.9);
     margin-top: 0.75rem;
     margin-bottom: 0.75rem;
     padding-left: 1.5rem;
@@ -458,25 +402,25 @@
   }
 
   .ai-message-container li::marker {
-    color: hsl(73 35% 65%);
+    color: hsl(var(--primary));
   }
 
   .ai-message-container code {
-    background-color: hsl(73 54% 39% / 0.15);
-    color: hsl(60 5% 92%);
+    background-color: hsl(var(--primary) / 0.14);
+    color: hsl(var(--foreground));
     padding: 0.2rem 0.4rem;
     border-radius: 0.25rem;
     font-size: 0.9em;
   }
 
   .ai-message-container pre {
-    background-color: hsl(73 54% 39% / 0.1);
+    background-color: hsl(var(--primary) / 0.08);
     padding: 1rem;
     border-radius: 0.5rem;
     overflow-x: auto;
     margin-top: 0.75rem;
     margin-bottom: 0.75rem;
-    border: 1px solid hsl(73 54% 39% / 0.2);
+    border: 1px solid hsl(var(--primary) / 0.2);
   }
 
   .ai-message-container pre code {
@@ -485,7 +429,7 @@
   }
 
   .ai-message-container a {
-    color: hsl(73 54% 39%);
+    color: hsl(var(--primary));
     text-decoration: underline;
   }
 
@@ -503,12 +447,12 @@
   .subtitle,
   h2.subtitle,
   h3.subtitle {
-    color: hsl(var(--accent));
+    color: hsl(var(--muted-foreground));
     font-weight: 500;
   }
 
   .conquista-title {
-    color: hsl(0 0% 100%) !important;
+    color: hsl(var(--foreground));
   }
 
   p, span, div, label {
@@ -574,13 +518,6 @@
     color: hsl(var(--card-foreground)) !important;
   }
 
-  .bg-card input.bg-muted,
-  .bg-card textarea.bg-muted,
-  .bg-card input.bg-input,
-  .bg-card textarea.bg-input {
-    color: hsl(72 6% 18%) !important;
-  }
-
   .bg-card h1,
   .bg-card h2,
   .bg-card h3,
@@ -590,7 +527,8 @@
     color: hsl(var(--card-foreground)) !important;
   }
 
-  /* Dark header override - must come AFTER the generic bg-card rules */
+  /* Alias legado: hoje toda a plataforma é escura, então isto só reforça
+     contraste de título e apaga o parágrafo de apoio. */
   .dark-header,
   .dark-header h1,
   .dark-header h2,
@@ -598,11 +536,11 @@
   .dark-header h4,
   .dark-header h5,
   .dark-header h6 {
-    color: #FFFFFF !important;
+    color: hsl(var(--foreground));
   }
 
   .dark-header p {
-    color: rgba(255,255,255,0.5) !important;
+    color: hsl(var(--muted-foreground));
   }
 
   .bg-popover {
@@ -672,7 +610,7 @@ iframe:focus {
 }
 
 .dark .scrollbar-thin::-webkit-scrollbar-thumb {
-  background-color: hsl(72 6% 30%);
+  background-color: hsl(var(--border));
 }
 
 /* Markdown prose list styles */
@@ -1083,4 +1021,93 @@ body.modo-foco main { max-width: 720px; margin: 0 auto; padding: 0 24px; }
     animation: none;
   }
   .ia-entry-bg__spark { opacity: 0.5; }
+}
+
+
+/* ============================================
+   Atmosfera e camadas — profundidade do site, em CSS puro
+   ============================================ */
+
+@layer components {
+  /* Malha que se desloca devagar atrás do conteúdo autenticado. Uma camada só,
+     sem custo por componente. */
+  .atmosfera {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.5;
+    background-image:
+      linear-gradient(hsl(var(--primary) / 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--primary) / 0.05) 1px, transparent 1px);
+    background-size: 64px 64px;
+    -webkit-mask-image: radial-gradient(110% 90% at 50% 0%, #000 10%, transparent 75%);
+    mask-image: radial-gradient(110% 90% at 50% 0%, #000 10%, transparent 75%);
+    animation: atmosfera-deriva 40s linear infinite;
+  }
+
+  /* Régua de profundidade: superfície → card → elevado → em foco. */
+  .camada-surface {
+    background-color: hsl(var(--surface));
+    border: 1px solid hsl(var(--border));
+  }
+
+  .camada-elevada {
+    background-color: hsl(var(--popover));
+    border: 1px solid hsl(var(--border));
+    box-shadow: var(--shadow-elevated, 0 30px 60px -20px rgb(0 0 0 / 0.6), 0 8px 20px -8px rgb(0 0 0 / 0.4));
+  }
+
+  .camada-foco {
+    border-color: hsl(var(--primary) / 0.5);
+    box-shadow: 0 0 0 1px hsl(var(--primary) / 0.35), 0 10px 30px -12px hsl(var(--primary) / 0.45);
+  }
+
+  /* Rótulo mono: data, percentual, status e eyebrow. */
+  .rotulo-mono {
+    font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: hsl(var(--muted-foreground));
+  }
+
+  /* Título de bloco: Inter Tight, mais fechada que a Inter do corpo. */
+  .titulo-bloco {
+    font-family: 'Inter Tight', 'Inter', system-ui, sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  /* Botão principal no padrão do site: pílula lime com brilho. */
+  .cta-lime {
+    background-image: linear-gradient(180deg, hsl(var(--lime-glow)) 0%, hsl(var(--lime)) 100%);
+    color: hsl(var(--primary-foreground));
+    box-shadow: 0 1px 0 0 hsl(0 0% 100% / 0.25) inset, 0 10px 30px -12px hsl(var(--lime) / 0.6);
+  }
+  .cta-lime:hover {
+    filter: brightness(1.06);
+    box-shadow: 0 1px 0 0 hsl(0 0% 100% / 0.3) inset, 0 14px 34px -12px hsl(var(--lime) / 0.75);
+  }
+
+}
+
+@keyframes atmosfera-deriva {
+  from { background-position: 0 0, 0 0; }
+  to { background-position: 64px 64px, 64px 64px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .atmosfera {
+    animation: none;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

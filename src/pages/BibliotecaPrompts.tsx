@@ -108,7 +108,7 @@ export default function BibliotecaPrompts() {
 
 
   return (
-    <PageContainer className="cards-light">
+    <PageContainer>
       <PageTitle primary="Biblioteca" secondary="de prompts" eyebrow="Recursos" />
 
       {/* Barra de Busca e Filtros Dropdown */}

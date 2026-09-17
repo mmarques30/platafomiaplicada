@@ -242,7 +242,7 @@ export default function TrilhaDetalhes() {
   }
 
   return (
-    <PageContainer className="cards-light">
+    <PageContainer>
       <Link to="/trilhas">
         <Button variant="ghost" className="mb-4">
           <ArrowLeft className="h-4 w-4 mr-2" />

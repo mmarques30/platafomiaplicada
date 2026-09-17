@@ -6,9 +6,9 @@ import { cn } from "@/lib/utils";
 const Tabs = TabsPrimitive.Root;
 
 /**
- * Sub-abas padrão do sistema: trilho cinza em pílula, aba ativa escura
- * (mesmo grafite do topo) com letra clara. Páginas não devem sobrescrever
- * as cores — só o layout (grid/inline, largura).
+ * Sub-abas padrão do sistema: trilho em pílula na superfície, aba ativa com
+ * contorno lime. Páginas não devem sobrescrever as cores — só o layout
+ * (grid/inline, largura).
  */
 const TabsList = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.List>,
@@ -17,7 +17,7 @@ const TabsList = React.forwardRef<
   <TabsPrimitive.List
     ref={ref}
     className={cn(
-      "inline-flex h-auto items-center justify-center gap-1 rounded-full bg-muted p-1 text-muted-foreground",
+      "inline-flex h-auto items-center justify-center gap-1 rounded-full border border-border bg-surface p-1 text-muted-foreground",
       className,
     )}
     {...props}
@@ -34,7 +34,7 @@ const TabsTrigger = React.forwardRef<
     className={cn(
       "inline-flex items-center justify-center whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium ring-offset-background transition-colors",
       "data-[state=inactive]:text-muted-foreground data-[state=inactive]:hover:text-foreground",
-      "data-[state=active]:bg-chrome data-[state=active]:text-chrome-foreground data-[state=active]:shadow-sm",
+      "data-[state=active]:bg-primary/10 data-[state=active]:text-foreground data-[state=active]:shadow-[inset_0_0_0_1px_hsl(var(--primary)/0.55)]",
       "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
       className,
     )}
