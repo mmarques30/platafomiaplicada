@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,14 +12,18 @@ import { useContratosBusiness } from "@/hooks/useContratosBusiness";
 import { useEtapasBusiness } from "@/hooks/useEtapasBusiness";
 import { useTasksByUser } from "@/hooks/useTasksBusiness";
 import { useMentoriaSessoes } from "@/hooks/useMentoriaSessoes";
+import { useNivelUsuario } from "@/hooks/useNivelUsuario";
+import { useSequenciaEstudo } from "@/hooks/useEvolucao";
 import { useCountUp } from "@/hooks/useCountUp";
 import { formatInTimeZone } from "date-fns-tz";
 import { format, isFuture, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Calendar, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { CartaoMetrica, CartaoMetricaSkeleton } from "./CartaoMetrica";
+import { listaCascata, aoMontar } from "@/lib/motion";
 
-const TIMEZONE = 'America/Sao_Paulo';
+const TIMEZONE = "America/Sao_Paulo";
 
 const DAY_ABBR: Record<string, string> = {
   "segunda-feira": "Seg",
@@ -30,13 +35,25 @@ const DAY_ABBR: Record<string, string> = {
   "domingo": "Dom",
 };
 
+interface Metrica {
+  rotulo: string;
+  valor: string;
+  unidade?: string;
+  apoio?: string;
+}
+
+/**
+ * Abertura do painel: data em mono, cumprimento em serif com o nome em itálico
+ * lime, e três cartões de métrica. Quais métricas aparecem depende do plano —
+ * a conta é a mesma que a página de evolução usa, para os números baterem.
+ */
 export function WelcomeHeader() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [dataAtual, setDataAtual] = useState(new Date());
   const { aulaAtiva } = useAulaSemanal();
   const { isVisitante, isAdmin, isParceiro, isLoading: roleLoading } = useUserRole();
-  const { effectivePlan, isBusiness, isSkills, isAcademy } = useEffectivePlan(isAdmin, roleLoading, isParceiro);
+  const { isBusiness, isSkills, isAcademy } = useEffectivePlan(isAdmin, roleLoading, isParceiro);
 
   useEffect(() => {
     const interval = setInterval(() => setDataAtual(new Date()), 60000);
@@ -44,32 +61,30 @@ export function WelcomeHeader() {
   }, []);
 
   const { data: profile } = useQuery({
-    queryKey: ['profile', user?.id],
+    queryKey: ["profile", user?.id],
     queryFn: async () => {
       const { data } = await supabase
-        .from('profiles')
-        .select('nome_completo')
-        .eq('id', user!.id)
+        .from("profiles")
+        .select("nome_completo")
+        .eq("id", user!.id)
         .single();
       return data;
     },
     enabled: !!user,
   });
 
-  const primeiroNome = profile?.nome_completo?.split(' ')[0] || 'Usuário';
+  const primeiroNome = profile?.nome_completo?.split(" ")[0] || "Usuário";
 
-  const hora = parseInt(formatInTimeZone(dataAtual, TIMEZONE, 'HH'));
-  const periodo = hora < 12 ? 'manhã' : hora < 18 ? 'tarde' : 'noite';
-  const dia = formatInTimeZone(dataAtual, TIMEZONE, 'dd');
-  const mes = formatInTimeZone(dataAtual, TIMEZONE, 'MMM', { locale: ptBR }).toUpperCase();
-  const diaSemana = formatInTimeZone(dataAtual, TIMEZONE, 'EEE', { locale: ptBR });
+  const hora = parseInt(formatInTimeZone(dataAtual, TIMEZONE, "HH"));
+  const periodo = hora < 12 ? "manhã" : hora < 18 ? "tarde" : "noite";
+  const dataExtenso = formatInTimeZone(dataAtual, TIMEZONE, "EEEE, d 'de' MMMM", { locale: ptBR });
 
   const diasSemAcesso = (() => {
     const u = localStorage.getItem(`ultimo_acesso_${user?.id}`);
     return u ? Math.floor((Date.now() - parseInt(u)) / (1000 * 60 * 60 * 24)) : 0;
   })();
 
-  // ── Business KPIs ──
+  // ── Business ──
   const rawBusinessUserId = useBusinessUserId();
   const businessUserId = rawBusinessUserId ?? user?.id;
   const { contrato, isLoading: isLoadingContrato } = useContratosBusiness(isBusiness ? businessUserId : undefined);
@@ -77,33 +92,30 @@ export function WelcomeHeader() {
   const { data: tasks, isLoading: isLoadingTasks } = useTasksByUser(isBusiness ? businessUserId : undefined);
   const { sessoes, isLoading: isLoadingSessoes } = useMentoriaSessoes(isBusiness ? businessUserId : undefined);
 
-  // ── Academy KPIs ──
+  // ── Academy ──
+  const nivel = useNivelUsuario();
+  const { data: sequencia, isLoading: isLoadingSequencia } = useSequenciaEstudo();
   const { data: academyData, isLoading: isLoadingAcademy } = useQuery({
     queryKey: ["welcome-header-academy", user?.id],
     enabled: isAcademy && !!user?.id,
     staleTime: 1000 * 60 * 5,
     queryFn: async () => {
-      const oneWeekAgo = new Date();
-      oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-      const [weekVideos, inProgress, certs] = await Promise.all([
-        supabase.from("progresso_videos").select("id").eq("user_id", user!.id).eq("completado", true).gte("updated_at", oneWeekAgo.toISOString()),
-        supabase.from("progresso_videos").select("videos(modulo_id, modulos(trilha_id))").eq("user_id", user!.id).eq("completado", false),
-        supabase.from("certificados").select("id", { count: "exact", head: true }).eq("user_id", user!.id),
-      ]);
+      const { data: inProgress } = await supabase
+        .from("progresso_videos")
+        .select("videos(modulo_id, modulos(trilha_id))")
+        .eq("user_id", user!.id)
+        .eq("completado", false);
+      type LinhaProgresso = { videos: { modulos: { trilha_id: string | null } | null } | null };
       const trilhaIds = new Set<string>();
-      (inProgress.data ?? []).forEach((row: any) => {
+      ((inProgress ?? []) as unknown as LinhaProgresso[]).forEach((row) => {
         const tid = row?.videos?.modulos?.trilha_id;
         if (tid) trilhaIds.add(tid);
       });
-      return {
-        estaSemana: weekVideos.data?.length ?? 0,
-        emAndamento: trilhaIds.size,
-        conquistas: certs.count ?? 0,
-      };
+      return { emAndamento: trilhaIds.size };
     },
   });
 
-  // ── Skills KPIs ──
+  // ── Skills ──
   const { data: skillsData, isLoading: isLoadingSkills } = useQuery({
     queryKey: ["welcome-header-skills", user?.id],
     enabled: isSkills && !!user?.id,
@@ -131,159 +143,143 @@ export function WelcomeHeader() {
     },
   });
 
-  // ── Compute KPIs ──
-  let kpi1Raw = 0, kpi2Raw = 0, kpi3Raw = 0;
-  let kpi1Label = "", kpi2Label = "", kpi3Label = "";
-  let kpi3Text: string | null = null; // for non-numeric values
-  let ctaLabel = "", ctaHref = "";
-  let hasKpis = false;
-
-  if (isBusiness) {
+  const tarefasCriticas = tasks?.filter((t) => ["alta", "urgente"].includes(t.prioridade) && t.status !== "aprovado").length ?? 0;
+  const roadmapPercent = (() => {
     const total = etapas?.length ?? 0;
     const concluidas = etapas?.filter((e) => e.status === "concluida").length ?? 0;
-    kpi1Raw = total > 0 ? Math.round((concluidas / total) * 100) : 0;
-    kpi1Label = "ROADMAP";
-    kpi2Raw = tasks?.filter((t) => ["alta", "urgente"].includes(t.prioridade) && t.status !== "aprovado").length ?? 0;
-    kpi2Label = "TAREFAS CRÍTICAS";
+    return total > 0 ? Math.round((concluidas / total) * 100) : 0;
+  })();
+
+  const roadmapAnimado = useCountUp(roadmapPercent, 700);
+  const emAndamentoAnimado = useCountUp(academyData?.emAndamento ?? 0, 700);
+  const sequenciaAnimada = useCountUp(sequencia ?? 0, 700);
+
+  let metricas: Metrica[] = [];
+  let ctaLabel = "";
+  let ctaHref = "";
+  let isLoadingMetricas = false;
+
+  if (isBusiness) {
     const proximaSessao = sessoes
       ?.filter((s) => s.status === "agendada" && isFuture(parseISO(s.data_sessao)))
       .sort((a, b) => parseISO(a.data_sessao).getTime() - parseISO(b.data_sessao).getTime())[0];
-    if (proximaSessao) {
-      const dayFull = format(parseISO(proximaSessao.data_sessao), "EEEE", { locale: ptBR });
-      kpi3Text = DAY_ABBR[dayFull] ?? dayFull.slice(0, 3);
-    }
-    kpi3Label = "PRÓX. SESSÃO";
+    const dayFull = proximaSessao ? format(parseISO(proximaSessao.data_sessao), "EEEE", { locale: ptBR }) : null;
+    const etapasConcluidas = etapas?.filter((e) => e.status === "concluida").length ?? 0;
+
+    metricas = [
+      {
+        rotulo: "Roadmap",
+        valor: `${roadmapAnimado}%`,
+        apoio: etapas?.length ? `${etapasConcluidas} de ${etapas.length} etapas concluídas` : undefined,
+      },
+      {
+        rotulo: "Tarefas críticas",
+        valor: String(tarefasCriticas),
+        apoio: tarefasCriticas > 0 ? "Precisam de atenção agora" : "Nada travando no momento",
+      },
+      {
+        rotulo: "Próxima sessão",
+        valor: dayFull ? (DAY_ABBR[dayFull] ?? dayFull.slice(0, 3)) : "—",
+        apoio: proximaSessao
+          ? format(parseISO(proximaSessao.data_sessao), "d 'de' MMMM", { locale: ptBR })
+          : "Nenhuma sessão agendada",
+      },
+    ];
     ctaLabel = "Ver sessão";
     ctaHref = "/mentoria/sessoes";
-    hasKpis = true;
-  } else if (isAcademy && academyData) {
-    kpi1Raw = academyData.estaSemana;
-    kpi1Label = "ESTA SEMANA";
-    kpi2Raw = academyData.emAndamento;
-    kpi2Label = "EM ANDAMENTO";
-    kpi3Raw = academyData.conquistas;
-    kpi3Label = "CONQUISTAS";
+    isLoadingMetricas = isLoadingContrato || isLoadingEtapas || isLoadingTasks || isLoadingSessoes;
+  } else if (isAcademy) {
+    const faltamXp = Math.max(0, nivel.xpNecessario - nivel.xpAtual);
+    metricas = [
+      {
+        rotulo: "Nível",
+        valor: String(nivel.nivel),
+        unidade: `${nivel.xpAtual.toLocaleString("pt-BR")} XP`,
+        apoio: `${nivel.tituloNivel} · ${faltamXp.toLocaleString("pt-BR")} XP para o nível ${nivel.nivel + 1}`,
+      },
+      {
+        rotulo: "Trilhas em andamento",
+        valor: String(emAndamentoAnimado),
+        apoio: (academyData?.emAndamento ?? 0) > 0 ? "Retome por onde você parou" : "Escolha uma para começar",
+      },
+      {
+        rotulo: "Sequência",
+        valor: String(sequenciaAnimada),
+        unidade: (sequencia ?? 0) === 1 ? "dia" : "dias",
+        apoio: (sequencia ?? 0) > 0 ? "Assista algo hoje para não zerar" : "Assista uma aula para começar",
+      },
+    ];
     ctaLabel = "Continuar trilha";
     ctaHref = "/trilhas";
-    hasKpis = true;
+    isLoadingMetricas = isLoadingAcademy || isLoadingSequencia;
   } else if (isSkills && skillsData) {
-    kpi1Raw = skillsData.equipe;
-    kpi1Label = "EQUIPE";
-    kpi2Raw = skillsData.pendentes;
-    kpi2Label = "PENDENTES";
-    kpi3Raw = skillsData.progresso;
-    kpi3Label = "PROGRESSO";
+    metricas = [
+      { rotulo: "Equipe", valor: String(skillsData.equipe), apoio: "Pessoas ativas no time" },
+      { rotulo: "Pendentes", valor: String(skillsData.pendentes), apoio: "Entregas em aberto" },
+      { rotulo: "Progresso", valor: `${skillsData.progresso}%`, apoio: "Das entregas concluídas" },
+    ];
     ctaLabel = "Ver equipe";
     ctaHref = "/skills/equipe";
-    hasKpis = true;
+    isLoadingMetricas = isLoadingSkills;
   }
 
-  const kpi1Animated = useCountUp(kpi1Raw, 600);
-  const kpi2Animated = useCountUp(kpi2Raw, 600);
-  const kpi3Animated = useCountUp(kpi3Raw, 600);
-
-  const kpi1Display = hasKpis ? (isBusiness ? `${kpi1Animated}%` : String(kpi1Animated)) : "—";
-  const kpi2Display = hasKpis ? String(kpi2Animated) : "—";
-  const kpi3Display = hasKpis ? (kpi3Text ?? (isSkills ? `${kpi3Animated}%` : String(kpi3Animated))) : "—";
-
-  const isLoadingKpis =
-    (isBusiness && (isLoadingContrato || isLoadingEtapas || isLoadingTasks || isLoadingSessoes))
-    || (isAcademy && isLoadingAcademy)
-    || (isSkills && isLoadingSkills);
-
-  const showKpis = !isVisitante && (hasKpis || isLoadingKpis);
-
-  // ── Saudação e tagline adaptativos ──
-  const temEntregaUrgente = isBusiness && kpi2Raw > 0;
-  const saudacao = temEntregaUrgente
-    ? `Atenção, ${primeiroNome}`
+  // ── Saudação ──
+  const temEntregaUrgente = isBusiness && tarefasCriticas > 0;
+  const cumprimento = temEntregaUrgente
+    ? "Atenção,"
     : diasSemAcesso >= 4
-    ? `Que bom te ver de volta, ${primeiroNome}`
-    : `Boa ${periodo}, ${primeiroNome}!`;
+    ? "Que bom te ver de volta,"
+    : `Boa ${periodo},`;
   const tagline = temEntregaUrgente
-    ? 'Você tem entregas que precisam de atenção agora.'
+    ? "Você tem entregas que precisam de atenção agora."
+    : aulaAtiva
+    ? `Aula desta semana: ${aulaAtiva.tema}`
     : diasSemAcesso >= 4
     ? `Faz ${diasSemAcesso} dias desde sua última visita. Por onde quer começar?`
-    : 'Aplique, replique e domine IA';
+    : "Aplique, replique e domine IA.";
 
-  const kpiSkeleton = (
-    <div className="mx-auto h-[26px] w-12 animate-[kpiPulse_1.2s_ease-in-out_infinite] rounded bg-foreground/[0.06]" />
-  );
+  const mostrarMetricas = !isVisitante && (metricas.length > 0 || isLoadingMetricas);
 
   return (
-    <>
-      <style>{`@keyframes kpiPulse { 0%,100% { opacity: 0.4 } 50% { opacity: 0.8 } }`}</style>
-      <div className="w-full">
-        <div className="flex flex-col gap-5 rounded-2xl border border-border bg-card px-5 py-5 md:gap-6 md:px-8 md:py-7">
-          {/* Top: saudação + tagline à esquerda · data à direita.
-              No mobile a data vira uma linha discreta acima da saudação. */}
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
-            <div className="flex items-center gap-2 text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground sm:hidden">
-              <Calendar className="h-3.5 w-3.5" strokeWidth={1.5} />
-              <span>{diaSemana} · {dia} {mes}</span>
-            </div>
-            <div className="min-w-0 flex-1">
-              <h1 className="font-serif-display text-[26px] leading-[1.05] tracking-tight text-foreground md:text-3xl lg:text-4xl">
-                {saudacao}
-              </h1>
-              {aulaAtiva ? (
-                <p className="mt-2 max-w-prose text-sm font-light text-muted-foreground md:text-base">
-                  <span className="font-medium text-foreground">Aula:</span> {aulaAtiva.tema}
-                </p>
-              ) : (
-                <p className="mt-2 max-w-prose text-sm font-light text-muted-foreground md:text-base">
-                  {tagline}
-                </p>
-              )}
-            </div>
-            <div className="hidden flex-shrink-0 items-center gap-3 border-l border-border pl-4 sm:flex md:pl-6">
-              <Calendar className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
-              <div className="flex flex-col leading-tight">
-                <span className="font-serif-display text-2xl text-foreground md:text-3xl">{dia}</span>
-                <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                  {diaSemana} · {mes}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* KPIs + CTA */}
-          {showKpis && (
-            <div data-welcome-kpis className="border-t border-border pt-4 md:pt-5">
-              {/* Mobile: 3 KPIs em colunas iguais + CTA em largura total.
-                  Desktop: linha única com divisores e CTA à direita. */}
-              <div className="grid grid-cols-3 gap-3 sm:flex sm:flex-wrap sm:items-center sm:gap-x-8 sm:gap-y-4">
-                <KpiCell label={kpi1Label} value={isLoadingKpis ? kpiSkeleton : kpi1Display} />
-                <span className="hidden h-8 w-px bg-border sm:block" />
-                <KpiCell label={kpi2Label} value={isLoadingKpis ? kpiSkeleton : kpi2Display} />
-                <span className="hidden h-8 w-px bg-border sm:block" />
-                <KpiCell label={kpi3Label} value={isLoadingKpis ? kpiSkeleton : kpi3Display} />
-
-                <Button
-                  onClick={() => navigate(ctaHref)}
-                  variant="brand-pill"
-                  size="pill"
-                  className="col-span-3 mt-1 w-full sm:col-span-1 sm:ml-auto sm:mt-0 sm:w-auto"
-                >
-                  {ctaLabel}
-                  <ArrowRight className="ml-1.5 h-3.5 w-3.5" strokeWidth={1.75} />
-                </Button>
-              </div>
-            </div>
-          )}
+    <section className="flex flex-col gap-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div className="min-w-0 flex-1 space-y-2">
+          <span className="rotulo-mono block">{dataExtenso}</span>
+          <h1 className="font-serif-display text-3xl leading-[1.05] tracking-tight text-foreground md:text-4xl lg:text-[44px]">
+            {cumprimento}{" "}
+            <em className="font-serif-italic text-primary">{primeiroNome}</em>
+          </h1>
+          <p className="max-w-prose text-sm text-muted-foreground md:text-base">{tagline}</p>
         </div>
-      </div>
-    </>
-  );
-}
 
-function KpiCell({ label, value }: { label: string; value: React.ReactNode }) {
-  return (
-    <div className="min-w-0 sm:min-w-[64px]">
-      <div className="font-serif-display text-2xl leading-none text-foreground">{value}</div>
-      <div className="mt-1.5 truncate text-[9px] font-medium uppercase tracking-[0.1em] text-muted-foreground sm:text-[10px] sm:tracking-[0.18em]">
-        {label}
+        {ctaLabel && (
+          <Button onClick={() => navigate(ctaHref)} size="pill" className="w-full shrink-0 sm:w-auto">
+            {ctaLabel}
+            <ArrowRight className="h-4 w-4" strokeWidth={1.75} />
+          </Button>
+        )}
       </div>
-    </div>
+
+      {mostrarMetricas && (
+        <motion.div
+          data-welcome-kpis
+          variants={listaCascata}
+          {...aoMontar}
+          className="grid grid-cols-1 gap-3 sm:grid-cols-3 md:gap-4"
+        >
+          {isLoadingMetricas
+            ? [0, 1, 2].map((i) => <CartaoMetricaSkeleton key={i} />)
+            : metricas.map((m) => (
+                <CartaoMetrica
+                  key={m.rotulo}
+                  rotulo={m.rotulo}
+                  valor={m.valor}
+                  unidade={m.unidade}
+                  apoio={m.apoio}
+                />
+              ))}
+        </motion.div>
+      )}
+    </section>
   );
 }

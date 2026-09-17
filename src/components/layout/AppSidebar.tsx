@@ -358,19 +358,16 @@ export function AppSidebar() {
                          }
                         end 
                         className={cn(
-                          "relative rounded-lg transition-all duration-200 font-medium pl-4 py-2.5",
-                          isActive 
-                            ? "text-foreground font-semibold" 
-                            : "text-foreground/75 hover:text-foreground"
+                          "relative rounded-xl px-3 py-2.5 font-medium transition-all duration-200",
+                          isActive
+                            ? "bg-primary/10 font-semibold text-foreground shadow-[inset_0_0_0_1px_hsl(var(--primary)/0.35)]"
+                            : "text-foreground/75 hover:bg-accent hover:text-foreground"
                         )}
                       >
-                        <span className={cn(
-                          "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
-                          isActive 
-                            ? "bg-brand-strong opacity-100" 
-                            : "bg-brand-strong opacity-0 group-hover:opacity-50"
-                        )} />
-                        <IconComponent className="h-4 w-4 shrink-0" strokeWidth={1.5} />
+                        <IconComponent
+                          className={cn("h-4 w-4 shrink-0", isActive && "text-primary")}
+                          strokeWidth={1.5}
+                        />
                         {!collapsed && <span className="text-sm">{menu.label}</span>}
                       </NavLink>
                     </SidebarMenuButton>
