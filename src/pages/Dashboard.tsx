@@ -15,7 +15,6 @@ import { ContinuarDeOndeParou } from "@/components/dashboard/ContinuarDeOndeParo
 import { SuasTrilhas } from "@/components/dashboard/SuasTrilhas";
 import { ProximoEncontro } from "@/components/dashboard/ProximoEncontro";
 import { PerguntarMarIAna } from "@/components/dashboard/PerguntarMarIAna";
-import { ComunidadeRecente } from "@/components/dashboard/ComunidadeRecente";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useUserProfile } from "@/hooks/useUserProfile";
@@ -97,7 +96,7 @@ export default function Dashboard() {
       <WelcomeHeader />
 
       {/* Duas colunas a partir de lg: à esquerda o que a pessoa vai fazer
-          agora, à direita o contexto (encontro, MarIAna, comunidade). Abaixo
+          agora, à direita o contexto (próximo encontro e MarIAna). Abaixo
           de lg tudo empilha na mesma ordem de prioridade. */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-6">
         <div className="flex flex-col gap-4 md:gap-6">
@@ -112,7 +111,6 @@ export default function Dashboard() {
         <aside className="flex flex-col gap-4 md:gap-6">
           <ProximoEncontro />
           <PerguntarMarIAna />
-          <ComunidadeRecente />
         </aside>
       </div>
 

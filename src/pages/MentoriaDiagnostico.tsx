@@ -90,14 +90,14 @@ export default function MentoriaDiagnostico() {
   const voltarUrl = isRealAdmin
     ? "/mentoria"
     : !effectivePlan
-      ? "/comunidade"
+      ? "/"
       : effectivePlan === "academy" || isAcademyRoute
         ? "/meu-diagnostico"
         : "/mentoria";
   const voltarLabel = isRealAdmin
     ? "Voltar para Mentoria"
     : !effectivePlan
-      ? "Voltar para Comunidade"
+      ? "Voltar para o início"
       : effectivePlan === "academy" || isAcademyRoute
         ? "Voltar para Meu Diagnóstico"
         : "Voltar para Mentoria";
