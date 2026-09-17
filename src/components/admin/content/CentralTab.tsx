@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Pencil, Trash2, Star, FileText, Newspaper, Lightbulb, Globe, Video, Eye, Users } from "lucide-react";
+import { Plus, Pencil, Trash2, Star, BookOpen, FileText, Newspaper, Lightbulb, Globe, Video, Eye, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -39,6 +39,8 @@ import {
 import { ConteudoModal } from "./ConteudoModal";
 
 const tipoIcons: Record<TipoConteudo, React.ReactNode> = {
+  artigo: <BookOpen className="h-4 w-4" />,
+  documento: <FileText className="h-4 w-4" />,
   newsletter: <Newspaper className="h-4 w-4" />,
   noticia: <Globe className="h-4 w-4" />,
   dica: <Lightbulb className="h-4 w-4" />,
@@ -47,9 +49,11 @@ const tipoIcons: Record<TipoConteudo, React.ReactNode> = {
 };
 
 const tipoLabels: Record<TipoConteudo, string> = {
+  artigo: "Artigo",
+  documento: "Documento",
   newsletter: "Newsletter",
-  noticia: "Notícia",
-  dica: "Dica",
+  noticia: "Mercado",
+  dica: "Prática",
   material: "Material",
   criador: "Criador",
 };
@@ -107,7 +111,9 @@ export function CentralTab() {
             <SelectContent>
               <SelectItem value="todos">Todos os tipos</SelectItem>
               <SelectItem value="newsletter">Newsletter</SelectItem>
-              <SelectItem value="noticia">Notícia</SelectItem>
+              <SelectItem value="artigo">Artigo</SelectItem>
+              <SelectItem value="documento">Documento</SelectItem>
+              <SelectItem value="noticia">Mercado</SelectItem>
               <SelectItem value="dica">Dica</SelectItem>
               <SelectItem value="material">Material</SelectItem>
               <SelectItem value="criador">Criador</SelectItem>

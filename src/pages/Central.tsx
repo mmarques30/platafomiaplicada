@@ -1,35 +1,26 @@
 import { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Newspaper, Globe, Lightbulb, FileText, ExternalLink, ImageIcon, Users, LayoutGrid } from "lucide-react";
+import { Download, ExternalLink, ImageIcon, LayoutGrid, Users } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useConteudosDashboard, TipoConteudo, ConteudoDashboard } from "@/hooks/useConteudosDashboard";
+import { useConteudosCurados, ConteudoDashboard } from "@/hooks/useConteudosDashboard";
 import { useCapasConteudo } from "@/hooks/useCapasConteudo";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { PageTitle } from "@/components/shared/PageTitle";
 import { PageContainer } from "@/components/shared/PageContainer";
 import { ConteudoCard } from "@/components/dashboard/ConteudoCard";
 import { CriadoresComunidadeTab } from "@/components/comunidade/CriadoresComunidadeTab";
-
-type TabValue = TipoConteudo | "todos" | "criadores";
+import { GRUPOS, tipoInfo, tempoLeitura } from "@/lib/conteudoTipos";
 
 const tabs = [
-  { value: "todos" as const, label: "Todos", icon: LayoutGrid },
-  { value: "noticia" as TipoConteudo, label: "Notícias IA", icon: Globe },
-  { value: "dica" as TipoConteudo, label: "Dicas práticas", icon: Lightbulb },
-  { value: "newsletter" as TipoConteudo, label: "Newsletter", icon: Newspaper },
-  { value: "criadores" as const, label: "Criadores", icon: Users },
+  { value: "todos", label: "Todos", icon: LayoutGrid },
+  ...GRUPOS.map((g) => ({ value: g.value, label: g.label, icon: tipoInfo(g.tipos[0]).icon })),
+  { value: "criadores", label: "Criadores", icon: Users },
 ];
 
-const TIPO_LABEL: Record<string, string> = {
-  newsletter: "Newsletter",
-  noticia: "Notícia",
-  dica: "Dica prática",
-};
-
-const validTabs: TabValue[] = ["todos", "noticia", "dica", "newsletter", "criadores"];
+const validTabs = tabs.map((t) => t.value);
 
 function GradeConteudos({
   itens,
@@ -46,7 +37,7 @@ function GradeConteudos({
     return (
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-          <Skeleton key={i} className="h-[240px] rounded-2xl" />
+          <Skeleton key={i} className="h-[260px] rounded-2xl" />
         ))}
       </div>
     );
@@ -69,8 +60,8 @@ function GradeConteudos({
 
 export default function Central() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const tabFromUrl = searchParams.get("tab") as TabValue | null;
-  const [activeTab, setActiveTab] = useState<TabValue>(
+  const tabFromUrl = searchParams.get("tab");
+  const [activeTab, setActiveTab] = useState<string>(
     tabFromUrl && validTabs.includes(tabFromUrl) ? tabFromUrl : "todos"
   );
   const [selectedConteudo, setSelectedConteudo] = useState<ConteudoDashboard | null>(null);
@@ -80,26 +71,27 @@ export default function Central() {
   }, [tabFromUrl]);
 
   const handleTabChange = (v: string) => {
-    setActiveTab(v as TabValue);
+    setActiveTab(v);
     if (v === "todos") searchParams.delete("tab");
     else searchParams.set("tab", v);
     setSearchParams(searchParams, { replace: true });
   };
 
-  const { data: newsletters, isLoading: loadingNewsletter } = useConteudosDashboard("newsletter");
-  const { data: noticias, isLoading: loadingNoticia } = useConteudosDashboard("noticia");
-  const { data: dicas, isLoading: loadingDica } = useConteudosDashboard("dica");
+  const { data: conteudos, isLoading } = useConteudosCurados();
+  useCapasConteudo(conteudos);
 
-  const isLoading = loadingNewsletter || loadingNoticia || loadingDica;
+  const todos = useMemo(() => conteudos || [], [conteudos]);
 
-  const allConteudos = useMemo(
-    () =>
-      [...(newsletters || []), ...(noticias || []), ...(dicas || [])].sort(
-        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-      ),
-    [newsletters, noticias, dicas]
-  );
-  useCapasConteudo(allConteudos);
+  const porGrupo = useMemo(() => {
+    const mapa: Record<string, ConteudoDashboard[]> = {};
+    for (const grupo of GRUPOS) {
+      mapa[grupo.value] = todos.filter((c) => grupo.tipos.includes(c.tipo));
+    }
+    return mapa;
+  }, [todos]);
+
+  const selecionadoInfo = selectedConteudo ? tipoInfo(selectedConteudo.tipo) : null;
+  const minutos = tempoLeitura(selectedConteudo?.conteudo);
 
   return (
     <PageContainer>
@@ -117,111 +109,119 @@ export default function Central() {
 
         <TabsContent value="todos" className="mt-6">
           <GradeConteudos
-            itens={allConteudos}
+            itens={todos}
             isLoading={isLoading}
             vazio="Nenhum conteúdo disponível"
             onSelect={setSelectedConteudo}
           />
         </TabsContent>
-        <TabsContent value="noticia" className="mt-6">
-          <GradeConteudos
-            itens={noticias || []}
-            isLoading={loadingNoticia}
-            vazio="Nenhuma notícia disponível"
-            onSelect={setSelectedConteudo}
-          />
-        </TabsContent>
-        <TabsContent value="dica" className="mt-6">
-          <GradeConteudos
-            itens={dicas || []}
-            isLoading={loadingDica}
-            vazio="Nenhuma dica disponível"
-            onSelect={setSelectedConteudo}
-          />
-        </TabsContent>
-        <TabsContent value="newsletter" className="mt-6">
-          <GradeConteudos
-            itens={newsletters || []}
-            isLoading={loadingNewsletter}
-            vazio="Nenhuma newsletter disponível"
-            onSelect={setSelectedConteudo}
-          />
-        </TabsContent>
+
+        {GRUPOS.map((grupo) => (
+          <TabsContent key={grupo.value} value={grupo.value} className="mt-6">
+            <GradeConteudos
+              itens={porGrupo[grupo.value] || []}
+              isLoading={isLoading}
+              vazio={`Nada em ${grupo.label.toLowerCase()} por enquanto`}
+              onSelect={setSelectedConteudo}
+            />
+          </TabsContent>
+        ))}
+
         <TabsContent value="criadores" className="mt-6">
           <CriadoresComunidadeTab />
         </TabsContent>
       </Tabs>
 
-      {/* Modal de detalhes */}
+      {/* Detalhe do conteúdo */}
       <Dialog open={!!selectedConteudo} onOpenChange={() => setSelectedConteudo(null)}>
         <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto">
-          {selectedConteudo && (
+          {selectedConteudo && selecionadoInfo && (
             <div className="space-y-4">
               {selectedConteudo.imagem_url && (
                 <div className="aspect-video w-full overflow-hidden rounded-xl bg-muted">
-                  <img src={selectedConteudo.imagem_url} alt={selectedConteudo.titulo} className="h-full w-full object-cover" />
+                  <img
+                    src={selectedConteudo.imagem_url}
+                    alt=""
+                    className="h-full w-full object-cover"
+                  />
                 </div>
               )}
 
               <div>
-                <div className="mb-2 flex items-center gap-2">
-                  <Badge variant="outline">{TIPO_LABEL[selectedConteudo.tipo] ?? selectedConteudo.tipo}</Badge>
+                <div className="mb-2 flex flex-wrap items-center gap-2">
+                  <Badge variant="outline" className="gap-1.5">
+                    <selecionadoInfo.icon className="h-3 w-3" />
+                    {selecionadoInfo.label}
+                  </Badge>
                   <span className="text-sm text-muted-foreground">
                     {new Date(selectedConteudo.created_at).toLocaleDateString("pt-BR")}
                   </span>
+                  {minutos && (
+                    <span className="text-sm text-muted-foreground">· {minutos} min de leitura</span>
+                  )}
                 </div>
-                <h2 className="font-serif-display text-2xl text-foreground md:text-3xl">{selectedConteudo.titulo}</h2>
-                {selectedConteudo.resumo && <p className="mt-2 text-muted-foreground">{selectedConteudo.resumo}</p>}
+                <h2 className="font-serif-display text-2xl text-foreground md:text-3xl">
+                  {selectedConteudo.titulo}
+                </h2>
+                {selectedConteudo.resumo && (
+                  <p className="mt-2 text-muted-foreground">{selectedConteudo.resumo}</p>
+                )}
               </div>
 
               {selectedConteudo.conteudo && (
                 <div
                   className="prose prose-sm max-w-none"
                   style={{
-                    fontSize: (selectedConteudo as any).estilo_texto?.fontSize || 16,
-                    lineHeight: (selectedConteudo as any).estilo_texto?.lineHeight || 1.5,
-                    fontWeight: (selectedConteudo as any).estilo_texto?.fontWeight || "normal",
-                    textAlign: (selectedConteudo as any).estilo_texto?.textAlign || "left",
+                    fontSize: selectedConteudo.estilo_texto?.fontSize || 16,
+                    lineHeight: selectedConteudo.estilo_texto?.lineHeight || 1.5,
+                    fontWeight: selectedConteudo.estilo_texto?.fontWeight || "normal",
+                    textAlign: (selectedConteudo.estilo_texto?.textAlign as React.CSSProperties["textAlign"]) || "left",
                   }}
                 >
                   <p className="whitespace-pre-wrap">{selectedConteudo.conteudo}</p>
                 </div>
               )}
 
-              {(selectedConteudo as any).galeria_imagens?.length > 0 && (
+              {!!selectedConteudo.galeria_imagens?.length && (
                 <div>
                   <h3 className="mb-2 flex items-center gap-2 text-sm font-medium">
                     <ImageIcon className="h-4 w-4" />
                     Galeria
                   </h3>
                   <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
-                    {(selectedConteudo as any).galeria_imagens.map((url: string, index: number) => (
+                    {selectedConteudo.galeria_imagens.map((url, index) => (
                       <div key={index} className="aspect-video overflow-hidden rounded-lg bg-muted">
-                        <img src={url} alt={`Imagem ${index + 1}`} className="h-full w-full object-cover" />
+                        <img src={url} alt="" className="h-full w-full object-cover" />
                       </div>
                     ))}
                   </div>
                 </div>
               )}
 
-              <div className="flex gap-2 border-t border-border pt-4">
-                {(selectedConteudo as any).arquivo_pdf_url && (
-                  <Button variant="outline" size="pill" asChild>
-                    <a href={(selectedConteudo as any).arquivo_pdf_url} target="_blank" rel="noopener noreferrer">
-                      <FileText className="mr-2 h-4 w-4" />
-                      Ver PDF
-                    </a>
-                  </Button>
-                )}
-                {selectedConteudo.link_externo && (
-                  <Button size="pill" asChild>
-                    <a href={selectedConteudo.link_externo} target="_blank" rel="noopener noreferrer">
-                      <ExternalLink className="mr-2 h-4 w-4" />
-                      Acessar link
-                    </a>
-                  </Button>
-                )}
-              </div>
+              {(selectedConteudo.arquivo_pdf_url || selectedConteudo.link_externo) && (
+                <div className="flex flex-wrap gap-2 border-t border-border pt-4">
+                  {selectedConteudo.arquivo_pdf_url && (
+                    <Button size="pill" asChild>
+                      <a
+                        href={selectedConteudo.arquivo_pdf_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Download className="mr-2 h-4 w-4" />
+                        Baixar material
+                      </a>
+                    </Button>
+                  )}
+                  {selectedConteudo.link_externo && (
+                    <Button variant="outline" size="pill" asChild>
+                      <a href={selectedConteudo.link_externo} target="_blank" rel="noopener noreferrer">
+                        <ExternalLink className="mr-2 h-4 w-4" />
+                        Abrir na fonte
+                      </a>
+                    </Button>
+                  )}
+                </div>
+              )}
             </div>
           )}
         </DialogContent>

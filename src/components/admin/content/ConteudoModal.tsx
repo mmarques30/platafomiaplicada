@@ -331,9 +331,11 @@ export function ConteudoModal({ open, onClose, conteudo }: ConteudoModalProps) {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="artigo">Artigo (análise que ensina)</SelectItem>
+                    <SelectItem value="documento">Documento (guia, estudo, PDF)</SelectItem>
+                    <SelectItem value="dica">Prática (aplicar hoje)</SelectItem>
+                    <SelectItem value="noticia">Mercado (muda uma decisão)</SelectItem>
                     <SelectItem value="newsletter">Newsletter</SelectItem>
-                    <SelectItem value="noticia">Notícia</SelectItem>
-                    <SelectItem value="dica">Dica</SelectItem>
                     <SelectItem value="material">Material (Aulas ao Vivo)</SelectItem>
                     <SelectItem value="criador">Criador</SelectItem>
                   </SelectContent>
@@ -398,9 +400,13 @@ export function ConteudoModal({ open, onClose, conteudo }: ConteudoModalProps) {
 
             {/* Resumo */}
             <div className="space-y-2">
-              <Label>Resumo * (aparece na listagem)</Label>
+              <Label>Por que isso importa *</Label>
+              <p className="text-xs text-muted-foreground">
+                Uma frase dizendo o que a pessoa ganha com isso. É o texto do card,
+                logo abaixo do título — não repita o título aqui.
+              </p>
               <Textarea
-                {...register('resumo', { required: 'Resumo é obrigatório' })}
+                {...register('resumo', { required: 'Escreva por que isso importa' })}
                 placeholder="Breve descrição do conteúdo..."
                 rows={2}
               />

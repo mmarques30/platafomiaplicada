@@ -9,8 +9,10 @@ import { useCuradoriaIA, type CuradoriaItem } from "@/hooks/admin/useCuradoriaIA
 import type { TipoConteudo } from "@/hooks/admin/useConteudosDashboardAdmin";
 
 const TIPO_LABELS: Record<TipoConteudo, string> = {
-  noticia: "Notícias IA",
-  dica: "Dicas Práticas",
+  artigo: "Artigos",
+  documento: "Documentos",
+  noticia: "Mercado",
+  dica: "Prática",
   newsletter: "Newsletter",
   material: "Material",
   criador: "Criador",
