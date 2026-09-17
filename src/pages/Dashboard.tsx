@@ -14,7 +14,6 @@ import { RankingTickerGratuito } from "@/components/dashboard/RankingTickerGratu
 import { ContinuarDeOndeParou } from "@/components/dashboard/ContinuarDeOndeParou";
 import { SuasTrilhas } from "@/components/dashboard/SuasTrilhas";
 import { ProximoEncontro } from "@/components/dashboard/ProximoEncontro";
-import { PerguntarMarIAna } from "@/components/dashboard/PerguntarMarIAna";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useUserProfile } from "@/hooks/useUserProfile";
@@ -93,23 +92,18 @@ export default function Dashboard() {
 
       <WelcomeHeader />
 
-      {/* Duas colunas a partir de lg: à esquerda o que a pessoa vai fazer
-          agora, à direita o contexto (próximo encontro e MarIAna). Abaixo
-          de lg tudo empilha na mesma ordem de prioridade. */}
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-6">
-        <div className="flex flex-col gap-4 md:gap-6">
-          <BriefingSemanal />
-          <DashboardUrgencias />
-          <AcademyWelcomeCard />
-          <ContinuarDeOndeParou />
-          <SuasTrilhas />
-          <CentralConteudo />
-        </div>
-
-        <aside className="flex flex-col gap-4 md:gap-6">
-          <ProximoEncontro />
-          <PerguntarMarIAna />
-        </aside>
+      {/* Uma coluna só. A régua é a ordem: primeiro o que tem data marcada,
+          depois o que a pessoa vai retomar, por último o que ela pode
+          explorar. Duas colunas deixavam um vazio grande sempre que um lado
+          era mais alto que o outro. */}
+      <div className="flex flex-col gap-4 md:gap-6">
+        <ProximoEncontro />
+        <BriefingSemanal />
+        <DashboardUrgencias />
+        <AcademyWelcomeCard />
+        <ContinuarDeOndeParou />
+        <SuasTrilhas />
+        <CentralConteudo />
       </div>
 
       <RankingTicker />
