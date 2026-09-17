@@ -61,11 +61,7 @@ Deno.serve(async (req) => {
       roles: userRoles, 
       planoMentoria, 
       origemConsultoria, 
-      empresaConsultoria, 
-      skillsLiberado,
-      equipeId,
-      novaEquipe,
-      papelEquipe
+      empresaConsultoria
     } = await req.json()
 
     // Normaliza o email (trim + minúsculas) para evitar divergência entre o
@@ -76,23 +72,21 @@ Deno.serve(async (req) => {
       throw new Error('Email é obrigatório')
     }
 
-    console.log(`Admin ${user.id} creating user:`, { email, nomeCompleto, roles: userRoles, planoMentoria, origemConsultoria, empresaConsultoria, skillsLiberado, equipeId, novaEquipe, papelEquipe })
+    console.log(`Admin ${user.id} creating user:`, { email, nomeCompleto, roles: userRoles, planoMentoria, origemConsultoria, empresaConsultoria })
 
-    // Validar planoMentoria
-    const planosValidos = ['academy', 'skills', 'business_parceria', 'insider_business'];
+    // Os três planos que existem. Antes a lista tinha skills e business_parceria,
+    // que morreram, e não tinha insider_convidado: criar um Insider Convidado
+    // pelo admin falhava com "plano inválido".
+    const planosValidos = ['academy', 'insider_business', 'insider_convidado'];
     if (planoMentoria && !planosValidos.includes(planoMentoria)) {
-      throw new Error(`Plano de mentoria inválido. Valores aceitos: ${planosValidos.join(', ')}`)
+      throw new Error(`Plano inválido. Valores aceitos: ${planosValidos.join(', ')}`)
     }
+    const effectivePlanoMentoria = planoMentoria || null;
 
-    // Se role inclui parceiros e não tem plano, setar como business automaticamente
-    const effectivePlanoMentoria = (!planoMentoria && userRoles?.includes('parceiros')) 
-      ? 'business_parceria' 
-      : planoMentoria;
-
-    // Validate Skills requires team
-    if (planoMentoria === 'skills' && !equipeId && !novaEquipe) {
-      throw new Error('Para o plano Skills, é obrigatório informar uma equipe existente ou criar uma nova.')
-    }
+    // Permissões são duas, e só de equipe: admin e equipe. O papel de cliente
+    // não é escolhido no formulário; ele vem do plano, abaixo.
+    const permissoesEquipe = ['admin', 'equipe'];
+    const rolesEquipe: string[] = (userRoles ?? []).filter((r: string) => permissoesEquipe.includes(r));
 
     let userId: string;
     let isExistingUser = false;
@@ -217,9 +211,6 @@ Deno.serve(async (req) => {
       updateData.empresa_consultoria = empresaConsultoria
     }
     
-    if (effectivePlanoMentoria === 'business_parceria' || effectivePlanoMentoria === 'insider_business') {
-      updateData.skills_liberado = skillsLiberado ?? false
-    }
 
     const { error: profileError } = await supabaseAdmin
       .from('profiles')
@@ -239,8 +230,16 @@ Deno.serve(async (req) => {
       console.log('Role visitante removida')
     }
 
-    // 5. Inserir roles
-    const rolesToInsert = userRoles && userRoles.length > 0 ? userRoles : ['aluno_trilha']
+    // 5. Inserir roles.
+    //
+    // Quem tem plano é cliente, e cliente é aluno_trilha: é o papel que a RLS
+    // de trilhas, vídeos e módulos aceita (junto com mentorado, que era o
+    // cliente da mentoria e continua valendo para quem já tem) e o mesmo que o
+    // webhook de compra atribui. Equipe sem plano fica só com a permissão.
+    const rolesToInsert = [...rolesEquipe, ...(effectivePlanoMentoria ? ['aluno_trilha'] : [])]
+    if (rolesToInsert.length === 0) {
+      throw new Error('Escolha um plano para o cliente ou uma permissão de equipe.')
+    }
     
     // Para usuários existentes, deletar roles antigas (exceto admin) antes de inserir
     if (isExistingUser) {
@@ -277,98 +276,18 @@ Deno.serve(async (req) => {
     }
     console.log('Roles confirmed')
 
-    // 7. Handle Skills team association
-    if (planoMentoria === 'skills') {
-      let targetEquipeId = equipeId;
-
-      if (novaEquipe && !equipeId) {
-        const { data: newEquipe, error: equipeError } = await supabaseAdmin
-          .from('equipes_skills')
-          .insert({
-            nome: novaEquipe.nome,
-            empresa_nome: novaEquipe.empresa,
-            lider_id: papelEquipe === 'lider' ? userId : null,
-            status: 'ativo',
-          })
-          .select()
-          .single();
-
-        if (equipeError) {
-          console.error('Error creating team:', equipeError)
-          throw new Error('Erro ao criar equipe: ' + equipeError.message)
-        }
-        
-        targetEquipeId = newEquipe.id;
-        console.log('New team created:', targetEquipeId)
-      }
-
-      if (targetEquipeId) {
-        // Para usuários existentes, verificar se já está na equipe
-        if (isExistingUser) {
-          const { data: existingMembro } = await supabaseAdmin
-            .from('membros_equipe_skills')
-            .select('id')
-            .eq('equipe_id', targetEquipeId)
-            .eq('user_id', userId)
-            .single()
-
-          if (existingMembro) {
-            // Atualizar membro existente
-            await supabaseAdmin
-              .from('membros_equipe_skills')
-              .update({ papel: papelEquipe || 'membro', status: 'ativo' })
-              .eq('id', existingMembro.id)
-            console.log('Membro existente atualizado na equipe')
-          } else {
-            const { error: membroError } = await supabaseAdmin
-              .from('membros_equipe_skills')
-              .insert({
-                equipe_id: targetEquipeId,
-                user_id: userId,
-                papel: papelEquipe || 'membro',
-                status: 'ativo'
-              });
-            if (membroError) throw new Error('Erro ao vincular usuário à equipe: ' + membroError.message)
-            console.log('User linked to team:', targetEquipeId)
-          }
-        } else {
-          const { error: membroError } = await supabaseAdmin
-            .from('membros_equipe_skills')
-            .insert({
-              equipe_id: targetEquipeId,
-              user_id: userId,
-              papel: papelEquipe || 'membro',
-              status: 'ativo'
-            });
-          if (membroError) throw new Error('Erro ao vincular usuário à equipe: ' + membroError.message)
-          console.log('User linked to team:', targetEquipeId)
-        }
-
-        if (papelEquipe === 'lider' && equipeId) {
-          await supabaseAdmin
-            .from('equipes_skills')
-            .update({ lider_id: userId })
-            .eq('id', targetEquipeId);
-          console.log('Team leader updated')
-        }
-      }
-    }
-
     const action = isExistingUser ? 'promovido de visitante' : 'criado'
     console.log(`User ${action} complete - by admin:`, user.id)
 
     // Enviar e-mail de boas-vindas (via n8n, com fallback Zapier — ver _shared/welcomeEmail.ts).
-    // Só faz sentido quando há um plano ativo (Academy/Builder/System).
-    const isBusiness = effectivePlanoMentoria === 'business_parceria' || effectivePlanoMentoria === 'insider_business';
-    const isAcademy = effectivePlanoMentoria === 'academy';
-
-    const planoLabel = isBusiness
-      ? (effectivePlanoMentoria === 'insider_business' ? 'System' : 'Builder')
-      : isAcademy
-        ? 'Academy'
-        : 'Gratuito';
-
-    if (effectivePlanoMentoria && (isBusiness || isAcademy)) {
+    // Só faz sentido quando há um plano: equipe sem plano não recebe.
+    const rotulos: Record<string, string> = {
+      academy: 'Academy',
+      insider_business: 'Insider Business',
+      insider_convidado: 'Insider Convidado',
+    };
+    const planoLabel = effectivePlanoMentoria ? (rotulos[effectivePlanoMentoria] ?? effectivePlanoMentoria) : '';
+    if (effectivePlanoMentoria) {
       await sendWelcomeEmail({
         email,
         nome: nomeCompleto,
