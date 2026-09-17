@@ -27,6 +27,7 @@ import EvolucaoConquistas from "./pages/EvolucaoConquistas";
 import EvolucaoCertificados from "./pages/EvolucaoCertificados";
 import MinhaHistoria from "./pages/MinhaHistoria";
 import Ecossistema from "./pages/Ecossistema";
+import Indica from "./pages/Indica";
 import Mentoria from "./pages/Mentoria";
 import MentoriaDiagnostico from "./pages/MentoriaDiagnostico";
 import MeuDiagnostico from "./pages/MeuDiagnostico";
@@ -198,6 +199,7 @@ function AppContent() {
             <Route path="/squad/lider/" element={<Navigate to="/skills/lider" replace />} />
             
             <Route path="/ecossistema" element={<Ecossistema />} />
+            <Route path="/indica" element={<Indica />} />
             <Route path="/mentoria" element={<Mentoria />} />
             <Route path="/mentoria/diagnostico" element={<MentoriaDiagnostico />} />
             <Route path="/mentoria/processo" element={<MentoriaProcesso />} />

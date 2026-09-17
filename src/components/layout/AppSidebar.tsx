@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { Fragment, useState, useEffect } from "react";
 import { Home, BookOpen, Star, Bell, LogOut, MessageSquare, TrendingUp, GraduationCap, Layers, ChevronDown } from "lucide-react";
 import { SidebarAdminSection } from "./SidebarAdminSection";
 import { useAdminViewContext } from "@/contexts/AdminViewContext";
@@ -28,6 +28,7 @@ import { cn } from "@/lib/utils";
 import { useMenuConfig } from "@/hooks/useMenuConfig";
 import { useEnvironment } from "@/hooks/useEnvironment";
 import { useSkillsMembro } from "@/hooks/useSkillsMembro";
+import { useProgramaPapel } from "@/hooks/usePrograma";
 import * as LucideIcons from "lucide-react";
 
 // Menus que deixaram de existir no sidebar: "Comunicações" (hoje no menu
@@ -46,6 +47,7 @@ export function AppSidebar() {
   const { getSidebarMenus, isMenuVisible, isLoading: menuLoading } = useMenuConfig();
   const { isLider: isSkillsLider, isLoading: skillsMembroLoading } = useSkillsMembro();
   const { currentEnvironment } = useEnvironment();
+  const { temPapel: temPapelPrograma } = useProgramaPapel();
 
   const collapsed = !open;
   const [expandedMenus, setExpandedMenus] = useState<string[]>([]);
@@ -494,12 +496,37 @@ export function AppSidebar() {
                 ) : null;
 
                 return (
-                  <>
+                  <Fragment key={menu.menu_key}>
                     {menuElement}
                     {bibliotecasMenu}
-                  </>
+                  </Fragment>
                 );
               })}
+
+              {/* IAplicada Indica: quem já tem papel no programa, e o Insider
+                  Business, que é a quem o programa é oferecido. */}
+              {!isVisitante && (temPapelPrograma || isBusinessSistemasEnv) && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild className="group">
+                    <NavLink
+                      to="/indica"
+                      end
+                      className={cn(
+                        "relative rounded-xl px-3 py-2.5 font-medium transition-all duration-200",
+                        location.pathname === '/indica'
+                          ? "bg-primary/10 font-semibold text-foreground shadow-[inset_0_0_0_1px_hsl(var(--primary)/0.35)]"
+                          : "text-foreground/75 hover:bg-accent hover:text-foreground"
+                      )}
+                    >
+                      <LucideIcons.Handshake
+                        className={cn("h-4 w-4 shrink-0", location.pathname === '/indica' && "text-primary")}
+                        strokeWidth={1.5}
+                      />
+                      {!collapsed && <span className="text-sm">Indica</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
 
             </SidebarMenu>
           </SidebarGroupContent>
