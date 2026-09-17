@@ -35,41 +35,32 @@ export default function GerenciarMenus() {
     });
   };
 
+  // Espelha o AdminSidebar. As telas de mentoria, projeto, visitantes,
+  // materiais gratuitos, comunidade, pesquisas, produtos e formulários saíram
+  // do produto junto com a máquina de acompanhamento de projeto.
   const adminPages = [
     { grupo: "Dashboard", items: [{ path: "/admin", label: "Dashboard" }] },
     { grupo: "Usuários", items: [
       { path: "/admin/usuarios", label: "Gerenciar Usuários" },
-      { path: "/admin/visitantes", label: "Visitantes" },
+      { path: "/admin/convites", label: "Convites do Indica" },
+      { path: "/admin/permissoes-equipe", label: "Permissões Equipe" },
     ]},
     { grupo: "Conteúdo", items: [
       { path: "/admin/conteudo", label: "Gerenciar Conteúdo" },
       { path: "/admin/bibliotecas", label: "Gerenciar Bibliotecas" },
-      { path: "/admin/materiais", label: "Materiais Gratuitos" },
-    ]},
-    { grupo: "Mentoria", items: [
-      { path: "/admin/mentoria/bonus", label: "Bônus Globais" },
-      { path: "/admin/mentoria/academy", label: "Academy" },
-      { path: "/admin/mentoria/skills", label: "Skills" },
-      { path: "/admin/mentoria/business", label: "Business" },
-      { path: "/admin/mentoria/business-iaplicada", label: "Business iAplicada" },
-      { path: "/admin/mentoria/preview-paineis", label: "Preview Painéis" },
-      { path: "/admin/formularios", label: "Diagnósticos" },
-      { path: "/admin/duvidas", label: "Central de Dúvidas" },
+      { path: "/admin/conhecimento", label: "Base de Conhecimento" },
     ]},
     { grupo: "Comunicação", items: [
       { path: "/admin/avisos", label: "Gerenciar Avisos" },
-      { path: "/admin/comunidade", label: "Comunidade" },
-      { path: "/admin/pesquisas", label: "Pesquisas" },
+      { path: "/admin/duvidas", label: "Central de Dúvidas" },
     ]},
     { grupo: "Gestão", items: [
-      { path: "/admin/produtos", label: "Produtos" },
       { path: "/admin/minhas-tarefas", label: "Minhas Tarefas" },
+      { path: "/admin/onboarding-monitor", label: "Monitor de Onboarding" },
     ]},
     { grupo: "Sistema", items: [
       { path: "/admin/menus", label: "Menus" },
       { path: "/admin/auditoria", label: "Auditoria do Sistema" },
-      { path: "/admin/conhecimento", label: "Base de Conhecimento" },
-      { path: "/admin/permissoes-equipe", label: "Permissões Equipe" },
       { path: "/admin/politicas", label: "Políticas" },
       { path: "/admin/historico-senhas", label: "Histórico de Senhas" },
     ]},

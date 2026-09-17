@@ -88,12 +88,12 @@ export default function MentoriaDiagnostico() {
 
   const isRealAdmin = isAdmin && !isSimulating;
   const voltarUrl = isRealAdmin
-    ? "/mentoria"
+    ? "/"
     : !effectivePlan
       ? "/"
       : effectivePlan === "academy" || isAcademyRoute
         ? "/meu-diagnostico"
-        : "/mentoria";
+        : "/";
   const voltarLabel = isRealAdmin
     ? "Voltar para Mentoria"
     : !effectivePlan
@@ -141,7 +141,7 @@ export default function MentoriaDiagnostico() {
             {planoGerado && (
               <Button
                 size="sm"
-                onClick={() => navigate(isBusiness ? "/mentoria" : "/diagnostico/painel")}
+                onClick={() => navigate(isBusiness ? "/" : "/diagnostico/painel")}
                 className="bg-brand-strong text-brand-cream hover:bg-brand-strong/90"
               >
                 <ExternalLink className="h-4 w-4 mr-2" />

@@ -178,15 +178,15 @@ export function WelcomeHeader() {
         apoio: tarefasCriticas > 0 ? "Precisam de atenção agora" : "Nada travando no momento",
       },
       {
-        rotulo: "Próxima sessão",
+        rotulo: "Próximo encontro Insider",
         valor: dayFull ? (DAY_ABBR[dayFull] ?? dayFull.slice(0, 3)) : "—",
         apoio: proximaSessao
           ? format(parseISO(proximaSessao.data_sessao), "d 'de' MMMM", { locale: ptBR })
-          : "Nenhuma sessão agendada",
+          : "Nenhum encontro agendado",
       },
     ];
-    ctaLabel = "Ver sessão";
-    ctaHref = "/mentoria/sessoes";
+    ctaLabel = "Ver encontros";
+    ctaHref = "/encontros";
     isLoadingMetricas = isLoadingContrato || isLoadingEtapas || isLoadingTasks || isLoadingSessoes;
   } else if (isAcademy) {
     const faltamXp = Math.max(0, nivel.xpNecessario - nivel.xpAtual);
@@ -218,8 +218,8 @@ export function WelcomeHeader() {
       { rotulo: "Pendentes", valor: String(skillsData.pendentes), apoio: "Entregas em aberto" },
       { rotulo: "Progresso", valor: `${skillsData.progresso}%`, apoio: "Das entregas concluídas" },
     ];
-    ctaLabel = "Ver equipe";
-    ctaHref = "/skills/equipe";
+    ctaLabel = "Ver trilhas";
+    ctaHref = "/trilhas";
     isLoadingMetricas = isLoadingSkills;
   }
 

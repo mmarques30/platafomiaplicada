@@ -71,7 +71,8 @@ const menuGroups: MenuGroup[] = [
     icon: Users,
     items: [
       { path: "/admin/usuarios", label: "Gerenciar Usuários" },
-      { path: "/admin/visitantes", label: "Visitantes" },
+      { path: "/admin/convites", label: "Convites do Indica" },
+      { path: "/admin/permissoes-equipe", label: "Permissões Equipe" },
     ],
   },
   {
@@ -81,35 +82,7 @@ const menuGroups: MenuGroup[] = [
     items: [
       { path: "/admin/conteudo", label: "Gerenciar Conteúdo" },
       { path: "/admin/bibliotecas", label: "Gerenciar Bibliotecas" },
-      { path: "/admin/materiais", label: "Materiais Gratuitos" },
-    ],
-  },
-  {
-    type: "group",
-    label: "Mentoria",
-    icon: GraduationCap,
-    items: [
-      { path: "/admin/mentoria/bonus", label: "Bônus Globais" },
-      // Renomeados para alinhar com a nomenclatura "do aluno":
-      //   Academy → Aluno Academy
-      //   Business → Parceria
-      // Skills foi removido do menu (produto descontinuado por enquanto;
-      //   rotas e dados em banco ficam preservados pra não quebrar nada).
-      // Business iAplicada saiu daqui e virou "Sistemas" no novo grupo
-      //   "Consultoria" (abaixo).
-      // Preview Painéis + Diagnósticos foram removidos do sidebar — vão
-      //   ser consolidados dentro da tela de cada mentorado (PR seguinte).
-      { path: "/admin/mentoria/academy", label: "Aluno Academy" },
-      { path: "/admin/mentoria/business", label: "Builder" },
-      { path: "/admin/duvidas", label: "Central de Dúvidas" },
-    ],
-  },
-  {
-    type: "group",
-    label: "Consultoria",
-    icon: Wrench,
-    items: [
-      { path: "/admin/mentoria/business-iaplicada", label: "Insider" },
+      { path: "/admin/conhecimento", label: "Base de Conhecimento" },
     ],
   },
   {
@@ -118,8 +91,7 @@ const menuGroups: MenuGroup[] = [
     icon: MessagesSquare,
     items: [
       { path: "/admin/avisos", label: "Gerenciar Avisos" },
-      { path: "/admin/comunidade", label: "Comunidade" },
-      { path: "/admin/pesquisas", label: "Pesquisas" },
+      { path: "/admin/duvidas", label: "Central de Dúvidas" },
     ],
   },
   {
@@ -127,7 +99,6 @@ const menuGroups: MenuGroup[] = [
     label: "Gestão",
     icon: Briefcase,
     items: [
-      { path: "/admin/produtos", label: "Produtos" },
       { path: "/admin/minhas-tarefas", label: "Minhas Tarefas" },
       { path: "/admin/onboarding-monitor", label: "Monitor de Onboarding" },
     ],
@@ -139,8 +110,6 @@ const menuGroups: MenuGroup[] = [
     items: [
       { path: "/admin/menus", label: "Menus" },
       { path: "/admin/auditoria", label: "Auditoria do Sistema" },
-      { path: "/admin/conhecimento", label: "Base de Conhecimento" },
-      { path: "/admin/permissoes-equipe", label: "Permissões Equipe" },
       { path: "/admin/politicas", label: "Políticas" },
       { path: "/admin/historico-senhas", label: "Histórico de Senhas" },
     ],
