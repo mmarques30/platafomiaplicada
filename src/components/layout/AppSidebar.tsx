@@ -224,14 +224,13 @@ export function AppSidebar() {
                 const renderBibliotecasAfter = menu.menu_key === 'aprender';
                 
                 const menuElement = hasSubMenus ? (
-                  <Collapsible 
-                    key={menu.menu_key} 
-                    open={isExpanded}
-                    onOpenChange={() => toggleMenu(menu.menu_key)}
-                  >
+                  <Collapsible key={menu.menu_key} open={isExpanded}>
                     <SidebarMenuItem>
-                      <CollapsibleTrigger asChild>
-                        <div className="flex items-center w-full">
+                      {/* Sem CollapsibleTrigger na linha: o Radix pendurava o
+                          toggle no div inteiro, e o clique no link subia e
+                          desfazia o que abrirMenu tinha acabado de abrir. Só a
+                          setinha alterna; o rótulo navega e abre. */}
+                      <div className="flex items-center w-full">
                           <NavLink
                             to={getMenuUrl(menu)}
                             onClick={() => abrirMenu(menu.menu_key)}
@@ -259,8 +258,12 @@ export function AppSidebar() {
                           </NavLink>
                           {!collapsed && (
                             <button
+                              type="button"
+                              aria-label={isExpanded ? "Recolher" : "Expandir"}
+                              aria-expanded={isExpanded}
                               onClick={(e) => {
                                 e.preventDefault();
+                                e.stopPropagation();
                                 toggleMenu(menu.menu_key);
                               }}
                               className="p-2 hover:bg-sidebar-accent rounded-lg transition-colors"
@@ -275,7 +278,6 @@ export function AppSidebar() {
                             </button>
                           )}
                         </div>
-                      </CollapsibleTrigger>
                     </SidebarMenuItem>
                     
                     <CollapsibleContent>

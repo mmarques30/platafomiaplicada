@@ -14,7 +14,7 @@ import { toast } from "sonner";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useEffectivePlan } from "@/hooks/useUserPlan";
-import logoSimbolo from "@/assets/logo-aplicada-simbolo.png";
+import { MarcaIAplicada } from "@/components/shared/MarcaIAplicada";
 
 interface Message {
   role: "user" | "assistant";
@@ -287,12 +287,7 @@ export function MarIAnaChatDrawer({ onClose }: MarIAnaChatDrawerProps) {
     >
       {/* Header */}
       <div className="flex items-center gap-3 px-4 py-3 border-b border-border bg-surface">
-        <img
-          src={logoSimbolo}
-          alt="MarIAna"
-          className="w-11 h-11 rounded-full object-contain"
-          
-        />
+        <MarcaIAplicada className="h-9 w-9" />
         <div className="flex-1 min-w-0">
           <h3 className="text-sm font-semibold leading-tight">
             Mar<span className="text-primary">IA</span>na
@@ -322,12 +317,7 @@ export function MarIAnaChatDrawer({ onClose }: MarIAnaChatDrawerProps) {
           </div>
         ) : messages.length === 0 && !isLoading ? (
           <div className="flex flex-col items-center justify-center text-center py-4">
-            <img
-              src={logoSimbolo}
-              alt="MarIAna"
-              className="w-16 h-16 rounded-full mb-2 object-contain"
-              
-            />
+            <MarcaIAplicada className="mb-2 h-14 w-14" />
             <p className="text-sm font-medium">
               Sou a Mar<span className="text-primary">IA</span>na
             </p>
@@ -358,12 +348,7 @@ export function MarIAnaChatDrawer({ onClose }: MarIAnaChatDrawerProps) {
               className={`flex gap-2 items-start max-w-[85%] min-w-0 ${message.role === "user" ? "flex-row-reverse" : ""}`}
             >
               {message.role === "assistant" && (
-                <img
-                  src={logoSimbolo}
-                  alt="MarIAna"
-                  className="w-9 h-9 rounded-full flex-shrink-0"
-                  
-                />
+                <MarcaIAplicada className="h-7 w-7 flex-shrink-0" />
               )}
               <div
                 className={`min-w-0 max-w-full break-words rounded-xl px-3 py-2 text-sm ${
@@ -437,12 +422,7 @@ export function MarIAnaChatDrawer({ onClose }: MarIAnaChatDrawerProps) {
         {isLoading && !isStreaming && (
           <div className="flex justify-start">
             <div className="flex gap-2 items-start">
-              <img
-                src={logoSimbolo}
-                alt="MarIAna"
-                className="w-9 h-9 rounded-full flex-shrink-0"
-                
-              />
+              <MarcaIAplicada className="h-7 w-7 flex-shrink-0" />
               <div className="bg-surface border border-border rounded-xl px-4 py-3 flex items-center gap-1">
                 {[0, 1, 2].map((i) => (
                   <span

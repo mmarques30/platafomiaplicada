@@ -82,3 +82,17 @@ export const trocaDeCena: Transition = { duration: 0.5, ease: SAIDA_LONGA };
 
 /** Estados nomeados, para não repetir as strings em cada componente. */
 export const aoEntrar = { initial: "inicial", animate: "ativo", exit: "saida" } as const;
+
+export const CHAVE_ABERTURA = "iaplicada_abertura_vista";
+
+/** Se a abertura deve tocar nesta carga. */
+export function deveTocarAbertura(): boolean {
+  if (typeof window === "undefined") return false;
+  if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return false;
+  try {
+    return !sessionStorage.getItem(CHAVE_ABERTURA);
+  } catch {
+    return true;
+  }
+}
+

@@ -17,7 +17,7 @@ const WHATSAPP_COMERCIAL = "5531990643023";
 /** Quem ainda não tem papel no programa vê o convite para entrar, não o painel. */
 function SemPapel() {
   return (
-    <PageContainer size="narrow">
+    <PageContainer>
       <PageTitle
         primary="IAplicada"
         secondary="Indica"

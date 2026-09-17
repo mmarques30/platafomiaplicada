@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { aoEntrar, trocaDeCena } from "@/components/auth/motion-entrada";
+import { deveTocarAbertura, trocaDeCena } from "@/components/auth/motion-entrada";
+import { AberturaMarca } from "@/components/auth/AberturaMarca";
+import { MarcaIAplicada } from "@/components/shared/MarcaIAplicada";
 import { useAuth } from "@/hooks/useAuth";
 import { IAplicadaBackground } from "@/components/auth/IAplicadaBackground";
 import { EntryHero } from "@/components/auth/EntryHero";
@@ -35,6 +37,8 @@ export default function Auth() {
   const { user, loading } = useAuth();
   const tab = searchParams.get("tab");
   const [view, setView] = useState<EntryView>(() => viewFromTab(tab));
+  // A tela só começa a própria chegada depois que a cortina da abertura sobe.
+  const [abrindo, setAbrindo] = useState<boolean>(() => deveTocarAbertura());
 
   // Links externos (?tab=login) abrem direto o acesso.
   useEffect(() => {
@@ -60,17 +64,50 @@ export default function Auth() {
 
   return (
     <div className="ia-entry relative flex min-h-[100dvh] w-full flex-col overflow-hidden">
+      {abrindo && <AberturaMarca onConcluir={() => setAbrindo(false)} />}
+
       <IAplicadaBackground />
+
+      {/* A marca, grande e lenta, ocupando a metade direita. É o que o site de
+          referência faz com um objeto 3D: o lado que não tem texto ganha um
+          assunto, em vez de ficar vazio. Some no celular, onde não há metade
+          direita. */}
+      <motion.div
+        aria-hidden="true"
+        className="pointer-events-none absolute right-[-6vw] top-1/2 z-[1] hidden w-[46vw] -translate-y-1/2 md:block lg:right-[-2vw] lg:w-[40vw]"
+        initial={{ opacity: 0, scale: 0.92, rotate: -8 }}
+        animate={abrindo ? { opacity: 0, scale: 0.92, rotate: -8 } : { opacity: 1, scale: 1, rotate: 0 }}
+        transition={{ duration: 1.6, ease: trocaDeCena.ease, delay: 0.1 }}
+      >
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 160, ease: "linear", repeat: Infinity }}
+        >
+          <MarcaIAplicada className="w-full opacity-[0.16]" />
+        </motion.div>
+      </motion.div>
 
       <main className="relative z-10 flex flex-1 items-center px-6 pb-12 pt-16 md:px-12 md:pb-16 lg:px-20">
         <div className="w-full md:w-[68%] lg:w-[66%] xl:w-[58%]">
           <AnimatePresence mode="wait">
             {view === "hero" ? (
-              <motion.div key="hero" {...aoEntrar} transition={trocaDeCena}>
+              <motion.div
+                key="hero"
+                initial="inicial"
+                animate={abrindo ? "inicial" : "ativo"}
+                exit="saida"
+                transition={trocaDeCena}
+              >
                 <EntryHero onStart={() => setView("login")} />
               </motion.div>
             ) : (
-              <motion.div key="login" {...aoEntrar} transition={trocaDeCena}>
+              <motion.div
+                key="login"
+                initial="inicial"
+                animate={abrindo ? "inicial" : "ativo"}
+                exit="saida"
+                transition={trocaDeCena}
+              >
                 <EntryLogin onBack={() => setView("hero")} />
               </motion.div>
             )}
