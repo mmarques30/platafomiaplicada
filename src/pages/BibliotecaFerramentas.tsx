@@ -71,7 +71,12 @@ export default function BibliotecaFerramentas() {
   return (
     <PageContainer>
       {/* Cabeçalho */}
-      <PageTitle primary="Biblioteca" secondary="de ferramentas" eyebrow="Recursos" />
+      <PageTitle
+        primary="Biblioteca"
+        secondary="de ferramentas"
+        eyebrow="Recursos"
+        description="As ferramentas de IA que eu testei e recomendo, com o que cada uma entrega e se vale a pena."
+      />
 
       {/* Ranking Top 3 */}
       {!isLoading && ferramentas && ferramentas.length > 0 && (

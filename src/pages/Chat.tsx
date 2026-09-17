@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect, useMemo } from "react";
-import { flushSync } from "react-dom";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -10,9 +9,9 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { lerFluxoResposta } from "@/lib/fluxoResposta";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import mariAvatar from "@/assets/mari-avatar-new.png";
-import mariAvatarFallback from "@/assets/mari-avatar.jpg";
+import { MarcaIAplicada } from "@/components/shared/MarcaIAplicada";
 
 interface Message {
   role: "user" | "assistant";
@@ -218,103 +217,31 @@ const Chat = () => {
         throw new Error(errorData.error || `Erro ${response.status}: ${response.statusText}`);
       }
 
-      const reader = response.body?.getReader();
-      const decoder = new TextDecoder();
-      let assistantContent = "";
-      let textBuffer = "";
-
-      if (reader) {
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-
-          textBuffer += decoder.decode(value, { stream: true });
-
-          let newlineIndex: number;
-          while ((newlineIndex = textBuffer.indexOf("\n")) !== -1) {
-            let line = textBuffer.slice(0, newlineIndex);
-            textBuffer = textBuffer.slice(newlineIndex + 1);
-
-            if (line.endsWith("\r")) line = line.slice(0, -1);
-            if (line.startsWith(":") || line.trim() === "") continue;
-            if (!line.startsWith("data: ")) continue;
-
-            const jsonStr = line.slice(6).trim();
-            if (jsonStr === "[DONE]") continue;
-
-            try {
-              const parsed = JSON.parse(jsonStr);
-              const content = parsed.choices?.[0]?.delta?.content;
-
-              if (content) {
-                assistantContent += content;
-
-                if (!isStreaming) {
-                  setIsLoading(false);
-                  setIsStreaming(true);
-                }
-
-                flushSync(() => {
-                  setMessages((prev) => {
-                    const newMessages = [...prev];
-                    if (newMessages[newMessages.length - 1]?.role === "assistant") {
-                      newMessages[newMessages.length - 1].content = assistantContent;
-                    } else {
-                      newMessages.push({
-                        role: "assistant",
-                        content: assistantContent,
-                        createdAt: new Date().toISOString(),
-                      });
-                    }
-                    return newMessages;
-                  });
-                });
-              }
-            } catch (e) {
-              textBuffer = line + "\n" + textBuffer;
-              break;
-            }
+      const aplicarTexto = (texto: string) => {
+        setMessages((prev) => {
+          const atualizadas = [...prev];
+          const ultima = atualizadas[atualizadas.length - 1];
+          if (ultima?.role === "assistant") {
+            atualizadas[atualizadas.length - 1] = { ...ultima, content: texto };
+          } else {
+            atualizadas.push({
+              role: "assistant",
+              content: texto,
+              createdAt: new Date().toISOString(),
+            });
           }
-        }
+          return atualizadas;
+        });
+      };
 
-        if (textBuffer.trim()) {
-          const remainingLines = textBuffer.split("\n");
-          for (let raw of remainingLines) {
-            if (!raw) continue;
-            if (raw.endsWith("\r")) raw = raw.slice(0, -1);
-            if (raw.startsWith(":") || raw.trim() === "") continue;
-            if (!raw.startsWith("data: ")) continue;
-
-            const jsonStr = raw.slice(6).trim();
-            if (jsonStr === "[DONE]") continue;
-
-            try {
-              const parsed = JSON.parse(jsonStr);
-              const content = parsed.choices?.[0]?.delta?.content;
-              if (content) {
-                assistantContent += content;
-                flushSync(() => {
-                  setMessages((prev) => {
-                    const newMessages = [...prev];
-                    if (newMessages[newMessages.length - 1]?.role === "assistant") {
-                      newMessages[newMessages.length - 1].content = assistantContent;
-                    } else {
-                      newMessages.push({
-                        role: "assistant",
-                        content: assistantContent,
-                        createdAt: new Date().toISOString(),
-                      });
-                    }
-                    return newMessages;
-                  });
-                });
-              }
-            } catch {
-              /* ignora */
-            }
-          }
-        }
-      }
+      const assistantContent = await lerFluxoResposta(response.body, {
+        aoReceber: aplicarTexto,
+        aoComecar: () => {
+          setIsLoading(false);
+          setIsStreaming(true);
+        },
+        controle: abortControllerRef.current,
+      });
 
       if (assistantContent) {
         const finalMessages = [
@@ -337,10 +264,14 @@ const Chat = () => {
     } catch (error: any) {
       console.error("Erro ao enviar mensagem:", error);
 
-      setMessages((prev) => prev.slice(0, -1));
+      // Só desfaz a pergunta se nada tiver chegado. Com uma resposta pela
+      // metade na tela, apagar removia o pedaço que a pessoa já estava lendo.
+      setMessages((prev) =>
+        prev[prev.length - 1]?.role === "user" ? prev.slice(0, -1) : prev,
+      );
 
       if (error.name === "AbortError") {
-        toast.error("A requisição demorou muito e foi cancelada. Tente novamente.", { duration: 5000 });
+        toast.error("A resposta parou de chegar e a conversa foi encerrada. Tente de novo.", { duration: 5000 });
       } else if (error.message.includes("limite de requisições")) {
         toast.error(error.message, { duration: 6000 });
       } else if (error.message.includes("Créditos insuficientes")) {
@@ -463,13 +394,9 @@ const Chat = () => {
 
           {!isLoadingHistory && visibleMessages.length === 0 && (
             <div className="flex flex-col items-center justify-center text-center py-12 md:py-16">
-              <img
-                src={mariAvatar}
-                alt="Mari"
-                className="w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 rounded-full mb-4 object-cover"
-                onError={(e) => {
-                  e.currentTarget.src = mariAvatarFallback;
-                }}
+              <MarcaIAplicada
+                className="mb-4 h-16 w-16 md:h-20 md:w-20 lg:h-24 lg:w-24"
+                titulo="MarIAna"
               />
               <h2 className="text-xl md:text-2xl font-bold mb-2">
                 Sou a Mar<span className="text-primary">IA</span>na
@@ -496,14 +423,7 @@ const Chat = () => {
                   )}
                 >
                   {message.role === "assistant" && (
-                    <img
-                      src={mariAvatar}
-                      alt="Mari"
-                      className="h-10 w-10 flex-shrink-0 rounded-full"
-                      onError={(e) => {
-                        e.currentTarget.src = mariAvatarFallback;
-                      }}
-                    />
+                    <MarcaIAplicada className="h-10 w-10 flex-shrink-0" />
                   )}
                   <div className="flex min-w-0 flex-col gap-1">
                     <div
@@ -572,14 +492,7 @@ const Chat = () => {
             {isLoading && !isStreaming && (
               <div className="flex justify-start">
                 <div className="flex items-start gap-3">
-                  <img
-                    src={mariAvatar}
-                    alt="Mari"
-                    className="h-10 w-10 flex-shrink-0 rounded-full"
-                    onError={(e) => {
-                      e.currentTarget.src = mariAvatarFallback;
-                    }}
-                  />
+                  <MarcaIAplicada className="h-10 w-10 flex-shrink-0" />
                   <div className="rounded-2xl rounded-bl-sm bg-brand-cream-soft border border-brand-hairline px-4 py-2 text-muted-foreground">
                     <span className="flex items-center gap-2">
                       <Loader2 className="h-4 w-4 animate-spin" />
