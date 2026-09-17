@@ -31,8 +31,9 @@ import { useSkillsMembro } from "@/hooks/useSkillsMembro";
 import * as LucideIcons from "lucide-react";
 
 // Menus que deixaram de existir no sidebar: "Comunicações" (hoje no menu
-// superior) e "Minhas dúvidas" (removido do produto).
-const HIDDEN_MENU_KEYS = ['interacoes', 'minhas_duvidas', 'calendario'];
+// superior), "Minhas dúvidas" (removido do produto) e "Comunidade" (a
+// conversa acontece no grupo do WhatsApp; o ranking ficou em Meu progresso).
+const HIDDEN_MENU_KEYS = ['interacoes', 'minhas_duvidas', 'calendario', 'comunidade'];
 
 export function AppSidebar() {
   const { open } = useSidebar();

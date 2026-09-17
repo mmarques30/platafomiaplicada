@@ -100,7 +100,6 @@ import GerenciarMenus from "./pages/admin/GerenciarMenus";
 import ImportarUsuarios from "./pages/admin/ImportarUsuarios";
 import GerenciarComunidade from "./pages/admin/GerenciarComunidade";
 import GerenciarTodasDuvidas from "./pages/admin/GerenciarTodasDuvidas";
-import Comunidade from "./pages/Comunidade";
 import GerenciarVisitantes from "./pages/admin/GerenciarVisitantes";
 import MateriaisGratuitos from "./pages/MateriaisGratuitos";
 import GerenciarMateriais from "./pages/admin/GerenciarMateriais";
@@ -223,7 +222,6 @@ function AppContent() {
             <Route path="/biblioteca-ferramentas" element={<BibliotecaFerramentas />} />
             <Route path="/biblioteca-prompts" element={<BibliotecaPrompts />} />
             <Route path="/metodos-aplicar" element={<MetodosAplicar />} />
-            <Route path="/comunidade" element={<Comunidade />} />
             <Route path="/materiais-gratuitos" element={<MateriaisGratuitos />} />
             <Route path="/videos-bonus" element={<VideosBonus />} />
             <Route path="/central" element={<Central />} />

@@ -119,11 +119,11 @@ export default function MateriaisGratuitos() {
       <Button
         variant="ghost"
         size="sm"
-        onClick={() => navigate("/comunidade")}
+        onClick={() => navigate("/videos-bonus")}
         className="-ml-2 w-fit"
       >
         <ArrowLeft className="h-4 w-4 mr-2" />
-        Voltar para Comunidade
+        Voltar para Bônus
       </Button>
 
       <PageTitle
