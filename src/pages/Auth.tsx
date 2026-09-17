@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { aoEntrar, trocaDeCena } from "@/components/auth/motion-entrada";
 import { useAuth } from "@/hooks/useAuth";
 import { IAplicadaBackground } from "@/components/auth/IAplicadaBackground";
 import { EntryHero } from "@/components/auth/EntryHero";
@@ -16,12 +17,17 @@ function viewFromTab(tab: string | null): EntryView {
 /**
  * /auth — acesso inicial da plataforma.
  *
- * 1. Hero no branding da LP iaplicada.com (fundo quadriculado escuro, frase
- *    do que a pessoa pode fazer ao entrar, CTA "Começar a aplicar").
- * 2. Ao clicar, o hero dá lugar ao acesso discreto (email + senha), sem card.
- * 3. Autenticou → vai para "/" e o EnvironmentProvider já resolve o ambiente
- *    de acordo com o plano. A antiga tela "Selecione seu ambiente" não existe
- *    mais.
+ * 1. Hero com a proposta da LP, alinhado à esquerda numa coluna, com o fundo
+ *    respirando à direita.
+ * 2. Ao clicar, o hero dá lugar ao acesso (email + senha) na mesma coluna e na
+ *    mesma margem, então a troca é o conteúdo mudando no lugar.
+ * 3. Autenticou → vai para "/" e o EnvironmentProvider resolve o ambiente de
+ *    acordo com o plano. A antiga tela "Selecione seu ambiente" não existe mais.
+ *
+ * A coreografia da chegada mora em `motion-entrada.ts`. Cada cena é um
+ * container de variantes: o pai declara `initial`/`animate`/`exit` uma vez e
+ * cada filho traz o seu instante, em vez de repetir transições componente a
+ * componente como estava antes.
  */
 export default function Auth() {
   const navigate = useNavigate();
@@ -53,38 +59,26 @@ export default function Auth() {
   }, [user, loading, navigate]);
 
   return (
-    <div className="ia-entry relative flex min-h-[100dvh] w-full flex-col overflow-x-hidden">
+    <div className="ia-entry relative flex min-h-[100dvh] w-full flex-col overflow-hidden">
       <IAplicadaBackground />
 
-      <main className="relative z-10 flex flex-1 items-center justify-center px-6 pb-12 pt-10 md:pb-16">
-        <AnimatePresence mode="wait">
-          {view === "hero" ? (
-            <motion.div
-              key="hero"
-              className="flex w-full justify-center"
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -12, transition: { duration: 0.2 } }}
-              transition={{ duration: 0.4 }}
-            >
-              <EntryHero onStart={() => setView("login")} />
-            </motion.div>
-          ) : (
-            <motion.div
-              key="login"
-              className="flex w-full justify-center"
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -12, transition: { duration: 0.2 } }}
-              transition={{ duration: 0.4 }}
-            >
-              <EntryLogin onBack={() => setView("hero")} />
-            </motion.div>
-          )}
-        </AnimatePresence>
+      <main className="relative z-10 flex flex-1 items-center px-6 pb-12 pt-16 md:px-12 md:pb-16 lg:px-20">
+        <div className="w-full md:w-[68%] lg:w-[66%] xl:w-[58%]">
+          <AnimatePresence mode="wait">
+            {view === "hero" ? (
+              <motion.div key="hero" {...aoEntrar} transition={trocaDeCena}>
+                <EntryHero onStart={() => setView("login")} />
+              </motion.div>
+            ) : (
+              <motion.div key="login" {...aoEntrar} transition={trocaDeCena}>
+                <EntryLogin onBack={() => setView("hero")} />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </main>
 
-      <footer className="ia-entry-footer relative z-10 px-6 pb-6 text-center">
+      <footer className="ia-entry-footer relative z-10 px-6 pb-7 md:px-12 lg:px-20">
         Ao continuar, você concorda com nossos{" "}
         <a href="/termos-uso">Termos</a> e <a href="/politica-privacidade">Privacidade</a>.
       </footer>
