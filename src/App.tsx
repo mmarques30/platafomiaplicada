@@ -28,42 +28,16 @@ import EvolucaoCertificados from "./pages/EvolucaoCertificados";
 import MinhaHistoria from "./pages/MinhaHistoria";
 import Ecossistema from "./pages/Ecossistema";
 import Indica from "./pages/Indica";
-import Mentoria from "./pages/Mentoria";
+import Encontros from "./pages/Encontros";
+import Documentos from "./pages/Documentos";
 import MentoriaDiagnostico from "./pages/MentoriaDiagnostico";
 import MeuDiagnostico from "./pages/MeuDiagnostico";
 import DiagnosticoPainelAcademy from "./pages/DiagnosticoPainelAcademy";
 import MinhasDuvidas from "./pages/MinhasDuvidas";
-import SkillsDiagnostico from "./pages/skills/SkillsDiagnostico";
-import SkillsEquipe from "./pages/skills/SkillsEquipe";
-import SkillsBacklog from "./pages/skills/SkillsBacklog";
-import SkillsRoadmap from "./pages/skills/SkillsRoadmap";
-import SkillsEntregas from "./pages/skills/SkillsEntregas";
-import SkillsLiderDashboard from "./pages/skills/SkillsLiderDashboard";
 
 // SkillsMeuProgresso removido - redirecionado para /skills/projeto
-import ProjetoSkills from "./pages/skills/ProjetoSkills";
-import ProjetoSkillsPerformancePage from "./pages/skills/ProjetoSkillsPerformancePage";
-import ProjetoSkillsDiagnosticoPage from "./pages/skills/ProjetoSkillsDiagnosticoPage";
-import ProjetoSkillsProjetosPage from "./pages/skills/ProjetoSkillsProjetosPage";
-import ProjetoSkillsEntregasPage from "./pages/skills/ProjetoSkillsEntregasPage";
 // Squad removido - Painel do Líder agora em /skills/lider
 
-import MentoriaSessoes from "./pages/MentoriaSessoes";
-import MentoriaRecursos from "./pages/MentoriaRecursos";
-import MentoriaProjetos from "./pages/MentoriaProjetos";
-import MentoriaTarefas from "./pages/MentoriaTarefas";
-import MentoriaDuvidas from "./pages/MentoriaDuvidas";
-import MentoriaPainelDiagnostico from "./pages/MentoriaPainelDiagnostico";
-import MentoriaProcesso from "./pages/MentoriaProcesso";
-import MentoriaEtapa from "./pages/MentoriaEtapa";
-import MentoriaEtapasBusiness from "./pages/MentoriaEtapasBusiness";
-import MentoriaInstrucoesBusiness from "./pages/MentoriaInstrucoesBusiness";
-import MentoriaTasksBusiness from "./pages/MentoriaTasksBusiness";
-import MentoriaValidacoes from "./pages/MentoriaValidacoes";
-import MentoriaReports from "./pages/MentoriaReports";
-import MentoriaDocumentos from "./pages/MentoriaDocumentos";
-import MentoriaEntregas from "./pages/MentoriaEntregas";
-import MentoriaEntregaDetalhe from "./pages/MentoriaEntregaDetalhe";
 import IACopieUse from "./pages/IACopieUse";
 import BibliotecaFerramentas from "./pages/BibliotecaFerramentas";
 import BibliotecaPrompts from "./pages/BibliotecaPrompts";
@@ -78,42 +52,26 @@ import { MainLayout } from "./components/layout/MainLayout";
 import { AdminLayout } from "./components/admin/AdminLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import GerenciarUsuarios from "./pages/admin/GerenciarUsuarios";
+import ConvitesIndica from "./pages/admin/ConvitesIndica";
 
 import OnboardingMonitor from "./pages/admin/OnboardingMonitor";
 import GerenciarConteudo from "./pages/admin/GerenciarConteudo";
 import GerenciarBibliotecas from "./pages/admin/GerenciarBibliotecas";
 import GerenciarAvisos from "./pages/admin/GerenciarAvisos";
-import VisualizarFormularios from "./pages/admin/VisualizarFormularios";
 import GerenciarConhecimento from "./pages/admin/GerenciarConhecimento";
 
-import MentoriaBonusPage from "./pages/admin/mentoria/MentoriaBonusPage";
-import MentoriaAcademyPage from "./pages/admin/mentoria/MentoriaAcademyPage";
-import MentoriaBusinessPage from "./pages/admin/mentoria/MentoriaBusinessPage";
-import MentoriaBusinessIAplicadaPage from "./pages/admin/mentoria/MentoriaBusinessIAplicadaPage";
-import AdminEtapaBusinessPage from "./pages/admin/mentoria/AdminEtapaBusinessPage";
-import PreviewPaineisPage from "./pages/admin/mentoria/PreviewPaineisPage";
-import MentoriaSkillsPage from "./pages/admin/mentoria/MentoriaSkillsPage";
 
-import GerenciarProdutos from "./pages/admin/GerenciarProdutos";
 import MinhasTarefas from "./pages/admin/MinhasTarefas";
 import Auditoria from "./pages/admin/Auditoria";
 import GerenciarMenus from "./pages/admin/GerenciarMenus";
-import GerenciarComunidade from "./pages/admin/GerenciarComunidade";
 import GerenciarTodasDuvidas from "./pages/admin/GerenciarTodasDuvidas";
-import GerenciarVisitantes from "./pages/admin/GerenciarVisitantes";
 import MateriaisGratuitos from "./pages/MateriaisGratuitos";
-import GerenciarMateriais from "./pages/admin/GerenciarMateriais";
 import CandidatarMentoria from "./pages/CandidatarMentoria";
 import VideosBonus from "./pages/VideosBonus";
 import PoliticaPrivacidade from "./pages/PoliticaPrivacidade";
 import PoliticaServicos from "./pages/PoliticaServicos";
 import PoliticaUso from "./pages/PoliticaUso";
 import GerenciarPoliticas from "./pages/admin/GerenciarPoliticas";
-import GerenciarPesquisas from "./pages/admin/GerenciarPesquisas";
-import MeuSistema from "./pages/MeuSistema";
-import MeuSistemaEtapaDetalhe from "./pages/MeuSistemaEtapaDetalhe";
-import MeuSistemaDocumentos from "./pages/MeuSistemaDocumentos";
-import MeuSistemaEntregas from "./pages/MeuSistemaEntregas";
 import FormularioAplica from "./pages/FormularioAplica";
 import Instalar from "./pages/Instalar";
 import Central from "./pages/Central";
@@ -172,53 +130,17 @@ function AppContent() {
             <Route path="/diagnostico/painel" element={<DiagnosticoPainelAcademy />} />
             
             {/* Skills routes */}
-            <Route path="/skills/diagnostico" element={<SkillsDiagnostico />} />
-            <Route path="/skills/equipe" element={<SkillsEquipe />} />
-            <Route path="/skills/backlog" element={<SkillsBacklog />} />
-            <Route path="/skills/roadmap" element={<SkillsRoadmap />} />
-            <Route path="/skills/entregas" element={<SkillsEntregas />} />
-            <Route path="/skills/lider" element={<SkillsLiderDashboard />} />
             
-            <Route path="/skills/progresso" element={<Navigate to="/skills/projeto" replace />} />
-            <Route path="/skills/projeto" element={<SkillsAdminTeamProvider><ProjetoSkills /></SkillsAdminTeamProvider>} />
-            <Route path="/skills/projeto/performance" element={<SkillsAdminTeamProvider><ProjetoSkillsPerformancePage /></SkillsAdminTeamProvider>} />
-            <Route path="/skills/projeto/diagnostico" element={<SkillsAdminTeamProvider><ProjetoSkillsDiagnosticoPage /></SkillsAdminTeamProvider>} />
-            <Route path="/skills/projeto/projetos" element={<SkillsAdminTeamProvider><ProjetoSkillsProjetosPage /></SkillsAdminTeamProvider>} />
-            <Route path="/skills/projeto/entregas" element={<SkillsAdminTeamProvider><ProjetoSkillsEntregasPage /></SkillsAdminTeamProvider>} />
 
             {/* Squad removido → redireciona para Skills */}
-            <Route path="/squad/lider" element={<Navigate to="/skills/lider" replace />} />
 
             {/* Aliases/redirects para evitar 404 por links antigos ou barra final */}
-            <Route path="/skills/progresso/" element={<Navigate to="/skills/projeto" replace />} />
-            <Route path="/skills/meu-progresso" element={<Navigate to="/skills/projeto" replace />} />
-            <Route path="/skills/painel-lider" element={<Navigate to="/skills/projeto" replace />} />
-            <Route path="/skills/painel-do-lider" element={<Navigate to="/skills/projeto" replace />} />
-            <Route path="/skills/lider/" element={<Navigate to="/skills/lider" replace />} />
-            <Route path="/squad/lider/" element={<Navigate to="/skills/lider" replace />} />
             
             <Route path="/ecossistema" element={<Ecossistema />} />
             <Route path="/indica" element={<Indica />} />
-            <Route path="/mentoria" element={<Mentoria />} />
-            <Route path="/mentoria/diagnostico" element={<MentoriaDiagnostico />} />
-            <Route path="/mentoria/processo" element={<MentoriaProcesso />} />
-            <Route path="/mentoria/painel-diagnostico" element={<MentoriaPainelDiagnostico />} />
-            <Route path="/mentoria/painel-diagnostico/:userId" element={<MentoriaPainelDiagnostico />} />
+            <Route path="/encontros" element={<Encontros />} />
+            <Route path="/documentos" element={<Documentos />} />
             
-            <Route path="/mentoria/sessoes" element={<MentoriaSessoes />} />
-            <Route path="/mentoria/recursos" element={<MentoriaRecursos />} />
-            <Route path="/mentoria/projetos" element={<MentoriaProjetos />} />
-            <Route path="/mentoria/tarefas" element={<MentoriaTarefas />} />
-            <Route path="/mentoria/duvidas" element={<MentoriaDuvidas />} />
-            <Route path="/mentoria/etapa/:etapaId" element={<MentoriaEtapa />} />
-            <Route path="/mentoria/etapas-business" element={<MentoriaEtapasBusiness />} />
-            <Route path="/mentoria/instrucoes-business" element={<MentoriaInstrucoesBusiness />} />
-            <Route path="/mentoria/tasks-business" element={<MentoriaTasksBusiness />} />
-            <Route path="/mentoria/validacoes" element={<MentoriaValidacoes />} />
-            <Route path="/mentoria/reports" element={<MentoriaReports />} />
-            <Route path="/mentoria/entregas" element={<MentoriaEntregas />} />
-            <Route path="/mentoria/entrega/:entregaId" element={<MentoriaEntregaDetalhe />} />
-            <Route path="/mentoria/documentos" element={<MentoriaDocumentos />} />
             <Route path="/ia-copie-use" element={<IACopieUse />} />
             <Route path="/biblioteca-ferramentas" element={<BibliotecaFerramentas />} />
             <Route path="/biblioteca-prompts" element={<BibliotecaPrompts />} />
@@ -227,10 +149,6 @@ function AppContent() {
             <Route path="/videos-bonus" element={<VideosBonus />} />
             <Route path="/central" element={<Central />} />
             <Route path="/cupons" element={<Cupons />} />
-            <Route path="/meu-sistema" element={<MeuSistema />} />
-            <Route path="/meu-sistema/fase/:etapaId" element={<MeuSistemaEtapaDetalhe />} />
-            <Route path="/meu-sistema/entregas" element={<MeuSistemaEntregas />} />
-            <Route path="/meu-sistema/documentos" element={<MeuSistemaDocumentos />} />
             <Route path="/instalar" element={<Instalar />} />
             <Route path="/politica-servicos" element={<PoliticaServicos />} />
           </Route>
@@ -240,30 +158,18 @@ function AppContent() {
           <Route path="/admin" element={<ProtectedRoute requireAnyRole={["admin", "equipe"]}><AdminLayout /></ProtectedRoute>}>
             <Route index element={<AdminDashboard />} />
             <Route path="usuarios" element={<GerenciarUsuarios />} />
-            <Route path="visitantes" element={<GerenciarVisitantes />} />
+            <Route path="convites" element={<ConvitesIndica />} />
             <Route path="conteudo" element={<GerenciarConteudo />} />
             <Route path="bibliotecas" element={<GerenciarBibliotecas />} />
             <Route path="avisos" element={<GerenciarAvisos />} />
             <Route path="conhecimento" element={<GerenciarConhecimento />} />
-            <Route path="mentoria/bonus" element={<MentoriaBonusPage />} />
-            <Route path="mentoria/academy" element={<MentoriaAcademyPage />} />
-            <Route path="mentoria/business" element={<MentoriaBusinessPage />} />
-            <Route path="mentoria/business-iaplicada" element={<MentoriaBusinessIAplicadaPage />} />
-            <Route path="mentoria/business/etapa/:etapaId" element={<AdminEtapaBusinessPage />} />
-            <Route path="mentoria/preview-paineis" element={<PreviewPaineisPage />} />
-            <Route path="mentoria/skills" element={<MentoriaSkillsPage />} />
             
             <Route path="duvidas" element={<GerenciarTodasDuvidas />} />
-            <Route path="produtos" element={<GerenciarProdutos />} />
-            <Route path="materiais" element={<GerenciarMateriais />} />
-            <Route path="formularios" element={<VisualizarFormularios />} />
             <Route path="minhas-tarefas" element={<MinhasTarefas />} />
             <Route path="onboarding-monitor" element={<OnboardingMonitor />} />
             <Route path="menus" element={<GerenciarMenus />} />
             <Route path="auditoria" element={<Auditoria />} />
-            <Route path="comunidade" element={<GerenciarComunidade />} />
             <Route path="politicas" element={<GerenciarPoliticas />} />
-            <Route path="pesquisas" element={<GerenciarPesquisas />} />
             <Route path="historico-senhas" element={<HistoricoSenhas />} />
             <Route path="permissoes-equipe" element={<GerenciarPermissoesEquipe />} />
           </Route>

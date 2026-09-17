@@ -30,7 +30,7 @@ export function MentoriaPageHeader({
   secondary,
   description,
   eyebrow = "Mentoria",
-  backTo = "/mentoria",
+  backTo = "/",
   backLabel = "Voltar",
   actions,
 }: MentoriaPageHeaderProps) {

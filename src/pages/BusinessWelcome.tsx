@@ -52,9 +52,9 @@ export default function BusinessWelcome() {
         .update({ primeiro_acesso: false })
         .eq("id", user.id);
       queryClient.invalidateQueries({ queryKey: ["user-profile"] });
-      navigate("/mentoria", { replace: true });
+      navigate("/", { replace: true });
     } catch {
-      navigate("/mentoria", { replace: true });
+      navigate("/", { replace: true });
     }
   };
 

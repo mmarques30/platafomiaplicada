@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { flushSync } from "react-dom";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Send, Maximize2, MessageSquarePlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,6 @@ import remarkGfm from "remark-gfm";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { useMentoriaContext } from "@/hooks/useMentoriaContext";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useEffectivePlan } from "@/hooks/useUserPlan";
@@ -36,9 +35,9 @@ const SUGESTOES = [
 export function MarIAnaChatDrawer({ onClose }: MarIAnaChatDrawerProps) {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { pathname } = useLocation();
-  const isMentoriaPage = pathname.startsWith("/mentoria");
-  const { contextText, proactiveMessage } = useMentoriaContext({ enabled: isMentoriaPage });
+  // O contexto extra e a mensagem proativa existiam para as telas de mentoria,
+  // que saíram do produto. Sem elas, nada disso voltaria a ligar: o chat agora
+  // é sempre o geral.
   const { profile } = useUserProfile();
   const { isAdmin, isLoading: roleLoading } = useUserRole();
   const { effectivePlan } = useEffectivePlan(isAdmin, roleLoading);
@@ -75,13 +74,6 @@ export function MarIAnaChatDrawer({ onClose }: MarIAnaChatDrawerProps) {
     };
     loadHistory();
   }, [user]);
-
-  // Inject proactive message when on mentoria pages and no history
-  useEffect(() => {
-    if (!isLoadingHistory && messages.length === 0 && proactiveMessage && isMentoriaPage) {
-      setMessages([{ role: "assistant", content: proactiveMessage }]);
-    }
-  }, [isLoadingHistory, proactiveMessage, isMentoriaPage]);
 
   // Welcome message on first ever chat open
   useEffect(() => {
@@ -142,7 +134,6 @@ export function MarIAnaChatDrawer({ onClose }: MarIAnaChatDrawerProps) {
               role: msg.role,
               content: msg.content,
             })),
-            ...(isMentoriaPage && contextText ? { mentoria_context: contextText } : {}),
           }),
           signal: abortControllerRef.current.signal,
         }

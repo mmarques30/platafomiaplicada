@@ -19,7 +19,6 @@ import { useUserRole } from "@/hooks/useUserRole";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { PageSkeleton } from "@/components/shared/PageSkeleton";
 import { PageContainer } from "@/components/shared/PageContainer";
-import { DashboardUrgencias } from "@/components/dashboard/DashboardUrgencias";
 import { BriefingSemanal } from "@/components/dashboard/BriefingSemanal";
 
 export default function Dashboard() {
@@ -99,7 +98,6 @@ export default function Dashboard() {
       <div className="flex flex-col gap-4 md:gap-6">
         <ProximoEncontro />
         <BriefingSemanal />
-        <DashboardUrgencias />
         <AcademyWelcomeCard />
         <ContinuarDeOndeParou />
         <SuasTrilhas />
