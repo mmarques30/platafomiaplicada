@@ -98,7 +98,6 @@ import GerenciarProdutos from "./pages/admin/GerenciarProdutos";
 import MinhasTarefas from "./pages/admin/MinhasTarefas";
 import Auditoria from "./pages/admin/Auditoria";
 import GerenciarMenus from "./pages/admin/GerenciarMenus";
-import ImportarUsuarios from "./pages/admin/ImportarUsuarios";
 import GerenciarComunidade from "./pages/admin/GerenciarComunidade";
 import GerenciarTodasDuvidas from "./pages/admin/GerenciarTodasDuvidas";
 import GerenciarVisitantes from "./pages/admin/GerenciarVisitantes";
@@ -262,7 +261,6 @@ function AppContent() {
             <Route path="onboarding-monitor" element={<OnboardingMonitor />} />
             <Route path="menus" element={<GerenciarMenus />} />
             <Route path="auditoria" element={<Auditoria />} />
-            <Route path="importar-usuarios" element={<ImportarUsuarios />} />
             <Route path="comunidade" element={<GerenciarComunidade />} />
             <Route path="politicas" element={<GerenciarPoliticas />} />
             <Route path="pesquisas" element={<GerenciarPesquisas />} />

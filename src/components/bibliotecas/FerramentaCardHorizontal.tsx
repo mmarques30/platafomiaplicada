@@ -78,19 +78,6 @@ export function FerramentaCardHorizontal({ ferramenta, onVerMais }: FerramentaCa
                   </div>
                 </div>
 
-                {/* Avaliação Comunidade */}
-                <div className="flex items-center gap-2 bg-muted/50 rounded-lg px-3 py-1.5">
-                  <Users className="w-4 h-4 text-status-info" />
-                  <div className="flex flex-col">
-                    <span className="text-xs text-muted-foreground whitespace-nowrap">Comunidade</span>
-                    <span className="font-bold">
-                      {ferramenta.avaliacao_comunidade?.toFixed(1) || "0.0"}
-                      <span className="text-xs text-muted-foreground ml-1">
-                        ({ferramenta.total_avaliacoes_comunidade || 0})
-                      </span>
-                    </span>
-                  </div>
-                </div>
               </div>
             </div>
 

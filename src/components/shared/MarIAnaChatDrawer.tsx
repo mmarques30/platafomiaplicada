@@ -299,7 +299,7 @@ export function MarIAnaChatDrawer({ onClose }: MarIAnaChatDrawerProps) {
         <img
           src={logoSimbolo}
           alt="MarIAna"
-          className="w-8 h-8 rounded-full object-contain"
+          className="w-11 h-11 rounded-full object-contain"
           
         />
         <div className="flex-1 min-w-0">
@@ -334,7 +334,7 @@ export function MarIAnaChatDrawer({ onClose }: MarIAnaChatDrawerProps) {
             <img
               src={logoSimbolo}
               alt="MarIAna"
-              className="w-12 h-12 rounded-full mb-2 object-contain"
+              className="w-16 h-16 rounded-full mb-2 object-contain"
               
             />
             <p className="text-sm font-medium">
@@ -370,7 +370,7 @@ export function MarIAnaChatDrawer({ onClose }: MarIAnaChatDrawerProps) {
                 <img
                   src={logoSimbolo}
                   alt="MarIAna"
-                  className="w-7 h-7 rounded-full flex-shrink-0"
+                  className="w-9 h-9 rounded-full flex-shrink-0"
                   
                 />
               )}
@@ -449,7 +449,7 @@ export function MarIAnaChatDrawer({ onClose }: MarIAnaChatDrawerProps) {
               <img
                 src={logoSimbolo}
                 alt="MarIAna"
-                className="w-7 h-7 rounded-full flex-shrink-0"
+                className="w-9 h-9 rounded-full flex-shrink-0"
                 
               />
               <div className="bg-surface border border-border rounded-xl px-4 py-3 flex items-center gap-1">

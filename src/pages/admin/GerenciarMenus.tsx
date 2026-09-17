@@ -40,7 +40,6 @@ export default function GerenciarMenus() {
     { grupo: "Usuários", items: [
       { path: "/admin/usuarios", label: "Gerenciar Usuários" },
       { path: "/admin/visitantes", label: "Visitantes" },
-      { path: "/admin/importar-usuarios", label: "Importar Usuários" },
     ]},
     { grupo: "Conteúdo", items: [
       { path: "/admin/conteudo", label: "Gerenciar Conteúdo" },

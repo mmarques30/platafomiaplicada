@@ -24,7 +24,7 @@ import {
 import { NovoUsuarioModal } from "@/components/admin/NovoUsuarioModal";
 import { EditUserModal } from "@/components/admin/EditUserModal";
 import { DeleteUserDialog } from "@/components/admin/DeleteUserDialog";
-import { Search, Edit, UserPlus, AlertCircle, Trash2, Upload, Mail, MessageCircle, Users, Download, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import { Search, Edit, UserPlus, AlertCircle, Trash2, Mail, MessageCircle, Users, Download, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { exportUsersToCSV } from "@/lib/exportUsers";
 import { Skeleton } from "@/components/ui/skeleton";
 import { format, subDays } from "date-fns";
@@ -234,15 +234,6 @@ export default function GerenciarUsuários() {
           >
             <Download className="h-3.5 w-3.5 mr-1.5" />
             Exportar
-          </Button>
-          <Button 
-            onClick={() => navigate('/admin/importar-usuarios')}
-            variant="outline"
-            size="sm"
-            className={adminTheme.buttonSm}
-          >
-            <Upload className="h-3.5 w-3.5 mr-1.5" />
-            Importar
           </Button>
           <Button onClick={() => setNovoUsuarioOpen(true)} size="sm" className={adminTheme.buttonSm}>
             <UserPlus className="h-3.5 w-3.5 mr-1.5" />

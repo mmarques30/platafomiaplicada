@@ -137,14 +137,6 @@ export default function BibliotecaFerramentas() {
         </Select>
       </div>
 
-        {/* Contador de Resultados */}
-        {filteredFerramentas && (
-          <p className="text-sm text-muted-foreground">
-            Mostrando {visibleFerramentas.length} de {filteredFerramentas.length}{" "}
-            {filteredFerramentas.length === 1 ? "ferramenta" : "ferramentas"}
-          </p>
-        )}
-
         {/* Conteúdo - Lista */}
         {isLoading ? (
           <div className="space-y-3">
@@ -194,6 +186,14 @@ export default function BibliotecaFerramentas() {
           </Card>
         )}
       </div>
+
+      {/* O somatório é referência, não manchete: fica no rodapé da lista. */}
+      {!isLoading && filteredFerramentas && filteredFerramentas.length > 0 && (
+        <p className="pt-2 text-center text-xs text-muted-foreground/70">
+          {visibleFerramentas.length} de {filteredFerramentas.length}{" "}
+          {filteredFerramentas.length === 1 ? "ferramenta" : "ferramentas"}
+        </p>
+      )}
 
       {/* Modal de Detalhes */}
       <FerramentaDetalhesModal

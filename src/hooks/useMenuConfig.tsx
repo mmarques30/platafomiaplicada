@@ -49,16 +49,19 @@ export function useMenuConfig() {
   const getSidebarMenus = (userPlan?: string | null, currentEnvironment?: string | null) => {
   // Menus a ocultar quando em ambiente específico
     const hiddenByEnvironment: Record<string, string[]> = {
-      // Insider Business (insider_business): cliente acompanha o projeto.
-      // Sem trilhas/calendário/progresso de mentoria, sem Skills e Squad.
+      // Insider Business (insider_business): cliente da IAplicada.
+      //
+      // A regra virou do avesso. Antes, cliente só via o projeto dele: trilhas,
+      // evolução, materiais e modelos prontos eram todos escondidos. Agora a
+      // plataforma é de consumo de conteúdo e do programa Indica, e a execução
+      // do projeto (sistema, entregas, documentos) sai daqui. Então o cliente
+      // passa a ver o conteúdo, e o que some é o acompanhamento de projeto.
       insider_business: [
-        'trilhas', 'trilhas_skills', 'calendario',
-        'evolucao', 'meu_diagnostico', 'minhas_duvidas',
-        'meu_progresso', 'meu_progresso_visao_geral', 'meu_progresso_roadmap',
+        'meu_sistema', 'meu_sistema_entregas', 'meu_sistema_documentos',
+        'meu_progresso_visao_geral', 'meu_progresso_roadmap',
         'meu_progresso_conteudo', 'meu_progresso_entregas',
         'skills_minha_equipe', 'skills_backlog', 'skills_roadmap', 'skills_entregas', 'skills_painel_lider',
         'projeto_skills', 'projeto_skills_visao_geral', 'projeto_skills_performance', 'projeto_skills_diagnostico', 'projeto_skills_projetos', 'projeto_skills_entregas',
-        'ia_copie_use', 'metodos_aplicar',
         'squad', 'squad_lider'
       ],
 

@@ -1,4 +1,4 @@
-import { Fragment, useState, useEffect } from "react";
+import { Fragment, useState } from "react";
 import { Home, BookOpen, Star, Bell, LogOut, MessageSquare, TrendingUp, GraduationCap, Layers, ChevronDown } from "lucide-react";
 import { SidebarAdminSection } from "./SidebarAdminSection";
 import { useAdminViewContext } from "@/contexts/AdminViewContext";
@@ -35,6 +35,10 @@ import * as LucideIcons from "lucide-react";
 // superior), "Minhas dúvidas" (removido do produto) e "Comunidade" (a
 // conversa acontece no grupo do WhatsApp; o ranking ficou em Meu progresso).
 const HIDDEN_MENU_KEYS = ['interacoes', 'minhas_duvidas', 'calendario', 'comunidade'];
+
+// "Materiais" tem bloco próprio, renderizado logo depois de "Aprender". Se a
+// chave vier também do menu_config como menu principal, o item sai duplicado.
+const MENU_COM_BLOCO_PROPRIO = ['bibliotecas'];
 
 export function AppSidebar() {
   const { open } = useSidebar();
@@ -104,7 +108,8 @@ export function AppSidebar() {
   // Excluir "Comunicações" (interacoes) e o grupo "Comunidade" (menu + submenus) do sidebar
   const temGrupoMeuProgresso = sidebarMenus.some(m => m.menu_key === 'meu_progresso' && !m.parent_key);
   const allMainMenus = sidebarMenus.filter(
-    menu => !menu.parent_key && !HIDDEN_MENU_KEYS.includes(menu.menu_key) && !menu.menu_key.startsWith('comunidade')
+    menu => !menu.parent_key && !HIDDEN_MENU_KEYS.includes(menu.menu_key)
+      && !MENU_COM_BLOCO_PROPRIO.includes(menu.menu_key) && !menu.menu_key.startsWith('comunidade')
       // "Meu progresso" e "Minha evolução" apontam para /evolucao: sem duplicar
       && !(menu.menu_key === 'evolucao' && temGrupoMeuProgresso)
   );
@@ -139,6 +144,11 @@ export function AppSidebar() {
       .filter(menu => !['projeto_skills_performance'].includes(menu.menu_key) || isSkillsLider || (isAdmin && !isViewingAs) || skillsMembroLoading);
   };
 
+  /** Abre o grupo sem alternar: clicar no pai nunca deve fechá-lo. */
+  const abrirMenu = (menuKey: string) => {
+    setExpandedMenus(prev => (prev.includes(menuKey) ? prev : [...prev, menuKey]));
+  };
+
   const toggleMenu = (menuKey: string) => {
     setExpandedMenus(prev => 
       prev.includes(menuKey) 
@@ -150,9 +160,9 @@ export function AppSidebar() {
   // Helper para determinar URL dinâmica baseada no plano
   const getMenuUrl = (menu: { menu_key: string; url: string | null }) => {
     if (menu.menu_key === 'meu_progresso') {
-      // "Meu progresso" é sempre a visão Academy (/evolucao). O painel antigo
-      // de mentoria (/mentoria) fica restrito ao Insider Business, que nem vê
-      // este menu. Ex-Builder e ex-Skills (hoje Academy) caem aqui.
+      // "Meu progresso" é sempre a visão Academy (/evolucao), para todo mundo.
+      // O painel antigo de mentoria (/mentoria) não é mais o destino de
+      // ninguém por aqui: o Insider Business agora também cai em /evolucao.
       return '/evolucao';
     }
     // Grupo sem URL (ex: meu_sistema): redireciona para primeiro filho
@@ -163,28 +173,36 @@ export function AppSidebar() {
     return menu.url || "/";
   };
 
-  // Auto-expandir menu quando rota ativa está em submenu (incluindo 3º nível)
-  useEffect(() => {
-    const newExpanded: string[] = [];
-    mainMenus.forEach(menu => {
-      const subMenus = getSubMenus(menu.menu_key);
-      const isInSubRoute = subMenus.some(sub => {
-        if (sub.url && location.pathname.startsWith(sub.url)) return true;
-        // Check 3rd-level children
-        const thirdLevel = getSubMenus(sub.menu_key);
-        return thirdLevel.some(child => child.url && location.pathname.startsWith(child.url));
-      });
-      if (isInSubRoute) {
-        newExpanded.push(menu.menu_key);
-      }
+  // A rota casa com o menu?
+  //
+  // "/" precisa de igualdade: com startsWith ele casaria com toda rota do app,
+  // e o grupo do Início ficaria marcado como ativo em qualquer tela. Para as
+  // demais, startsWith é o certo, porque /trilhas/42 pertence a /trilhas.
+  const rotaCasa = (url: string | null | undefined) => {
+    if (!url) return false;
+    if (url === "/") return location.pathname === "/";
+    return location.pathname === url || location.pathname.startsWith(url + "/");
+  };
+
+  // O grupo a que a rota atual pertence, seja pela própria URL do grupo ou
+  // pela de um filho (ou neto).
+  //
+  // Antes isso era um useEffect que só ACRESCENTAVA ao estado, e só quando a
+  // rota já era a de um filho. O resultado era o relatado: clicar no menu pai
+  // levava para a página mas não abria o grupo, então o caminho não aparecia;
+  // e o que abrisse uma vez ficava aberto para sempre. Derivar da rota resolve
+  // os dois: o grupo da rota está sempre aberto, e nenhum estado fica preso.
+  const grupoDaRota = mainMenus.find(menu => {
+    if (rotaCasa(getMenuUrl(menu))) return true;
+    return getSubMenus(menu.menu_key).some(sub => {
+      if (rotaCasa(sub.url)) return true;
+      return getSubMenus(sub.menu_key).some(child => rotaCasa(child.url));
     });
-    if (newExpanded.length > 0) {
-      setExpandedMenus(prev => {
-        const combined = [...new Set([...prev, ...newExpanded])];
-        return combined;
-      });
-    }
-  }, [location.pathname]);
+  })?.menu_key;
+
+  // As rotas do bloco fixo de "Materiais", que não passa pelo menu_config.
+  const ROTAS_MATERIAIS = ['/ia-copie-use', '/biblioteca-ferramentas', '/biblioteca-prompts', '/metodos-aplicar'];
+  const rotaDeMateriais = ROTAS_MATERIAIS.some(rotaCasa);
 
   return (
     <Sidebar className={cn(
@@ -200,7 +218,7 @@ export function AppSidebar() {
                 const IconComponent = getIconComponent(menu.icon);
                 const subMenus = getSubMenus(menu.menu_key);
                 const hasSubMenus = subMenus.length > 0;
-                const isExpanded = expandedMenus.includes(menu.menu_key);
+                const isExpanded = menu.menu_key === grupoDaRota || expandedMenus.includes(menu.menu_key);
                 
                 // Renderizar Bibliotecas logo após "Aprender" (menu_key === 'aprender')
                 const renderBibliotecasAfter = menu.menu_key === 'aprender';
@@ -216,6 +234,7 @@ export function AppSidebar() {
                         <div className="flex items-center w-full">
                           <NavLink
                             to={getMenuUrl(menu)}
+                            onClick={() => abrirMenu(menu.menu_key)}
                              data-tour={
                               menu.menu_key === 'aprender' ? 'aprender' :
                               menu.menu_key === 'meu_progresso' ? 'meu-progresso' :
@@ -382,7 +401,7 @@ export function AppSidebar() {
                 const bibliotecasMenu = renderBibliotecasAfter && !isVisitante && isMenuVisible('bibliotecas') ? (
                   <Collapsible 
                     key="bibliotecas_menu"
-                    open={expandedMenus.includes('bibliotecas_menu')} 
+                    open={rotaDeMateriais || expandedMenus.includes('bibliotecas_menu')} 
                     onOpenChange={() => toggleMenu('bibliotecas_menu')}
                     data-tour="bibliotecas"
                   >
@@ -391,7 +410,7 @@ export function AppSidebar() {
                         <SidebarMenuButton className="group w-full relative pl-4">
                           <span className={cn(
                             "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
-                            ['/ia-copie-use', '/biblioteca-ferramentas', '/biblioteca-prompts', '/metodos-aplicar'].some(p => location.pathname.startsWith(p))
+                            rotaDeMateriais
                               ? "bg-brand-strong opacity-100" 
                               : "bg-brand-strong opacity-0 group-hover:opacity-50"
                           )} />

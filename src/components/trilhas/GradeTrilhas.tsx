@@ -155,7 +155,7 @@ export function GradeTrilhas() {
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
         {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
           <div key={i} className="h-[340px] animate-skeleton-pulse rounded-card bg-card" />
         ))}
@@ -224,7 +224,7 @@ export function GradeTrilhas() {
         <motion.div
           variants={listaCascata}
           {...aoMontar}
-          className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+          className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5"
         >
           {filtradas.map((t) => (
             <CartaoTrilha
