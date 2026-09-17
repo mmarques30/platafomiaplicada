@@ -27,6 +27,11 @@ export function CentralConteudo() {
     return mapa;
   }, [conteudos]);
 
+  /* Sem nada curado, a seção inteira sai do painel em vez de deixar uma
+     caixa alta e vazia no meio da coluna. */
+  const temAlgum = tabs.some((t) => porGrupo[t.value]?.length);
+  if (!isLoading && !temAlgum) return null;
+
   return (
     <section className="rounded-2xl border border-border bg-card p-4 md:p-6">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -60,9 +65,11 @@ export function CentralConteudo() {
                     <ConteudoCard key={conteudo.id} conteudo={conteudo} />
                   ))
                 ) : (
-                  <div className="col-span-full w-full py-10 text-center">
-                    <tab.icon className="mx-auto mb-3 h-10 w-10 text-muted-foreground/40" strokeWidth={1.5} />
-                    <p className="text-sm text-muted-foreground">Nada publicado aqui por enquanto</p>
+                  <div className="col-span-full flex items-center gap-2.5 rounded-xl border border-dashed border-border px-4 py-3">
+                    <tab.icon className="h-4 w-4 shrink-0 text-muted-foreground/60" strokeWidth={1.5} />
+                    <p className="text-sm text-muted-foreground">
+                      Nada em {tab.label.toLowerCase()} por enquanto.
+                    </p>
                   </div>
                 )}
               </motion.div>
