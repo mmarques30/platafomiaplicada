@@ -32,8 +32,8 @@ export function HeroEvolucao() {
           </p>
         </div>
         <div className="shrink-0 text-sm text-muted-foreground md:text-right">
-          <span className="text-2xl font-semibold text-foreground">{xpAtual.toLocaleString()}</span>
-          <span> / {xpNecessario.toLocaleString()} XP</span>
+          <span className="text-2xl font-semibold text-foreground">{xpAtual.toLocaleString("pt-BR")}</span>
+          <span> / {xpNecessario.toLocaleString("pt-BR")} XP</span>
         </div>
       </div>
 

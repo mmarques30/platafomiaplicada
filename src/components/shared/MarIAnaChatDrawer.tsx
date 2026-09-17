@@ -13,12 +13,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useMentoriaContext } from "@/hooks/useMentoriaContext";
 import { useUserProfile } from "@/hooks/useUserProfile";
-import { useSidebar } from "@/components/ui/sidebar";
-import { cn } from "@/lib/utils";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useEffectivePlan } from "@/hooks/useUserPlan";
-import mariAvatar from "@/assets/mari-avatar-new.png";
-import mariAvatarFallback from "@/assets/mari-avatar.jpg";
+import logoSimbolo from "@/assets/logo-aplicada-simbolo.png";
 
 interface Message {
   role: "user" | "assistant";
@@ -43,8 +40,6 @@ export function MarIAnaChatDrawer({ onClose }: MarIAnaChatDrawerProps) {
   const isMentoriaPage = pathname.startsWith("/mentoria");
   const { contextText, proactiveMessage } = useMentoriaContext({ enabled: isMentoriaPage });
   const { profile } = useUserProfile();
-  const { state: sidebarState } = useSidebar();
-  const sidebarAberta = sidebarState === "expanded";
   const { isAdmin, isLoading: roleLoading } = useUserRole();
   const { effectivePlan } = useEffectivePlan(isAdmin, roleLoading);
   const firstName = profile?.nome_completo?.split(' ')?.[0] ?? 'por aqui';
@@ -297,20 +292,15 @@ export function MarIAnaChatDrawer({ onClose }: MarIAnaChatDrawerProps) {
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: 20, scale: 0.95 }}
       transition={{ duration: 0.2 }}
-      className={cn(
-        "fixed bottom-20 left-4 right-4 z-50 flex h-[500px] max-h-[70vh] flex-col overflow-hidden",
-        "rounded-card border border-border bg-surface text-foreground shadow-elevated",
-        "md:bottom-24 md:right-auto md:w-[380px]",
-        sidebarAberta ? "md:left-[17rem]" : "md:left-[4.25rem]",
-      )}
+      className="fixed bottom-20 left-4 right-4 z-50 flex h-[500px] max-h-[70vh] flex-col overflow-hidden rounded-card border border-border bg-surface text-foreground shadow-elevated md:bottom-24 md:left-auto md:right-6 md:w-[380px]"
     >
       {/* Header */}
       <div className="flex items-center gap-3 px-4 py-3 border-b border-border bg-surface">
         <img
-          src={mariAvatar}
+          src={logoSimbolo}
           alt="MarIAna"
-          className="w-8 h-8 rounded-full object-cover"
-          onError={(e) => { e.currentTarget.src = mariAvatarFallback; }}
+          className="w-8 h-8 rounded-full object-contain"
+          
         />
         <div className="flex-1 min-w-0">
           <h3 className="text-sm font-semibold leading-tight">
@@ -342,10 +332,10 @@ export function MarIAnaChatDrawer({ onClose }: MarIAnaChatDrawerProps) {
         ) : messages.length === 0 && !isLoading ? (
           <div className="flex flex-col items-center justify-center text-center py-4">
             <img
-              src={mariAvatar}
+              src={logoSimbolo}
               alt="MarIAna"
-              className="w-12 h-12 rounded-full mb-2 object-cover"
-              onError={(e) => { e.currentTarget.src = mariAvatarFallback; }}
+              className="w-12 h-12 rounded-full mb-2 object-contain"
+              
             />
             <p className="text-sm font-medium">
               Sou a Mar<span className="text-primary">IA</span>na
@@ -378,10 +368,10 @@ export function MarIAnaChatDrawer({ onClose }: MarIAnaChatDrawerProps) {
             >
               {message.role === "assistant" && (
                 <img
-                  src={mariAvatar}
+                  src={logoSimbolo}
                   alt="MarIAna"
                   className="w-7 h-7 rounded-full flex-shrink-0"
-                  onError={(e) => { e.currentTarget.src = mariAvatarFallback; }}
+                  
                 />
               )}
               <div
@@ -457,10 +447,10 @@ export function MarIAnaChatDrawer({ onClose }: MarIAnaChatDrawerProps) {
           <div className="flex justify-start">
             <div className="flex gap-2 items-start">
               <img
-                src={mariAvatar}
+                src={logoSimbolo}
                 alt="MarIAna"
                 className="w-7 h-7 rounded-full flex-shrink-0"
-                onError={(e) => { e.currentTarget.src = mariAvatarFallback; }}
+                
               />
               <div className="bg-surface border border-border rounded-xl px-4 py-3 flex items-center gap-1">
                 {[0, 1, 2].map((i) => (

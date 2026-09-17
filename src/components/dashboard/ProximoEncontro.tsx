@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { format, isAfter, parseISO, startOfDay } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
-import { useAulasCalendario } from "@/hooks/useCalendarioAulas";
+import { useAulasCalendario, type AulaSemanal } from "@/hooks/useCalendarioAulas";
 import { Button } from "@/components/ui/button";
 
 const NOME_TIPO: Record<string, string> = {
@@ -13,13 +13,13 @@ const NOME_TIPO: Record<string, string> = {
 };
 
 /**
- * O próximo encontro marcado, lido do calendário de aulas. Some quando não há
- * nada agendado com data — aula recorrente sem data não entra aqui.
+ * O próximo encontro marcado, lido do calendário de aulas. Aula recorrente sem
+ * data não entra: aqui só vale o que tem dia.
  */
-export function ProximoEncontro() {
+function useProximoEncontro(): { aula: AulaSemanal | null; isLoading: boolean } {
   const { data: aulas, isLoading } = useAulasCalendario();
 
-  const proxima = useMemo(() => {
+  const aula = useMemo(() => {
     if (!aulas?.length) return null;
     const hoje = startOfDay(new Date());
     return (
@@ -29,48 +29,65 @@ export function ProximoEncontro() {
     );
   }, [aulas]);
 
+  return { aula, isLoading };
+}
+
+/**
+ * Faixa larga, no fluxo da página. Era um cartão estreito numa coluna à
+ * direita, e essa coluna deixava um vazio grande sempre que o conteúdo da
+ * esquerda era mais alto.
+ */
+export function ProximoEncontro() {
+  const { aula, isLoading } = useProximoEncontro();
+
   if (isLoading) {
-    return <div className="h-[196px] animate-skeleton-pulse rounded-card bg-card" />;
+    return <div className="h-[92px] animate-skeleton-pulse rounded-card bg-card" />;
   }
 
-  if (!proxima) return null;
+  if (!aula) return null;
 
-  const data = parseISO(proxima.data_aula!);
+  const data = parseISO(aula.data_aula!);
 
   return (
-    <section className="rounded-card border border-border bg-card p-5 shadow-card">
-      <span className="rotulo-mono">Próximo encontro</span>
-
-      <div className="mt-4 flex items-baseline gap-3">
+    <section className="flex flex-col gap-4 rounded-card border border-border bg-card p-4 shadow-card sm:flex-row sm:items-center md:p-5">
+      {/* Data */}
+      <div className="flex items-baseline gap-3 sm:min-w-[150px] sm:flex-col sm:items-start sm:gap-0.5 sm:border-r sm:border-border sm:pr-5">
         <span className="font-serif-display text-4xl leading-none text-foreground">
           {format(data, "dd")}
         </span>
-        <div className="flex min-w-0 flex-col">
+        <div className="flex flex-col">
           <span className="text-sm font-medium capitalize text-foreground">
             {format(data, "MMMM", { locale: ptBR })}
           </span>
-          <span className="rotulo-mono truncate">
+          <span className="rotulo-mono">
             {format(data, "EEEE", { locale: ptBR })}
-            {proxima.horario ? ` · ${proxima.horario}` : ""}
+            {aula.horario ? ` · ${aula.horario}` : ""}
           </span>
         </div>
       </div>
 
-      <p className="mt-4 text-sm leading-relaxed text-foreground">{proxima.tema}</p>
-      {proxima.descricao && (
-        <p className="mt-1.5 line-clamp-3 text-xs leading-relaxed text-muted-foreground">
-          {proxima.descricao}
-        </p>
-      )}
-      {proxima.tipo_evento && (
-        <span className="mt-3 inline-flex rounded-full border border-border px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
-          {NOME_TIPO[proxima.tipo_evento] ?? "Encontro"}
-        </span>
-      )}
+      {/* Tema */}
+      <div className="min-w-0 flex-1 space-y-1">
+        <div className="flex flex-wrap items-center gap-2.5">
+          <span className="rotulo-mono">Próximo encontro</span>
+          {aula.tipo_evento && (
+            <>
+              <span className="text-muted-foreground/40">·</span>
+              <span className="rotulo-mono">{NOME_TIPO[aula.tipo_evento] ?? "Encontro"}</span>
+            </>
+          )}
+        </div>
+        <p className="text-sm font-medium leading-snug text-foreground md:text-base">{aula.tema}</p>
+        {aula.descricao && (
+          <p className="line-clamp-2 text-xs leading-relaxed text-muted-foreground md:text-sm">
+            {aula.descricao}
+          </p>
+        )}
+      </div>
 
-      {proxima.link_reuniao && (
-        <Button size="pill" className="mt-4 w-full" asChild>
-          <a href={proxima.link_reuniao} target="_blank" rel="noopener noreferrer">
+      {aula.link_reuniao && (
+        <Button size="pill" className="w-full shrink-0 sm:w-auto" asChild>
+          <a href={aula.link_reuniao} target="_blank" rel="noopener noreferrer">
             Entrar no encontro
           </a>
         </Button>

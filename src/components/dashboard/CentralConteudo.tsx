@@ -52,7 +52,7 @@ export function CentralConteudo() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
                 transition={{ duration: 0.15 }}
-                className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 md:gap-4"
+                className="grid gap-3 md:gap-4 [grid-template-columns:repeat(auto-fill,minmax(220px,1fr))]"
               >
                 {isLoading ? (
                   <>
