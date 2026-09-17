@@ -1,31 +1,42 @@
+import { motion } from "framer-motion";
+
+import { SAIDA_LONGA } from "./motion-entrada";
+
 /**
- * IAplicadaBackground — fundo escuro "quadriculado" do acesso inicial.
+ * O ambiente do acesso inicial.
  *
- * Porta direta da camada `IABackground` da LP iaplicada.com (repo
- * ia-transform): grade blueprint deslizando + glows verdes que derivam +
- * feixe varrendo + sparks ✱ + grão. Cores/valores idênticos aos da LP
- * (grid rgba(158,176,56,.1) em 58px, lime #d5e95a, olive #7a8f30).
+ * Antes, um quadriculado denso com dois glows enormes lavava a tela inteira
+ * de verde, e o conteúdo disputava contraste com o fundo. A estrutura agora é
+ * a do refractweb.com: base escura neutra, e a cor concentrada em dois orbes
+ * saturados fora do enquadramento, num canto só. O resto da tela fica limpo,
+ * que é o que deixa a tipografia respirar.
  *
- * Fica atrás do conteúdo (absolute inset-0 z-0, pointer-events off); o
- * wrapper precisa ser `relative overflow-hidden` e o conteúdo z-10.
- * O CSS mora em index.css sob o prefixo `.ia-entry-bg`.
+ * Os orbes também chegam: entram em escala ao longo de dois segundos, mais
+ * devagar que qualquer texto, então a luz já está lá quando a pessoa começa a
+ * ler. Depois disso eles derivam devagar, em ciclos longos e dessincronizados,
+ * para a tela nunca ficar parada sem chamar atenção.
+ *
+ * Fica atrás do conteúdo; o wrapper precisa ser `relative overflow-hidden` e o
+ * conteúdo, z-10.
  */
 export function IAplicadaBackground() {
   return (
     <div className="ia-entry-bg" aria-hidden="true">
       <div className="ia-entry-bg__grid" />
-      <div className="ia-entry-bg__glow ia-entry-bg__glow--1" />
-      <div className="ia-entry-bg__glow ia-entry-bg__glow--2" />
-      <div className="ia-entry-bg__sweep" />
-      <div className="ia-entry-bg__spark" style={{ top: "14%", left: "38%" }}>
-        ✱
-      </div>
-      <div className="ia-entry-bg__spark" style={{ top: "70%", left: "24%" }}>
-        ✱
-      </div>
-      <div className="ia-entry-bg__spark" style={{ top: "26%", right: "34%" }}>
-        ✱
-      </div>
+
+      <motion.div
+        className="ia-entry-bg__orbe ia-entry-bg__orbe--lime"
+        initial={{ opacity: 0, scale: 0.86 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 2, ease: SAIDA_LONGA }}
+      />
+      <motion.div
+        className="ia-entry-bg__orbe ia-entry-bg__orbe--oliva"
+        initial={{ opacity: 0, scale: 0.86 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 2, delay: 0.25, ease: SAIDA_LONGA }}
+      />
+
       <div className="ia-entry-bg__grain" />
     </div>
   );

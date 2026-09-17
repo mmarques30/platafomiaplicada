@@ -1,5 +1,9 @@
 import { motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
+
+import { LetrasQueGiram } from "./LetrasQueGiram";
+import { LinhaRevelada } from "./LinhaRevelada";
+import { COMPASSO, sobeEAparece } from "./motion-entrada";
 import { LoginForm } from "@/components/auth/LoginForm";
 import logoIAplicada from "@/assets/logo-auth-fundo-escuro.png";
 
@@ -8,52 +12,41 @@ interface EntryLoginProps {
 }
 
 /**
- * EntryLogin — acesso discreto, direto sobre o fundo da LP (sem card).
- * Só logo, título "Entrar", e-mail, senha, botão "Acessar" e
- * "Esqueceu a senha?". Não existe criação de conta: o acesso é dado
- * pela IAplicada conforme o plano.
+ * EntryLogin — o acesso, direto sobre o fundo, sem card.
+ *
+ * Os campos são os mesmos: e-mail, senha, "Acessar" e "Esqueceu a senha?".
+ * Não existe criação de conta, porque o acesso é dado pela IAplicada conforme
+ * o plano.
+ *
+ * O que mudou: antes isso era uma coluna estreita centralizada, e sair do hero
+ * jogava o olho do canto esquerdo para o meio da tela. Agora o acesso nasce na
+ * mesma coluna e na mesma margem do título, então a troca é o conteúdo mudando
+ * no lugar, não a página se reorganizando. A marca e o título repetem o mesmo
+ * compasso de chegada do hero, com os degraus mais curtos, porque aqui a
+ * pessoa já chegou: ela quer digitar.
  */
 export function EntryLogin({ onBack }: EntryLoginProps) {
   return (
-    <div className="flex w-full max-w-sm flex-col items-center text-center">
-      <motion.img
-        src={logoIAplicada}
-        alt="IAplicada"
-        className="h-8 w-auto md:h-9"
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-      />
+    <div className="w-full max-w-sm text-left">
+      <motion.div variants={sobeEAparece(COMPASSO.marca, 0.6)} className="ia-entry-marca">
+        <img src={logoIAplicada} alt="IAplicada" className="ia-entry-marca__logo" />
+        <span className="ia-entry-marca__rule" aria-hidden />
+      </motion.div>
 
-      <motion.h1
-        className="ia-entry-login-title mt-7"
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.45, delay: 0.08 }}
-      >
-        Entrar
-      </motion.h1>
+      <h1 className="ia-entry-login-title mt-8">
+        <LinhaRevelada atraso={COMPASSO.tituloPrimeiraLinha}>Entrar</LinhaRevelada>
+      </h1>
 
-      <motion.div
-        className="mt-7 w-full"
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.45, delay: 0.16 }}
-      >
+      <motion.div variants={sobeEAparece(COMPASSO.apoio - 0.2, 0.6)} className="mt-7 w-full">
         <LoginForm />
       </motion.div>
 
-      <motion.button
-        type="button"
-        onClick={onBack}
-        className="ia-entry-link mt-8 inline-flex items-center gap-1.5"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.4, delay: 0.3 }}
-      >
-        <ArrowLeft className="h-3.5 w-3.5" />
-        Voltar
-      </motion.button>
+      <motion.div variants={sobeEAparece(COMPASSO.acao - 0.2, 0.6)} className="mt-8">
+        <button type="button" onClick={onBack} className="ia-entry-link group/letras">
+          <ArrowLeft className="h-3.5 w-3.5 transition-transform duration-300 group-hover/letras:-translate-x-1" />
+          <LetrasQueGiram texto="Voltar" />
+        </button>
+      </motion.div>
     </div>
   );
 }
