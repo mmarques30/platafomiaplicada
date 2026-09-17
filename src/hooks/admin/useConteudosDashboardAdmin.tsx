@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-export type TipoConteudo = 'newsletter' | 'noticia' | 'dica' | 'material' | 'criador';
+export type TipoConteudo = 'artigo' | 'documento' | 'dica' | 'noticia' | 'newsletter' | 'material' | 'criador';
 
 export type CategoriaConteudo = 'ChatGPT' | 'Claude' | 'Midjourney' | 'Canva' | 'Notion' | 'Excel' | 'Outro';
 

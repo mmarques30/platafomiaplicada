@@ -1,35 +1,31 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Newspaper, Globe, Lightbulb, FileText, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useConteudosDashboardGratuito } from "@/hooks/useConteudosDashboardGratuito";
-import { useMateriaisGratuitos } from "@/hooks/useMateriaisGratuitos";
-import { TipoConteudo } from "@/hooks/useConteudosDashboard";
+import { ConteudoDashboard } from "@/hooks/useConteudosDashboard";
+import { GRUPOS, tipoInfo } from "@/lib/conteudoTipos";
 import { ConteudoCard } from "./ConteudoCard";
-import { MaterialCard } from "./MaterialCard";
 import logo3d from "@/assets/logo-3d.png";
 import { Link } from "react-router-dom";
 
-type TabValue = TipoConteudo | "material";
+type TabValue = string;
 
-const tabs = [
-  { value: "noticia" as TabValue, label: "Notícias IA", icon: Globe },
-  { value: "dica" as TabValue, label: "Dicas Práticas", icon: Lightbulb },
-  { value: "newsletter" as TabValue, label: "Newsletter", icon: Newspaper },
-];
+const tabs = GRUPOS.map((g) => ({ value: g.value, label: g.label, icon: tipoInfo(g.tipos[0]).icon }));
 
 export function CentralConteudoGratuito() {
-  const [activeTab, setActiveTab] = useState<TabValue>("noticia");
-  
-  // Para conteúdos (newsletter, noticia, dica)
-  const { data: conteudos, isLoading: isLoadingConteudos } = useConteudosDashboardGratuito(
-    activeTab !== "material" ? activeTab as TipoConteudo : undefined
-  );
-  
-  // Para materiais (da tabela materiais_gratuitos)
-  const { data: materiais, isLoading: isLoadingMateriais } = useMateriaisGratuitos(10);
-  
-  const isLoading = activeTab === "material" ? isLoadingMateriais : isLoadingConteudos;
+  const [activeTab, setActiveTab] = useState<TabValue>(tabs[0].value);
+
+  // Uma consulta só; as abas agrupam no cliente.
+  const { data: conteudos, isLoading } = useConteudosDashboardGratuito();
+
+  const porGrupo = useMemo(() => {
+    const mapa: Record<string, ConteudoDashboard[]> = {};
+    for (const grupo of GRUPOS) {
+      mapa[grupo.value] = (conteudos || []).filter((c) => grupo.tipos.includes(c.tipo));
+    }
+    return mapa;
+  }, [conteudos]);
 
   return (
     <section className="relative overflow-hidden rounded-xl sm:rounded-2xl border border-primary/30 sm:border-2 bg-gradient-to-br from-primary/10 via-card to-primary/5 shadow-lg sm:shadow-xl shadow-primary/10 dark:border-primary/40 dark:from-primary/15 dark:to-primary/5">
@@ -93,14 +89,8 @@ export function CentralConteudoGratuito() {
                         </div>
                       ))}
                     </>
-                  ) : activeTab === "material" && materiais && materiais.length > 0 ? (
-                    materiais.map((material) => (
-                      <div key={material.id} className="snap-start">
-                        <MaterialCard material={material} />
-                      </div>
-                    ))
-                  ) : activeTab !== "material" && conteudos && conteudos.length > 0 ? (
-                    conteudos.map((conteudo) => (
+                  ) : porGrupo[tab.value]?.length ? (
+                    porGrupo[tab.value].map((conteudo) => (
                       <div key={conteudo.id} className="snap-start">
                         <ConteudoCard conteudo={conteudo} />
                       </div>
@@ -109,7 +99,7 @@ export function CentralConteudoGratuito() {
                     <div className="w-full py-12 text-center">
                       <tab.icon className="w-12 h-12 mx-auto text-primary/30 mb-3" />
                       <p className="text-muted-foreground">
-                        Nenhum conteúdo disponível nesta categoria
+                        Nada publicado aqui por enquanto
                       </p>
                     </div>
                   )}
