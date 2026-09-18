@@ -122,11 +122,13 @@ export type Database = {
           data_aula: string | null
           descricao: string | null
           dia_semana: string | null
+          gravacao_url: string | null
           horario: string | null
           id: string
           link_reuniao: string | null
           realizada: boolean | null
           recorrente: boolean | null
+          resumo: string | null
           tema: string
           tipo_evento: string | null
           updated_at: string | null
@@ -137,11 +139,13 @@ export type Database = {
           data_aula?: string | null
           descricao?: string | null
           dia_semana?: string | null
+          gravacao_url?: string | null
           horario?: string | null
           id?: string
           link_reuniao?: string | null
           realizada?: boolean | null
           recorrente?: boolean | null
+          resumo?: string | null
           tema: string
           tipo_evento?: string | null
           updated_at?: string | null
@@ -152,11 +156,13 @@ export type Database = {
           data_aula?: string | null
           descricao?: string | null
           dia_semana?: string | null
+          gravacao_url?: string | null
           horario?: string | null
           id?: string
           link_reuniao?: string | null
           realizada?: boolean | null
           recorrente?: boolean | null
+          resumo?: string | null
           tema?: string
           tipo_evento?: string | null
           updated_at?: string | null
@@ -499,6 +505,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      bonus_catalogo: {
+        Row: {
+          ativo: boolean
+          created_at: string
+          descricao: string | null
+          id: string
+          nome: string
+          ordem: number
+          prazo_entrega_dias: number | null
+          updated_at: string
+          valor_referencia: number | null
+        }
+        Insert: {
+          ativo?: boolean
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          nome: string
+          ordem?: number
+          prazo_entrega_dias?: number | null
+          updated_at?: string
+          valor_referencia?: number | null
+        }
+        Update: {
+          ativo?: boolean
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          nome?: string
+          ordem?: number
+          prazo_entrega_dias?: number | null
+          updated_at?: string
+          valor_referencia?: number | null
+        }
+        Relationships: []
       }
       bonus_mentoria: {
         Row: {
@@ -1569,6 +1611,57 @@ export type Database = {
           },
         ]
       }
+      convites: {
+        Row: {
+          aceito_em: string | null
+          created_at: string
+          creditar_a: string | null
+          email: string
+          empresa: string | null
+          expira_em: string
+          gerado_por: string
+          id: string
+          nome: string | null
+          papel: Database["public"]["Enums"]["papel_programa"]
+          status: Database["public"]["Enums"]["status_convite"]
+          token: string
+          updated_at: string
+          usuario_id: string | null
+        }
+        Insert: {
+          aceito_em?: string | null
+          created_at?: string
+          creditar_a?: string | null
+          email: string
+          empresa?: string | null
+          expira_em?: string
+          gerado_por: string
+          id?: string
+          nome?: string | null
+          papel: Database["public"]["Enums"]["papel_programa"]
+          status?: Database["public"]["Enums"]["status_convite"]
+          token?: string
+          updated_at?: string
+          usuario_id?: string | null
+        }
+        Update: {
+          aceito_em?: string | null
+          created_at?: string
+          creditar_a?: string | null
+          email?: string
+          empresa?: string | null
+          expira_em?: string
+          gerado_por?: string
+          id?: string
+          nome?: string | null
+          papel?: Database["public"]["Enums"]["papel_programa"]
+          status?: Database["public"]["Enums"]["status_convite"]
+          token?: string
+          updated_at?: string
+          usuario_id?: string | null
+        }
+        Relationships: []
+      }
       cupons_visitantes: {
         Row: {
           ativo: boolean | null
@@ -1991,6 +2084,48 @@ export type Database = {
           },
         ]
       }
+      documentos_consulta: {
+        Row: {
+          arquivo_url: string
+          ativo: boolean
+          categoria: string | null
+          created_at: string
+          descricao: string | null
+          destinatario_id: string | null
+          id: string
+          ordem: number
+          publicado_por: string | null
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          arquivo_url: string
+          ativo?: boolean
+          categoria?: string | null
+          created_at?: string
+          descricao?: string | null
+          destinatario_id?: string | null
+          id?: string
+          ordem?: number
+          publicado_por?: string | null
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          arquivo_url?: string
+          ativo?: boolean
+          categoria?: string | null
+          created_at?: string
+          descricao?: string | null
+          destinatario_id?: string | null
+          id?: string
+          ordem?: number
+          publicado_por?: string | null
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       documentos_legais: {
         Row: {
           apenas_mentorados: boolean | null
@@ -2200,6 +2335,97 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "ranking_dashboard"
             referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      encontro_materiais: {
+        Row: {
+          aula_id: string
+          created_at: string
+          descricao: string | null
+          id: string
+          ordem: number
+          tipo: string
+          titulo: string
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          aula_id: string
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          ordem?: number
+          tipo?: string
+          titulo: string
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          aula_id?: string
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          ordem?: number
+          tipo?: string
+          titulo?: string
+          updated_at?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "encontro_materiais_aula_id_fkey"
+            columns: ["aula_id"]
+            isOneToOne: false
+            referencedRelation: "aulas_semanais"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      encontro_speakers: {
+        Row: {
+          aula_id: string
+          bio: string | null
+          created_at: string
+          empresa: string | null
+          foto_url: string | null
+          id: string
+          nome: string
+          ordem: number
+          papel: string | null
+          updated_at: string
+        }
+        Insert: {
+          aula_id: string
+          bio?: string | null
+          created_at?: string
+          empresa?: string | null
+          foto_url?: string | null
+          id?: string
+          nome: string
+          ordem?: number
+          papel?: string | null
+          updated_at?: string
+        }
+        Update: {
+          aula_id?: string
+          bio?: string | null
+          created_at?: string
+          empresa?: string | null
+          foto_url?: string | null
+          id?: string
+          nome?: string
+          ordem?: number
+          papel?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "encontro_speakers_aula_id_fkey"
+            columns: ["aula_id"]
+            isOneToOne: false
+            referencedRelation: "aulas_semanais"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -3377,6 +3603,109 @@ export type Database = {
         }
         Relationships: []
       }
+      indicacao_eventos: {
+        Row: {
+          created_at: string
+          de_status: Database["public"]["Enums"]["status_indicacao"] | null
+          id: string
+          indicacao_id: string
+          nota: string | null
+          para_status: Database["public"]["Enums"]["status_indicacao"]
+          por: string | null
+        }
+        Insert: {
+          created_at?: string
+          de_status?: Database["public"]["Enums"]["status_indicacao"] | null
+          id?: string
+          indicacao_id: string
+          nota?: string | null
+          para_status: Database["public"]["Enums"]["status_indicacao"]
+          por?: string | null
+        }
+        Update: {
+          created_at?: string
+          de_status?: Database["public"]["Enums"]["status_indicacao"] | null
+          id?: string
+          indicacao_id?: string
+          nota?: string | null
+          para_status?: Database["public"]["Enums"]["status_indicacao"]
+          por?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "indicacao_eventos_indicacao_id_fkey"
+            columns: ["indicacao_id"]
+            isOneToOne: false
+            referencedRelation: "indicacoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      indicacoes: {
+        Row: {
+          contato_email: string | null
+          contato_nome: string | null
+          contato_whatsapp: string | null
+          convite_id: string | null
+          created_at: string
+          empresa_nome: string
+          fechada_em: string | null
+          id: string
+          indicador_id: string
+          motivo_perda: string | null
+          observacao: string | null
+          qualificada_em: string | null
+          responsavel_id: string | null
+          status: Database["public"]["Enums"]["status_indicacao"]
+          updated_at: string
+          valor_fechado: number | null
+        }
+        Insert: {
+          contato_email?: string | null
+          contato_nome?: string | null
+          contato_whatsapp?: string | null
+          convite_id?: string | null
+          created_at?: string
+          empresa_nome: string
+          fechada_em?: string | null
+          id?: string
+          indicador_id: string
+          motivo_perda?: string | null
+          observacao?: string | null
+          qualificada_em?: string | null
+          responsavel_id?: string | null
+          status?: Database["public"]["Enums"]["status_indicacao"]
+          updated_at?: string
+          valor_fechado?: number | null
+        }
+        Update: {
+          contato_email?: string | null
+          contato_nome?: string | null
+          contato_whatsapp?: string | null
+          convite_id?: string | null
+          created_at?: string
+          empresa_nome?: string
+          fechada_em?: string | null
+          id?: string
+          indicador_id?: string
+          motivo_perda?: string | null
+          observacao?: string | null
+          qualificada_em?: string | null
+          responsavel_id?: string | null
+          status?: Database["public"]["Enums"]["status_indicacao"]
+          updated_at?: string
+          valor_fechado?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "indicacoes_convite_id_fkey"
+            columns: ["convite_id"]
+            isOneToOne: false
+            referencedRelation: "convites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       instrucoes_etapa: {
         Row: {
           created_at: string | null
@@ -4106,6 +4435,45 @@ export type Database = {
           },
         ]
       }
+      mural_oportunidades: {
+        Row: {
+          area: string | null
+          ativo: boolean
+          autor_id: string
+          created_at: string
+          descricao: string
+          expira_em: string | null
+          id: string
+          tipo: Database["public"]["Enums"]["tipo_oportunidade"]
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          area?: string | null
+          ativo?: boolean
+          autor_id: string
+          created_at?: string
+          descricao: string
+          expira_em?: string | null
+          id?: string
+          tipo: Database["public"]["Enums"]["tipo_oportunidade"]
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          area?: string | null
+          ativo?: boolean
+          autor_id?: string
+          created_at?: string
+          descricao?: string
+          expira_em?: string | null
+          id?: string
+          tipo?: Database["public"]["Enums"]["tipo_oportunidade"]
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       notas_projeto_business: {
         Row: {
           categoria: string | null
@@ -4251,6 +4619,45 @@ export type Database = {
           id?: string
           plano?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      parcerias: {
+        Row: {
+          condicoes: string | null
+          contrato_url: string | null
+          created_at: string
+          id: string
+          papel: Database["public"]["Enums"]["papel_programa"]
+          status: Database["public"]["Enums"]["status_parceria"]
+          updated_at: string
+          user_id: string
+          vigencia_fim: string | null
+          vigencia_inicio: string | null
+        }
+        Insert: {
+          condicoes?: string | null
+          contrato_url?: string | null
+          created_at?: string
+          id?: string
+          papel: Database["public"]["Enums"]["papel_programa"]
+          status?: Database["public"]["Enums"]["status_parceria"]
+          updated_at?: string
+          user_id: string
+          vigencia_fim?: string | null
+          vigencia_inicio?: string | null
+        }
+        Update: {
+          condicoes?: string | null
+          contrato_url?: string | null
+          created_at?: string
+          id?: string
+          papel?: Database["public"]["Enums"]["papel_programa"]
+          status?: Database["public"]["Enums"]["status_parceria"]
+          updated_at?: string
+          user_id?: string
+          vigencia_fim?: string | null
+          vigencia_inicio?: string | null
         }
         Relationships: []
       }
@@ -4781,6 +5188,84 @@ export type Database = {
         }
         Relationships: []
       }
+      programa_papeis: {
+        Row: {
+          created_at: string
+          definido_por: string | null
+          id: string
+          observacao: string | null
+          origem_convite_id: string | null
+          papel: Database["public"]["Enums"]["papel_programa"]
+          updated_at: string
+          user_id: string
+          vigente_ate: string | null
+          vigente_de: string
+        }
+        Insert: {
+          created_at?: string
+          definido_por?: string | null
+          id?: string
+          observacao?: string | null
+          origem_convite_id?: string | null
+          papel: Database["public"]["Enums"]["papel_programa"]
+          updated_at?: string
+          user_id: string
+          vigente_ate?: string | null
+          vigente_de?: string
+        }
+        Update: {
+          created_at?: string
+          definido_por?: string | null
+          id?: string
+          observacao?: string | null
+          origem_convite_id?: string | null
+          papel?: Database["public"]["Enums"]["papel_programa"]
+          updated_at?: string
+          user_id?: string
+          vigente_ate?: string | null
+          vigente_de?: string
+        }
+        Relationships: []
+      }
+      programa_regras: {
+        Row: {
+          exige_contrato: boolean
+          observacao: string | null
+          papel: Database["public"]["Enums"]["papel_programa"]
+          percentual_base: number | null
+          percentual_incremento: number
+          percentual_teto: number | null
+          renovacao_meses: number | null
+          rotulo: string
+          updated_at: string
+          volume_minimo_mes: number | null
+        }
+        Insert: {
+          exige_contrato?: boolean
+          observacao?: string | null
+          papel: Database["public"]["Enums"]["papel_programa"]
+          percentual_base?: number | null
+          percentual_incremento?: number
+          percentual_teto?: number | null
+          renovacao_meses?: number | null
+          rotulo: string
+          updated_at?: string
+          volume_minimo_mes?: number | null
+        }
+        Update: {
+          exige_contrato?: boolean
+          observacao?: string | null
+          papel?: Database["public"]["Enums"]["papel_programa"]
+          percentual_base?: number | null
+          percentual_incremento?: number
+          percentual_teto?: number | null
+          renovacao_meses?: number | null
+          rotulo?: string
+          updated_at?: string
+          volume_minimo_mes?: number | null
+        }
+        Relationships: []
+      }
       progresso_videos: {
         Row: {
           completado: boolean | null
@@ -4920,6 +5405,119 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      recompensa_parcelas: {
+        Row: {
+          created_at: string
+          id: string
+          observacao: string | null
+          pago_em: string | null
+          previsto_para: string | null
+          recompensa_id: string
+          updated_at: string
+          valor: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          observacao?: string | null
+          pago_em?: string | null
+          previsto_para?: string | null
+          recompensa_id: string
+          updated_at?: string
+          valor: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          observacao?: string | null
+          pago_em?: string | null
+          previsto_para?: string | null
+          recompensa_id?: string
+          updated_at?: string
+          valor?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recompensa_parcelas_recompensa_id_fkey"
+            columns: ["recompensa_id"]
+            isOneToOne: false
+            referencedRelation: "recompensas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      recompensas: {
+        Row: {
+          aprovada_em: string | null
+          beneficiario_id: string
+          bonus_id: string | null
+          created_at: string
+          escolhida_em: string | null
+          id: string
+          indicacao_id: string
+          observacao: string | null
+          ordem_fechamento: number | null
+          paga_em: string | null
+          percentual: number | null
+          status: Database["public"]["Enums"]["status_recompensa"]
+          tipo: Database["public"]["Enums"]["tipo_recompensa"] | null
+          updated_at: string
+          valor: number | null
+          valor_base: number | null
+        }
+        Insert: {
+          aprovada_em?: string | null
+          beneficiario_id: string
+          bonus_id?: string | null
+          created_at?: string
+          escolhida_em?: string | null
+          id?: string
+          indicacao_id: string
+          observacao?: string | null
+          ordem_fechamento?: number | null
+          paga_em?: string | null
+          percentual?: number | null
+          status?: Database["public"]["Enums"]["status_recompensa"]
+          tipo?: Database["public"]["Enums"]["tipo_recompensa"] | null
+          updated_at?: string
+          valor?: number | null
+          valor_base?: number | null
+        }
+        Update: {
+          aprovada_em?: string | null
+          beneficiario_id?: string
+          bonus_id?: string | null
+          created_at?: string
+          escolhida_em?: string | null
+          id?: string
+          indicacao_id?: string
+          observacao?: string | null
+          ordem_fechamento?: number | null
+          paga_em?: string | null
+          percentual?: number | null
+          status?: Database["public"]["Enums"]["status_recompensa"]
+          tipo?: Database["public"]["Enums"]["tipo_recompensa"] | null
+          updated_at?: string
+          valor?: number | null
+          valor_base?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recompensas_bonus_id_fkey"
+            columns: ["bonus_id"]
+            isOneToOne: false
+            referencedRelation: "bonus_catalogo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recompensas_indicacao_id_fkey"
+            columns: ["indicacao_id"]
+            isOneToOne: false
+            referencedRelation: "indicacoes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       recursos_mentoria: {
         Row: {
@@ -6324,7 +6922,12 @@ export type Database = {
         Returns: undefined
       }
       admin_delete_user: { Args: { p_user_id: string }; Returns: Json }
-      calcular_prazo_sla: { Args: { p_user_id: string }; Returns: string }
+      calcular_prazo_sla:
+        | { Args: { p_user_id: string }; Returns: string }
+        | {
+            Args: { plano: Database["public"]["Enums"]["plano_mentoria"] }
+            Returns: string
+          }
       calcular_progresso_preparacao: {
         Args: { p_projeto_id: string; p_user_id: string }
         Returns: number
@@ -6421,12 +7024,20 @@ export type Database = {
       is_leader_of_skills_team: { Args: { team_id: string }; Returns: boolean }
       is_leader_of_squad: { Args: { team_id: string }; Returns: boolean }
       is_member_of_skills_team: { Args: { team_id: string }; Returns: boolean }
+      papel_vigente: {
+        Args: { _user_id?: string }
+        Returns: Database["public"]["Enums"]["papel_programa"]
+      }
+      percentual_da_proxima: { Args: { _user_id?: string }; Returns: number }
+      programa_permanencia_ok: { Args: { _user_id?: string }; Returns: boolean }
+      tem_papel_programa: { Args: { _user_id?: string }; Returns: boolean }
       user_has_access_level: {
         Args: {
           required_level: Database["public"]["Enums"]["nivel_acesso_plano"]
         }
         Returns: boolean
       }
+      user_is_insider: { Args: { _user_id?: string }; Returns: boolean }
       verificar_email_mentorado: {
         Args: { email_input: string }
         Returns: boolean
@@ -6451,6 +7062,7 @@ export type Database = {
         | "equipe"
         | "parceiros"
       nivel_acesso_plano: "academy" | "skills" | "business"
+      papel_programa: "indicador" | "parceria_aberta" | "parceria_executora"
       plano_mentoria:
         | "academy"
         | "skills"
@@ -6459,12 +7071,29 @@ export type Database = {
         | "business_parceria"
         | "insider_business"
         | "insider_convidado"
+      status_convite: "pendente" | "aceito" | "expirado" | "cancelado"
+      status_indicacao:
+        | "nova"
+        | "em_contato"
+        | "qualificada"
+        | "proposta"
+        | "fechada"
+        | "perdida"
+      status_parceria: "rascunho" | "vigente" | "encerrada"
       status_projeto:
         | "planejamento"
         | "em_andamento"
         | "concluido"
         | "cancelado"
+      status_recompensa:
+        | "prevista"
+        | "escolhida"
+        | "aprovada"
+        | "paga"
+        | "cancelada"
       status_sessao: "agendada" | "realizada" | "cancelada"
+      tipo_oportunidade: "oferta" | "procura"
+      tipo_recompensa: "cashback" | "bonus"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -6602,6 +7231,7 @@ export const Constants = {
         "parceiros",
       ],
       nivel_acesso_plano: ["academy", "skills", "business"],
+      papel_programa: ["indicador", "parceria_aberta", "parceria_executora"],
       plano_mentoria: [
         "academy",
         "skills",
@@ -6609,14 +7239,34 @@ export const Constants = {
         "business_iaplicada",
         "business_parceria",
         "insider_business",
+        "insider_convidado",
       ],
+      status_convite: ["pendente", "aceito", "expirado", "cancelado"],
+      status_indicacao: [
+        "nova",
+        "em_contato",
+        "qualificada",
+        "proposta",
+        "fechada",
+        "perdida",
+      ],
+      status_parceria: ["rascunho", "vigente", "encerrada"],
       status_projeto: [
         "planejamento",
         "em_andamento",
         "concluido",
         "cancelado",
       ],
+      status_recompensa: [
+        "prevista",
+        "escolhida",
+        "aprovada",
+        "paga",
+        "cancelada",
+      ],
       status_sessao: ["agendada", "realizada", "cancelada"],
+      tipo_oportunidade: ["oferta", "procura"],
+      tipo_recompensa: ["cashback", "bonus"],
     },
   },
 } as const
