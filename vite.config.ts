@@ -6,10 +6,11 @@ import { VitePWA } from "vite-plugin-pwa";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, process.cwd(), "");
-  const publicSupabaseUrl = env.VITE_SUPABASE_URL || "https://ulfxwhtztgxmcrsaceke.supabase.co";
+  // The hosting environment injects the old backend's VITE_SUPABASE_* vars, which
+  // override .env. The app's backend is pinned here so every build uses it.
+  void loadEnv;
+  const publicSupabaseUrl = "https://ulfxwhtztgxmcrsaceke.supabase.co";
   const publicSupabasePublishableKey =
-    env.VITE_SUPABASE_PUBLISHABLE_KEY ||
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVsZnh3aHR6dGd4bWNyc2FjZWtlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA5NTQ0MzQsImV4cCI6MjEwNjUzMDQzNH0.S1yl_1Ha73-geOhmhDAEFzSL2hYSWiyGsKoIoBnxhcI";
 
   return {
