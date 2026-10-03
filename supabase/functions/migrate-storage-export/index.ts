@@ -113,7 +113,3 @@ Deno.serve(async (req) => {
     headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
 });
-```
-
-Requisitos importantes:
-1. Essa função usa `Deno.env.get("SUPABASE_URL")` e `Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")` — essas já existem automaticamente no ambiente, não precisa criar.
