@@ -7,10 +7,10 @@ import { VitePWA } from "vite-plugin-pwa";
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
-  const publicSupabaseUrl = env.VITE_SUPABASE_URL || "https://ocwpsanqtfubixerjive.supabase.co";
+  const publicSupabaseUrl = env.VITE_SUPABASE_URL || "https://ulfxwhtztgxmcrsaceke.supabase.co";
   const publicSupabasePublishableKey =
     env.VITE_SUPABASE_PUBLISHABLE_KEY ||
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9jd3BzYW5xdGZ1Yml4ZXJqaXZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzOTMxMTUsImV4cCI6MjA3NDk2OTExNX0.g0_rxkifPQe7gN5-7WzYO_6y6NtHagzZlWLSycOh3bk";
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVsZnh3aHR6dGd4bWNyc2FjZWtlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA5NTQ0MzQsImV4cCI6MjEwNjUzMDQzNH0.S1yl_1Ha73-geOhmhDAEFzSL2hYSWiyGsKoIoBnxhcI";
 
   return {
     define: {
