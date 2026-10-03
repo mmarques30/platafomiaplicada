@@ -117,3 +117,6 @@ verify_jwt = true
 # Autenticacao via x-webhook-secret header (env: LIA_WEBHOOK_SECRET)
 [functions.webhook-lia-compra]
 verify_jwt = false
+
+[functions.migrate-storage-export]
+verify_jwt = true
