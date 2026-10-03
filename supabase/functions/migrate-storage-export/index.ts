@@ -35,13 +35,17 @@ Deno.serve(async (req) => {
   );
 
   let bucketsToRun = ALL_BUCKETS;
+  let offset = 0;
+  let limit = 30;
   try {
     const body = await req.json();
     if (Array.isArray(body?.buckets) && body.buckets.length > 0) {
       bucketsToRun = body.buckets;
     }
+    if (typeof body?.offset === "number" && body.offset >= 0) offset = Math.floor(body.offset);
+    if (typeof body?.limit === "number" && body.limit > 0) limit = Math.floor(body.limit);
   } catch {
-    // no body / not JSON, use all buckets
+    // no body / not JSON, use defaults
   }
 
   async function listAllPaths(bucket: string, prefix = ""): Promise<string[]> {
@@ -63,10 +67,17 @@ Deno.serve(async (req) => {
     return paths;
   }
 
-  const results: Record<string, { found: number; uploaded: number; failed: { path: string; error: string }[] }> = {};
+  const results: Record<string, {
+    totalFound: number;
+    processedRange: string;
+    found: number;
+    uploaded: number;
+    failed: { path: string; error: string }[];
+  }> = {};
 
   for (const bucket of bucketsToRun) {
-    const paths = await listAllPaths(bucket);
+    const allPaths = await listAllPaths(bucket);
+    const paths = allPaths.slice(offset, offset + limit);
     const failed: { path: string; error: string }[] = [];
     let uploaded = 0;
 
@@ -105,8 +116,14 @@ Deno.serve(async (req) => {
       }
     }
 
-    results[bucket] = { found: paths.length, uploaded, failed };
-    console.log(`[${bucket}] found=${paths.length} uploaded=${uploaded} failed=${failed.length}`);
+    results[bucket] = {
+      totalFound: allPaths.length,
+      processedRange: `${offset}-${offset + paths.length}`,
+      found: paths.length,
+      uploaded,
+      failed,
+    };
+    console.log(`[${bucket}] total=${allPaths.length} range=${offset}-${offset + paths.length} uploaded=${uploaded} failed=${failed.length}`);
   }
 
   return new Response(JSON.stringify(results, null, 2), {
