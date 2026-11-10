@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Download, ExternalLink, ImageIcon, LayoutGrid, Users } from "lucide-react";
+import { Download, ExternalLink, ImageIcon, LayoutGrid } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,8 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { PageTitle } from "@/components/shared/PageTitle";
 import { PageContainer } from "@/components/shared/PageContainer";
 import { ConteudoCard } from "@/components/dashboard/ConteudoCard";
+import { LinhaRecurso, ListaRecursos } from "@/components/bibliotecas/LinhaRecurso";
+import { ChipMeta } from "@/components/bibliotecas/ChipsRecurso";
 import { GRUPOS, tipoInfo, tempoLeitura } from "@/lib/conteudoTipos";
 
 const tabs = [
@@ -20,17 +22,38 @@ const tabs = [
 
 const validTabs = tabs.map((t) => t.value);
 
+/**
+ * Um ecrã de conteúdo por vez.
+ *
+ * Em tela larga a grade tem quatro colunas, então oito itens são duas
+ * fileiras: o que cabe de uma olhada. A lista inteira de uma vez fazia a
+ * página descer por cinco ou seis telas antes de qualquer decisão, e quem
+ * chega à Central ainda não sabe o que procura — essa altura toda é rolagem
+ * antes de escolher, não depois.
+ */
+const LOTE = 8;
+
 function GradeConteudos({
   itens,
   isLoading,
   vazio,
+  visao,
   onSelect,
 }: {
   itens: ConteudoDashboard[];
   isLoading: boolean;
   vazio: string;
+  visao: "cards" | "lista";
   onSelect: (c: ConteudoDashboard) => void;
 }) {
+  const [visiveis, setVisiveis] = useState(LOTE);
+
+  // Trocar de aba ou de visão recomeça a contagem: cada aba abre no seu
+  // primeiro ecrã, não na altura em que a anterior tinha parado.
+  useEffect(() => {
+    setVisiveis(LOTE);
+  }, [itens, visao]);
+
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -40,6 +63,7 @@ function GradeConteudos({
       </div>
     );
   }
+
   if (itens.length === 0) {
     return (
       <div className="rounded-2xl border border-dashed border-border py-16 text-center">
@@ -47,11 +71,59 @@ function GradeConteudos({
       </div>
     );
   }
+
+  const naTela = itens.slice(0, visiveis);
+  const faltam = itens.length - naTela.length;
+
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      {itens.map((c) => (
-        <ConteudoCard key={c.id} conteudo={c} onClick={() => onSelect(c)} />
-      ))}
+    <div className="space-y-5">
+      {visao === "cards" ? (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {naTela.map((c) => (
+            <ConteudoCard key={c.id} conteudo={c} onClick={() => onSelect(c)} />
+          ))}
+        </div>
+      ) : (
+        <ListaRecursos>
+          {naTela.map((c) => {
+            const info = tipoInfo(c.tipo);
+            const minutos = tempoLeitura(c.conteudo);
+            return (
+              <LinhaRecurso
+                key={c.id}
+                marcador={
+                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-border bg-surface">
+                    <info.icon className="h-4 w-4 text-primary" strokeWidth={1.75} />
+                  </span>
+                }
+                titulo={c.titulo}
+                descricao={c.resumo}
+                meta={
+                  <>
+                    <ChipMeta>{info.label}</ChipMeta>
+                    {minutos && <ChipMeta>{minutos} min</ChipMeta>}
+                    {c.destaque && <ChipMeta>Destaque</ChipMeta>}
+                  </>
+                }
+                direita={
+                  <span className="rotulo-mono whitespace-nowrap text-[10px]">
+                    {new Date(c.created_at).toLocaleDateString("pt-BR")}
+                  </span>
+                }
+                aoClicar={() => onSelect(c)}
+              />
+            );
+          })}
+        </ListaRecursos>
+      )}
+
+      {faltam > 0 && (
+        <div className="flex justify-center">
+          <Button variant="outline" size="pill" onClick={() => setVisiveis((n) => n + LOTE)}>
+            Mais {Math.min(faltam, LOTE)} de {faltam}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
@@ -63,6 +135,7 @@ export default function Central() {
     tabFromUrl && validTabs.includes(tabFromUrl) ? tabFromUrl : "todos"
   );
   const [selectedConteudo, setSelectedConteudo] = useState<ConteudoDashboard | null>(null);
+  const [visao, setVisao] = useState<"cards" | "lista">("cards");
 
   useEffect(() => {
     if (tabFromUrl && validTabs.includes(tabFromUrl)) setActiveTab(tabFromUrl);
@@ -96,20 +169,32 @@ export default function Central() {
       <PageTitle primary="Explorar" secondary="conteúdos" />
 
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-        <TabsList className="flex w-full flex-wrap justify-start sm:inline-flex sm:w-auto">
-          {tabs.map((tab) => (
-            <TabsTrigger key={tab.value} value={tab.value} className="gap-1.5 px-3 text-xs sm:px-4 sm:text-sm">
-              <tab.icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-              {tab.label}
-            </TabsTrigger>
-          ))}
-        </TabsList>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <TabsList className="flex w-full flex-wrap justify-start sm:inline-flex sm:w-auto">
+            {tabs.map((tab) => (
+              <TabsTrigger key={tab.value} value={tab.value} className="gap-1.5 px-3 text-xs sm:px-4 sm:text-sm">
+                <tab.icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                {tab.label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+
+          {/* Cartão para varrer pela capa, lista para varrer pelo título.
+              A mesma dupla das bibliotecas, no mesmo canto. */}
+          <Tabs value={visao} onValueChange={(v) => setVisao(v as "cards" | "lista")}>
+            <TabsList className="h-10">
+              <TabsTrigger value="cards">Cartões</TabsTrigger>
+              <TabsTrigger value="lista">Lista</TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
 
         <TabsContent value="todos" className="mt-6">
           <GradeConteudos
             itens={todos}
             isLoading={isLoading}
             vazio="Nenhum conteúdo disponível"
+            visao={visao}
             onSelect={setSelectedConteudo}
           />
         </TabsContent>
@@ -120,6 +205,7 @@ export default function Central() {
               itens={porGrupo[grupo.value] || []}
               isLoading={isLoading}
               vazio={`Nada em ${grupo.label.toLowerCase()} por enquanto`}
+              visao={visao}
               onSelect={setSelectedConteudo}
             />
           </TabsContent>

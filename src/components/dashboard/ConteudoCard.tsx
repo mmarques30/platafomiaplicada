@@ -5,6 +5,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { ConteudoDashboard } from "@/hooks/useConteudosDashboard";
 import { tipoInfo, tempoLeitura } from "@/lib/conteudoTipos";
+import { CapaGerada } from "@/components/shared/CapaGerada";
 import { cn } from "@/lib/utils";
 
 interface ConteudoCardProps {
@@ -52,13 +53,11 @@ export function ConteudoCard({ conteudo, onClick, className }: ConteudoCardProps
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
         ) : (
-          <div className={cn("relative h-full w-full bg-gradient-to-br", info.capa)}>
-            <div className="absolute inset-0 dot-grid-bg opacity-40" />
-            <Icon
-              className="absolute -bottom-3 -right-2 h-24 w-24 text-foreground/[0.14]"
-              strokeWidth={1.25}
-            />
-          </div>
+          /* Sem foto, a capa é desenhada a partir do título. O degradê por
+             tipo que havia aqui deixava toda notícia com a mesma capa roxa:
+             numa grade em que metade dos itens não tem foto, eram seis
+             retângulos iguais. */
+          <CapaGerada chave={conteudo.titulo} icone={Icon} />
         )}
 
         <span className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-chrome/85 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-chrome-foreground backdrop-blur">
