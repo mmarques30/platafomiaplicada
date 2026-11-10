@@ -1,24 +1,56 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
+
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { BarrasMarca, CartaoGrafico, ChipVariacao } from "@/components/graficos";
+import { Skeleton } from "@/components/ui/skeleton";
 
-function getWeekKey(date: Date): string {
-  const d = new Date(date);
+/** A chave ISO da semana, para agrupar sem depender do fuso. */
+function chaveDaSemana(data: Date): string {
+  const d = new Date(data);
   d.setHours(0, 0, 0, 0);
   d.setDate(d.getDate() + 3 - ((d.getDay() + 6) % 7));
-  const yearStart = new Date(d.getFullYear(), 0, 4);
-  const weekNum = 1 + Math.round(((d.getTime() - yearStart.getTime()) / 86400000 - 3 + ((yearStart.getDay() + 6) % 7)) / 7);
-  return `${d.getFullYear()}-W${weekNum}`;
+  const inicioDoAno = new Date(d.getFullYear(), 0, 4);
+  const semana =
+    1 +
+    Math.round(
+      ((d.getTime() - inicioDoAno.getTime()) / 86400000 - 3 + ((inicioDoAno.getDay() + 6) % 7)) / 7,
+    );
+  return `${d.getFullYear()}-W${semana}`;
 }
 
+/** O dia em que a semana começa, para escrever "13/10" no eixo. */
+function segundaDaSemana(data: Date): Date {
+  const d = new Date(data);
+  d.setHours(0, 0, 0, 0);
+  d.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+  return d;
+}
+
+/**
+ * O ritmo das últimas oito semanas.
+ *
+ * Este componente já agrupava as aulas por semana e já calculava a variação
+ * contra a média — e jogava tudo fora, mostrando só um número e uma etiqueta
+ * dizendo "12% acima do seu ritmo médio". A série estava ali, calculada, e
+ * ninguém a via.
+ *
+ * Agora ela é o gráfico. Oito barras, uma por semana, a da semana corrente em
+ * destaque, com o número e o chip de variação acima. O mesmo dado responde
+ * "quanto" e "como chegou até aqui", que é o que uma página chamada Meu
+ * progresso precisa responder.
+ *
+ * A regra de não mostrar nada com menos de três semanas de dados continua: um
+ * gráfico de duas barras não é uma tendência, é um par de números.
+ */
 export function RitmoCard() {
   const { user } = useAuth();
 
-  const { data: ritmo } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["ritmo-semanal", user?.id],
     enabled: !!user?.id,
+    staleTime: 1000 * 60 * 5,
     queryFn: async () => {
       const oitoSemanasAtras = new Date();
       oitoSemanasAtras.setDate(oitoSemanasAtras.getDate() - 56);
@@ -31,76 +63,106 @@ export function RitmoCard() {
         .gte("created_at", oitoSemanasAtras.toISOString())
         .order("created_at", { ascending: false });
 
-      if (!data || data.length === 0) return null;
-
-      // Group by week
-      const porSemana: Record<string, number> = {};
-      for (const item of data) {
-        const key = getWeekKey(new Date(item.created_at));
-        porSemana[key] = (porSemana[key] || 0) + 1;
-      }
-
-      // Build ordered week keys for last 8 weeks
-      const now = new Date();
-      const semanas: string[] = [];
-      for (let i = 0; i < 8; i++) {
-        const d = new Date(now);
-        d.setDate(d.getDate() - i * 7);
-        const key = getWeekKey(d);
-        if (!semanas.includes(key)) semanas.push(key);
-      }
-
-      // Need at least 3 weeks with data
-      const semanasComDados = semanas.filter(s => (porSemana[s] || 0) > 0);
-      if (semanasComDados.length < 3) return null;
-
-      const recentes = semanas.slice(0, 2);
-      const historico = semanas.slice(2);
-
-      const atualMedia = recentes.reduce((sum, s) => sum + (porSemana[s] || 0), 0) / recentes.length;
-      const baseMedia = historico.length > 0
-        ? historico.reduce((sum, s) => sum + (porSemana[s] || 0), 0) / historico.length
-        : 0;
-
-      const variacaoPct = baseMedia > 0 ? Math.round(((atualMedia - baseMedia) / baseMedia) * 100) : 0;
-
-      return { atualMedia: Math.round(atualMedia * 10) / 10, variacaoPct };
+      return data ?? [];
     },
   });
 
-  if (!ritmo) return null;
+  const ritmo = useMemo(() => {
+    if (!data || data.length === 0) return null;
 
-  const { atualMedia, variacaoPct } = ritmo;
+    const porSemana = new Map<string, number>();
+    for (const item of data) {
+      if (!item.created_at) continue;
+      const chave = chaveDaSemana(new Date(item.created_at));
+      porSemana.set(chave, (porSemana.get(chave) ?? 0) + 1);
+    }
 
-  const isUp = variacaoPct > 15;
-  const isDown = variacaoPct < -15;
+    // Oito baldes, do mais antigo para o mais recente, incluindo os vazios.
+    const agora = new Date();
+    const semanas: Array<{ nome: string; valor: number; destaque?: boolean }> = [];
+    for (let i = 7; i >= 0; i--) {
+      const d = new Date(agora);
+      d.setDate(d.getDate() - i * 7);
+      const inicio = segundaDaSemana(d);
+      semanas.push({
+        nome: `${String(inicio.getDate()).padStart(2, "0")}/${String(inicio.getMonth() + 1).padStart(2, "0")}`,
+        valor: porSemana.get(chaveDaSemana(d)) ?? 0,
+        destaque: i === 0,
+      });
+    }
 
-  const badgeColor = isUp
-    ? "bg-primary/15 text-primary"
-    : isDown
-      ? "bg-status-danger/15 text-status-danger"
-      : "bg-muted text-muted-foreground";
+    const comDados = semanas.filter((s) => s.valor > 0);
+    if (comDados.length < 3) return null;
 
-  const badgeText = isUp
-    ? `${variacaoPct}% acima do seu ritmo médio`
-    : isDown
-      ? `${Math.abs(variacaoPct)}% abaixo do seu ritmo médio`
-      : "Ritmo estável";
+    const recentes = semanas.slice(-2);
+    const historico = semanas.slice(0, -2);
+    const mediaAtual = recentes.reduce((soma, s) => soma + s.valor, 0) / recentes.length;
+    const mediaBase =
+      historico.length > 0
+        ? historico.reduce((soma, s) => soma + s.valor, 0) / historico.length
+        : 0;
+    const variacao = mediaBase > 0 ? ((mediaAtual - mediaBase) / mediaBase) * 100 : null;
 
-  const Icon = isUp ? TrendingUp : isDown ? TrendingDown : Minus;
+    return {
+      semanas,
+      mediaAtual: Math.round(mediaAtual * 10) / 10,
+      variacao,
+    };
+  }, [data]);
+
+  if (isLoading) return <Skeleton className="h-[260px] rounded-[20px]" />;
+
+  // Sem três semanas de dados não há tendência para desenhar. Antes o
+  // componente sumia, e a célula larga da grade virava um buraco com o bloco
+  // de atalhos boiando sozinho à direita. Agora ele ocupa o lugar e explica
+  // o que falta para o gráfico existir.
+  if (!ritmo) {
+    return (
+      <div className="h-[260px]">
+        <CartaoGrafico titulo="Seu ritmo, semana a semana">
+          <div className="flex h-full flex-col items-center justify-center gap-2 text-center">
+            <p className="text-sm text-muted-foreground">
+              Ainda não dá para desenhar uma tendência.
+            </p>
+            <p className="max-w-xs text-xs text-muted-foreground/70">
+              Conclua aulas em três semanas diferentes e este gráfico passa a mostrar seu ritmo.
+            </p>
+          </div>
+        </CartaoGrafico>
+      </div>
+    );
+  }
+
+  const leitura =
+    ritmo.variacao === null
+      ? `Média de ${ritmo.mediaAtual} aulas por semana.`
+      : ritmo.variacao > 15
+        ? `Você está ${Math.round(ritmo.variacao)}% acima do seu ritmo médio.`
+        : ritmo.variacao < -15
+          ? `Você está ${Math.abs(Math.round(ritmo.variacao))}% abaixo do seu ritmo médio.`
+          : "Seu ritmo está estável.";
 
   return (
-    <Card>
-      <CardContent className="space-y-3 p-5">
-        <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">Seu ritmo</span>
-        <p className="text-3xl font-semibold leading-none text-foreground">
-          {atualMedia} <span className="text-sm font-normal text-muted-foreground">módulos/semana</span>
-        </p>
-        <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium ${badgeColor}`}>
-          <Icon className="h-3.5 w-3.5" />
-          {badgeText}
-        </span>
-      </CardContent>
-    </Card>
+    <div className="h-[260px]">
+      <CartaoGrafico
+        titulo="Seu ritmo, semana a semana"
+        leitura={leitura}
+        acao={
+          <div className="text-right">
+            <span className="numero-painel block text-xl text-foreground">{ritmo.mediaAtual}</span>
+            <span className="rotulo-mono text-[9px]">aulas/semana</span>
+          </div>
+        }
+      >
+        <div className="flex h-full flex-col">
+          <div className="mb-2 flex justify-end">
+            <ChipVariacao valor={ritmo.variacao} />
+          </div>
+          <div className="min-h-0 flex-1">
+            <BarrasMarca dados={ritmo.semanas} formatar={(v) => String(Math.round(v))} />
+          </div>
+        </div>
+      </CartaoGrafico>
+    </div>
   );
 }

@@ -7,6 +7,7 @@ import { HeroComunidade } from "@/components/evolucao/HeroComunidade";
 import { TrilhasEmAndamentoCards } from "@/components/evolucao/TrilhasEmAndamentoCards";
 import { VitrineConquistas } from "@/components/evolucao/VitrineConquistas";
 import { RitmoCard } from "@/components/evolucao/RitmoCard";
+import { DistribuicaoConstancia } from "@/components/evolucao/DistribuicaoConstancia";
 import { BonusEvolucao } from "@/components/evolucao/BonusEvolucao";
 import { AtalhosProgresso } from "@/components/evolucao/AtalhosProgresso";
 import { AbaFavoritos } from "@/components/evolucao/AbaFavoritos";
@@ -54,13 +55,18 @@ export default function Evolucao() {
         <TabsContent value="minha-evolucao" className="mt-6 space-y-6">
           <HeroEvolucao />
 
-          <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
-            <TrilhasEmAndamentoCards />
-            <div className="space-y-6">
+          {/* Os gráficos primeiro: quem abre "Meu progresso" quer ver o
+              progresso desenhado, não uma lista de atalhos. */}
+          <div className="grid gap-4 lg:grid-cols-3">
+            <div className="lg:col-span-2">
               <RitmoCard />
-              <AtalhosProgresso />
             </div>
+            <AtalhosProgresso />
           </div>
+
+          <DistribuicaoConstancia />
+
+          <TrilhasEmAndamentoCards />
 
           <VitrineConquistas />
           {!isBusinessSistemas && <BonusEvolucao />}
