@@ -21,6 +21,8 @@ import { ptBR } from "date-fns/locale";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CartaoMetrica, CartaoMetricaSkeleton } from "./CartaoMetrica";
+import { MarcaIAplicada } from "@/components/shared/MarcaIAplicada";
+import { useRitmoEstudo } from "@/hooks/useRitmoEstudo";
 import { listaCascata, aoMontar } from "@/lib/motion";
 
 const TIMEZONE = "America/Sao_Paulo";
@@ -40,6 +42,12 @@ interface Metrica {
   valor: string;
   unidade?: string;
   apoio?: string;
+  /** A série por trás do número, quando existe dado com data. */
+  serie?: number[];
+  /** Variação contra o período anterior, em %. */
+  variacao?: number | null;
+  /** Quando subir é ruim: atrasos, pendências. */
+  inverterVariacao?: boolean;
 }
 
 /**
@@ -150,6 +158,11 @@ export function WelcomeHeader() {
     return total > 0 ? Math.round((concluidas / total) * 100) : 0;
   })();
 
+  // As faíscas e a variação saem daqui. É o único registro com data que a
+  // plataforma guarda do aluno, então é o único lugar de onde pode sair uma
+  // comparação honesta com o período anterior.
+  const { dados: ritmo } = useRitmoEstudo(!isVisitante);
+
   const roadmapAnimado = useCountUp(roadmapPercent, 700);
   const emAndamentoAnimado = useCountUp(academyData?.emAndamento ?? 0, 700);
   const sequenciaAnimada = useCountUp(sequencia ?? 0, 700);
@@ -176,6 +189,7 @@ export function WelcomeHeader() {
         rotulo: "Tarefas críticas",
         valor: String(tarefasCriticas),
         apoio: tarefasCriticas > 0 ? "Precisam de atenção agora" : "Nada travando no momento",
+        inverterVariacao: true,
       },
       {
         rotulo: "Próximo encontro Insider",
@@ -207,6 +221,8 @@ export function WelcomeHeader() {
         valor: String(sequenciaAnimada),
         unidade: (sequencia ?? 0) === 1 ? "dia" : "dias",
         apoio: (sequencia ?? 0) > 0 ? "Assista algo hoje para não zerar" : "Assista uma aula para começar",
+        serie: ritmo.faisca,
+        variacao: ritmo.variacaoSemana,
       },
     ];
     ctaLabel = "Continuar trilha";
@@ -241,45 +257,70 @@ export function WelcomeHeader() {
   const mostrarMetricas = !isVisitante && (metricas.length > 0 || isLoadingMetricas);
 
   return (
-    <section className="flex flex-col gap-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div className="min-w-0 flex-1 space-y-2">
-          <span className="rotulo-mono block">{dataExtenso}</span>
-          <h1 className="font-serif-display text-3xl leading-[1.05] tracking-tight text-foreground md:text-4xl lg:text-[44px]">
-            {cumprimento}{" "}
-            <em className="font-serif-italic text-primary">{primeiroNome}</em>
-          </h1>
-          <p className="max-w-prose text-sm text-muted-foreground md:text-base">{tagline}</p>
+    /*
+     * O painel de abertura.
+     *
+     * A marca não está mais desenhada dentro de um cartão: ela é o fundo.
+     * Fica grande, fora de foco e em 22% de opacidade atrás de tudo, e os
+     * cartões de métrica por cima são de vidro, então ela aparece através
+     * deles. Era isto que faltava — antes a logo aparecia duas vezes, uma
+     * no fundo e outra dentro do cartão, e o cartão era opaco, então o
+     * fundo não servia para nada.
+     *
+     * O véu da base do `.painel-marca` entrega o painel ao conteúdo
+     * seguinte sem linha dura, que é como a referência encaixa o herói no
+     * resto da página.
+     */
+    <section className="painel-marca px-5 pb-6 pt-7 md:px-8 md:pb-8 md:pt-10">
+      {/* A marca, em vetor, para ficar nítida em qualquer tamanho. */}
+      <MarcaIAplicada
+        className="marca-de-fundo -right-[18%] top-1/2 h-[200%] w-auto max-w-none -translate-y-1/2 rotate-[14deg] md:right-[2%] md:h-[165%]"
+      />
+
+      <div className="relative flex flex-col gap-7">
+        <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+          <div className="min-w-0 flex-1 space-y-2.5">
+            <span className="rotulo-mono block">{dataExtenso}</span>
+            <h1 className="font-serif-display text-[34px] leading-[1.02] tracking-tight text-foreground md:text-5xl lg:text-[52px]">
+              {cumprimento}{" "}
+              <em className="font-serif-italic text-primary">{primeiroNome}</em>
+            </h1>
+            <p className="max-w-prose text-sm text-muted-foreground md:text-base">{tagline}</p>
+          </div>
+
+          {ctaLabel && (
+            <Button onClick={() => navigate(ctaHref)} size="pill" className="w-full shrink-0 sm:w-auto">
+              {ctaLabel}
+              <ArrowRight className="h-4 w-4" strokeWidth={1.75} />
+            </Button>
+          )}
         </div>
 
-        {ctaLabel && (
-          <Button onClick={() => navigate(ctaHref)} size="pill" className="w-full shrink-0 sm:w-auto">
-            {ctaLabel}
-            <ArrowRight className="h-4 w-4" strokeWidth={1.75} />
-          </Button>
+        {mostrarMetricas && (
+          <motion.div
+            data-welcome-kpis
+            variants={listaCascata}
+            {...aoMontar}
+            className="grid grid-cols-1 gap-3 sm:grid-cols-3 md:gap-4"
+          >
+            {isLoadingMetricas
+              ? [0, 1, 2].map((i) => <CartaoMetricaSkeleton key={i} vidro />)
+              : metricas.map((m) => (
+                  <CartaoMetrica
+                    key={m.rotulo}
+                    rotulo={m.rotulo}
+                    valor={m.valor}
+                    unidade={m.unidade}
+                    apoio={m.apoio}
+                    serie={m.serie}
+                    variacao={m.variacao}
+                    inverterVariacao={m.inverterVariacao}
+                    vidro
+                  />
+                ))}
+          </motion.div>
         )}
       </div>
-
-      {mostrarMetricas && (
-        <motion.div
-          data-welcome-kpis
-          variants={listaCascata}
-          {...aoMontar}
-          className="grid grid-cols-1 gap-3 sm:grid-cols-3 md:gap-4"
-        >
-          {isLoadingMetricas
-            ? [0, 1, 2].map((i) => <CartaoMetricaSkeleton key={i} />)
-            : metricas.map((m) => (
-                <CartaoMetrica
-                  key={m.rotulo}
-                  rotulo={m.rotulo}
-                  valor={m.valor}
-                  unidade={m.unidade}
-                  apoio={m.apoio}
-                />
-              ))}
-        </motion.div>
-      )}
     </section>
   );
 }

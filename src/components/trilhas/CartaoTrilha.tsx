@@ -49,7 +49,7 @@ export function CartaoTrilha({
       <Link
         to={`/trilhas/${id}`}
         className={cn(
-          "group flex h-full flex-col overflow-hidden rounded-card border border-border bg-card shadow-card",
+          "group flex h-full flex-col overflow-hidden superficie",
           "transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-elevated"
         )}
       >

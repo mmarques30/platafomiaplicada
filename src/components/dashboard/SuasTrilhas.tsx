@@ -23,7 +23,7 @@ export function SuasTrilhas() {
   const emAndamento = trilhas?.slice(0, LIMITE) ?? [];
 
   return (
-    <section className="rounded-card border border-border bg-card p-4 shadow-card md:p-5">
+    <section className="superficie p-4 shadow-card md:p-5">
       <div className="mb-5 flex items-center justify-between gap-3">
         <span className="rotulo-mono">Suas trilhas</span>
         <Link

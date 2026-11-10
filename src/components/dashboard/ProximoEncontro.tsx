@@ -49,7 +49,7 @@ export function ProximoEncontro() {
   const data = parseISO(aula.data_aula!);
 
   return (
-    <section className="flex flex-col gap-4 rounded-card border border-border bg-card p-4 shadow-card sm:flex-row sm:items-center md:p-5">
+    <section className="flex flex-col gap-4 superficie p-4 shadow-card sm:flex-row sm:items-center md:p-5">
       {/* Data */}
       <div className="flex items-baseline gap-3 sm:min-w-[150px] sm:flex-col sm:items-start sm:gap-0.5 sm:border-r sm:border-border sm:pr-5">
         <span className="font-serif-display text-4xl leading-none text-foreground">

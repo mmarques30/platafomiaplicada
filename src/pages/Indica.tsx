@@ -24,7 +24,7 @@ function SemPapel() {
         description="Você indica um dono de empresa com a operação travada. A gente conduz proposta e fechamento. Fechou, você escolhe como recebe."
       />
 
-      <div className="space-y-4 rounded-card border border-border bg-card p-5 shadow-card md:p-6">
+      <div className="space-y-4 superficie p-5 shadow-card md:p-6">
         <span className="rotulo-mono">Dois caminhos</span>
         <div className="space-y-4">
           <div className="space-y-1">

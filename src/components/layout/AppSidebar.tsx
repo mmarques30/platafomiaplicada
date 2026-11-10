@@ -1,27 +1,26 @@
 import { Fragment, useState } from "react";
-import { Home, BookOpen, Star, Bell, LogOut, MessageSquare, TrendingUp, GraduationCap, Layers, ChevronDown } from "lucide-react";
+import { Home, Library, LogOut } from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
+import * as LucideIcons from "lucide-react";
+import { toast } from "sonner";
+
 import { SidebarAdminSection } from "./SidebarAdminSection";
+import { BlocoFilhos, ItemFilho, ItemNeto, ItemPai } from "./ItensSidebar";
+import { porTamanhoDoNome } from "@/lib/ordenarMenus";
 import { useAdminViewContext } from "@/contexts/AdminViewContext";
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
-import logoSimbolo from "@/assets/logo-aplicada-simbolo.png";
+import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { UserAvatar } from "@/components/shared/UserAvatar";
 import { useUserRole } from "@/hooks/useUserRole";
+import { useUserProfile } from "@/hooks/useUserProfile";
 import { useEffectivePlan } from "@/hooks/useUserPlan";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
@@ -29,62 +28,99 @@ import { useMenuConfig } from "@/hooks/useMenuConfig";
 import { useEnvironment } from "@/hooks/useEnvironment";
 import { useSkillsMembro } from "@/hooks/useSkillsMembro";
 import { useProgramaPapel } from "@/hooks/usePrograma";
-import * as LucideIcons from "lucide-react";
 
 // Menus que deixaram de existir no sidebar: "Comunicações" (hoje no menu
 // superior), "Minhas dúvidas" (removido do produto) e "Comunidade" (a
 // conversa acontece no grupo do WhatsApp; o ranking ficou em Meu progresso).
-const HIDDEN_MENU_KEYS = ['interacoes', 'minhas_duvidas', 'calendario', 'comunidade'];
+const HIDDEN_MENU_KEYS = ["interacoes", "minhas_duvidas", "calendario", "comunidade"];
 
 // "Materiais" tem bloco próprio, renderizado logo depois de "Aprender". Se a
 // chave vier também do menu_config como menu principal, o item sai duplicado.
-const MENU_COM_BLOCO_PROPRIO = ['bibliotecas'];
+const MENU_COM_BLOCO_PROPRIO = ["bibliotecas"];
 
+const ROTAS_MATERIAIS = [
+  "/biblioteca-prompts",
+  "/biblioteca-ferramentas",
+  "/ia-copie-use",
+  "/metodos-aplicar",
+];
+
+const PLANO_ROTULO: Record<string, string> = {
+  academy: "Academy",
+  business_parceria: "Academy",
+  insider_business: "Insider Business",
+  insider_convidado: "Insider Convidado",
+};
+
+/**
+ * A sidebar da plataforma.
+ *
+ * O que mudou em relação à versão anterior, e por quê:
+ *
+ * Os menus pais eram linhas de texto cinza empilhadas, sem fundo e sem
+ * peso. A tela inteira tinha o mesmo tom, então a navegação parecia o
+ * índice de um documento, não o leme do sistema. Agora cada pai é um
+ * botão com altura, ícone e setinha, e o grupo da rota atual acende em
+ * lime com uma barra na borda esquerda.
+ *
+ * Os submenus eram indentados, mas nada dizia a quem pertenciam depois
+ * do segundo nível. Agora o bloco de filhos tem uma guia vertical, e o
+ * terceiro nível vive dentro dela.
+ *
+ * Os itens vinham na ordem de cadastro, com nome longo no meio de nomes
+ * curtos. Agora cada grupo é ordenado do nome mais curto para o mais
+ * longo, o que deixa a borda direita em escada.
+ *
+ * O rodapé era um "Sair" vermelho solto, a coisa mais datada da tela.
+ * Agora é um bloco de conta: avatar, nome, plano, e o sair como ícone
+ * discreto ao lado — a ação existe, mas parou de ser o elemento de
+ * maior contraste da navegação.
+ */
 export function AppSidebar() {
   const { open } = useSidebar();
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAdmin, isMentorado, isParceiro, isLoading: roleLoading } = useUserRole();
-  const { effectivePlan, isVisitante, isBusiness, isSkills, isAcademy, isLoading: effectivePlanLoading } = useEffectivePlan(isAdmin, roleLoading, isParceiro);
+  const { isAdmin, isParceiro, isLoading: roleLoading } = useUserRole();
+  const { profile } = useUserProfile();
+  const {
+    effectivePlan,
+    isVisitante,
+    isLoading: effectivePlanLoading,
+  } = useEffectivePlan(isAdmin, roleLoading, isParceiro);
   const { isViewingAs, resetView, viewAs } = useAdminViewContext();
-  const { user, signOut } = useAuth();
-  const { getSidebarMenus, isMenuVisible, isLoading: menuLoading } = useMenuConfig();
+  const { signOut } = useAuth();
+  const { getSidebarMenus, isMenuVisible } = useMenuConfig();
   const { isLider: isSkillsLider, isLoading: skillsMembroLoading } = useSkillsMembro();
   const { currentEnvironment } = useEnvironment();
   const { temPapel: temPapelPrograma } = useProgramaPapel();
 
-  const collapsed = !open;
-  const [expandedMenus, setExpandedMenus] = useState<string[]>([]);
-  const [logoError, setLogoError] = useState(false);
+  const recolhido = !open;
+  const [abertos, setAbertos] = useState<string[]>([]);
 
-  const handleLogout = async () => {
+  const sair = async () => {
     await signOut();
     toast.success("Logout realizado com sucesso");
+    navigate("/auth");
   };
 
-  const getIconComponent = (iconName: string | null) => {
-    if (!iconName) return Home;
-    const IconComponent = (LucideIcons as any)[iconName];
-    return IconComponent || Home;
+  const icone = (nome: string | null) => {
+    if (!nome) return Home;
+    const Componente = (LucideIcons as unknown as Record<string, typeof Home>)[nome];
+    return Componente || Home;
   };
 
-  // Em modo simulação, o EnvironmentSwitcher fica oculto; então garantimos que o filtro de menus
-  // acompanhe o plano simulado. Ambientes atuais: academy, insider_business (Insider Business)
-  // e insider_convidado (Insider não pago). Gratuito, Builder e Skills não existem mais.
-  const effectiveEnvironment = (() => {
+  // Em modo simulação, o EnvironmentSwitcher fica oculto; então garantimos que
+  // o filtro de menus acompanhe o plano simulado.
+  const ambienteEfetivo = (() => {
     if (!isViewingAs) {
-      // Fallback: se nenhum ambiente selecionado, inferir do plano
       if (!currentEnvironment) {
-        if (effectivePlan === 'insider_business') return 'insider_business';
-        if (effectivePlan === 'insider_convidado') return 'insider_convidado';
-        // Builder (legado) cai no Academy
-        if (effectivePlan === 'business_parceria' || effectivePlan === 'academy') return 'academy';
+        if (effectivePlan === "insider_business") return "insider_business";
+        if (effectivePlan === "insider_convidado") return "insider_convidado";
+        if (effectivePlan === "business_parceria" || effectivePlan === "academy") return "academy";
         return null;
       }
       return currentEnvironment;
     }
-
-    // Simulação
     switch (viewAs) {
       case "academy":
         return "academy";
@@ -97,459 +133,259 @@ export function AppSidebar() {
     }
   })();
 
-  const sidebarMenus = getSidebarMenus(effectivePlan, effectiveEnvironment);
-  
-  // Detectar se é Business Sistemas (para filtros especiais)
-  const isBusinessSistemasEnv = effectiveEnvironment === 'insider_business' 
-    || effectivePlan === 'insider_business';
-  
-  // Pegar todos os menus principais (sem parent_key)
-  // Excluir "Comunicações" (interacoes) do sidebar - agora está no menu superior
-  // Excluir "Comunicações" (interacoes) e o grupo "Comunidade" (menu + submenus) do sidebar
-  const temGrupoMeuProgresso = sidebarMenus.some(m => m.menu_key === 'meu_progresso' && !m.parent_key);
-  const allMainMenus = sidebarMenus.filter(
-    menu => !menu.parent_key && !HIDDEN_MENU_KEYS.includes(menu.menu_key)
-      && !MENU_COM_BLOCO_PROPRIO.includes(menu.menu_key) && !menu.menu_key.startsWith('comunidade')
-      // "Meu progresso" e "Minha evolução" apontam para /evolucao: sem duplicar
-      && !(menu.menu_key === 'evolucao' && temGrupoMeuProgresso)
+  const menus = getSidebarMenus(effectivePlan, ambienteEfetivo);
+  const ehInsiderBusiness =
+    ambienteEfetivo === "insider_business" || effectivePlan === "insider_business";
+
+  const temGrupoMeuProgresso = menus.some((m) => m.menu_key === "meu_progresso" && !m.parent_key);
+  const todosOsPais = menus.filter(
+    (menu) =>
+      !menu.parent_key &&
+      !HIDDEN_MENU_KEYS.includes(menu.menu_key) &&
+      !MENU_COM_BLOCO_PROPRIO.includes(menu.menu_key) &&
+      !menu.menu_key.startsWith("comunidade") &&
+      !(menu.menu_key === "evolucao" && temGrupoMeuProgresso),
   );
-  
-  // Filtrar para visitantes: apenas início (sem submenus expansíveis)
-  // Enquanto loading, não filtra como visitante para evitar flicker
-  const isLoadingState = roleLoading || effectivePlanLoading;
-  const mainMenus = (!isLoadingState && isVisitante)
-    ? allMainMenus.filter(menu => menu.menu_key === 'inicio')
-    : allMainMenus;
-  
-  // Obter submenus de um parent
-  const getSubMenus = (parentKey: string) => {
-    // Visitantes têm submenus específicos para "início"
-    if (!isLoadingState && isVisitante) {
-      if (parentKey === 'inicio') {
-        return [
-          { menu_key: 'inicio_central', label: 'Explorar', url: '/central', icon: null, parent_key: 'inicio' },
-        ] as any[];
+
+  const carregando = roleLoading || effectivePlanLoading;
+  const pais = !carregando && isVisitante
+    ? todosOsPais.filter((menu) => menu.menu_key === "inicio")
+    : todosOsPais;
+
+  type MenuLike = { menu_key: string; label: string; url: string | null; icon?: string | null };
+
+  const filhosDe = (chavePai: string): MenuLike[] => {
+    if (!carregando && isVisitante) {
+      if (chavePai === "inicio") {
+        return [{ menu_key: "inicio_central", label: "Explorar", url: "/central", icon: null }];
       }
       return [];
     }
-    
-    // Filtrar menu "Painel do Líder" se não for líder Skills (e não for admin)
-    // Filtrar Performance e Diagnóstico do Projeto Skills para não-líderes/não-admins
-    const BIBLIOTECAS_KEYS = ['bibliotecas', 'biblioteca_ferramentas', 'biblioteca_prompts', 'ia_copie_use', 'metodos_aplicar'];
-    return sidebarMenus
-      .filter(menu => menu.parent_key === parentKey)
-      .filter(menu => !HIDDEN_MENU_KEYS.includes(menu.menu_key))
-      .filter(menu => !BIBLIOTECAS_KEYS.includes(menu.menu_key))
-      .filter(menu => !['skills_lider', 'skills_painel_lider'].includes(menu.menu_key) || isSkillsLider || (isAdmin && !isViewingAs) || skillsMembroLoading)
-      .filter(menu => !['projeto_skills_performance'].includes(menu.menu_key) || isSkillsLider || (isAdmin && !isViewingAs) || skillsMembroLoading);
+    const CHAVES_BIBLIOTECA = [
+      "bibliotecas",
+      "biblioteca_ferramentas",
+      "biblioteca_prompts",
+      "ia_copie_use",
+      "metodos_aplicar",
+    ];
+    const encontrados = menus
+      .filter((menu) => menu.parent_key === chavePai)
+      .filter((menu) => !HIDDEN_MENU_KEYS.includes(menu.menu_key))
+      .filter((menu) => !CHAVES_BIBLIOTECA.includes(menu.menu_key))
+      .filter(
+        (menu) =>
+          !["skills_lider", "skills_painel_lider"].includes(menu.menu_key) ||
+          isSkillsLider ||
+          (isAdmin && !isViewingAs) ||
+          skillsMembroLoading,
+      )
+      .filter(
+        (menu) =>
+          !["projeto_skills_performance"].includes(menu.menu_key) ||
+          isSkillsLider ||
+          (isAdmin && !isViewingAs) ||
+          skillsMembroLoading,
+      );
+    return porTamanhoDoNome(encontrados, (m) => m.label);
   };
 
-  /** Abre o grupo sem alternar: clicar no pai nunca deve fechá-lo. */
-  const abrirMenu = (menuKey: string) => {
-    setExpandedMenus(prev => (prev.includes(menuKey) ? prev : [...prev, menuKey]));
-  };
-
-  const toggleMenu = (menuKey: string) => {
-    setExpandedMenus(prev => 
-      prev.includes(menuKey) 
-        ? prev.filter(k => k !== menuKey) 
-        : [...prev, menuKey]
+  const abrir = (chave: string) =>
+    setAbertos((atual) => (atual.includes(chave) ? atual : [...atual, chave]));
+  const alternar = (chave: string) =>
+    setAbertos((atual) =>
+      atual.includes(chave) ? atual.filter((k) => k !== chave) : [...atual, chave],
     );
-  };
 
-  // Helper para determinar URL dinâmica baseada no plano
-  const getMenuUrl = (menu: { menu_key: string; url: string | null }) => {
-    if (menu.menu_key === 'meu_progresso') {
-      // "Meu progresso" é sempre a visão Academy (/evolucao), para todo mundo.
-      // O painel antigo de mentoria (/mentoria) não é mais o destino de
-      // ninguém por aqui: o Insider Business agora também cai em /evolucao.
-      return '/evolucao';
-    }
-    // Grupo sem URL (ex: meu_sistema): redireciona para primeiro filho
+  const urlDoMenu = (menu: MenuLike) => {
+    if (menu.menu_key === "meu_progresso") return "/evolucao";
     if (!menu.url) {
-      const children = sidebarMenus.filter(m => m.parent_key === menu.menu_key);
-      if (children.length > 0 && children[0].url) return children[0].url;
+      const filhos = menus.filter((m) => m.parent_key === menu.menu_key);
+      if (filhos.length > 0 && filhos[0].url) return filhos[0].url;
     }
     return menu.url || "/";
   };
 
-  // A rota casa com o menu?
-  //
-  // "/" precisa de igualdade: com startsWith ele casaria com toda rota do app,
-  // e o grupo do Início ficaria marcado como ativo em qualquer tela. Para as
-  // demais, startsWith é o certo, porque /trilhas/42 pertence a /trilhas.
+  // A rota casa com o menu? "/" exige igualdade: com startsWith ele casaria
+  // com toda rota do app e o Início ficaria aceso em qualquer tela.
   const rotaCasa = (url: string | null | undefined) => {
     if (!url) return false;
     if (url === "/") return location.pathname === "/";
     return location.pathname === url || location.pathname.startsWith(url + "/");
   };
 
-  // O grupo a que a rota atual pertence, seja pela própria URL do grupo ou
-  // pela de um filho (ou neto).
-  //
-  // Antes isso era um useEffect que só ACRESCENTAVA ao estado, e só quando a
-  // rota já era a de um filho. O resultado era o relatado: clicar no menu pai
-  // levava para a página mas não abria o grupo, então o caminho não aparecia;
-  // e o que abrisse uma vez ficava aberto para sempre. Derivar da rota resolve
-  // os dois: o grupo da rota está sempre aberto, e nenhum estado fica preso.
-  const grupoDaRota = mainMenus.find(menu => {
-    if (rotaCasa(getMenuUrl(menu))) return true;
-    return getSubMenus(menu.menu_key).some(sub => {
-      if (rotaCasa(sub.url)) return true;
-      return getSubMenus(sub.menu_key).some(child => rotaCasa(child.url));
+  // Derivar o grupo aberto da rota, em vez de acumular num efeito, é o que
+  // mantém o caminho visível ao voltar para um menu já visitado.
+  const grupoDaRota = pais.find((menu) => {
+    if (rotaCasa(urlDoMenu(menu))) return true;
+    return filhosDe(menu.menu_key).some((filho) => {
+      if (rotaCasa(filho.url)) return true;
+      return filhosDe(filho.menu_key).some((neto) => rotaCasa(neto.url));
     });
   })?.menu_key;
 
-  // As rotas do bloco fixo de "Materiais", que não passa pelo menu_config.
-  const ROTAS_MATERIAIS = ['/ia-copie-use', '/biblioteca-ferramentas', '/biblioteca-prompts', '/metodos-aplicar'];
   const rotaDeMateriais = ROTAS_MATERIAIS.some(rotaCasa);
 
-  return (
-    <Sidebar className={cn(
-      "border-r border-sidebar-border bg-sidebar",
-      isViewingAs ? "pt-24" : "pt-14"
-    )}>
-      <SidebarContent className="pt-2 pb-4">
-        <SidebarGroup>
-          <SidebarGroupContent>
-            <SidebarMenu className="space-y-1 px-3">
-              {mainMenus.map((menu, index) => {
-                const isActive = location.pathname === menu.url;
-                const IconComponent = getIconComponent(menu.icon);
-                const subMenus = getSubMenus(menu.menu_key);
-                const hasSubMenus = subMenus.length > 0;
-                const isExpanded = menu.menu_key === grupoDaRota || expandedMenus.includes(menu.menu_key);
-                
-                // Renderizar Bibliotecas logo após "Aprender" (menu_key === 'aprender')
-                const renderBibliotecasAfter = menu.menu_key === 'aprender';
-                
-                const menuElement = hasSubMenus ? (
-                  <Collapsible key={menu.menu_key} open={isExpanded}>
-                    <SidebarMenuItem>
-                      {/* Sem CollapsibleTrigger na linha: o Radix pendurava o
-                          toggle no div inteiro, e o clique no link subia e
-                          desfazia o que abrirMenu tinha acabado de abrir. Só a
-                          setinha alterna; o rótulo navega e abre. */}
-                      <div className="flex items-center w-full">
-                          <NavLink
-                            to={getMenuUrl(menu)}
-                            onClick={() => abrirMenu(menu.menu_key)}
-                             data-tour={
-                              menu.menu_key === 'aprender' ? 'aprender' :
-                              menu.menu_key === 'meu_progresso' ? 'meu-progresso' :
-                              menu.menu_key === 'projeto_skills' ? 'meu-projeto' :
-                              undefined
-                            }
-                          className={cn(
-                            "group relative rounded-lg transition-all duration-200 font-medium pl-4 flex-1 flex items-center gap-3 py-2.5",
-                            isActive 
-                              ? "text-foreground font-semibold"
-                              : "text-foreground/75 hover:text-foreground"
-                          )}
-                        >
-                          <span className={cn(
-                            "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
-                            isActive 
-                              ? "bg-brand-strong opacity-100" 
-                              : "bg-brand-strong opacity-0 group-hover:opacity-50"
-                          )} />
-                            <IconComponent className="h-4 w-4 shrink-0" strokeWidth={1.5} />
-                            {!collapsed && <span className="text-sm">{menu.label}</span>}
-                          </NavLink>
-                          {!collapsed && (
-                            <button
-                              type="button"
-                              aria-label={isExpanded ? "Recolher" : "Expandir"}
-                              aria-expanded={isExpanded}
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                toggleMenu(menu.menu_key);
-                              }}
-                              className="p-2 hover:bg-sidebar-accent rounded-lg transition-colors"
-                            >
-                              <ChevronDown 
-                                className={cn(
-                                  "h-4 w-4 transition-transform duration-200 text-sidebar-foreground/60",
-                                  isExpanded && "rotate-180"
-                                )} 
-                                strokeWidth={1.5}
-                              />
-                            </button>
-                          )}
-                        </div>
-                    </SidebarMenuItem>
-                    
-                    <CollapsibleContent>
-                      <SidebarMenu className="ml-4 mt-1 border-l border-border pl-2">
-                        {subMenus.map((subMenu) => {
-                          const subIsActive = location.pathname === subMenu.url;
-                          const SubIconComponent = subMenu.icon ? getIconComponent(subMenu.icon) : null;
-                          
-                          // Check for 3rd-level children (e.g. Painel Líder under Visão Geral)
-                          const thirdLevelMenus = getSubMenus(subMenu.menu_key);
-                          
-                          if (thirdLevelMenus.length > 0) {
-                            const hasActiveChild = thirdLevelMenus.some(child => child.url && location.pathname.startsWith(child.url));
-                            return (
-                              <Collapsible key={subMenu.menu_key} defaultOpen={hasActiveChild || subIsActive}>
-                                <div className="flex items-center">
-                                  <SidebarMenuItem className="flex-1">
-                                    <SidebarMenuButton asChild className="group">
-                                      <NavLink 
-                                        to={subMenu.url || "/"} 
-                                        end 
-                                        className={cn(
-                                          "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
-                                          subIsActive 
-                                            ? "text-foreground font-semibold"
-                                            : "text-muted-foreground hover:text-foreground"
-                                        )}
-                                      >
-                                        {!collapsed && <span>{subMenu.label}</span>}
-                                      </NavLink>
-                                    </SidebarMenuButton>
-                                  </SidebarMenuItem>
-                                  {!collapsed && (
-                                    <CollapsibleTrigger asChild>
-                                      <button className="p-1 rounded hover:bg-muted/50 text-sidebar-foreground/50 hover:text-sidebar-foreground transition-colors">
-                                        <ChevronDown className="h-3.5 w-3.5 transition-transform duration-200 [[data-state=open]>button>&]:rotate-180" />
-                                      </button>
-                                    </CollapsibleTrigger>
-                                  )}
-                                </div>
-                                <CollapsibleContent>
-                                  {thirdLevelMenus.map((child) => {
-                                    const childIsActive = location.pathname === child.url;
-                                    return (
-                                      <SidebarMenuItem key={child.menu_key}>
-                                        <SidebarMenuButton asChild className="group">
-                                          <NavLink 
-                                            to={child.url || "/"} 
-                                            end 
-                                            className={cn(
-                                              "rounded-lg transition-all duration-200 font-medium pl-6 py-2 text-sm",
-                                              childIsActive 
-                                                ? "text-foreground font-semibold" 
-                                                : "text-muted-foreground hover:text-foreground"
-                                            )}
-                                          >
-                                            {!collapsed && <span>{child.label}</span>}
-                                          </NavLink>
-                                        </SidebarMenuButton>
-                                      </SidebarMenuItem>
-                                    );
-                                  })}
-                                </CollapsibleContent>
-                              </Collapsible>
-                            );
-                          }
+  const materiais = porTamanhoDoNome(
+    [
+      { chave: "biblioteca_prompts", rotulo: "Prompts", url: "/biblioteca-prompts" },
+      { chave: "biblioteca_ferramentas", rotulo: "Ferramentas", url: "/biblioteca-ferramentas" },
+      { chave: "ia_copie_use", rotulo: "Modelos prontos", url: "/ia-copie-use" },
+      { chave: "metodos_aplicar", rotulo: "Métodos práticos", url: "/metodos-aplicar" },
+    ].filter((item) => isMenuVisible(item.chave)),
+    (item) => item.rotulo,
+  );
 
-                          return (
-                            <SidebarMenuItem key={subMenu.menu_key}>
-                              <SidebarMenuButton asChild className="group">
-                                <NavLink 
-                                  to={subMenu.url || "/"} 
-                                  end 
-                                  className={cn(
-                                    "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
-                                    subIsActive 
-                                      ? "text-foreground font-semibold" 
-                                      : "text-muted-foreground hover:text-foreground"
-                                  )}
-                                >
-                                  {!collapsed && <span>{subMenu.label}</span>}
-                                </NavLink>
-                              </SidebarMenuButton>
-                            </SidebarMenuItem>
-                          );
-                        })}
-                      </SidebarMenu>
-                    </CollapsibleContent>
-                  </Collapsible>
-                ) : (
-                  <SidebarMenuItem key={menu.menu_key}>
-                    <SidebarMenuButton asChild className="group">
-                      <NavLink 
-                        to={getMenuUrl(menu)} 
-                         data-tour={
-                           getMenuUrl(menu).includes('calendario') ? 'calendario' :
-                           getMenuUrl(menu).includes('evolucao') ? 'evolucao' :
-                           menu.menu_key === 'meu_progresso' ? 'meu-progresso' :
-                           menu.menu_key === 'projeto_skills' ? 'meu-projeto' :
-                           menu.menu_key === 'meu_sistema' ? 'meu-projeto' :
-                           undefined
-                         }
-                        end 
-                        className={cn(
-                          "relative rounded-xl px-3 py-2.5 font-medium transition-all duration-200",
-                          isActive
-                            ? "bg-primary/10 font-semibold text-foreground shadow-[inset_0_0_0_1px_hsl(var(--primary)/0.35)]"
-                            : "text-foreground/75 hover:bg-accent hover:text-foreground"
-                        )}
-                      >
-                        <IconComponent
-                          className={cn("h-4 w-4 shrink-0", isActive && "text-primary")}
-                          strokeWidth={1.5}
-                        />
-                        {!collapsed && <span className="text-sm">{menu.label}</span>}
-                      </NavLink>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
+  const nome = profile?.nome_completo?.split(" ")[0] ?? "Você";
+  const plano = PLANO_ROTULO[effectivePlan ?? ""] ?? "Plataforma";
+
+  return (
+    <Sidebar
+      className="border-r border-sidebar-border bg-sidebar pt-14"
+    >
+      <SidebarContent className="gap-0 pb-2 pt-3">
+        <SidebarGroup className="py-0">
+          <SidebarGroupContent>
+            <nav className="space-y-1 px-2.5">
+              {pais.map((menu) => {
+                const Icone = icone(menu.icon);
+                const filhos = filhosDe(menu.menu_key);
+                const url = urlDoMenu(menu);
+                const ativo = menu.menu_key === grupoDaRota || rotaCasa(url);
+                const aberto = menu.menu_key === grupoDaRota || abertos.includes(menu.menu_key);
+
+                const pai = (
+                  <ItemPai
+                    rotulo={menu.label}
+                    icone={<Icone className="h-[18px] w-[18px]" strokeWidth={1.75} />}
+                    para={url}
+                    ativo={ativo}
+                    expansivel={filhos.length > 0}
+                    aberto={aberto}
+                    aoAlternar={() => alternar(menu.menu_key)}
+                    aoNavegar={() => abrir(menu.menu_key)}
+                    recolhido={recolhido}
+                    dataTour={
+                      menu.menu_key === "aprender"
+                        ? "aprender"
+                        : menu.menu_key === "meu_progresso"
+                          ? "meu-progresso"
+                          : undefined
+                    }
+                  />
                 );
 
-                // Renderizar Bibliotecas imediatamente após "Aprender"
-                // Para IAplicada: apenas Prompts e Ferramentas
-                const bibliotecasMenu = renderBibliotecasAfter && !isVisitante && isMenuVisible('bibliotecas') ? (
-                  <Collapsible 
-                    key="bibliotecas_menu"
-                    open={rotaDeMateriais || expandedMenus.includes('bibliotecas_menu')} 
-                    onOpenChange={() => toggleMenu('bibliotecas_menu')}
-                    data-tour="bibliotecas"
-                  >
-                    <SidebarMenuItem>
-                      <CollapsibleTrigger asChild>
-                        <SidebarMenuButton className="group w-full relative pl-4">
-                          <span className={cn(
-                            "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-200",
-                            rotaDeMateriais
-                              ? "bg-brand-strong opacity-100" 
-                              : "bg-brand-strong opacity-0 group-hover:opacity-50"
-                          )} />
-                          <div className={cn(
-                            "flex items-center gap-3 rounded-lg transition-all duration-200 font-medium py-2.5 w-full",
-                            ['/ia-copie-use', '/biblioteca-ferramentas', '/biblioteca-prompts', '/metodos-aplicar'].some(p => location.pathname.startsWith(p))
-                              ? "text-foreground font-semibold"
-                              : "text-foreground/75 hover:text-foreground"
-                          )}>
-                            <LucideIcons.Library className="h-4 w-4 shrink-0" strokeWidth={1.5} />
-                            {!collapsed && (
-                              <>
-                                <span className="text-sm flex-1 text-left">Materiais</span>
-                                <LucideIcons.ChevronDown className={cn(
-                                  "h-4 w-4 transition-transform duration-200",
-                                  expandedMenus.includes('bibliotecas_menu') && "rotate-180"
-                                )} />
-                              </>
-                            )}
-                          </div>
-                        </SidebarMenuButton>
-                      </CollapsibleTrigger>
-                      
+                const bloco =
+                  filhos.length > 0 && !recolhido ? (
+                    <Collapsible open={aberto}>
                       <CollapsibleContent>
-                        <SidebarMenu className="ml-4 mt-1 border-l border-border pl-2">
-                          {isMenuVisible('biblioteca_prompts') && (
-                              <SidebarMenuItem>
-                                <SidebarMenuButton asChild className="group">
-                                  <NavLink 
-                                    to="/biblioteca-prompts" 
-                                    end
-                                    className={cn(
-                                      "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
-                                      location.pathname === '/biblioteca-prompts'
-                                        ? "text-foreground font-semibold" 
-                                        : "text-muted-foreground hover:text-foreground"
-                                    )}
-                                  >
-                                    {!collapsed && <span>Prompts</span>}
-                                  </NavLink>
-                                </SidebarMenuButton>
-                              </SidebarMenuItem>
-                          )}
-                          {isMenuVisible('biblioteca_ferramentas') && (
-                              <SidebarMenuItem>
-                                <SidebarMenuButton asChild className="group">
-                                  <NavLink 
-                                    to="/biblioteca-ferramentas" 
-                                    end
-                                    className={cn(
-                                      "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
-                                      location.pathname === '/biblioteca-ferramentas'
-                                        ? "text-foreground font-semibold" 
-                                        : "text-muted-foreground hover:text-foreground"
-                                    )}
-                                  >
-                                    {!collapsed && <span>Ferramentas</span>}
-                                  </NavLink>
-                                </SidebarMenuButton>
-                              </SidebarMenuItem>
-                          )}
-                          {isMenuVisible('ia_copie_use') && (
-                              <SidebarMenuItem>
-                                <SidebarMenuButton asChild className="group">
-                                  <NavLink 
-                                    to="/ia-copie-use" 
-                                    end
-                                    className={cn(
-                                      "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
-                                      location.pathname === '/ia-copie-use'
-                                        ? "text-foreground font-semibold" 
-                                        : "text-muted-foreground hover:text-foreground"
-                                    )}
-                                  >
-                                    {!collapsed && <span>Modelos prontos</span>}
-                                  </NavLink>
-                                </SidebarMenuButton>
-                              </SidebarMenuItem>
-                          )}
-                          {isMenuVisible('metodos_aplicar') && (
-                              <SidebarMenuItem>
-                                <SidebarMenuButton asChild className="group">
-                                  <NavLink 
-                                    to="/metodos-aplicar" 
-                                    end
-                                    className={cn(
-                                      "rounded-lg transition-all duration-200 font-medium pl-2 py-2 text-sm",
-                                      location.pathname === '/metodos-aplicar'
-                                        ? "text-foreground font-semibold" 
-                                        : "text-muted-foreground hover:text-foreground"
-                                    )}
-                                  >
-                                    {!collapsed && <span>Métodos práticos</span>}
-                                  </NavLink>
-                                </SidebarMenuButton>
-                              </SidebarMenuItem>
-                          )}
-                        </SidebarMenu>
+                        <BlocoFilhos>
+                          {filhos.map((filho) => {
+                            const netos = filhosDe(filho.menu_key);
+                            const netoAtivo = netos.some((n) => rotaCasa(n.url));
+                            const filhoAberto =
+                              netoAtivo || abertos.includes(`sub:${filho.menu_key}`);
+
+                            if (netos.length > 0) {
+                              return (
+                                <Collapsible key={filho.menu_key} open={filhoAberto}>
+                                  <ItemFilho
+                                    rotulo={filho.label}
+                                    para={filho.url || "/"}
+                                    ativo={rotaCasa(filho.url)}
+                                    expansivel
+                                    aberto={filhoAberto}
+                                    aoAlternar={() => alternar(`sub:${filho.menu_key}`)}
+                                  />
+                                  <CollapsibleContent>
+                                    <BlocoFilhos>
+                                      {netos.map((neto) => (
+                                        <ItemNeto
+                                          key={neto.menu_key}
+                                          rotulo={neto.label}
+                                          para={neto.url || "/"}
+                                          ativo={rotaCasa(neto.url)}
+                                        />
+                                      ))}
+                                    </BlocoFilhos>
+                                  </CollapsibleContent>
+                                </Collapsible>
+                              );
+                            }
+
+                            return (
+                              <ItemFilho
+                                key={filho.menu_key}
+                                rotulo={filho.label}
+                                para={filho.url || "/"}
+                                ativo={rotaCasa(filho.url)}
+                              />
+                            );
+                          })}
+                        </BlocoFilhos>
                       </CollapsibleContent>
-                    </SidebarMenuItem>
-                  </Collapsible>
-                ) : null;
+                    </Collapsible>
+                  ) : null;
+
+                // Materiais vem logo depois de Aprender: é a continuação
+                // natural da leitura, do que se estuda para o que se aplica.
+                const blocoMateriais =
+                  menu.menu_key === "aprender" &&
+                  !isVisitante &&
+                  isMenuVisible("bibliotecas") &&
+                  materiais.length > 0 ? (
+                    <Collapsible
+                      key="materiais"
+                      open={rotaDeMateriais || abertos.includes("materiais")}
+                    >
+                      <ItemPai
+                        rotulo="Materiais"
+                        icone={<Library className="h-[18px] w-[18px]" strokeWidth={1.75} />}
+                        para={materiais[0].url}
+                        ativo={rotaDeMateriais}
+                        expansivel
+                        aberto={rotaDeMateriais || abertos.includes("materiais")}
+                        aoAlternar={() => alternar("materiais")}
+                        aoNavegar={() => abrir("materiais")}
+                        recolhido={recolhido}
+                        dataTour="bibliotecas"
+                      />
+                      {!recolhido && (
+                        <CollapsibleContent>
+                          <BlocoFilhos>
+                            {materiais.map((item) => (
+                              <ItemFilho
+                                key={item.chave}
+                                rotulo={item.rotulo}
+                                para={item.url}
+                                ativo={rotaCasa(item.url)}
+                              />
+                            ))}
+                          </BlocoFilhos>
+                        </CollapsibleContent>
+                      )}
+                    </Collapsible>
+                  ) : null;
 
                 return (
                   <Fragment key={menu.menu_key}>
-                    {menuElement}
-                    {bibliotecasMenu}
+                    <div>{pai}{bloco}</div>
+                    {blocoMateriais}
                   </Fragment>
                 );
               })}
 
               {/* IAplicada Indica: quem já tem papel no programa, e o Insider
                   Business, que é a quem o programa é oferecido. */}
-              {!isVisitante && (temPapelPrograma || isBusinessSistemasEnv) && (
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild className="group">
-                    <NavLink
-                      to="/indica"
-                      end
-                      className={cn(
-                        "relative rounded-xl px-3 py-2.5 font-medium transition-all duration-200",
-                        location.pathname === '/indica'
-                          ? "bg-primary/10 font-semibold text-foreground shadow-[inset_0_0_0_1px_hsl(var(--primary)/0.35)]"
-                          : "text-foreground/75 hover:bg-accent hover:text-foreground"
-                      )}
-                    >
-                      <LucideIcons.Handshake
-                        className={cn("h-4 w-4 shrink-0", location.pathname === '/indica' && "text-primary")}
-                        strokeWidth={1.5}
-                      />
-                      {!collapsed && <span className="text-sm">Indica</span>}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
+              {!isVisitante && (temPapelPrograma || ehInsiderBusiness) && (
+                <ItemPai
+                  rotulo="Indica"
+                  icone={<LucideIcons.Handshake className="h-[18px] w-[18px]" strokeWidth={1.75} />}
+                  para="/indica"
+                  ativo={rotaCasa("/indica")}
+                  recolhido={recolhido}
+                />
               )}
-
-            </SidebarMenu>
+            </nav>
           </SidebarGroupContent>
         </SidebarGroup>
 
@@ -557,19 +393,44 @@ export function AppSidebar() {
           isAdmin={isAdmin}
           isViewingAs={isViewingAs}
           resetView={resetView}
-          collapsed={collapsed}
+          collapsed={recolhido}
         />
       </SidebarContent>
 
-      <SidebarFooter className="border-t border-sidebar-border p-4">
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton onClick={handleLogout} className="text-destructive/80 hover:text-destructive hover:bg-destructive/10 py-2.5">
-              <LogOut className="h-4 w-4 shrink-0" strokeWidth={1.5} />
-              {!collapsed && <span className="text-sm">Sair</span>}
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
+      {/* Bloco de conta. O sair deixou de ser uma linha vermelha gritando no
+          pé da navegação e virou um ícone ao lado de quem está logado. */}
+      <SidebarFooter className="border-t border-sidebar-border p-2.5">
+        <div
+          className={cn(
+            "flex items-center gap-2.5 rounded-xl px-2.5 py-2 transition-colors",
+            !recolhido && "bg-sidebar-accent/60",
+          )}
+        >
+          <UserAvatar name={profile?.nome_completo ?? nome} size="sm" />
+          {!recolhido && (
+            <>
+              <div className="min-w-0 flex-1 leading-tight">
+                <p className="truncate text-[13px] font-medium text-sidebar-foreground">{nome}</p>
+                <p className="truncate text-[11px] text-muted-foreground">{plano}</p>
+              </div>
+              <TooltipProvider delayDuration={200}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      type="button"
+                      onClick={sair}
+                      aria-label="Sair da conta"
+                      className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-destructive/15 hover:text-destructive"
+                    >
+                      <LogOut className="h-4 w-4" strokeWidth={1.75} />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top">Sair</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </>
+          )}
+        </div>
       </SidebarFooter>
     </Sidebar>
   );

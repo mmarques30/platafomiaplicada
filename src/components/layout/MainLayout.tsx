@@ -9,7 +9,6 @@ import { useUserProfile } from "@/hooks/useUserProfile";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffectivePlan } from "@/hooks/useUserPlan";
 import { useEnvironmentSafe } from "@/hooks/useEnvironment";
-import { useAdminViewContext } from "@/contexts/AdminViewContext";
 import { GraduationCap, Users, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import logoAplicada from "@/assets/logo-aplicada-nova.png";
@@ -18,7 +17,6 @@ import { PageSkeleton } from "@/components/shared/PageSkeleton";
 import { VisitorExpirationNotice } from "@/components/shared/VisitorExpirationNotice";
 import { TrocarSenhaModal } from "@/components/auth/TrocarSenhaModal";
 import { useQueryClient } from "@tanstack/react-query";
-import { cn } from "@/lib/utils";
 import { PageTransition } from "@/components/ui/PageTransition";
 
 export function MainLayout() {
@@ -30,7 +28,6 @@ export function MainLayout() {
   const { user, signOut } = useAuth();
   const queryClient = useQueryClient();
   const environmentContext = useEnvironmentSafe();
-  const { isViewingAs } = useAdminViewContext();
   const { effectivePlan } = useEffectivePlan(isAdmin, isLoading);
   const isBusinessPlan = effectivePlan === 'business_parceria' || effectivePlan === 'insider_business';
 
@@ -75,10 +72,9 @@ export function MainLayout() {
     <>
       <SidebarProvider>
         <TopHeader />
-        <div className={cn(
-          "relative min-h-screen flex w-full",
-          isAdmin && isViewingAs ? "pt-24" : "pt-14"
-        )}>
+        {/* Altura fixa de topo. Antes, simular um plano empilhava uma
+            segunda barra e a página descia para caber as duas. */}
+        <div className="relative flex min-h-screen w-full pt-14">
           <div className="atmosfera" aria-hidden="true" />
           <AppSidebar />
           <div className="flex-1 flex flex-col relative z-[1] min-w-0">
