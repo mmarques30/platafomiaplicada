@@ -271,17 +271,17 @@ export function WelcomeHeader() {
      * seguinte sem linha dura, que é como a referência encaixa o herói no
      * resto da página.
      */
-    <section className="painel-marca px-5 pb-6 pt-7 md:px-8 md:pb-8 md:pt-10">
+    <section className="painel-marca px-5 pb-5 pt-6 md:px-8 md:pb-6 md:pt-7">
       {/* A marca, em vetor, para ficar nítida em qualquer tamanho. */}
       <MarcaIAplicada
         className="marca-de-fundo -right-[18%] top-1/2 h-[200%] w-auto max-w-none -translate-y-1/2 rotate-[14deg] md:right-[2%] md:h-[165%]"
       />
 
-      <div className="relative flex flex-col gap-7">
+      <div className="relative flex flex-col gap-5">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
-          <div className="min-w-0 flex-1 space-y-2.5">
+          <div className="min-w-0 flex-1 space-y-2">
             <span className="rotulo-mono block">{dataExtenso}</span>
-            <h1 className="font-serif-display text-[34px] leading-[1.02] tracking-tight text-foreground md:text-5xl lg:text-[52px]">
+            <h1 className="font-serif-display text-[30px] leading-[1.02] tracking-tight text-foreground md:text-4xl lg:text-[42px]">
               {cumprimento}{" "}
               <em className="font-serif-italic text-primary">{primeiroNome}</em>
             </h1>

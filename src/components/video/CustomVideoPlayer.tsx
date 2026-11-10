@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Play, Pause, Volume2, VolumeX, Maximize, RotateCcw, SkipForward, HardDrive, ExternalLink } from "lucide-react";
+import { CapaVideo } from "@/components/shared/CapaVideo";
 import { CustomYouTubePlayer, PlayerState } from "@/lib/youtubePlayer";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -229,12 +230,13 @@ export function CustomVideoPlayer({
   if (useGoogleDrive) {
     return (
       <div className={cn("relative w-full bg-black overflow-hidden rounded-lg", aspectClass)}>
-        {showThumbnail && thumbnail ? (
+        {showThumbnail ? (
           <div className="absolute inset-0 w-full h-full">
-            <img
-              src={thumbnail}
-              alt={title || "Video thumbnail"}
-              className="w-full h-full object-cover"
+            <CapaVideo
+              youtubeId={videoId}
+              capa={thumbnail}
+              alt={title || "Capa do vídeo"}
+              priority
             />
             <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
               <Button
@@ -266,13 +268,13 @@ export function CustomVideoPlayer({
   if (error) {
     return (
       <div className={cn("relative w-full bg-black overflow-hidden rounded-lg flex items-center justify-center", aspectClass)}>
-        {thumbnail && (
-          <img
-            src={thumbnail}
-            alt={title || "Video thumbnail"}
-            className="absolute inset-0 w-full h-full object-cover opacity-30"
-          />
-        )}
+        <CapaVideo
+          youtubeId={videoId}
+          capa={thumbnail}
+          alt=""
+          semPulso
+          className="absolute inset-0 opacity-30"
+        />
         <div className="relative z-10 text-center space-y-4 p-6">
           <div className="text-destructive text-lg font-semibold">
             Erro ao carregar vídeo
@@ -306,13 +308,13 @@ export function CustomVideoPlayer({
   if (isLoading) {
     return (
       <div className={cn("relative w-full bg-black overflow-hidden rounded-lg flex items-center justify-center", aspectClass)}>
-        {thumbnail && (
-          <img
-            src={thumbnail}
-            alt={title || "Video thumbnail"}
-            className="absolute inset-0 w-full h-full object-cover opacity-50"
-          />
-        )}
+        <CapaVideo
+          youtubeId={videoId}
+          capa={thumbnail}
+          alt=""
+          semPulso
+          className="absolute inset-0 opacity-50"
+        />
         <div className="relative z-10 text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto mb-4"></div>
           <p className="text-white/80 text-sm">Carregando vídeo...</p>

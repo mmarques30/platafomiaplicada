@@ -65,7 +65,11 @@ export default function Dashboard() {
   }
 
   return (
-    <PageContainer>
+    /* O respiro entre blocos era de 40px em tela grande, herdado do padrão
+       das páginas de leitura. Num painel isso vira um dedo de vazio entre
+       cada gráfico e empurra tudo para fora da primeira tela. Aqui ele cai
+       para 24px, que é o mesmo das telas médias. */
+    <PageContainer className="lg:space-y-6">
       {mostrarAvisoSenha && (
         <Alert className="border-primary/40 bg-primary/5">
           <AlertCircle className="h-4 w-4 text-primary" />

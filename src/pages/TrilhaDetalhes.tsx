@@ -14,7 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ArrowLeft, Play, CheckCircle2, Clock, ChevronDown } from "lucide-react";
-import { getYouTubeThumbnail } from "@/lib/youtube";
+import { CapaVideo } from "@/components/shared/CapaVideo";
 import { getGoogleDriveEmbedUrl } from "@/lib/google-drive";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
@@ -453,10 +453,10 @@ export default function TrilhaDetalhes() {
                           )}
                         >
                           <div className="aspect-video relative overflow-hidden">
-                            <img
-                              src={getYouTubeThumbnail(video.youtube_id, video.thumbnail_customizado_url)}
+                            <CapaVideo
+                              youtubeId={video.youtube_id}
+                              capa={video.thumbnail_customizado_url}
                               alt={video.titulo}
-                              className="w-full h-full object-cover"
                             />
                             {isPlaying && (
                               <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
@@ -524,10 +524,11 @@ export default function TrilhaDetalhes() {
 
                         {/* Thumbnail */}
                         <div className="relative w-28 flex-shrink-0">
-                          <img
-                            src={getYouTubeThumbnail(video.youtube_id, video.thumbnail_customizado_url)}
+                          <CapaVideo
+                            youtubeId={video.youtube_id}
+                            capa={video.thumbnail_customizado_url}
                             alt={video.titulo}
-                            className="w-full h-16 rounded object-cover"
+                            className="h-16 rounded"
                           />
                           <div className="absolute bottom-0.5 right-0.5 bg-black/80 text-white text-[10px] px-1 rounded">
                             {formatDuration(video.duracao)}

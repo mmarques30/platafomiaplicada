@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, Clock, Play } from "lucide-react";
-import { getYouTubeThumbnail } from "@/lib/youtube";
+import { CapaVideo } from "@/components/shared/CapaVideo";
 import { cn } from "@/lib/utils";
 import { FavoriteButton } from "./FavoriteButton";
 import {
@@ -47,26 +47,6 @@ function formatTotalDuration(totalMin: number) {
 }
 
 // Thumbnail com placeholder enquanto carrega (evita o "demora a aparecer"/preto).
-function VideoThumb({ src, alt, bloqueada }: { src: string; alt: string; bloqueada?: boolean }) {
-  const [loaded, setLoaded] = useState(false);
-  return (
-    <>
-      {!loaded && <div className="absolute inset-0 bg-brand-cream animate-pulse" />}
-      <img
-        src={src}
-        alt={alt}
-        loading="lazy"
-        onLoad={() => setLoaded(true)}
-        className={cn(
-          "w-full h-full object-cover transition-opacity duration-300",
-          loaded ? "opacity-100" : "opacity-0",
-          bloqueada && "opacity-50 grayscale"
-        )}
-      />
-    </>
-  );
-}
-
 export function TrilhaOverview({ trilha, videos, onSelectVideo, progressData }: TrilhaOverviewProps) {
   const totalVideos = videos.length;
   const completedVideos = videos.filter(v =>
@@ -143,10 +123,11 @@ export function TrilhaOverview({ trilha, videos, onSelectVideo, progressData }: 
                     onClick={() => !trilha.bloqueada && onSelectVideo(video.id)}
                   >
                     <div className="relative aspect-[9/16] overflow-hidden rounded-xl border border-brand-hairline shadow-sm hover:shadow-lg transition-all duration-300 bg-brand-cream">
-                      <VideoThumb
-                        src={getYouTubeThumbnail(video.youtube_id, video.thumbnail_customizado_url || video.thumbnail_url)}
+                      <CapaVideo
+                        youtubeId={video.youtube_id}
+                        capa={video.thumbnail_customizado_url || video.thumbnail_url}
                         alt={video.titulo}
-                        bloqueada={trilha.bloqueada}
+                        esmaecida={trilha.bloqueada}
                       />
 
                       {/* Overlay "Em Breve" para trilhas bloqueadas */}
