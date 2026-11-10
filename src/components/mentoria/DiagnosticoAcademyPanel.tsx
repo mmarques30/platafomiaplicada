@@ -28,6 +28,7 @@ import { toast } from "sonner";
 import { useEffect, useRef, useState } from "react";
 import { useMentoriaForm } from "@/hooks/useMentoriaForm";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { MarcaIAplicada } from "@/components/shared/MarcaIAplicada";
 
 // Tipos completos do insight gerado pela IA
 interface FerramentaEtapa {
@@ -244,146 +245,168 @@ export function DiagnosticoAcademyPanel({ diagnostico }: DiagnosticoAcademyPanel
 
   return (
     <div className="space-y-8">
-      {/* Header Premium */}
-      <header className="flex items-center gap-4 pb-6 border-b border-aplicada-green-800/20">
-        <div className="p-4 rounded-2xl bg-aplicada-green-700/10 border border-aplicada-green-700/20">
-          <Sparkles className="h-8 w-8 text-aplicada-green-700" />
-        </div>
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">
-            Seu Plano de Desenvolvimento IA
+      {/*
+        O cabeçalho do plano.
+        
+        Era um ícone grande dentro de um quadrado verde tingido, ao lado de um
+        título em negrito. Agora é o painel de marca com o símbolo atrás, o
+        título em serifa como o resto da plataforma, e uma linha de números que
+        diz o tamanho do plano antes de a pessoa rolar: quantas etapas, quantas
+        ferramentas, quanto tempo.
+      */}
+      <section className="painel-marca px-5 pb-6 pt-7 md:px-8 md:pb-7 md:pt-9">
+        <MarcaIAplicada className="marca-de-fundo -right-[10%] top-1/2 h-[170%] w-auto max-w-none -translate-y-1/2 rotate-[12deg] md:right-0 md:h-[140%]" />
+
+        <div className="relative">
+          <span className="rotulo-mono">Plano gerado por IA</span>
+          <h1 className="font-serif-display mt-2 text-3xl leading-[1.05] text-foreground md:text-4xl">
+            Seu plano de <em className="font-serif-italic text-primary">desenvolvimento</em>
           </h1>
           {dataGeracao && (
-            <p className="text-muted-foreground">
-              Gerado em {dataGeracao}
-            </p>
+            <p className="mt-2 text-sm text-muted-foreground">Gerado em {dataGeracao}</p>
           )}
+
+          <dl className="mt-7 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {[
+              { rotulo: "Etapas", valor: etapasEvolucao.length },
+              { rotulo: "Ferramentas", valor: ferramentas.length },
+              { rotulo: "Objetivos", valor: objetivos.length },
+              { rotulo: "Projetos", valor: projetos.length },
+            ]
+              .filter((item) => item.valor > 0)
+              .map((item) => (
+                <div key={item.rotulo} className="vidro px-4 py-3">
+                  <dt className="rotulo-mono text-[10px]">{item.rotulo}</dt>
+                  <dd className="numero-painel mt-1.5 text-2xl text-foreground">{item.valor}</dd>
+                </div>
+              ))}
+          </dl>
         </div>
-      </header>
+      </section>
 
-      {/* Seção: Análise do Perfil */}
-      {analisePerfil && (
-        <section>
-          <Card className="bg-gradient-to-r from-aplicada-green-700/10 to-aplicada-green-900/5 border border-aplicada-green-700/30">
-            <CardContent className="p-6">
-              <div className="flex items-start gap-4">
-                <div className="p-3 rounded-xl bg-aplicada-green-700/20">
-                  <User className="h-6 w-6 text-aplicada-green-700" />
-                </div>
-                <div>
-                  <h2 className="text-lg font-semibold text-aplicada-green-700 mb-2">
-                    Análise do Seu Perfil
-                  </h2>
-                  <p className="text-foreground leading-relaxed">{analisePerfil}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </section>
-      )}
-
-      {/* Seção: Foco dos Próximos 30 Dias */}
-      {recomendacaoFoco && (
-        <section>
-          <Card className="bg-gradient-to-r from-status-warning/10 to-status-warning/5 border border-status-warning/30">
-            <CardContent className="p-6">
-              <div className="flex items-start gap-4">
-                <div className="p-3 rounded-xl bg-status-warning/20">
-                  <Rocket className="h-6 w-6 text-status-warning" />
-                </div>
-                <div>
-                  <h2 className="text-lg font-semibold text-status-warning mb-2">
-                    Foco dos Próximos 30 Dias
-                  </h2>
-                  <p className="text-foreground leading-relaxed font-medium">{recomendacaoFoco}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </section>
-      )}
-
-      {/* Seção: Alerta de Desafios */}
-      {alertaDesafios && (
-        <section>
-          <Card className="bg-gradient-to-r from-status-danger/10 to-status-danger/5 border border-status-danger/30">
-            <CardContent className="p-6">
-              <div className="flex items-start gap-4">
-                <div className="p-3 rounded-xl bg-status-danger/20">
-                  <AlertTriangle className="h-6 w-6 text-status-danger" />
-                </div>
-                <div>
-                  <h2 className="text-lg font-semibold text-status-danger mb-2">
-                    Alerta de Desafios
-                  </h2>
-                  <p className="text-foreground leading-relaxed">{alertaDesafios}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </section>
-      )}
-
-      {/* Seção: Ferramentas Prioritárias - Movida para cima */}
-      {ferramentas.length > 0 && (
-        <section>
-          <h2 className="text-lg font-semibold text-aplicada-green-700 flex items-center gap-2 mb-4">
-            <Bot className="h-5 w-5" />
-            Ferramentas que Você Vai Dominar
-          </h2>
-          {/* Limita a 5 ferramentas e usa 5 colunas em desktop pra todas
-              ficarem na mesma linha (Mari pediu: "no máximo 5, mas que não
-              ficassem embaixo, numa mesma linha"). Em telas menores quebra
-              naturalmente porque 5 cards não cabem horizontalmente. */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-            {ferramentas.slice(0, 5).map((ferramenta, index) => (
-              <Card 
-                key={index}
-                className="bg-card border border-aplicada-green-800/20 hover:border-aplicada-green-700/40 transition-colors"
+      {/*
+        As três leituras do plano.
+        
+        Eram três cards de largura cheia, empilhados, cada um com degradê
+        próprio e um ícone dentro de um quadrado tingido — verde, âmbar e
+        vermelho. Três faixas coloridas atravessando a tela, uma embaixo da
+        outra, e o vermelho fazia "desafios" parecer um erro do sistema.
+        
+        Agora são três colunas da mesma altura, na superfície comum. A cor
+        ficou num fio de 2px na borda esquerda e no ícone: o bastante para
+        distinguir perfil, foco e alerta, sem três manchas competindo.
+      */}
+      {(analisePerfil || recomendacaoFoco || alertaDesafios) && (
+        <div className="grid gap-4 lg:grid-cols-3">
+          {[
+            { chave: "perfil", titulo: "Seu perfil", texto: analisePerfil, Icone: User, cor: "hsl(var(--primary))" },
+            { chave: "foco", titulo: "Foco dos próximos 30 dias", texto: recomendacaoFoco, Icone: Rocket, cor: "hsl(var(--status-warning))" },
+            { chave: "alerta", titulo: "Onde você pode travar", texto: alertaDesafios, Icone: AlertTriangle, cor: "hsl(var(--status-danger))" },
+          ]
+            .filter((bloco) => bloco.texto)
+            .map(({ chave, titulo, texto, Icone, cor }) => (
+              <section
+                key={chave}
+                className="superficie relative overflow-hidden p-5 pl-6"
               >
-                <CardContent className="p-4 text-center">
-                  <div className="w-12 h-12 mx-auto rounded-xl bg-aplicada-green-700/10 flex items-center justify-center mb-3">
-                    <Bot className="h-6 w-6 text-aplicada-green-700" />
-                  </div>
-                  <p className="font-semibold text-foreground text-sm">{ferramenta.nome}</p>
-                  {ferramenta.categoria && (
-                    <p className="text-xs text-muted-foreground mt-1">{ferramenta.categoria}</p>
-                  )}
-                  {(ferramenta.prioridade || ferramenta.nivel_prioridade) && (
-                    <Badge variant="outline" className="mt-2 text-xs border-aplicada-green-700/30 text-aplicada-green-700">
-                      Prioridade {ferramenta.prioridade || ferramenta.nivel_prioridade}
-                    </Badge>
-                  )}
-                  {ferramenta.motivo && (
-                    <p className="text-xs text-muted-foreground mt-2 line-clamp-2">{ferramenta.motivo}</p>
-                  )}
-                </CardContent>
-              </Card>
+                <span
+                  aria-hidden="true"
+                  className="absolute inset-y-0 left-0 w-[2px]"
+                  style={{ background: cor }}
+                />
+                <div className="flex items-center gap-2">
+                  <Icone className="h-3.5 w-3.5 shrink-0" style={{ color: cor }} strokeWidth={1.75} />
+                  <h2 className="titulo-bloco text-sm text-foreground">{titulo}</h2>
+                </div>
+                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{texto}</p>
+              </section>
             ))}
-          </div>
+        </div>
+      )}
+
+      {/*
+        As ferramentas, por prioridade.
+        
+        Eram cinco cartões centrados, cada um com o mesmo robô dentro do mesmo
+        quadrado verde — cinco ícones iguais que não distinguiam nada — e a
+        prioridade escondida numa etiqueta pequena embaixo. Agora a prioridade
+        é a ordem e é a barra: o olho compara comprimentos a partir de uma base
+        comum, que é como se responde "qual vem primeiro".
+      */}
+      {ferramentas.length > 0 && (
+        <section className="superficie p-5">
+          <header className="mb-5 flex items-baseline justify-between gap-4">
+            <h2 className="titulo-bloco text-sm text-foreground">
+              Ferramentas que você vai dominar
+            </h2>
+            <span className="rotulo-mono text-[10px]">Por prioridade</span>
+          </header>
+
+          <ol className="space-y-3">
+            {ferramentas.slice(0, 5).map((ferramenta, index) => {
+              const prioridade = ferramenta.prioridade ?? ferramenta.nivel_prioridade ?? index + 1;
+              // A barra desce do topo: a primeira ferramenta é a mais cheia.
+              const forca = Math.max(0.25, 1 - index * 0.17);
+              return (
+                <li key={`${ferramenta.nome}-${index}`} className="flex items-start gap-4">
+                  <span className="rotulo-mono w-4 shrink-0 pt-0.5 text-[11px] text-primary">
+                    {index + 1}
+                  </span>
+
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
+                      <span className="text-sm font-medium text-foreground">{ferramenta.nome}</span>
+                      {ferramenta.categoria && (
+                        <span className="text-[11px] text-muted-foreground">
+                          {ferramenta.categoria}
+                        </span>
+                      )}
+                      {ferramenta.gratuito && (
+                        <span className="rounded-full border border-border px-2 py-0.5 text-[10px] text-muted-foreground">
+                          Gratuita
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                      <div
+                        className="h-full rounded-full bg-primary transition-all duration-700"
+                        style={{ width: `${forca * 100}%` }}
+                      />
+                    </div>
+
+                    {ferramenta.motivo && (
+                      <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+                        {ferramenta.motivo}
+                      </p>
+                    )}
+                  </div>
+
+                  <span className="rotulo-mono shrink-0 pt-0.5 text-[10px]">P{prioridade}</span>
+                </li>
+              );
+            })}
+          </ol>
         </section>
       )}
 
       {/* Seção: Etapas de Evolução */}
       {etapasEvolucao.length > 0 && (
         <section>
-          <h2 className="text-lg font-semibold text-aplicada-green-700 flex items-center gap-2 mb-4">
-            <Map className="h-5 w-5" />
-            Suas Etapas de Evolução
-          </h2>
+          <h2 className="titulo-bloco mb-4 text-base text-foreground">Suas Etapas de Evolução</h2>
           <div className="relative pl-8">
             {/* Timeline vertical */}
-            <div className="absolute left-3 top-2 bottom-2 w-0.5 bg-gradient-to-b from-aplicada-green-700 via-aplicada-green-700/50 to-aplicada-green-900/30" />
+            <div className="absolute bottom-2 left-3 top-2 w-px bg-border" />
             
             {etapasEvolucao.map((etapa, index) => (
               <div key={index} className="relative flex gap-4 mb-6 last:mb-0">
                 {/* Círculo numerado */}
-                <div className="absolute -left-5 w-8 h-8 rounded-full bg-aplicada-green-700 text-white flex items-center justify-center font-bold text-sm shadow-md">
+                <div className="absolute -left-5 grid h-8 w-8 place-items-center rounded-full bg-primary font-mono text-xs font-semibold text-primary-foreground">
                   {etapa.numero || index + 1}
                 </div>
                 
                 {/* Card da etapa */}
-                <Card className="flex-1 bg-card border border-aplicada-green-800/20">
+                <Card className="flex-1">
                   <CardContent className="p-5">
                     <div className="flex items-center justify-between mb-2">
                       <h3 className="font-semibold text-foreground text-lg">{etapa.titulo}</h3>
@@ -445,20 +468,17 @@ export function DiagnosticoAcademyPanel({ diagnostico }: DiagnosticoAcademyPanel
       {/* Fallback: Roadmap antigo (se não tiver etapas_evolucao) */}
       {etapasEvolucao.length === 0 && roadmap.length > 0 && (
         <section>
-          <h2 className="text-lg font-semibold text-aplicada-green-700 flex items-center gap-2 mb-4">
-            <Map className="h-5 w-5" />
-            Seu Roadmap de Aprendizado
-          </h2>
+          <h2 className="titulo-bloco mb-4 text-base text-foreground">Seu Roadmap de Aprendizado</h2>
           <div className="relative pl-8">
-            <div className="absolute left-3 top-2 bottom-2 w-0.5 bg-gradient-to-b from-aplicada-green-700 via-aplicada-green-700/50 to-aplicada-green-900/30" />
+            <div className="absolute bottom-2 left-3 top-2 w-px bg-border" />
             
             {roadmap.map((etapa, index) => (
               <div key={index} className="relative flex gap-4 mb-6 last:mb-0">
-                <div className="absolute -left-5 w-8 h-8 rounded-full bg-aplicada-green-700 text-white flex items-center justify-center font-bold text-sm shadow-md">
+                <div className="absolute -left-5 grid h-8 w-8 place-items-center rounded-full bg-primary font-mono text-xs font-semibold text-primary-foreground">
                   {index + 1}
                 </div>
                 
-                <Card className="flex-1 bg-card border border-aplicada-green-800/20">
+                <Card className="flex-1">
                   <CardContent className="p-4">
                     <div className="flex items-center gap-2 mb-1">
                       <Clock className="h-4 w-4 text-muted-foreground" />
@@ -477,76 +497,41 @@ export function DiagnosticoAcademyPanel({ diagnostico }: DiagnosticoAcademyPanel
       {/* Seção: Objetivos Estratégicos */}
       {objetivos.length > 0 && (
         <section>
-          <h2 className="text-lg font-semibold text-aplicada-green-700 flex items-center gap-2 mb-4">
-            <Target className="h-5 w-5" />
-            Seus Objetivos Estratégicos
-          </h2>
-          <div className="grid md:grid-cols-3 gap-4">
-            {/* Curto Prazo */}
-            <Card className="border border-status-success/30 bg-status-success/5">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-status-success flex items-center gap-2">
-                  <Clock className="h-4 w-4" />
-                  Curto Prazo
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                {objetivosCurtoPrazo.length > 0 ? (
-                  objetivosCurtoPrazo.map((obj, idx) => (
-                    <div key={idx} className="flex items-start gap-2">
-                      <CheckCircle2 className="h-4 w-4 text-status-success mt-0.5 shrink-0" />
-                      <p className="text-sm text-foreground">{obj.objetivo}</p>
-                    </div>
-                  ))
+          <h2 className="titulo-bloco mb-4 text-base text-foreground">Seus Objetivos Estratégicos</h2>
+          {/*
+            Os três horizontes eram verde, azul e cinza — um semáforo aplicado
+            a uma linha do tempo, onde a cor não significa nada: longo prazo
+            não é pior que curto. Agora são três colunas iguais, e o que
+            distingue é o rótulo e a posição.
+          */}
+          <div className="grid gap-4 md:grid-cols-3">
+            {[
+              { rotulo: "Curto prazo", apoio: "Próximas semanas", itens: objetivosCurtoPrazo },
+              { rotulo: "Médio prazo", apoio: "Próximos meses", itens: objetivosMedioPrazo },
+              { rotulo: "Longo prazo", apoio: "O ano", itens: objetivosLongoPrazo },
+            ].map((coluna) => (
+              <section key={coluna.rotulo} className="superficie p-5">
+                <header className="mb-4">
+                  <h3 className="titulo-bloco text-sm text-foreground">{coluna.rotulo}</h3>
+                  <span className="rotulo-mono text-[10px]">{coluna.apoio}</span>
+                </header>
+                {coluna.itens.length > 0 ? (
+                  <ul className="space-y-2.5">
+                    {coluna.itens.map((obj, idx) => (
+                      <li key={idx} className="flex items-start gap-2.5">
+                        <CheckCircle2
+                          className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary"
+                          strokeWidth={2}
+                        />
+                        <p className="text-sm leading-relaxed text-foreground">{obj.objetivo}</p>
+                      </li>
+                    ))}
+                  </ul>
                 ) : (
-                  <p className="text-sm text-muted-foreground">Nenhum objetivo definido</p>
+                  <p className="text-sm text-muted-foreground">Nada definido para este horizonte.</p>
                 )}
-              </CardContent>
-            </Card>
-
-            {/* Médio Prazo */}
-            <Card className="border border-status-info/30 bg-status-info/5">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-status-info flex items-center gap-2">
-                  <Target className="h-4 w-4" />
-                  Médio Prazo
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                {objetivosMedioPrazo.length > 0 ? (
-                  objetivosMedioPrazo.map((obj, idx) => (
-                    <div key={idx} className="flex items-start gap-2">
-                      <CheckCircle2 className="h-4 w-4 text-status-info mt-0.5 shrink-0" />
-                      <p className="text-sm text-foreground">{obj.objetivo}</p>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-sm text-muted-foreground">Nenhum objetivo definido</p>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Longo Prazo */}
-            <Card className="border border-secondary/30 bg-secondary/5">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-secondary flex items-center gap-2">
-                  <Rocket className="h-4 w-4" />
-                  Longo Prazo
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                {objetivosLongoPrazo.length > 0 ? (
-                  objetivosLongoPrazo.map((obj, idx) => (
-                    <div key={idx} className="flex items-start gap-2">
-                      <CheckCircle2 className="h-4 w-4 text-secondary mt-0.5 shrink-0" />
-                      <p className="text-sm text-foreground">{obj.objetivo}</p>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-sm text-muted-foreground">Nenhum objetivo definido</p>
-                )}
-              </CardContent>
-            </Card>
+              </section>
+            ))}
           </div>
         </section>
       )}
@@ -554,10 +539,7 @@ export function DiagnosticoAcademyPanel({ diagnostico }: DiagnosticoAcademyPanel
       {/* Seção: Projetos Práticos */}
       {projetos.length > 0 && (
         <section>
-          <h2 className="text-lg font-semibold text-aplicada-green-700 flex items-center gap-2 mb-4">
-            <Folder className="h-5 w-5" />
-            Projetos Práticos Sugeridos
-          </h2>
+          <h2 className="titulo-bloco mb-4 text-base text-foreground">Projetos Práticos Sugeridos</h2>
           <Accordion type="single" collapsible className="space-y-3">
             {projetos.map((projeto, index) => (
               <AccordionItem key={index} value={`projeto-${index}`} className="border border-aplicada-green-800/20 rounded-xl px-4">
@@ -615,10 +597,7 @@ export function DiagnosticoAcademyPanel({ diagnostico }: DiagnosticoAcademyPanel
       {/* Seção: Por Onde Começar */}
       {primeirosPassos.length > 0 && (
         <section>
-          <h2 className="text-lg font-semibold text-aplicada-green-700 flex items-center gap-2 mb-4">
-            <PlayCircle className="h-5 w-5" />
-            Por Onde Começar
-          </h2>
+          <h2 className="titulo-bloco mb-4 text-base text-foreground">Por Onde Começar</h2>
           <div className="space-y-3">
             {primeirosPassos.map((passo, index) => (
               <div 
@@ -638,10 +617,7 @@ export function DiagnosticoAcademyPanel({ diagnostico }: DiagnosticoAcademyPanel
       {/* Seção: Oportunidades Identificadas */}
       {oportunidades.length > 0 && (
         <section>
-          <h2 className="text-lg font-semibold text-aplicada-green-700 flex items-center gap-2 mb-4">
-            <Lightbulb className="h-5 w-5" />
-            Oportunidades Identificadas
-          </h2>
+          <h2 className="titulo-bloco mb-4 text-base text-foreground">Oportunidades Identificadas</h2>
           <div className="grid md:grid-cols-2 gap-4">
             {oportunidades.map((oportunidade, index) => {
               // Pode ser string ou objeto
@@ -671,10 +647,7 @@ export function DiagnosticoAcademyPanel({ diagnostico }: DiagnosticoAcademyPanel
       {/* Seção: Trilhas Recomendadas */}
       {trilhasRecomendadas.length > 0 && (
         <section>
-          <h2 className="text-lg font-semibold text-aplicada-green-700 flex items-center gap-2 mb-4">
-            <GraduationCap className="h-5 w-5" />
-            Trilhas Recomendadas
-          </h2>
+          <h2 className="titulo-bloco mb-4 text-base text-foreground">Trilhas Recomendadas</h2>
           <div className="space-y-3">
             {trilhasRecomendadas.map((trilha, index) => (
               <Card 

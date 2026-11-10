@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 
+import { FolhasLiquidas } from "./FolhasLiquidas";
 import logoIAplicada from "@/assets/logo-auth-fundo-escuro.png";
 import { cn } from "@/lib/utils";
 
@@ -12,6 +13,12 @@ interface MolduraAcessoProps {
   children: ReactNode;
   /** Rodapé pequeno, como o aviso de expiração do link. */
   rodape?: ReactNode;
+  /** As folhas flutuando atrás. Só a porta de entrada as usa. */
+  comFolhas?: boolean;
+  /** Segura as folhas enquanto a abertura da marca está na tela. */
+  segurarFolhas?: boolean;
+  /** Linha legal no pé da página, fora da coluna. */
+  pePagina?: ReactNode;
   className?: string;
 }
 
@@ -35,14 +42,21 @@ export function MolduraAcesso({
   apoio,
   children,
   rodape,
+  comFolhas,
+  segurarFolhas,
+  pePagina,
   className,
 }: MolduraAcessoProps) {
   return (
     <div className="ia-login">
-      <div className="ia-login-fundo" aria-hidden="true">
-        <div className="ia-login-veu" />
-        <div className="ia-login-grao" />
-      </div>
+      {comFolhas ? (
+        <FolhasLiquidas segurar={segurarFolhas} />
+      ) : (
+        <div className="ia-login-fundo" aria-hidden="true">
+          <div className="ia-login-veu" />
+          <div className="ia-login-grao" />
+        </div>
+      )}
 
       <div className="ia-login-conteudo">
         <main className="flex flex-1 items-center justify-center px-6 py-12 sm:px-10">
@@ -64,6 +78,12 @@ export function MolduraAcesso({
             )}
           </div>
         </main>
+
+        {pePagina && (
+          <footer className="px-6 pb-8 text-center text-xs text-muted-foreground sm:px-10">
+            {pePagina}
+          </footer>
+        )}
       </div>
     </div>
   );
