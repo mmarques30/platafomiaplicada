@@ -1,15 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
-import {
-  AnelProgresso,
-  AreaMarca,
-  CartaoGrafico,
-  MalhaCalor,
-  RoscaMarca,
-} from "@/components/graficos";
+import { AreaMarca, CartaoGrafico, MalhaCalor, RoscaMarca } from "@/components/graficos";
 import { useRitmoEstudo } from "@/hooks/useRitmoEstudo";
-import { useNivelUsuario } from "@/hooks/useNivelUsuario";
 import { itemCascata, listaCascata, aoMontar } from "@/lib/motion";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -24,7 +17,7 @@ import { Skeleton } from "@/components/ui/skeleton";
  *
  * A composição segue o que as referências fazem bem: uma célula larga
  * para a evolução no tempo, uma estreita para a divisão, e uma linha
- * embaixo para constância e progresso. Cada gráfico leva uma linha de
+ * embaixo para a constância. Cada gráfico leva uma linha de
  * leitura — a conclusão escrita — porque gráfico que não conclui nada é
  * decoração.
  *
@@ -34,13 +27,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 export function PainelRitmo() {
   const navigate = useNavigate();
   const { dados, isLoading } = useRitmoEstudo();
-  const nivel = useNivelUsuario();
 
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <Skeleton className="h-[320px] rounded-[20px] lg:col-span-2" />
-        <Skeleton className="h-[320px] rounded-[20px]" />
+        <Skeleton className="h-[264px] rounded-[20px] lg:col-span-2 lg:h-[330px]" />
+        <Skeleton className="h-[264px] rounded-[20px] lg:h-[330px]" />
       </div>
     );
   }
@@ -59,16 +51,12 @@ export function PainelRitmo() {
     return "Seu ritmo está estável em relação à semana passada.";
   })();
 
-  const xpParaProximo = Math.max(0, nivel.xpNecessario - nivel.xpAtual);
-  const percentualNivel =
-    nivel.xpNecessario > 0 ? Math.round((nivel.xpAtual / nivel.xpNecessario) * 100) : 0;
-
   return (
     <motion.div variants={listaCascata} {...aoMontar} className="flex flex-col gap-4">
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         {/* Célula larga: evolução no tempo. Área com degradê, como a
             referência, para separar o dado da grade sem borda dura. */}
-        <motion.div variants={itemCascata} className="h-[300px] lg:col-span-2 lg:h-[330px]">
+        <motion.div variants={itemCascata} className="h-[264px] lg:col-span-2 lg:h-[330px]">
           <CartaoGrafico titulo="Seu ritmo nas últimas quatro semanas" leitura={leituraEvolucao}>
             <AreaMarca
               id="ritmo"
@@ -82,7 +70,7 @@ export function PainelRitmo() {
         </motion.div>
 
         {/* Célula estreita: divisão. Rosca, que só funciona aqui. */}
-        <motion.div variants={itemCascata} className="h-[300px] lg:h-[330px]">
+        <motion.div variants={itemCascata} className="h-[264px] lg:h-[330px]">
           <CartaoGrafico
             titulo="Onde seu tempo foi"
             leitura={
@@ -106,18 +94,31 @@ export function PainelRitmo() {
         </motion.div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        {/* Constância: a malha responde "em quais dias", que linha e barra
-            respondem mal quando o dado é denso e quase binário. */}
-        <motion.div variants={itemCascata} className="lg:col-span-2">
+      {/* Constância ocupa a linha inteira. Ao lado dela ficava um anel com
+          o nível e o XP que faltava — exatamente o que o cartão "Nível" do
+          cabeçalho já diz, três blocos acima, e o que a página Meu progresso
+          mostra por extenso. Eram 330px de altura para repetir um número que
+          a pessoa já tinha lido. */}
+      <div className="grid grid-cols-1 gap-4">
+        <motion.div variants={itemCascata}>
           <CartaoGrafico
             titulo="Constância"
             leitura={`Você estudou em ${diasAtivos} dos últimos 28 dias. O melhor foi ${melhorDia.dia}, com ${melhorDia.aulas} ${melhorDia.aulas === 1 ? "aula" : "aulas"}.`}
             className="h-full"
           >
             <div className="flex h-full flex-col gap-5 py-2 lg:flex-row lg:items-center lg:gap-8">
-              <div className="flex w-full shrink-0 flex-col gap-3 lg:w-[442px]">
-                <MalhaCalor celulas={dados.celulas} colunas={14} />
+              {/* Com a linha inteira para si, a malha abre os 28 dias numa
+                  fileira só: lê-se o mês da esquerda para a direita, sem
+                  quebra no meio da semana. Em duas fileiras de 14 ela
+                  ocupava o dobro da altura para dizer o mesmo. */}
+              <div className="flex w-full min-w-0 flex-1 flex-col gap-3">
+                <MalhaCalor celulas={dados.celulas} colunas={14} ladoMaximo={30} className="lg:hidden" />
+                <MalhaCalor
+                  celulas={dados.celulas}
+                  colunas={28}
+                  ladoMaximo={30}
+                  className="hidden lg:grid"
+                />
                 <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
                   <span>Menos</span>
                   {[0, 0.25, 0.5, 0.75, 1].map((n) => (
@@ -137,7 +138,7 @@ export function PainelRitmo() {
               {/* O resumo ao lado da malha: sem ele a célula larga ficava
                   com metade do card vazia, que é o defeito que a malha
                   limitada em largura criaria sozinha. */}
-              <dl className="grid grid-cols-3 gap-4 lg:flex-1 lg:grid-cols-1 lg:gap-3 lg:border-l lg:border-border/60 lg:pl-8">
+              <dl className="grid shrink-0 grid-cols-3 gap-4 lg:gap-8 lg:border-l lg:border-border/60 lg:pl-8">
                 <div>
                   <dt className="rotulo-mono text-[10px]">Dias ativos</dt>
                   <dd className="numero-painel mt-1 text-xl text-foreground">
@@ -163,27 +164,6 @@ export function PainelRitmo() {
           </CartaoGrafico>
         </motion.div>
 
-        {/* Progresso de nível: anel, porque o número é a informação
-            principal da célula e o arco responde "quanto falta". */}
-        <motion.div variants={itemCascata}>
-          <CartaoGrafico
-            titulo={`Nível ${nivel.nivel} · ${nivel.tituloNivel}`}
-            leitura={
-              xpParaProximo > 0
-                ? `Faltam ${xpParaProximo.toLocaleString("pt-BR")} XP para o nível ${nivel.nivel + 1}.`
-                : "Você completou este nível."
-            }
-            className="h-full"
-          >
-            <div className="flex h-full items-center justify-center py-2">
-              <AnelProgresso
-                valor={percentualNivel}
-                rotulo={`${nivel.xpAtual.toLocaleString("pt-BR")} de ${nivel.xpNecessario.toLocaleString("pt-BR")} XP`}
-                tamanho={140}
-              />
-            </div>
-          </CartaoGrafico>
-        </motion.div>
       </div>
     </motion.div>
   );

@@ -70,7 +70,7 @@ export function CartaoMetrica({
       variants={itemCascata}
       className={cn(
         "group grid grid-cols-[1fr_auto] items-baseline gap-x-3 gap-y-2 p-4",
-        "sm:flex sm:flex-col sm:items-stretch sm:gap-3 md:p-5",
+        "sm:flex sm:flex-col sm:items-stretch sm:gap-2.5",
         vidro ? "vidro vidro-interativo" : "superficie superficie-interativa",
         className,
       )}
@@ -85,7 +85,7 @@ export function CartaoMetrica({
       </div>
 
       <div className="flex flex-wrap items-baseline justify-end gap-x-2 gap-y-1 sm:justify-start">
-        <span className="numero-painel text-[28px] leading-none text-foreground sm:text-[32px] sm:leading-tight md:text-[38px]">
+        <span className="numero-painel text-[28px] leading-none text-foreground sm:text-[30px] sm:leading-tight md:text-[34px]">
           {valor}
         </span>
         {unidade && <span className="text-sm text-muted-foreground">{unidade}</span>}
@@ -98,7 +98,7 @@ export function CartaoMetrica({
 
       {serie && serie.length > 1 && (
         <div className="col-span-2 sm:w-full">
-          <Faisca dados={serie} id={chave} altura={38} colorirPelaTendencia={inverterVariacao} />
+          <Faisca dados={serie} id={chave} altura={30} colorirPelaTendencia={inverterVariacao} />
         </div>
       )}
 
@@ -116,13 +116,13 @@ export function CartaoMetricaSkeleton({ vidro }: { vidro?: boolean }) {
   return (
     <div
       className={cn(
-        "flex flex-col gap-3 p-4 md:p-5",
+        "flex flex-col gap-2.5 p-4",
         vidro ? "vidro" : "superficie",
       )}
     >
       <div className="h-2.5 w-20 animate-skeleton-pulse rounded-full bg-foreground/[0.08]" />
       <div className="h-9 w-24 animate-skeleton-pulse rounded bg-foreground/[0.08]" />
-      <div className="h-[38px] w-full animate-skeleton-pulse rounded bg-foreground/[0.05]" />
+      <div className="h-[30px] w-full animate-skeleton-pulse rounded bg-foreground/[0.05]" />
       <div className="h-2.5 w-28 animate-skeleton-pulse rounded-full bg-foreground/[0.06]" />
     </div>
   );
