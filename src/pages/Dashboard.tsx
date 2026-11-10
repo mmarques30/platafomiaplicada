@@ -20,6 +20,7 @@ import { useUserProfile } from "@/hooks/useUserProfile";
 import { PageSkeleton } from "@/components/shared/PageSkeleton";
 import { PageContainer } from "@/components/shared/PageContainer";
 import { BriefingSemanal } from "@/components/dashboard/BriefingSemanal";
+import { PainelRitmo } from "@/components/dashboard/PainelRitmo";
 
 export default function Dashboard() {
   const { isVisitante, isLoading: loadingRole } = useUserRole();
@@ -90,6 +91,11 @@ export default function Dashboard() {
       )}
 
       <WelcomeHeader />
+
+      {/* Os gráficos vêm logo depois da abertura: a pessoa chega, lê o
+          cumprimento e os três números, e a próxima coisa que vê é o
+          próprio ritmo desenhado. Antes disso só havia listas. */}
+      <PainelRitmo />
 
       {/* Uma coluna só. A régua é a ordem: primeiro o que tem data marcada,
           depois o que a pessoa vai retomar, por último o que ela pode

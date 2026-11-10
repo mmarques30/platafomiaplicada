@@ -32,7 +32,7 @@ function CartaoEncontro({ encontro, passado }: { encontro: Encontro; passado: bo
   return (
     <motion.article
       variants={itemCascata}
-      className="space-y-4 rounded-card border border-border bg-card p-4 shadow-card md:p-5"
+      className="space-y-4 superficie p-4 shadow-card md:p-5"
     >
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div className="space-y-1">

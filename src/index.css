@@ -1126,6 +1126,203 @@ iframe:focus {
     box-shadow: 0 1px 0 0 hsl(0 0% 100% / 0.3) inset, 0 14px 34px -12px hsl(var(--lime) / 0.75);
   }
 
+  /* ===========================================================
+     Superfícies: a linguagem de profundidade da plataforma
+
+     Antes só existia um card: retângulo chapado com um fio de
+     borda. Tudo na tela tinha o mesmo peso, e por isso a interface
+     parecia plana e antiga por mais que a paleta fosse boa.
+
+     Agora são três degraus, e a diferença entre eles é luz, não
+     sombra:
+
+       .superficie  o card comum, com um fio de luz no topo
+       .vidro       translúcido, deixa passar o que está atrás
+       .vidro-forte o mesmo, mais fechado, para texto longo
+
+     O fio de luz no topo (`inset 0 1px 0 branco`) é o que faz a
+     peça parecer ter espessura: é a quina de cima pegando luz. É
+     o truque que todo painel moderno usa e que faltava aqui.
+     =========================================================== */
+
+  .superficie {
+    position: relative;
+    border-radius: 20px;
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    box-shadow:
+      inset 0 1px 0 0 hsl(0 0% 100% / 0.04),
+      0 1px 2px 0 hsl(0 0% 0% / 0.4);
+    transition: border-color 200ms ease, box-shadow 200ms ease, transform 200ms ease;
+  }
+
+  .superficie-interativa:hover {
+    border-color: hsl(var(--primary) / 0.3);
+    box-shadow:
+      inset 0 1px 0 0 hsl(0 0% 100% / 0.06),
+      0 10px 30px -14px hsl(var(--primary) / 0.35),
+      0 2px 6px 0 hsl(0 0% 0% / 0.5);
+    transform: translateY(-2px);
+  }
+
+  /* Vidro: o card deixa ver o que está atrás dele.
+     É o que a referência usa sobre a foto de fundo, e o motivo de a
+     marca não precisar ser repetida dentro do card: ela aparece
+     através dele. */
+  .vidro {
+    position: relative;
+    border-radius: 20px;
+    background: hsl(var(--card) / 0.42);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    backdrop-filter: blur(18px) saturate(140%);
+    border: 1px solid hsl(0 0% 100% / 0.09);
+    box-shadow:
+      inset 0 1px 0 0 hsl(0 0% 100% / 0.09),
+      0 20px 50px -24px hsl(0 0% 0% / 0.8);
+    transition: border-color 200ms ease, box-shadow 200ms ease, transform 200ms ease;
+  }
+
+  .vidro-forte {
+    background: hsl(var(--card) / 0.72);
+    -webkit-backdrop-filter: blur(24px) saturate(130%);
+    backdrop-filter: blur(24px) saturate(130%);
+  }
+
+  .vidro-interativo:hover {
+    border-color: hsl(var(--primary) / 0.38);
+    box-shadow:
+      inset 0 1px 0 0 hsl(0 0% 100% / 0.14),
+      0 24px 60px -24px hsl(var(--primary) / 0.4),
+      0 20px 50px -24px hsl(0 0% 0% / 0.8);
+    transform: translateY(-2px);
+  }
+
+  /* Navegador sem backdrop-filter: fecha o fundo para o texto não
+     perder contraste. Sem isto o card vira uma mancha ilegível. */
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .vidro { background: hsl(var(--card) / 0.92); }
+    .vidro-forte { background: hsl(var(--card) / 0.97); }
+  }
+
+  /* ===========================================================
+     Painel de marca: o fundo vivo do topo das páginas
+
+     A referência abre com uma imagem grande e os cartões flutuando
+     por cima em vidro. Aqui a imagem é a própria marca, desenhada
+     em luz: duas manchas de lime fora de foco, a malha de pontos
+     por cima e um degradê que apaga tudo na base para o conteúdo
+     seguinte entrar sem emenda.
+     =========================================================== */
+
+  .painel-marca {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    border-radius: 28px;
+    border: 1px solid hsl(var(--border));
+    background:
+      radial-gradient(90% 120% at 82% -10%, hsl(var(--olive) / 0.5) 0%, transparent 58%),
+      radial-gradient(70% 90% at 8% 110%, hsl(var(--lime) / 0.18) 0%, transparent 60%),
+      linear-gradient(160deg, hsl(77 30% 9%) 0%, hsl(var(--background)) 72%);
+  }
+
+  /* A malha de pontos, só dentro do painel. */
+  .painel-marca::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-image: radial-gradient(hsl(var(--primary) / 0.16) 1px, transparent 1px);
+    background-size: 26px 26px;
+    -webkit-mask-image: radial-gradient(120% 100% at 70% 0%, #000 10%, transparent 75%);
+    mask-image: radial-gradient(120% 100% at 70% 0%, #000 10%, transparent 75%);
+  }
+
+  /* O véu da base: entrega o painel ao conteúdo sem linha dura. */
+  .painel-marca::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 45%;
+    z-index: -1;
+    background: linear-gradient(180deg, transparent 0%, hsl(var(--background) / 0.85) 100%);
+  }
+
+  /* A marca grande, fora de foco, atrás de tudo. Quem põe a imagem
+     é o componente; isto só manda nela. */
+  .marca-de-fundo {
+    position: absolute;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.16;
+    filter: blur(1px) saturate(130%);
+    -webkit-mask-image: radial-gradient(closest-side, #000 55%, transparent 100%);
+    mask-image: radial-gradient(closest-side, #000 55%, transparent 100%);
+  }
+
+  /* ===========================================================
+     Controles em pílula e chips
+     =========================================================== */
+
+  .pilula {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    height: 2.25rem;
+    padding: 0 0.875rem;
+    border-radius: 999px;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: hsl(var(--muted-foreground));
+    background: hsl(var(--card) / 0.6);
+    border: 1px solid hsl(var(--border));
+    transition: color 150ms ease, background-color 150ms ease, border-color 150ms ease;
+  }
+  .pilula:hover {
+    color: hsl(var(--foreground));
+    border-color: hsl(var(--primary) / 0.35);
+  }
+  .pilula[data-ativo="true"] {
+    color: hsl(var(--primary-foreground));
+    background: hsl(var(--primary));
+    border-color: hsl(var(--primary));
+  }
+
+  /* Chip de variação: o "+12,5%" ao lado do número. Verde sobe,
+     vermelho desce, neutro quando não há com o que comparar. */
+  .chip-variacao {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.125rem 0.5rem;
+    border-radius: 999px;
+    font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1.5;
+  }
+  .chip-variacao[data-sentido="sobe"] {
+    color: hsl(var(--status-success));
+    background: hsl(var(--status-success) / 0.12);
+  }
+  .chip-variacao[data-sentido="desce"] {
+    color: hsl(var(--status-danger));
+    background: hsl(var(--status-danger) / 0.12);
+  }
+  .chip-variacao[data-sentido="igual"] {
+    color: hsl(var(--muted-foreground));
+    background: hsl(var(--muted-foreground) / 0.12);
+  }
+
+  /* Número de painel: tabular para a coluna não dançar ao animar. */
+  .numero-painel {
+    font-family: 'Inter Tight', 'Inter', system-ui, sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+
 }
 
 @keyframes atmosfera-deriva {

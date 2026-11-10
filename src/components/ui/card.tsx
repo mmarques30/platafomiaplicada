@@ -2,12 +2,21 @@ import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
+/**
+ * O card da plataforma.
+ *
+ * Era um retângulo chapado: fundo, um fio de borda e uma sombra fraca
+ * embaixo. Como 106 arquivos montam as telas em cima dele, era também o
+ * motivo de o sistema inteiro parecer plano — modernizar gráfico e painel
+ * não adiantava enquanto tudo o que os cercava continuava sem relevo.
+ *
+ * Agora ele usa `.superficie`, que acrescenta o fio de luz na quina de
+ * cima. É o que dá a impressão de espessura, e vale para toda tela de
+ * uma vez. A classe pode ser trocada por `.vidro` caso a caso, quando o
+ * card vive sobre o painel de marca.
+ */
 const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn(
-      "rounded-card border border-border bg-card text-card-foreground shadow-card",
-      "transition-[border-color,box-shadow,transform] duration-200",
-      className,
-    )} {...props} />
+  <div ref={ref} className={cn("superficie text-card-foreground", className)} {...props} />
 ));
 Card.displayName = "Card";
 

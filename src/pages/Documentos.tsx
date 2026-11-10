@@ -111,7 +111,7 @@ export default function Documentos() {
                   <motion.article
                     key={doc.id}
                     variants={itemCascata}
-                    className="flex flex-wrap items-start justify-between gap-4 rounded-card border border-border bg-card p-4 shadow-card md:p-5"
+                    className="flex flex-wrap items-start justify-between gap-4 superficie p-4 shadow-card md:p-5"
                   >
                     <div className="min-w-0 space-y-1">
                       <h3 className="titulo-bloco text-base text-foreground">{doc.titulo}</h3>

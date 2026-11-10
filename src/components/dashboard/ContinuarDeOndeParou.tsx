@@ -32,7 +32,7 @@ export function ContinuarDeOndeParou() {
   if (!retomar) return null;
 
   return (
-    <section className="rounded-card border border-border bg-card p-4 shadow-card transition-colors hover:border-primary/40 md:p-5">
+    <section className="superficie p-4 shadow-card transition-colors hover:border-primary/40 md:p-5">
       <div className="mb-4 flex items-baseline justify-between gap-3">
         <span className="rotulo-mono">Continue de onde parou</span>
         <span className="rotulo-mono">
