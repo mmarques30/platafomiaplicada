@@ -2,10 +2,9 @@ import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { PasswordInput } from "@/components/ui/password-input";
-import { Check, X, Loader2, Lock, CheckCircle, AlertTriangle } from "lucide-react";
+import { Check, X, Loader2 } from "lucide-react";
+import { MolduraAcesso } from "@/components/auth/MolduraAcesso";
 
 export default function RedefinirSenha() {
   const navigate = useNavigate();
@@ -96,129 +95,108 @@ export default function RedefinirSenha() {
   // Token inválido ou expirado
   if (!tokenValido) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#151515] p-6">
-        <div className="w-full max-w-md text-center space-y-6 bg-[#1a1a1a] p-8 rounded-2xl border border-white/10">
-          <AlertTriangle className="h-16 w-16 text-status-danger mx-auto" />
-          <div className="space-y-2">
-            <h1 className="text-2xl font-bold text-white">Link inválido ou expirado</h1>
-            <p className="text-white/60">
-              O link de recuperação pode ter expirado ou já foi utilizado.
-              Solicite um novo link na página de login.
-            </p>
-          </div>
-          <Button
-            onClick={() => navigate("/auth")}
-            className="w-full bg-primary hover:bg-[#8a9a31] text-white"
-          >
-            Voltar para o login
-          </Button>
+      <MolduraAcesso
+        etiqueta="Recuperação de senha"
+        titulo="Link inválido ou expirado"
+        apoio="O link pode ter expirado ou já ter sido usado. Peça um novo na tela de acesso."
+      >
+        <div className="ia-login-botao-area">
+          <span className="ia-login-gota" aria-hidden="true" />
+          <button type="button" onClick={() => navigate("/auth")} className="ia-login-botao">
+            Voltar para o acesso
+          </button>
         </div>
-      </div>
+      </MolduraAcesso>
     );
   }
 
   // Senha alterada com sucesso
   if (senhaAlterada) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#151515] p-6">
-        <div className="w-full max-w-md text-center space-y-6 bg-[#1a1a1a] p-8 rounded-2xl border border-white/10">
-          <CheckCircle className="h-16 w-16 text-primary mx-auto" />
-          <div className="space-y-2">
-            <h1 className="text-2xl font-bold text-white">Senha alterada!</h1>
-            <p className="text-white/60">
-              Sua senha foi redefinida com sucesso. Você será redirecionado para fazer login.
-            </p>
-          </div>
-          <Loader2 className="h-6 w-6 animate-spin text-primary mx-auto" />
+      <MolduraAcesso
+        etiqueta="Recuperação de senha"
+        titulo="Senha alterada"
+        apoio="Pronto. Estamos te levando de volta para o acesso."
+      >
+        <div className="flex items-center gap-3 text-sm text-muted-foreground">
+          <Loader2 className="h-4 w-4 animate-spin text-primary" />
+          Redirecionando
         </div>
-      </div>
+      </MolduraAcesso>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#151515] p-6">
-      <div className="w-full max-w-md space-y-6 bg-[#1a1a1a] p-8 rounded-2xl border border-white/10">
-        <div className="text-center space-y-2">
-          <Lock className="h-12 w-12 text-primary mx-auto" />
-          <h1 className="text-2xl font-bold text-white">Criar nova senha</h1>
-          {email && (
-            <p className="text-white/60 text-sm">
-              Olá! Crie uma nova senha para <span className="text-white">{decodeURIComponent(email)}</span>
-            </p>
-          )}
+    <MolduraAcesso
+      etiqueta="Recuperação de senha"
+      titulo="Criar nova senha"
+      apoio={email ? <>Para <span className="text-foreground">{decodeURIComponent(email)}</span>.</> : undefined}
+      rodape="Este link expira em 15 minutos por segurança."
+    >
+      <form onSubmit={handleSubmit}>
+        <div className="ia-login-grupo">
+          <label htmlFor="nova-senha" className="ia-login-rotulo">
+            Nova senha
+          </label>
+          <PasswordInput
+            id="nova-senha"
+            name="new-password"
+            autoComplete="new-password"
+            placeholder="••••••••"
+            value={novaSenha}
+            onChange={(e) => setNovaSenha(e.target.value)}
+            required
+            className="ia-login-campo"
+          />
+          <span className="ia-login-brilho" aria-hidden="true" />
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div className="space-y-2">
-            <Label htmlFor="nova-senha" className="text-white/80 text-sm font-medium">
-              Nova senha
-            </Label>
-            <PasswordInput
-              id="nova-senha"
-              placeholder="Digite sua nova senha"
-              value={novaSenha}
-              onChange={(e) => setNovaSenha(e.target.value)}
-              required
-              className="bg-white/5 border-white/10 text-white placeholder:text-white/40 h-12 rounded-lg focus:border-primary focus:ring-primary/20"
-            />
-          </div>
+        <div className="ia-login-grupo mt-7">
+          <label htmlFor="confirmar-senha" className="ia-login-rotulo">
+            Confirmar senha
+          </label>
+          <PasswordInput
+            id="confirmar-senha"
+            name="confirm-password"
+            autoComplete="new-password"
+            placeholder="••••••••"
+            value={confirmarSenha}
+            onChange={(e) => setConfirmarSenha(e.target.value)}
+            required
+            className="ia-login-campo"
+          />
+          <span className="ia-login-brilho" aria-hidden="true" />
+        </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="confirmar-senha" className="text-white/80 text-sm font-medium">
-              Confirmar senha
-            </Label>
-            <PasswordInput
-              id="confirmar-senha"
-              placeholder="Confirme sua nova senha"
-              value={confirmarSenha}
-              onChange={(e) => setConfirmarSenha(e.target.value)}
-              required
-              className="bg-white/5 border-white/10 text-white placeholder:text-white/40 h-12 rounded-lg focus:border-primary focus:ring-primary/20"
-            />
-          </div>
+        {/* Os requisitos marcam sozinhos conforme a pessoa digita: é o
+            retorno que evita descobrir o que faltava só ao enviar. */}
+        <ul className="mt-7 space-y-2">
+          <RequisitoItem atendido={temMinimo8} texto="Mínimo de 8 caracteres" />
+          <RequisitoItem atendido={temMaiuscula} texto="Uma letra maiúscula" />
+          <RequisitoItem atendido={temNumero} texto="Um número" />
+          <RequisitoItem atendido={senhasIguais} texto="As duas senhas coincidem" />
+        </ul>
 
-          {/* Requisitos de senha */}
-          <div className="space-y-2 p-4 rounded-lg bg-white/5 border border-white/10">
-            <p className="text-xs text-white/60 font-medium mb-2">Requisitos da senha:</p>
-            <RequisitoItem atendido={temMinimo8} texto="Mínimo 8 caracteres" />
-            <RequisitoItem atendido={temMaiuscula} texto="Uma letra maiúscula" />
-            <RequisitoItem atendido={temNumero} texto="Um número" />
-            <RequisitoItem atendido={senhasIguais} texto="Senhas coincidem" />
-          </div>
-
-          <Button
-            type="submit"
-            disabled={!senhaValida || isLoading}
-            className="w-full h-12 bg-primary hover:bg-[#8a9a31] text-white font-medium rounded-lg transition-all disabled:opacity-50"
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Salvando...
-              </>
-            ) : (
-              "Salvar nova senha"
-            )}
-          </Button>
-        </form>
-
-        <p className="text-center text-xs text-white/40">
-          Este link expira em 15 minutos por segurança.
-        </p>
-      </div>
-    </div>
+        <div className="ia-login-botao-area mt-9">
+          <span className="ia-login-gota" aria-hidden="true" />
+          <button type="submit" disabled={!senhaValida || isLoading} className="ia-login-botao">
+            {isLoading ? "Salvando" : "Salvar nova senha"}
+          </button>
+        </div>
+      </form>
+    </MolduraAcesso>
   );
 }
 
 function RequisitoItem({ atendido, texto }: { atendido: boolean; texto: string }) {
   return (
-    <div className="flex items-center gap-2 text-sm">
+    <li className="flex items-center gap-2.5 text-[13px]">
       {atendido ? (
-        <Check className="h-4 w-4 text-primary" />
+        <Check className="h-3.5 w-3.5 shrink-0 text-primary" strokeWidth={2.5} />
       ) : (
-        <X className="h-4 w-4 text-white/30" />
+        <X className="h-3.5 w-3.5 shrink-0 text-muted-foreground/40" strokeWidth={2} />
       )}
-      <span className={atendido ? "text-white" : "text-white/50"}>{texto}</span>
-    </div>
+      <span className={atendido ? "text-foreground" : "text-muted-foreground"}>{texto}</span>
+    </li>
   );
 }

@@ -1,49 +1,47 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
-import { deveTocarAbertura, trocaDeCena } from "@/components/auth/motion-entrada";
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+
 import { AberturaMarca } from "@/components/auth/AberturaMarca";
-import { MarcaIAplicada } from "@/components/shared/MarcaIAplicada";
+import { FolhasLiquidas } from "@/components/auth/FolhasLiquidas";
+import { LinhaRevelada } from "@/components/auth/LinhaRevelada";
+import { LoginForm } from "@/components/auth/LoginForm";
+import { COMPASSO, deveTocarAbertura, sobeEAparece } from "@/components/auth/motion-entrada";
 import { useAuth } from "@/hooks/useAuth";
-import { IAplicadaBackground } from "@/components/auth/IAplicadaBackground";
-import { EntryHero } from "@/components/auth/EntryHero";
-import { EntryLogin } from "@/components/auth/EntryLogin";
-
-type EntryView = "hero" | "login";
-
-function viewFromTab(tab: string | null): EntryView {
-  // Não existe mais criação de conta: qualquer ?tab abre o acesso.
-  return tab ? "login" : "hero";
-}
+import logoIAplicada from "@/assets/logo-auth-fundo-escuro.png";
 
 /**
- * /auth — acesso inicial da plataforma.
+ * /auth — a tela de acesso.
  *
- * 1. Hero com a proposta da LP, alinhado à esquerda numa coluna, com o fundo
- *    respirando à direita.
- * 2. Ao clicar, o hero dá lugar ao acesso (email + senha) na mesma coluna e na
- *    mesma margem, então a troca é o conteúdo mudando no lugar.
- * 3. Autenticou → vai para "/" e o EnvironmentProvider resolve o ambiente de
- *    acordo com o plano. A antiga tela "Selecione seu ambiente" não existe mais.
+ * O que mudou na estrutura
  *
- * A coreografia da chegada mora em `motion-entrada.ts`. Cada cena é um
- * container de variantes: o pai declara `initial`/`animate`/`exit` uma vez e
- * cada filho traz o seu instante, em vez de repetir transições componente a
- * componente como estava antes.
+ * Antes eram duas cenas: um hero com a proposta e um botão "Começar a
+ * aplicar", e só depois o formulário, que entrava no lugar do hero. Quem já
+ * tinha conta — que é todo mundo que chega aqui, porque não existe cadastro
+ * público — pagava um clique e uma animação para ver dois campos.
+ *
+ * Agora é uma tela só, em duas colunas: a proposta à esquerda, o acesso à
+ * direita. Nenhuma palavra foi tirada; o que saiu foi o botão que só servia
+ * para revelar o que agora já está na tela. No celular as colunas empilham, e
+ * a proposta vem antes do formulário, que é a ordem de leitura.
+ *
+ * O que mudou no visual
+ *
+ * O fundo deixou de ser dois orbes parados e virou a marca em estado líquido:
+ * folhas da IAplicada flutuando e se fundindo umas nas outras por um filtro
+ * SVG, em `FolhasLiquidas`. A forma é a do símbolo, não uma bola qualquer.
+ *
+ * O que não mudou
+ *
+ * A autenticação, os nomes dos campos, o `autocomplete`, a validação, o erro e
+ * o redirecionamento. Trocou-se a casca, não o formulário.
  */
 export default function Auth() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
   const { user, loading } = useAuth();
-  const tab = searchParams.get("tab");
-  const [view, setView] = useState<EntryView>(() => viewFromTab(tab));
+
   // A tela só começa a própria chegada depois que a cortina da abertura sobe.
   const [abrindo, setAbrindo] = useState<boolean>(() => deveTocarAbertura());
-
-  // Links externos (?tab=login) abrem direto o acesso.
-  useEffect(() => {
-    if (tab) setView(viewFromTab(tab));
-  }, [tab]);
 
   // Redirecionar usuários já autenticados
   useEffect(() => {
@@ -62,63 +60,76 @@ export default function Auth() {
     }
   }, [user, loading, navigate]);
 
+  const cena = abrindo ? "inicial" : "ativo";
+
   return (
-    <div className="ia-entry relative flex min-h-[100dvh] w-full flex-col overflow-hidden">
+    <div className="ia-login">
       {abrindo && <AberturaMarca onConcluir={() => setAbrindo(false)} />}
 
-      <IAplicadaBackground />
+      <FolhasLiquidas segurar={abrindo} />
 
-      {/* A marca, grande e lenta, ocupando a metade direita. É o que o site de
-          referência faz com um objeto 3D: o lado que não tem texto ganha um
-          assunto, em vez de ficar vazio. Some no celular, onde não há metade
-          direita. */}
-      <motion.div
-        aria-hidden="true"
-        className="pointer-events-none absolute right-[-6vw] top-1/2 z-[1] hidden w-[46vw] -translate-y-1/2 md:block lg:right-[-2vw] lg:w-[40vw]"
-        initial={{ opacity: 0, scale: 0.92, rotate: -8 }}
-        animate={abrindo ? { opacity: 0, scale: 0.92, rotate: -8 } : { opacity: 1, scale: 1, rotate: 0 }}
-        transition={{ duration: 1.6, ease: trocaDeCena.ease, delay: 0.1 }}
-      >
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 160, ease: "linear", repeat: Infinity }}
-        >
-          <MarcaIAplicada className="w-full opacity-[0.16]" />
-        </motion.div>
-      </motion.div>
-
-      <main className="relative z-10 flex flex-1 items-center px-6 pb-12 pt-16 md:px-12 md:pb-16 lg:px-20">
-        <div className="w-full md:w-[68%] lg:w-[66%] xl:w-[58%]">
-          <AnimatePresence mode="wait">
-            {view === "hero" ? (
+      <div className="ia-login-conteudo">
+        <main className="flex flex-1 items-center px-6 py-12 sm:px-10 lg:px-16 xl:px-24">
+          <div className="mx-auto grid w-full max-w-6xl items-center gap-12 lg:grid-cols-[1.05fr_minmax(0,420px)] lg:gap-20">
+            {/* A proposta. Mesmo texto de antes, palavra por palavra. */}
+            <section className="max-w-xl">
               <motion.div
-                key="hero"
+                variants={sobeEAparece(COMPASSO.marca, 0.7)}
                 initial="inicial"
-                animate={abrindo ? "inicial" : "ativo"}
-                exit="saida"
-                transition={trocaDeCena}
+                animate={cena}
               >
-                <EntryHero onStart={() => setView("login")} />
+                <img src={logoIAplicada} alt="IAplicada" className="h-7 w-auto md:h-8" />
               </motion.div>
-            ) : (
-              <motion.div
-                key="login"
-                initial="inicial"
-                animate={abrindo ? "inicial" : "ativo"}
-                exit="saida"
-                transition={trocaDeCena}
-              >
-                <EntryLogin onBack={() => setView("hero")} />
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </main>
 
-      <footer className="ia-entry-footer relative z-10 px-6 pb-7 md:px-12 lg:px-20">
-        Ao continuar, você concorda com nossos{" "}
-        <a href="/termos-uso">Termos</a> e <a href="/politica-privacidade">Privacidade</a>.
-      </footer>
+              <h1 className="ia-login-titulo mt-9 md:mt-11">
+                <LinhaRevelada atraso={COMPASSO.tituloPrimeiraLinha}>Faça o dobro.</LinhaRevelada>
+                <LinhaRevelada atraso={COMPASSO.tituloSegundaLinha}>
+                  <em>Entregue em metade do tempo.</em>
+                </LinhaRevelada>
+              </h1>
+
+              <motion.p
+                variants={sobeEAparece(COMPASSO.apoio)}
+                initial="inicial"
+                animate={cena}
+                className="mt-6 max-w-md text-sm text-muted-foreground md:mt-7 md:text-base"
+              >
+                Tudo em um só lugar para você aumentar seus resultados.
+              </motion.p>
+            </section>
+
+            {/* O acesso. */}
+            <motion.section
+              variants={sobeEAparece(COMPASSO.acao, 0.7)}
+              initial="inicial"
+              animate={cena}
+              className="w-full"
+            >
+              <span className="ia-login-id">Acesso à plataforma</span>
+              <h2 className="ia-login-titulo mt-3 text-[2rem] md:text-[2.25rem]">Entrar</h2>
+
+              <div className="mt-9">
+                <LoginForm />
+              </div>
+            </motion.section>
+          </div>
+        </main>
+
+        <footer className="px-6 pb-8 text-xs text-muted-foreground sm:px-10 lg:px-16 xl:px-24">
+          Ao continuar, você concorda com nossos{" "}
+          <a href="/termos-uso" className="text-foreground/70 underline-offset-4 hover:underline">
+            Termos
+          </a>{" "}
+          e{" "}
+          <a
+            href="/politica-privacidade"
+            className="text-foreground/70 underline-offset-4 hover:underline"
+          >
+            Privacidade
+          </a>
+          .
+        </footer>
+      </div>
     </div>
   );
 }
