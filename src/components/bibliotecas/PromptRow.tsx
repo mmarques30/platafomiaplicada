@@ -5,7 +5,7 @@ import { FavoriteButton } from "@/components/shared/FavoriteButton";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { ChipMeta, ChipNivel } from "./ChipsRecurso";
 import { LinhaRecurso } from "./LinhaRecurso";
-import { splitTitulo } from "./PromptCard";
+import { splitTitulo } from "@/lib/titulos";
 
 interface PromptRowProps {
   prompt: {

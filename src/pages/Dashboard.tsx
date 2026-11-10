@@ -11,7 +11,6 @@ import { CentralConteudo } from "@/components/dashboard/CentralConteudo";
 import { CentralConteudoGratuito } from "@/components/dashboard/CentralConteudoGratuito";
 import { RankingTicker } from "@/components/dashboard/RankingTicker";
 import { RankingTickerGratuito } from "@/components/dashboard/RankingTickerGratuito";
-import { ContinuarDeOndeParou } from "@/components/dashboard/ContinuarDeOndeParou";
 import { SuasTrilhas } from "@/components/dashboard/SuasTrilhas";
 import { ProximoEncontro } from "@/components/dashboard/ProximoEncontro";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -57,6 +56,8 @@ export default function Dashboard() {
   if (isVisitante) {
     return (
       <PageContainer>
+        {/* Visitante tem a sua própria tira de destaques, com o que é
+            público. A do aluno não entra aqui. */}
         <WelcomeHeader />
         <CentralConteudoGratuito />
         <RankingTickerGratuito />
@@ -94,7 +95,7 @@ export default function Dashboard() {
         </Alert>
       )}
 
-      <WelcomeHeader />
+      <WelcomeHeader rodape={<RankingTicker />} />
 
       {/* Os gráficos vêm logo depois da abertura: a pessoa chega, lê o
           cumprimento e os três números, e a próxima coisa que vê é o
@@ -120,7 +121,6 @@ export default function Dashboard() {
        */}
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:gap-5">
         <div className="flex min-w-0 flex-1 flex-col gap-4 empty:hidden">
-          <ContinuarDeOndeParou />
           <SuasTrilhas />
         </div>
 
@@ -133,7 +133,6 @@ export default function Dashboard() {
 
       <CentralConteudo />
 
-      <RankingTicker />
       {novidadesSemana && <NovidadesSemana />}
     </PageContainer>
   );

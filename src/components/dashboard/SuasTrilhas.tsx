@@ -1,10 +1,12 @@
+import { useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Play } from "lucide-react";
 
 import { AnelProgresso } from "@/components/graficos";
 import { useTrilhasEmAndamento } from "@/hooks/useEvolucao";
 import { listaCascata, itemCascata, aoMontar } from "@/lib/motion";
+import { cn } from "@/lib/utils";
 
 const LIMITE = 4;
 
@@ -20,10 +22,29 @@ const LIMITE = 4;
  * Agora cada trilha é um cartão com anel: o arco mostra o quanto já foi, o
  * centro guarda a porcentagem, e embaixo fica a conta de aulas e o que vem a
  * seguir. É a mesma informação, lida de relance em vez de lida por extenso.
+ *
+ * Acima deste bloco havia um "Continue de onde parou" que mostrava uma única
+ * trilha — a mesma que aparece aqui em primeiro lugar, com o mesmo título e
+ * a mesma próxima aula. Eram dois blocos dizendo a mesma coisa, um embaixo
+ * do outro. O "continue" virou o que sempre foi: uma marca na trilha mais
+ * recente, que por isso leva direto para a aula em vez de levar para a
+ * trilha.
  */
 export function SuasTrilhas() {
   const navigate = useNavigate();
   const { data: trilhas, isLoading } = useTrilhasEmAndamento();
+
+  /* A trilha mexida por último, entre as que têm uma próxima aula. É ela que
+     ganha a marca e o atalho direto para o vídeo. */
+  const retomarId = useMemo(() => {
+    const comVideo = (trilhas ?? []).filter((t) => t.proximoVideoId);
+    if (comVideo.length === 0) return null;
+    return [...comVideo].sort((a, b) => {
+      const da = a.ultimaVisualizacao ? new Date(a.ultimaVisualizacao).getTime() : 0;
+      const db = b.ultimaVisualizacao ? new Date(b.ultimaVisualizacao).getTime() : 0;
+      return db - da;
+    })[0].id;
+  }, [trilhas]);
 
   if (isLoading) {
     return <div className="h-[220px] animate-skeleton-pulse rounded-[20px] bg-card" />;
@@ -63,39 +84,52 @@ export function SuasTrilhas() {
           {...aoMontar}
           className="grid grid-cols-1 gap-3 sm:grid-cols-2"
         >
-          {emAndamento.map((trilha) => (
-            <motion.li key={trilha.id} variants={itemCascata}>
-              <Link
-                to={`/trilhas/${trilha.id}`}
-                className="superficie superficie-interativa group flex h-full items-center gap-4 p-4"
-              >
-                <AnelProgresso valor={trilha.progressoPercent} tamanho={64} />
-
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium text-foreground transition-colors group-hover:text-primary">
-                    {trilha.titulo}
-                  </p>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    <span className="font-mono tabular-nums text-foreground">
-                      {trilha.videosCompletos}
-                    </span>{" "}
-                    de {trilha.totalVideos} aulas
-                  </p>
-                  {trilha.proximoVideo && (
-                    <p className="mt-1.5 truncate text-[11px] text-muted-foreground/80">
-                      A seguir: {trilha.proximoVideo}
-                    </p>
+          {emAndamento.map((trilha) => {
+            const retomar = trilha.id === retomarId;
+            return (
+              <motion.li key={trilha.id} variants={itemCascata}>
+                <Link
+                  to={retomar ? `/videos/${trilha.proximoVideoId}` : `/trilhas/${trilha.id}`}
+                  className={cn(
+                    "superficie superficie-interativa group flex h-full items-center gap-4 p-4",
+                    retomar && "border-primary/45",
                   )}
-                </div>
+                >
+                  <AnelProgresso valor={trilha.progressoPercent} tamanho={64} />
 
-                <ArrowUpRight
-                  className="h-4 w-4 shrink-0 self-start text-muted-foreground/50 transition-all duration-200 group-hover:translate-x-0.5 group-hover:text-primary"
-                  strokeWidth={1.75}
-                  aria-hidden="true"
-                />
-              </Link>
-            </motion.li>
-          ))}
+                  <div className="min-w-0 flex-1">
+                    {retomar && (
+                      <span className="rotulo-mono mb-1 flex items-center gap-1.5 text-primary">
+                        <Play className="h-2.5 w-2.5" fill="currentColor" strokeWidth={0} />
+                        Continue aqui
+                      </span>
+                    )}
+                    <p className="truncate text-sm font-medium text-foreground transition-colors group-hover:text-primary">
+                      {trilha.titulo}
+                    </p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      <span className="font-mono tabular-nums text-foreground">
+                        {trilha.videosCompletos}
+                      </span>{" "}
+                      de {trilha.totalVideos} aulas
+                    </p>
+                    {trilha.proximoVideo && (
+                      <p className="mt-1.5 truncate text-[11px] text-muted-foreground/80">
+                        {retomar ? "Vai abrir: " : "A seguir: "}
+                        {trilha.proximoVideo}
+                      </p>
+                    )}
+                  </div>
+
+                  <ArrowUpRight
+                    className="h-4 w-4 shrink-0 self-start text-muted-foreground/50 transition-all duration-200 group-hover:translate-x-0.5 group-hover:text-primary"
+                    strokeWidth={1.75}
+                    aria-hidden="true"
+                  />
+                </Link>
+              </motion.li>
+            );
+          })}
         </motion.ul>
       )}
     </section>
