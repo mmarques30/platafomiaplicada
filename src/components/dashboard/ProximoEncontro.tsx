@@ -33,15 +33,21 @@ function useProximoEncontro(): { aula: AulaSemanal | null; isLoading: boolean } 
 }
 
 /**
- * Faixa larga, no fluxo da página. Era um cartão estreito numa coluna à
- * direita, e essa coluna deixava um vazio grande sempre que o conteúdo da
- * esquerda era mais alto.
+ * O que tem data marcada, como cartão da coluna lateral.
+ *
+ * Foi faixa larga no meio do fluxo, e a faixa tinha um problema: o dia, o
+ * tema e o botão numa linha só deixavam o número da data — a informação que
+ * se procura num cartão de agenda — do mesmo tamanho visual que tudo o resto.
+ *
+ * Na coluna estreita ele volta a ser o que é: o dia grande em serif no alto,
+ * o mês e o dia da semana ao lado, o tema abaixo e o botão fechando o cartão.
+ * A ordem de leitura passa a ser quando, o quê, e então entrar.
  */
 export function ProximoEncontro() {
   const { aula, isLoading } = useProximoEncontro();
 
   if (isLoading) {
-    return <div className="h-[92px] animate-skeleton-pulse rounded-card bg-card" />;
+    return <div className="h-[200px] animate-skeleton-pulse rounded-card bg-card" />;
   }
 
   if (!aula) return null;
@@ -49,44 +55,39 @@ export function ProximoEncontro() {
   const data = parseISO(aula.data_aula!);
 
   return (
-    <section className="flex flex-col gap-4 superficie p-4 shadow-card sm:flex-row sm:items-center md:p-5">
-      {/* Data */}
-      <div className="flex items-baseline gap-3 sm:min-w-[150px] sm:flex-col sm:items-start sm:gap-0.5 sm:border-r sm:border-border sm:pr-5">
-        <span className="font-serif-display text-4xl leading-none text-foreground">
-          {format(data, "dd")}
-        </span>
-        <div className="flex flex-col">
-          <span className="text-sm font-medium capitalize text-foreground">
-            {format(data, "MMMM", { locale: ptBR })}
+    <section className="superficie flex flex-col gap-4 p-4 shadow-card md:p-5">
+      <div className="flex items-start justify-between gap-3 border-b border-border pb-4">
+        <div className="flex items-baseline gap-3">
+          <span className="font-serif-display text-[44px] leading-none text-foreground">
+            {format(data, "dd")}
           </span>
-          <span className="rotulo-mono">
-            {format(data, "EEEE", { locale: ptBR })}
-            {aula.horario ? ` · ${aula.horario}` : ""}
-          </span>
+          <div className="flex flex-col">
+            <span className="text-sm font-medium capitalize text-foreground">
+              {format(data, "MMMM", { locale: ptBR })}
+            </span>
+            <span className="rotulo-mono">
+              {format(data, "EEEE", { locale: ptBR })}
+              {aula.horario ? ` · ${aula.horario}` : ""}
+            </span>
+          </div>
         </div>
+        <span className="rotulo-mono shrink-0 pt-1 text-right text-[9px]">Próximo encontro</span>
       </div>
 
-      {/* Tema */}
-      <div className="min-w-0 flex-1 space-y-1">
-        <div className="flex flex-wrap items-center gap-2.5">
-          <span className="rotulo-mono">Próximo encontro</span>
-          {aula.tipo_evento && (
-            <>
-              <span className="text-muted-foreground/40">·</span>
-              <span className="rotulo-mono">{NOME_TIPO[aula.tipo_evento] ?? "Encontro"}</span>
-            </>
-          )}
-        </div>
+      <div className="min-w-0 space-y-1.5">
+        {aula.tipo_evento && (
+          <span className="rotulo-mono block">{NOME_TIPO[aula.tipo_evento] ?? "Encontro"}</span>
+        )}
         <p className="text-sm font-medium leading-snug text-foreground md:text-base">{aula.tema}</p>
         {aula.descricao && (
-          <p className="line-clamp-2 text-xs leading-relaxed text-muted-foreground md:text-sm">
+          <p className="line-clamp-3 text-xs leading-relaxed text-muted-foreground">
             {aula.descricao}
           </p>
         )}
       </div>
 
       {aula.link_reuniao && (
-        <Button size="pill" className="w-full shrink-0 sm:w-auto" asChild>
+        <Button size="pill" className="mt-auto w-full" asChild>
           <a href={aula.link_reuniao} target="_blank" rel="noopener noreferrer">
             Entrar no encontro
           </a>

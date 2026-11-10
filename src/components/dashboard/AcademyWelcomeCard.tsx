@@ -4,9 +4,8 @@ import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserProfile } from "@/hooks/useUserProfile";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { X, BookOpen, ClipboardCheck, Compass } from "lucide-react";
+import { X, BookOpen, ClipboardCheck, Compass, ArrowRight } from "lucide-react";
 
 interface AcademyWelcomeCardProps {
   onStartTour?: () => void;
@@ -83,51 +82,77 @@ export function AcademyWelcomeCard({ onStartTour }: AcademyWelcomeCardProps) {
   ];
 
   return (
-    <Card className="relative border-primary/30 bg-primary/5 overflow-hidden">
-      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/60 via-primary to-primary/60" />
+    /*
+     * O cartão de primeiros passos.
+     *
+     * Estava com cor escrita à mão: `#c8e040` no rótulo, `#0c0e08` no texto
+     * do botão, `rgba(175,192,64,0.08)` no fundo da caixa, tudo em `style`
+     * inline. Em tema claro o botão ficava lime sobre lime, e nenhum desses
+     * valores acompanhava uma troca de paleta. Agora são os mesmos tokens do
+     * resto da plataforma, e os três atalhos viram lista vertical, que é o
+     * que cabe na coluna lateral.
+     */
+    <section className="superficie relative overflow-hidden p-4 md:p-5">
+      <span
+        aria-hidden="true"
+        className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary to-transparent"
+      />
+
       <button
         onClick={handleDismiss}
-        className="absolute top-3 right-3 p-1 rounded-md hover:bg-primary/10 text-muted-foreground hover:text-foreground transition-colors"
+        className="absolute right-3 top-3 rounded-md p-1 text-muted-foreground transition-colors hover:bg-primary/10 hover:text-foreground"
         aria-label="Fechar"
       >
         <X className="h-4 w-4" />
       </button>
-      <CardContent className="pt-6 pb-5 space-y-4">
-        <div>
-          <h3 className="text-lg font-semibold text-foreground">
+
+      <div className="space-y-4">
+        <div className="pr-8">
+          <span className="rotulo-mono">Primeiros passos</span>
+          <h3 className="mt-1.5 text-base font-medium leading-snug text-foreground">
             Olá, {firstName}! Por onde começar?
           </h3>
-          <p className="text-sm text-muted-foreground mt-1">
-            Escolha uma das opções abaixo para dar seus primeiros passos na plataforma.
-          </p>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+
+        <ul className="space-y-1.5">
           {actions.map((action) => {
             const Icon = action.icon;
             return (
-              <Button
-                key={action.label}
-                variant="outline"
-                className="flex items-center gap-2 h-auto py-3 px-4 justify-start border-primary/20 hover:bg-primary/10 hover:border-primary/40 transition-all"
-                onClick={action.onClick}
-              >
-                <Icon className="h-4 w-4 text-primary flex-shrink-0" />
-                <span className="text-sm text-left">{action.label}</span>
-              </Button>
+              <li key={action.label}>
+                <button
+                  type="button"
+                  onClick={action.onClick}
+                  className="group flex w-full items-center gap-3 rounded-xl border border-border px-3 py-2.5 text-left transition-colors hover:border-primary/45 hover:bg-primary/5"
+                >
+                  <Icon className="h-4 w-4 shrink-0 text-primary" strokeWidth={1.75} />
+                  <span className="min-w-0 flex-1 truncate text-sm text-foreground">
+                    {action.label}
+                  </span>
+                  <ArrowRight
+                    className="h-3.5 w-3.5 shrink-0 text-muted-foreground/50 transition-all group-hover:translate-x-0.5 group-hover:text-primary"
+                    strokeWidth={1.75}
+                  />
+                </button>
+              </li>
             );
           })}
-        </div>
-        <div style={{ marginTop: 16, padding: '12px 14px', background: 'rgba(175,192,64,0.08)', borderRadius: 10, border: '0.5px solid rgba(175,192,64,0.2)' }}>
-          <p style={{ fontSize: 11, fontWeight: 600, color: '#c8e040', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>Comece por aqui</p>
-          <p style={{ fontSize: 14, fontWeight: 500, color: 'hsl(var(--foreground))', marginBottom: 10 }}>{primeiraTrilha?.titulo ?? 'Introdução à IA Aplicada'}</p>
-          <button
-            onClick={() => navigate(primeiraTrilha ? `/trilhas/${primeiraTrilha.id}` : '/trilhas')}
-            style={{ background: '#c8e040', color: '#0c0e08', fontSize: 13, fontWeight: 600, padding: '8px 20px', borderRadius: 8, border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}
+        </ul>
+
+        <div className="rounded-xl border border-primary/25 bg-primary/[0.07] p-3.5">
+          <span className="rotulo-mono text-primary">Comece por aqui</span>
+          <p className="mt-1.5 text-sm font-medium leading-snug text-foreground">
+            {primeiraTrilha?.titulo ?? "Introdução à IA Aplicada"}
+          </p>
+          <Button
+            size="pill"
+            className="mt-3 w-full"
+            onClick={() => navigate(primeiraTrilha ? `/trilhas/${primeiraTrilha.id}` : "/trilhas")}
           >
-            Começar trilha →
-          </button>
+            Começar trilha
+            <ArrowRight className="h-4 w-4" strokeWidth={1.75} />
+          </Button>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </section>
   );
 }

@@ -33,7 +33,7 @@ export function CentralConteudo() {
   if (!isLoading && !temAlgum) return null;
 
   return (
-    <section className="rounded-2xl border border-border bg-card p-4 md:p-6">
+    <section className="superficie p-4 md:p-6">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="mb-4 grid w-full grid-cols-3 md:mb-6 md:inline-flex md:w-auto">
           {tabs.map((tab) => (
