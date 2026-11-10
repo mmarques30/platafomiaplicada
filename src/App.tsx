@@ -29,7 +29,6 @@ import MinhaHistoria from "./pages/MinhaHistoria";
 import Ecossistema from "./pages/Ecossistema";
 import Indica from "./pages/Indica";
 import Encontros from "./pages/Encontros";
-import Documentos from "./pages/Documentos";
 import MentoriaDiagnostico from "./pages/MentoriaDiagnostico";
 import MeuDiagnostico from "./pages/MeuDiagnostico";
 import DiagnosticoPainelAcademy from "./pages/DiagnosticoPainelAcademy";
@@ -139,7 +138,6 @@ function AppContent() {
             <Route path="/ecossistema" element={<Ecossistema />} />
             <Route path="/indica" element={<Indica />} />
             <Route path="/encontros" element={<Encontros />} />
-            <Route path="/documentos" element={<Documentos />} />
             
             <Route path="/ia-copie-use" element={<IACopieUse />} />
             <Route path="/biblioteca-ferramentas" element={<BibliotecaFerramentas />} />
