@@ -1,7 +1,7 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { ArrowRight } from "lucide-react";
+import { Check, Layers } from "lucide-react";
+
+import { CartaoRecurso, MarcadorCapa } from "@/components/bibliotecas/CartaoRecurso";
+import { ChipMeta } from "@/components/bibliotecas/ChipsRecurso";
 import { Produto } from "@/hooks/admin/useProdutos";
 
 interface ProdutoCardProps {
@@ -10,83 +10,58 @@ interface ProdutoCardProps {
   onSaibaMais: () => void;
 }
 
-export function ProdutoCard({ produto, isUserPlan, onSaibaMais }: ProdutoCardProps) {
-  const formatPreco = (valor: number) => {
-    return new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(valor);
-  };
+function emReais(valor: number) {
+  return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(valor);
+}
 
-  const getPrecoExibicao = () => {
-    // Produtos B2B mostram "Sob consulta"
-    if (produto.tipo === 'b2b') {
-      return 'Sob consulta';
-    }
-    if (produto.is_consultoria) {
-      return `${formatPreco(produto.valor_minimo || 0)} - ${formatPreco(produto.valor_maximo || 0)}`;
-    }
-    return formatPreco(produto.valor);
-  };
+/**
+ * Um produto do ecossistema.
+ *
+ * Era um cartão com a imagem em cima, o nome, o preço em corpo 24 e um botão
+ * "Saiba mais" que repetia o que o cartão inteiro já faz ao ser clicado. O
+ * plano atual da pessoa era marcado trocando o fundo e escrevendo `text-white`
+ * e `bg-white` à mão — em tema claro, texto branco sobre fundo branco.
+ *
+ * Agora é o cartão padrão das bibliotecas, o mesmo de modelos, skills e
+ * biblioteca: capa com a imagem do produto (ou desenhada a partir do nome
+ * quando não há), o público na primeira linha, o preço na segunda, e o plano
+ * atual marcado por um chip, não por uma inversão de cores.
+ */
+export function ProdutoCard({ produto, isUserPlan, onSaibaMais }: ProdutoCardProps) {
+  const preco =
+    produto.tipo === "b2b"
+      ? "Sob consulta"
+      : produto.is_consultoria
+        ? `${emReais(produto.valor_minimo || 0)} – ${emReais(produto.valor_maximo || 0)}`
+        : emReais(produto.valor);
 
   return (
-    <Card 
-      className={`group transition-all duration-200 hover:shadow-lg ${
-        isUserPlan 
-          ? 'bg-background border-foreground/30 text-white' 
-          : 'hover:border-primary/20'
-      }`}
-    >
-      <CardContent className="p-6 space-y-6">
-        {produto.imagem_url ? (
-          <div className="aspect-[16/10] w-full overflow-hidden rounded-lg bg-gradient-to-br from-primary/10 to-primary/5">
-            <img
-              src={produto.imagem_url}
-              alt={produto.nome}
-              className="w-full h-full object-cover"
-            />
-          </div>
-        ) : (
-          <div className="aspect-[16/10] w-full rounded-lg bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center">
-            <span className="text-4xl font-bold text-primary/30">
-              {produto.nome.charAt(0)}
-            </span>
-          </div>
-        )}
-
-        <div className="space-y-3">
-          <h3 className={`text-xl font-semibold ${isUserPlan ? 'text-white' : ''}`}>
-            {produto.nome}
-          </h3>
-
-          <p className={`text-2xl font-bold ${isUserPlan ? 'text-white' : 'text-primary'}`}>
-            {getPrecoExibicao()}
-          </p>
-          
-          {produto.periodicidade && (
-            <p className={`text-xs ${isUserPlan ? 'text-muted-foreground' : 'text-muted-foreground'}`}>
-              {produto.periodicidade}
-            </p>
+    <CartaoRecurso
+      chaveCapa={produto.nome}
+      imagemUrl={produto.imagem_url}
+      marcador={
+        <MarcadorCapa>
+          <Layers className="h-6 w-6 text-primary" strokeWidth={1.5} />
+        </MarcadorCapa>
+      }
+      capaRotulo={produto.tipo === "b2b" ? "Para empresas" : "Para profissional solo"}
+      capaTitulo={preco}
+      titulo={produto.nome}
+      descricao={produto.descricao_curta}
+      rodape={
+        <>
+          {isUserPlan && (
+            <ChipMeta>
+              <Check className="h-3 w-3 shrink-0" strokeWidth={2.5} aria-hidden="true" />
+              Seu plano
+            </ChipMeta>
           )}
-
-          <p className={`text-sm line-clamp-2 ${isUserPlan ? 'text-muted-foreground' : 'text-muted-foreground'}`}>
-            {produto.descricao_curta}
-          </p>
-        </div>
-
-        <Button
-          onClick={onSaibaMais}
-          variant={isUserPlan ? "secondary" : "outline"}
-          className={`w-full ${
-            isUserPlan 
-              ? 'bg-white text-foreground hover:bg-muted' 
-              : 'group-hover:bg-primary/5'
-          }`}
-        >
-          Saiba mais
-          <ArrowRight className="ml-2 h-4 w-4" />
-        </Button>
-      </CardContent>
-    </Card>
+          {produto.periodicidade && <ChipMeta>{produto.periodicidade}</ChipMeta>}
+          {produto.duracao && <ChipMeta>{produto.duracao}</ChipMeta>}
+        </>
+      }
+      aoClicar={onSaibaMais}
+      className={isUserPlan ? "border-primary/45" : undefined}
+    />
   );
 }
