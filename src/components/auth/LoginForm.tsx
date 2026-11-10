@@ -1,21 +1,30 @@
 import { useState } from "react";
+
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
-import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { RecuperarSenhaModal } from "@/components/auth/RecuperarSenhaModal";
-import { LetrasQueGiram } from "@/components/auth/LetrasQueGiram";
 
 /**
- * Formulário de acesso (e-mail + senha), direto sobre o fundo escuro, sem
- * card. Os campos ficam translúcidos e clareiam ao receber foco, e o de baixo
- * ganha a borda lime quando está ativo (ver .ia-entry-input em index.css).
+ * O formulário de acesso.
  *
- * O botão "Acessar" ficou com o relevo do refractweb.com: um fio de luz por
- * dentro da borda de cima, sombra por dentro embaixo, e um brilho largo e
- * baixo que acende a área ao redor sem virar um halo pulsante. Ele sobe 2px no
- * hover e afunda no clique, que é o que dá a sensação de botão físico.
+ * Só a casca mudou. A chamada de autenticação, os `name` dos campos, o
+ * `autocomplete`, a validação, a mensagem de erro e o modal de recuperação
+ * continuam exatamente os mesmos — é por isso que o gerenciador de senha
+ * segue preenchendo e o fluxo de recuperar senha segue chegando no mesmo
+ * lugar.
+ *
+ * O que mudou: os campos perderam a caixa. Agora são um fio embaixo que
+ * acende de ponta a ponta no foco, e o grupo inteiro anda 8px para a direita,
+ * o que diz "é aqui" sem precisar de borda colorida em volta. O rótulo saiu do
+ * `sr-only` e virou texto em mono acima do campo: a referência mostra que
+ * rótulo visível fica melhor que placeholder, porque o placeholder some
+ * justamente quando a pessoa precisa dele.
+ *
+ * O botão são duas camadas dentro do filtro de fusão: a pastilha lime por
+ * baixo e o botão por cima. No hover a pastilha cresce um pouco mais, e o
+ * filtro faz ela escorrer pelas bordas como uma gota.
  */
 export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
@@ -24,7 +33,7 @@ export function LoginForm() {
   const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
-    
+
     const formData = new FormData(e.currentTarget);
     const email = ((formData.get("signin-email") as string) || "").trim().toLowerCase();
     const password = (formData.get("signin-password") as string) || "";
@@ -47,61 +56,56 @@ export function LoginForm() {
 
   return (
     <>
-      <form onSubmit={handleSignIn} className="space-y-2.5">
-        <div className="ia-entry-field">
-          <Label htmlFor="signin-email" className="sr-only">
-            Email
-          </Label>
+      <form onSubmit={handleSignIn} noValidate={false}>
+        <div className="ia-login-grupo">
+          <label htmlFor="signin-email" className="ia-login-rotulo">
+            E-mail
+          </label>
           <Input
             id="signin-email"
             name="signin-email"
             type="email"
-            placeholder="seu@email.com"
+            placeholder="voce@empresa.com"
             autoComplete="email"
             required
-            className="ia-entry-input"
+            className="ia-login-campo"
           />
+          <span className="ia-login-brilho" aria-hidden="true" />
         </div>
-        
-        <div className="ia-entry-field">
-          <Label htmlFor="signin-password" className="sr-only">
+
+        <div className="ia-login-grupo mt-7">
+          <label htmlFor="signin-password" className="ia-login-rotulo">
             Senha
-          </Label>
+          </label>
           <PasswordInput
             id="signin-password"
             name="signin-password"
-            placeholder="Senha"
+            placeholder="••••••••"
             autoComplete="current-password"
             required
-            className="ia-entry-input"
+            className="ia-login-campo"
           />
+          <span className="ia-login-brilho" aria-hidden="true" />
         </div>
-        
-        <button
-          type="submit"
-          className="ia-entry-acessar mt-5 w-full disabled:pointer-events-none disabled:opacity-60"
-          disabled={isLoading}
-        >
-          {isLoading ? "Acessando..." : "Acessar"}
-        </button>
 
-        {/* Link esqueceu a senha */}
-        <div className="pt-3">
-          <button
-            type="button"
-            onClick={() => setShowRecuperarSenha(true)}
-            className="ia-entry-link group/letras"
-          >
-            <LetrasQueGiram texto="Esqueceu a senha?" />
+        <div className="ia-login-botao-area mt-10">
+          <span className="ia-login-gota" aria-hidden="true" />
+          <button type="submit" className="ia-login-botao" disabled={isLoading}>
+            {isLoading ? "Acessando" : "Acessar"}
           </button>
+        </div>
+
+        <div className="ia-login-rodape mt-8">
+          <button type="button" onClick={() => setShowRecuperarSenha(true)}>
+            Esqueci minha senha
+          </button>
+          <a href="https://iaplicada.com" target="_blank" rel="noreferrer">
+            iaplicada.com
+          </a>
         </div>
       </form>
 
-      {/* Modal de recuperação de senha */}
-      <RecuperarSenhaModal
-        open={showRecuperarSenha}
-        onOpenChange={setShowRecuperarSenha}
-      />
+      <RecuperarSenhaModal open={showRecuperarSenha} onOpenChange={setShowRecuperarSenha} />
     </>
   );
 }
