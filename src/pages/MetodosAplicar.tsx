@@ -15,6 +15,7 @@ import { PageTitle } from "@/components/shared/PageTitle";
 import { PageContainer } from "@/components/shared/PageContainer";
 import { BarraFiltros } from "@/components/bibliotecas/BarraFiltros";
 import { ChipMeta, ChipNivel } from "@/components/bibliotecas/ChipsRecurso";
+import { CartaoRecurso, MarcadorCapa } from "@/components/bibliotecas/CartaoRecurso";
 import { MateriaisBibliotecaTab } from "@/components/biblioteca/MateriaisBibliotecaTab";
 import { ModelosProntosTab } from "@/components/bibliotecas/ModelosProntosTab";
 import { toast } from "sonner";
@@ -227,28 +228,39 @@ export default function MetodosAplicar() {
               {/* Grid de skills */}
               {filteredSkills.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {filteredSkills.map(skill => (
-                    <Card
-                      key={skill.id}
-                      onClick={() => setDetailItem(skill)}
-                      className="p-5 flex flex-col gap-3 hover:shadow-md hover:border-brand-strong/30 transition-all cursor-pointer"
-                    >
-                      <div className="flex items-start justify-between gap-2">
-                        <h3 className="font-semibold text-sm leading-tight line-clamp-2 flex-1">{skill.titulo}</h3>
-                        <div onClick={(e) => e.stopPropagation()}>
-                          <FavoriteButton tipo="metodo" itemId={skill.id} variant="ghost" className="h-7 w-7 shrink-0" />
-                        </div>
-                      </div>
-                      <p className="text-sm text-muted-foreground line-clamp-3">{skill.descricao}</p>
-                      <div className="flex items-center gap-2 flex-wrap mt-auto">
-                        {getNivelBadge(skill.nivel)}
-                        {skill.categoria && <ChipMeta>{skill.categoria}</ChipMeta>}
-                      </div>
-                      <div className="flex items-center gap-1.5 text-xs text-brand-strong font-medium mt-1">
-                        Ver detalhes <ExternalLink className="h-3 w-3" />
-                      </div>
-                    </Card>
-                  ))}
+                  {filteredSkills.map(skill => {
+                    const daFerramenta = skill.ferramenta ? logoProps(skill.ferramenta) : null;
+                    return (
+                      <CartaoRecurso
+                        key={skill.id}
+                        chaveCapa={skill.titulo}
+                        marcador={
+                          daFerramenta ? (
+                            <ToolLogo
+                              logoUrl={daFerramenta.logoUrl}
+                              toolName={skill.ferramenta as string}
+                              linkFerramenta={daFerramenta.linkFerramenta}
+                              size="lg"
+                              className="border border-border/70 bg-card/80 backdrop-blur"
+                            />
+                          ) : (
+                            <MarcadorCapa>
+                              <Zap className="h-6 w-6 text-primary" strokeWidth={1.5} />
+                            </MarcadorCapa>
+                          )
+                        }
+                        capaRotulo={skill.categoria || "Skill"}
+                        capaTitulo={skill.ferramenta || "Qualquer ferramenta"}
+                        titulo={skill.titulo}
+                        descricao={skill.descricao}
+                        favorito={
+                          <FavoriteButton tipo="metodo" itemId={skill.id} variant="icon-only" size="sm" />
+                        }
+                        rodape={<ChipNivel nivel={skill.nivel} />}
+                        aoClicar={() => setDetailItem(skill)}
+                      />
+                    );
+                  })}
                 </div>
               ) : (
                 <Card className="flex flex-col items-center justify-center py-12">
@@ -386,35 +398,30 @@ export default function MetodosAplicar() {
             </div>
           ) : filteredBiblioteca.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {filteredBiblioteca.map(item => (
-                <Card
-                  key={item.id}
-                  onClick={() => setDetailItem(item)}
-                  className="overflow-hidden flex flex-col hover:shadow-md hover:border-brand-strong/30 transition-all cursor-pointer"
-                >
-                  {item.imagem_url && (
-                    <div className="h-36 bg-muted overflow-hidden">
-                      <img src={item.imagem_url} alt={item.titulo} className="w-full h-full object-cover" />
-                    </div>
-                  )}
-                  <div className="p-5 flex flex-col gap-3 flex-1">
-                    <div className="flex items-start justify-between gap-2">
-                      <h3 className="font-semibold text-sm leading-tight line-clamp-2 flex-1">{item.titulo}</h3>
-                      <div onClick={(e) => e.stopPropagation()}>
-                        <FavoriteButton tipo="metodo" itemId={item.id} variant="ghost" className="h-7 w-7 shrink-0" />
-                      </div>
-                    </div>
-                    <p className="text-sm text-muted-foreground line-clamp-3">{item.descricao}</p>
-                    <div className="flex items-center gap-2 flex-wrap mt-auto">
-                      {getTipoBadge(item.tipo)}
-                      {getNivelBadge(item.nivel)}
-                    </div>
-                    <div className="flex items-center gap-1.5 text-xs text-brand-strong font-medium mt-1">
-                      Ver detalhes <ExternalLink className="h-3 w-3" />
-                    </div>
-                  </div>
-                </Card>
-              ))}
+              {filteredBiblioteca.map(item => {
+                const tipo = ARSENAL_TIPOS.find(t => t.value === item.tipo);
+                return (
+                  <CartaoRecurso
+                    key={item.id}
+                    chaveCapa={item.titulo}
+                    imagemUrl={item.imagem_url}
+                    marcador={
+                      <MarcadorCapa>
+                        <BookOpen className="h-6 w-6 text-primary" strokeWidth={1.5} />
+                      </MarcadorCapa>
+                    }
+                    capaRotulo={item.categoria || "Biblioteca"}
+                    capaTitulo={tipo?.label ?? "Material"}
+                    titulo={item.titulo}
+                    descricao={item.descricao}
+                    favorito={
+                      <FavoriteButton tipo="metodo" itemId={item.id} variant="icon-only" size="sm" />
+                    }
+                    rodape={<ChipNivel nivel={item.nivel} />}
+                    aoClicar={() => setDetailItem(item)}
+                  />
+                );
+              })}
             </div>
           ) : (
             <Card className="flex flex-col items-center justify-center py-12">

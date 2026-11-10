@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
@@ -55,7 +55,12 @@ interface Metrica {
  * lime, e três cartões de métrica. Quais métricas aparecem depende do plano —
  * a conta é a mesma que a página de evolução usa, para os números baterem.
  */
-export function WelcomeHeader() {
+interface WelcomeHeaderProps {
+  /** Uma faixa a mais, dentro do painel, abaixo das métricas. */
+  rodape?: ReactNode;
+}
+
+export function WelcomeHeader({ rodape }: WelcomeHeaderProps) {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [dataAtual, setDataAtual] = useState(new Date());
@@ -320,6 +325,8 @@ export function WelcomeHeader() {
                 ))}
           </motion.div>
         )}
+
+        {rodape}
       </div>
     </section>
   );
