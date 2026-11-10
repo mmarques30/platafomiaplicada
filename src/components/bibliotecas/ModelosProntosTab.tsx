@@ -1,12 +1,13 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 import type { Database } from "@/integrations/supabase/types";
 
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useIACopieUse } from "@/hooks/useFerramentas";
+import { useIACopieUse, useFerramentasIA } from "@/hooks/useFerramentas";
 import { IACopieUseCard } from "@/components/bibliotecas/IACopieUseCard";
+import { FERRAMENTA_INFO, normalizarFerramenta } from "@/lib/metodosCategories";
 import { IACopieUseRow } from "@/components/bibliotecas/IACopieUseRow";
 import { IACopieUseDetalhesModal } from "@/components/bibliotecas/IACopieUseDetalhesModal";
 import { BarraFiltros } from "@/components/bibliotecas/BarraFiltros";
@@ -43,6 +44,28 @@ const POR_PAGINA = 12;
  */
 export function ModelosProntosTab() {
   const { data: ias, isLoading } = useIACopieUse();
+  const { data: ferramentasIA } = useFerramentasIA();
+
+  /*
+   * O logo da ferramenta do modelo: primeiro o cadastro da Biblioteca de
+   * Ferramentas, depois o logo local do arsenal, e o ToolLogo ainda tem o
+   * favicon do site oficial como último degrau. É a mesma cadeia que
+   * Métodos práticos já usava nas skills.
+   */
+  const logoDe = useCallback(
+    (nome: string) => {
+      const alvo = normalizarFerramenta(nome) ?? nome;
+      const daBase = (ferramentasIA || []).find(
+        (f: { nome: string }) => (normalizarFerramenta(f.nome) ?? f.nome) === alvo,
+      ) as { logo_url?: string | null; link_ferramenta?: string | null } | undefined;
+      const info = FERRAMENTA_INFO[alvo];
+      return {
+        logoUrl: daBase?.logo_url || info?.logo || null,
+        linkFerramenta: daBase?.link_ferramenta || info?.link || null,
+      };
+    },
+    [ferramentasIA],
+  );
   const [busca, setBusca] = useState("");
   const [categoria, setCategoria] = useState<string | null>(null);
   const [selecionado, setSelecionado] = useState<ModeloPronto | null>(null);
@@ -117,7 +140,7 @@ export function ModelosProntosTab() {
           {visao === "cards" ? (
             <div className="grid auto-rows-fr grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
               {naTela.map((ia) => (
-                <IACopieUseCard key={ia.id} ia={ia} onClick={() => setSelecionado(ia)} />
+                <IACopieUseCard key={ia.id} ia={ia} logoDe={logoDe} onClick={() => setSelecionado(ia)} />
               ))}
             </div>
           ) : (
