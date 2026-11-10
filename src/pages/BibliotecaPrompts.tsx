@@ -1,12 +1,13 @@
 import { useState, useMemo, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { usePrompts } from "@/hooks/useFerramentas";
 import { usePromptCopyLogger } from "@/hooks/usePromptCopyLogger";
-import { MessageSquare, Search } from "lucide-react";
+import { MessageSquare } from "lucide-react";
 import { PromptRow } from "@/components/bibliotecas/PromptRow";
+import { BarraFiltros } from "@/components/bibliotecas/BarraFiltros";
+import { ListaRecursos } from "@/components/bibliotecas/LinhaRecurso";
 import { PromptDetalhesModal } from "@/components/bibliotecas/PromptDetalhesModal";
 import {
   Select,
@@ -116,115 +117,82 @@ export default function BibliotecaPrompts() {
         description="Prompts testados e prontos para copiar, organizados por objetivo e por ferramenta."
       />
 
-      {/* Barra de Busca e Filtros Dropdown */}
-      <div className="flex flex-col md:flex-row gap-3">
-        {/* Campo de Busca */}
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder="Buscar prompts..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
-          />
-        </div>
-
-        {/* Filtro Categoria */}
-        <Select value={filtroCategoria} onValueChange={setFiltroCategoria}>
-          <SelectTrigger className="w-full md:w-[180px]">
-            <SelectValue placeholder="Categoria" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="todas">Todas Categorias</SelectItem>
-            {categorias.map((categoria) => (
-              <SelectItem key={categoria} value={categoria}>
-                {categoria}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        {/* Filtro Nível */}
-        <Select value={filtroNivel} onValueChange={setFiltroNivel}>
-          <SelectTrigger className="w-full md:w-[180px]">
-            <SelectValue placeholder="Nível" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="todos">Todos os Níveis</SelectItem>
-            <SelectItem value="iniciante">Iniciante</SelectItem>
-            <SelectItem value="intermediario">Intermediário</SelectItem>
-            <SelectItem value="avancado">Avançado</SelectItem>
-          </SelectContent>
-        </Select>
-
-        {/* Filtro Tag */}
-        {tags.length > 0 && (
-          <Select value={filtroTag} onValueChange={setFiltroTag}>
-            <SelectTrigger className="w-full md:w-[180px]">
-              <SelectValue placeholder="Tag" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="todas">Todas as Tags</SelectItem>
-              {tags.map((tag) => (
-                <SelectItem key={String(tag)} value={String(tag)}>
-                  {String(tag)}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        )}
-
-        {/* Filtro Ferramenta */}
-        {ferramentas.length > 0 && (
-          <Select value={filtroFerramenta} onValueChange={setFiltroFerramenta}>
-            <SelectTrigger className="w-full md:w-[180px]">
-              <SelectValue placeholder="Ferramenta" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="todas">Todas Ferramentas</SelectItem>
-              {ferramentas.map((ferramenta) => (
-                <SelectItem key={String(ferramenta)} value={String(ferramenta)}>
-                  {String(ferramenta)}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        )}
-      </div>
+      <BarraFiltros
+        busca={searchTerm}
+        aoBuscar={setSearchTerm}
+        placeholderBusca="Buscar prompts"
+        total={filteredPrompts?.length}
+        substantivo="prompt"
+        filtros={[
+          {
+            chave: "categoria",
+            rotuloVazio: "Categoria",
+            rotuloLista: "Todas as categorias",
+            valor: filtroCategoria,
+            valorVazio: "todas",
+            opcoes: categorias,
+            aoMudar: setFiltroCategoria,
+          },
+          {
+            chave: "nivel",
+            rotuloVazio: "Nível",
+            rotuloLista: "Todos os níveis",
+            valor: filtroNivel,
+            valorVazio: "todos",
+            opcoes: ["iniciante", "intermediario", "avancado"],
+            aoMudar: setFiltroNivel,
+            formatar: (n) =>
+              ({ iniciante: "Iniciante", intermediario: "Intermediário", avancado: "Avançado" })[n] ?? n,
+          },
+          ...(tags.length > 0
+            ? [
+                {
+                  chave: "tag",
+                  rotuloVazio: "Tag",
+                  rotuloLista: "Todas as tags",
+                  valor: filtroTag,
+                  valorVazio: "todas",
+                  opcoes: tags.map(String),
+                  aoMudar: setFiltroTag,
+                },
+              ]
+            : []),
+          ...(ferramentas.length > 0
+            ? [
+                {
+                  chave: "ferramenta",
+                  rotuloVazio: "Ferramenta",
+                  rotuloLista: "Todas as ferramentas",
+                  valor: filtroFerramenta,
+                  valorVazio: "todas",
+                  opcoes: ferramentas.map(String),
+                  aoMudar: setFiltroFerramenta,
+                },
+              ]
+            : []),
+        ]}
+      />
 
       {/* Lista de Prompts */}
       {isLoading ? (
-        <Card>
-          <CardContent className="p-0">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="flex items-center gap-4 p-4 border-b last:border-b-0">
-                <Skeleton className="h-12 w-12 rounded-lg flex-shrink-0" />
-                <div className="flex-1 space-y-2">
-                  <Skeleton className="h-5 w-3/4" />
-                  <Skeleton className="h-4 w-full" />
-                </div>
-                <Skeleton className="h-6 w-20" />
-                <Skeleton className="h-6 w-24" />
-                <Skeleton className="h-8 w-8" />
-              </div>
-            ))}
-          </CardContent>
-        </Card>
+        <div className="flex flex-col gap-2">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <Skeleton key={i} className="h-[86px] rounded-[20px]" />
+          ))}
+        </div>
       ) : filteredPrompts && filteredPrompts.length > 0 ? (
         <>
-          <Card>
-            <CardContent className="p-0">
-              {visiblePrompts.map((prompt) => (
-                <PromptRow
-                  key={prompt.id}
-                  prompt={prompt}
-                  onClick={() => setPromptSelecionado(prompt)}
-                  onQuickCopy={() => handleQuickCopy(prompt as PromptLike)}
-                  justCopied={copiedId === prompt.id}
-                />
-              ))}
-            </CardContent>
-          </Card>
+          <ListaRecursos>
+            {visiblePrompts.map((prompt) => (
+              <PromptRow
+                key={prompt.id}
+                prompt={prompt}
+                onClick={() => setPromptSelecionado(prompt)}
+                onQuickCopy={() => handleQuickCopy(prompt as PromptLike)}
+                justCopied={copiedId === prompt.id}
+              />
+            ))}
+          </ListaRecursos>
 
           {/* Botão Ver Mais */}
           {filteredPrompts && visiblePrompts.length < filteredPrompts.length && (
@@ -255,13 +223,9 @@ export default function BibliotecaPrompts() {
         </Card>
       )}
 
-      {/* O somatório é referência, não manchete: fica no rodapé da lista. */}
-      {!isLoading && filteredPrompts && filteredPrompts.length > 0 && (
-        <p className="pt-2 text-center text-xs text-muted-foreground/70">
-          {visiblePrompts.length} de {filteredPrompts.length}{" "}
-          {filteredPrompts.length === 1 ? "prompt" : "prompts"}
-        </p>
-      )}
+      {/* A contagem vive na barra de filtros, que é onde ela responde a
+          quem acabou de mexer num filtro. Repeti-la no rodapé só somava
+          ruído. */}
     </PageContainer>
   );
 }

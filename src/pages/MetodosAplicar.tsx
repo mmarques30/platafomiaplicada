@@ -3,16 +3,18 @@ import { useSearchParams } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ToolLogo } from "@/components/shared/ToolLogo";
 import { FavoriteButton } from "@/components/shared/FavoriteButton";
 import { useMetodos, useFerramentasIA } from "@/hooks/useFerramentas";
-import { Search, Zap, BookOpen, FileText, ExternalLink, ArrowLeft, Users, Sparkles, Copy, Check } from "lucide-react";
+import { Zap, BookOpen, FileText, ExternalLink, ArrowLeft, Users, Sparkles, Copy, Check } from "lucide-react";
 import { ARSENAL_FERRAMENTAS, FERRAMENTA_INFO, normalizarFerramenta, ARSENAL_NIVEIS, ARSENAL_TIPOS } from "@/lib/metodosCategories";
 import { PageTitle } from "@/components/shared/PageTitle";
+import { PageContainer } from "@/components/shared/PageContainer";
+import { BarraFiltros } from "@/components/bibliotecas/BarraFiltros";
+import { ChipMeta, ChipNivel } from "@/components/bibliotecas/ChipsRecurso";
 import { MateriaisBibliotecaTab } from "@/components/biblioteca/MateriaisBibliotecaTab";
 import { toast } from "sonner";
 
@@ -118,7 +120,11 @@ export default function MetodosAplicar() {
     return items;
   }, [bibliotecaItems, selectedBibliotecaTipo, searchTerm]);
 
+  // O nível era verde, âmbar ou vermelho, o que fazia "avançado" parecer um
+  // defeito do item em vez de uma escala. Agora são três traços na cor da
+  // marca, iguais aos da biblioteca de prompts.
   const getNivelBadge = (nivel: string | null) => {
+    if (nivel) return <ChipNivel nivel={nivel} />;
     const found = ARSENAL_NIVEIS.find(n => n.value === nivel);
     if (!found) return null;
     return <Badge variant="outline" className={`text-xs ${found.color}`}>{found.label}</Badge>;
@@ -127,18 +133,16 @@ export default function MetodosAplicar() {
   const getTipoBadge = (tipo: string | null) => {
     const found = ARSENAL_TIPOS.find(t => t.value === tipo);
     if (!found) return null;
-    return <Badge variant="outline" className="text-xs">{found.label}</Badge>;
+    return <ChipMeta>{found.label}</ChipMeta>;
   };
 
   return (
-    <div className="p-4 md:p-6 space-y-4 md:space-y-6 min-w-0 overflow-hidden">
-      <div className="mb-6 md:mb-8">
-        <PageTitle
-          primary="Métodos"
-          secondary="práticos"
-          description="O passo a passo de quem já aplica IA no trabalho, com o material pronto para você seguir."
-        />
-      </div>
+    <PageContainer className="min-w-0 overflow-hidden">
+      <PageTitle
+        primary="Métodos"
+        secondary="práticos"
+        description="O passo a passo de quem já aplica IA no trabalho, com o material pronto para você seguir."
+      />
 
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
         <TabsList className="grid w-full grid-cols-3 md:inline-flex md:w-auto mb-6">
@@ -204,16 +208,13 @@ export default function MetodosAplicar() {
                 </div>
               </div>
 
-              {/* Busca */}
-              <div className="relative max-w-sm">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                <Input
-                  placeholder="Buscar skills..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
+              <BarraFiltros
+                busca={searchTerm}
+                aoBuscar={setSearchTerm}
+                placeholderBusca="Buscar skills"
+                total={filteredSkills.length}
+                substantivo="skill"
+              />
 
               {/* Grid de skills */}
               {filteredSkills.length > 0 ? (
@@ -233,7 +234,7 @@ export default function MetodosAplicar() {
                       <p className="text-sm text-muted-foreground line-clamp-3">{skill.descricao}</p>
                       <div className="flex items-center gap-2 flex-wrap mt-auto">
                         {getNivelBadge(skill.nivel)}
-                        {skill.categoria && <Badge variant="secondary" className="text-xs">{skill.categoria}</Badge>}
+                        {skill.categoria && <ChipMeta>{skill.categoria}</ChipMeta>}
                       </div>
                       <div className="flex items-center gap-1.5 text-xs text-brand-strong font-medium mt-1">
                         Ver detalhes <ExternalLink className="h-3 w-3" />
@@ -357,13 +358,13 @@ export default function MetodosAplicar() {
                 );
               })}
             </div>
-            <div className="relative flex-1 max-w-sm">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
-              <Input
-                placeholder="Buscar na biblioteca..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
+            <div className="flex-1">
+              <BarraFiltros
+                busca={searchTerm}
+                aoBuscar={setSearchTerm}
+                placeholderBusca="Buscar na biblioteca"
+                total={filteredBiblioteca.length}
+                substantivo="item"
               />
             </div>
           </div>
@@ -443,7 +444,7 @@ export default function MetodosAplicar() {
                     </Badge>
                   )}
                   {detailItem.categoria && (
-                    <Badge variant="secondary" className="text-xs">{detailItem.categoria}</Badge>
+                    <ChipMeta>{detailItem.categoria}</ChipMeta>
                   )}
                 </div>
 
@@ -510,6 +511,6 @@ export default function MetodosAplicar() {
           )}
         </DialogContent>
       </Dialog>
-    </div>
+    </PageContainer>
   );
 }

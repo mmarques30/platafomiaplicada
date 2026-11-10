@@ -1,8 +1,7 @@
-import { useState, useMemo } from "react";
-import { Button } from "@/components/ui/button";
+import { useMemo } from "react";
+
 import { ToolLogo } from "@/components/shared/ToolLogo";
-import { Star, ExternalLink } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { NotaMari } from "./ChipsRecurso";
 
 interface Ferramenta {
   id: string;
@@ -26,13 +25,25 @@ interface FerramentasRankingProps {
   onVerMais: (ferramenta: Ferramenta) => void;
 }
 
+/**
+ * O pódio das cinco ferramentas que a Mariana recomenda primeiro.
+ *
+ * A seleção não mudou: continua curada por nome, com as vagas que
+ * sobram preenchidas por score. O que mudou foi o tamanho que ela
+ * ocupava.
+ *
+ * Antes este bloco tomava quase uma tela inteira: um título grande e
+ * centralizado, uma doca de cinco ícones flutuantes com número por
+ * cima, e abaixo cinco cartões repetindo nome, categoria, objetivo,
+ * nota e dois botões — exatamente as mesmas ferramentas que a lista
+ * logo abaixo mostrava de novo. A pessoa rolava duas vezes pelo mesmo
+ * conteúdo antes de chegar ao catálogo.
+ *
+ * Agora são cinco colunas de uma faixa só, do tamanho de um cabeçalho:
+ * posição, logo, nome e nota. É um atalho para o topo da lista, que é
+ * o que um ranking precisa ser quando a lista inteira vem a seguir.
+ */
 export function FerramentasRanking({ ferramentas, onVerMais }: FerramentasRankingProps) {
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-
-  // Top 5 curado pela mentora, nesta ordem. Cada posição casa pelo nome da
-  // ferramenta (tolerante a variações como "Lovable (GPT Engineer)" ou
-  // "Wispr Flow"). Se alguma não existir na base, a vaga é preenchida pela
-  // próxima melhor colocada no score_ranking.
   const top5 = useMemo(() => {
     const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
     const curado: string[][] = [
@@ -45,7 +56,7 @@ export function FerramentasRanking({ ferramentas, onVerMais }: FerramentasRankin
     const escolhidas: Ferramenta[] = [];
     for (const aliases of curado) {
       const found = ferramentas.find(
-        (f) => !escolhidas.includes(f) && aliases.some((a) => norm(f.nome).includes(a))
+        (f) => !escolhidas.includes(f) && aliases.some((a) => norm(f.nome).includes(a)),
       );
       if (found) escolhidas.push(found);
     }
@@ -57,7 +68,7 @@ export function FerramentasRanking({ ferramentas, onVerMais }: FerramentasRankin
           (f.avaliacao || 0) > 0 ||
           (f.avaliacao_comunidade || 0) > 0 ||
           (f.relevancia_mercado || 0) > 0 ||
-          (f.recencia_modelo || 0) > 0
+          (f.recencia_modelo || 0) > 0,
       );
     return [...escolhidas, ...porScore].slice(0, 5);
   }, [ferramentas]);
@@ -65,134 +76,42 @@ export function FerramentasRanking({ ferramentas, onVerMais }: FerramentasRankin
   if (top5.length === 0) return null;
 
   return (
-    <div className="relative rounded-2xl overflow-hidden bg-card border border-border p-6 md:p-8">
-      {/* Header */}
-      <div className="relative text-center mb-8">
-        <h2 className="font-serif-display text-2xl md:text-3xl text-foreground">
-          Top 5 Ferramentas <span className="font-serif-italic text-primary">recomendadas</span>
-        </h2>
-        <p className="text-muted-foreground mt-2 text-sm md:text-base">
-          Classificadas por relevância de mercado, últimos modelos e avaliações da mentora e da comunidade
+    <section className="superficie overflow-hidden">
+      <header className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-border/70 px-5 py-3.5">
+        <h2 className="titulo-bloco text-sm text-foreground">As cinco que eu abro primeiro</h2>
+        <p className="text-xs text-muted-foreground">
+          Por relevância de mercado, modelo mais recente e nota da mentora
         </p>
-      </div>
+      </header>
 
-      {/* Dock flutuante com efeito glass */}
-      <div className="relative flex justify-center mb-8">
-        <div className="inline-flex items-end gap-2 md:gap-3 p-3 md:p-4 rounded-2xl glass-dock">
-          {top5.map((ferramenta, idx) => (
+      <ol className="grid grid-cols-1 divide-y divide-border/70 sm:grid-cols-2 sm:divide-y-0 lg:grid-cols-5 lg:divide-x">
+        {top5.map((ferramenta, i) => (
+          <li key={ferramenta.id}>
             <button
-              key={ferramenta.id}
-              className={cn(
-                "relative w-12 h-12 md:w-16 md:h-16 rounded-xl transition-all duration-300",
-                "glass-card hover:scale-110 hover:-translate-y-2",
-                "flex items-center justify-center",
-                hoveredIndex === idx && "scale-110 -translate-y-2 ring-2 ring-primary/50"
-              )}
-              onMouseEnter={() => setHoveredIndex(idx)}
-              onMouseLeave={() => setHoveredIndex(null)}
+              type="button"
               onClick={() => onVerMais(ferramenta)}
+              className="group flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors hover:bg-accent/50"
             >
-              {/* Número de posição */}
-              <span className="absolute -top-2 -right-2 w-5 h-5 md:w-6 md:h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center shadow-lg">
-                {idx + 1}
-              </span>
-              
-              {/* Logo */}
-              <ToolLogo 
+              <span className="rotulo-mono w-4 shrink-0 text-[11px] text-primary">{i + 1}</span>
+              <ToolLogo
                 logoUrl={ferramenta.logo_url}
                 toolName={ferramenta.nome}
-                linkFerramenta={ferramenta.link_ferramenta}
-                size="md"
-                className="!bg-transparent"
+                linkFerramenta={null}
+                size="sm"
               />
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Grid de Cards Glass */}
-      <div className="relative grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-        {top5.map((ferramenta, idx) => (
-          <div
-            key={ferramenta.id}
-            className={cn(
-              "group relative rounded-xl p-4 transition-colors duration-200 h-full flex flex-col",
-              "bg-card border border-border hover:border-primary/50",
-              hoveredIndex === idx && "border-primary/50"
-            )}
-            onMouseEnter={() => setHoveredIndex(idx)}
-            onMouseLeave={() => setHoveredIndex(null)}
-          >
-            {/* Conteúdo */}
-            <div className="pt-2 flex flex-col flex-grow">
-              {/* Logo pequena + Nome */}
-              <div className="flex items-center gap-2">
-                <ToolLogo 
-                  logoUrl={ferramenta.logo_url}
-                  toolName={ferramenta.nome}
-                  linkFerramenta={ferramenta.link_ferramenta}
-                  size="sm"
-                />
-                <h3 className="font-semibold text-sm line-clamp-1">{ferramenta.nome}</h3>
-              </div>
-              
-              {/* Categoria */}
-              <span className="inline-block px-2 py-0.5 rounded-full text-xs bg-muted text-muted-foreground mt-3">
-                {ferramenta.categoria}
-              </span>
-
-              {/* Objetivo */}
-              <p className="text-xs text-muted-foreground line-clamp-2 h-[2.5rem] mt-3">
-                {ferramenta.objetivo}
-              </p>
-
-              {/* Spacer para empurrar botões para baixo */}
-              <div className="flex-grow" />
-
-              {/* Avaliação Combinada */}
-              <div className="flex items-center gap-1.5 mt-3">
-                <Star className="w-4 h-4 text-status-warning fill-status-warning" />
-                <span className="font-semibold text-sm">
-                  {ferramenta.score_ranking?.toFixed(1) || ferramenta.avaliacao_mari || 0}
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-[13px] font-medium text-foreground transition-colors group-hover:text-primary">
+                  {ferramenta.nome}
                 </span>
-                <span className="text-xs text-muted-foreground">/ 5</span>
-                {(ferramenta.total_avaliacoes_comunidade || 0) > 0 && (
-                  <span className="text-xs text-muted-foreground ml-1">
-                    ({ferramenta.total_avaliacoes_comunidade} votos)
-                  </span>
-                )}
-              </div>
-
-              {/* Ações */}
-              <div className="flex gap-2 mt-3">
-                <Button 
-                  size="sm" 
-                  className="flex-1 text-xs h-8"
-                  onClick={() => onVerMais(ferramenta)}
-                >
-                  Ver Detalhes
-                </Button>
-                {ferramenta.link_ferramenta && (
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="h-8 w-8 p-0"
-                    asChild
-                  >
-                    <a
-                      href={ferramenta.link_ferramenta}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <ExternalLink className="w-3.5 h-3.5" />
-                    </a>
-                  </Button>
-                )}
-              </div>
-            </div>
-          </div>
+                <span className="block truncate text-[11px] text-muted-foreground">
+                  {ferramenta.categoria}
+                </span>
+              </span>
+              <NotaMari nota={ferramenta.avaliacao_mari} className="shrink-0" />
+            </button>
+          </li>
         ))}
-      </div>
-    </div>
+      </ol>
+    </section>
   );
 }

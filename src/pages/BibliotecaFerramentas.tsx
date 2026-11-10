@@ -1,14 +1,15 @@
 import { useState, useMemo, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { useFerramentasIA } from "@/hooks/useFerramentas";
-import { Wrench, Search } from "lucide-react";
+import { Wrench } from "lucide-react";
 import { FerramentasRanking } from "@/components/bibliotecas/FerramentasRanking";
 import { FerramentaCardHorizontal } from "@/components/bibliotecas/FerramentaCardHorizontal";
+import { BarraFiltros } from "@/components/bibliotecas/BarraFiltros";
+import { ListaRecursos } from "@/components/bibliotecas/LinhaRecurso";
 import { FerramentaDetalhesModal } from "@/components/bibliotecas/FerramentaDetalhesModal";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { TabsContent } from "@/components/ui/tabs";
 import { PageTitle } from "@/components/shared/PageTitle";
 import { PageContainer } from "@/components/shared/PageContainer";
 import {
@@ -89,76 +90,57 @@ export default function BibliotecaFerramentas() {
       {/* Seção de Catálogo Completo */}
       <div className="space-y-4">
 
-        {/* Barra de Busca e Filtros */}
-        <div className="flex flex-col md:flex-row gap-3">
-        {/* Campo de Busca */}
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder="Buscar ferramentas..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
-          />
-        </div>
-
-        {/* Filtro Categoria */}
-        <Select value={filtroCategoria} onValueChange={setFiltroCategoria}>
-          <SelectTrigger className="w-full md:w-[200px]">
-            <SelectValue placeholder="Categoria" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="todas">Todas Categorias</SelectItem>
-            {categorias.map((categoria) => (
-              <SelectItem key={categoria} value={categoria}>
-                {categoria}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        {/* Filtro Preço */}
-        <Select value={filtroPreco} onValueChange={setFiltroPreco}>
-          <SelectTrigger className="w-full md:w-[180px]">
-            <SelectValue placeholder="Preço" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="todas">Todas</SelectItem>
-            <SelectItem value="gratuitas">Gratuitas</SelectItem>
-            <SelectItem value="pagas">Pagas</SelectItem>
-          </SelectContent>
-        </Select>
-
-        {/* Filtro Vale a Pena */}
-        <Select value={filtroValeAPena} onValueChange={setFiltroValeAPena}>
-          <SelectTrigger className="w-full md:w-[180px]">
-            <SelectValue placeholder="Recomendação" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="todas">Todas</SelectItem>
-            <SelectItem value="sim">Vale a Pena</SelectItem>
-            <SelectItem value="nao">Não Recomendado</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+        <BarraFiltros
+          busca={searchTerm}
+          aoBuscar={setSearchTerm}
+          placeholderBusca="Buscar ferramentas"
+          total={filteredFerramentas?.length}
+          substantivo="ferramenta"
+          filtros={[
+            {
+              chave: "categoria",
+              rotuloVazio: "Categoria",
+              rotuloLista: "Todas as categorias",
+              valor: filtroCategoria,
+              valorVazio: "todas",
+              opcoes: categorias,
+              aoMudar: setFiltroCategoria,
+            },
+            {
+              chave: "preco",
+              rotuloVazio: "Preço",
+              rotuloLista: "Gratuitas e pagas",
+              valor: filtroPreco,
+              valorVazio: "todas",
+              opcoes: ["gratuitas", "pagas"],
+              aoMudar: setFiltroPreco,
+              formatar: (v) => (v === "gratuitas" ? "Gratuitas" : "Pagas"),
+              larguraClasse: "w-[140px]",
+            },
+            {
+              chave: "recomendacao",
+              rotuloVazio: "Recomendação",
+              rotuloLista: "Todas as recomendações",
+              valor: filtroValeAPena,
+              valorVazio: "todas",
+              opcoes: ["sim", "nao"],
+              aoMudar: setFiltroValeAPena,
+              formatar: (v) => (v === "sim" ? "Vale a pena" : "Não recomendo"),
+              larguraClasse: "w-[180px]",
+            },
+          ]}
+        />
 
         {/* Conteúdo - Lista */}
         {isLoading ? (
-          <div className="space-y-3">
+          <div className="flex flex-col gap-2">
             {[1, 2, 3, 4, 5, 6].map((i) => (
-              <Card key={i} className="h-[140px]">
-                <CardContent className="p-4 flex flex-col gap-3">
-                  <Skeleton className="h-16 w-16 rounded-xl" />
-                  <Skeleton className="h-6 w-3/4" />
-                  <Skeleton className="h-4 w-full" />
-                  <Skeleton className="h-9 w-full mt-auto" />
-                </CardContent>
-              </Card>
+              <Skeleton key={i} className="h-[92px] rounded-[20px]" />
             ))}
           </div>
         ) : filteredFerramentas && filteredFerramentas.length > 0 ? (
           <>
-            <div className="space-y-3">
+            <ListaRecursos>
               {visibleFerramentas.map((ferramenta) => (
                 <FerramentaCardHorizontal
                   key={ferramenta.id}
@@ -166,7 +148,7 @@ export default function BibliotecaFerramentas() {
                   onVerMais={() => setFerramentaSelecionada(ferramenta)}
                 />
               ))}
-            </div>
+            </ListaRecursos>
 
             {/* Botão Ver Mais */}
             {filteredFerramentas && visibleFerramentas.length < filteredFerramentas.length && (
@@ -192,13 +174,7 @@ export default function BibliotecaFerramentas() {
         )}
       </div>
 
-      {/* O somatório é referência, não manchete: fica no rodapé da lista. */}
-      {!isLoading && filteredFerramentas && filteredFerramentas.length > 0 && (
-        <p className="pt-2 text-center text-xs text-muted-foreground/70">
-          {visibleFerramentas.length} de {filteredFerramentas.length}{" "}
-          {filteredFerramentas.length === 1 ? "ferramenta" : "ferramentas"}
-        </p>
-      )}
+      {/* A contagem vive na barra de filtros, junto de quem a muda. */}
 
       {/* Modal de Detalhes */}
       <FerramentaDetalhesModal

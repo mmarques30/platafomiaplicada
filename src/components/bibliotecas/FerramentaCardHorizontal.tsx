@@ -1,9 +1,11 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { ExternalLink } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { FavoriteButton } from "@/components/shared/FavoriteButton";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { ToolLogo } from "@/components/shared/ToolLogo";
-import { Star, Users, ExternalLink, CheckCircle, XCircle } from "lucide-react";
+import { ChipMeta, ChipVeredito, NotaMari } from "./ChipsRecurso";
+import { LinhaRecurso } from "./LinhaRecurso";
 
 interface FerramentaCardHorizontalProps {
   ferramenta: {
@@ -22,101 +24,79 @@ interface FerramentaCardHorizontalProps {
   onVerMais: () => void;
 }
 
+/**
+ * Uma linha da biblioteca de ferramentas.
+ *
+ * Esta era a pior da plataforma. Cada linha trazia dois botões
+ * sólidos, "Ver Detalhes" em lime cheio e "Acessar" contornado, mais
+ * três pílulas sólidas, mais a nota dentro de uma caixa cinza. Oito
+ * linhas assim davam dezesseis botões e vinte e quatro pílulas na
+ * mesma tela: uma parede de lime onde nada chamava atenção porque
+ * tudo chamava.
+ *
+ * Agora a linha inteira abre os detalhes, que era o que o primeiro
+ * botão fazia. "Acessar" vira um ícone, porque sair da plataforma é a
+ * ação secundária, não a principal. As pílulas viraram chips de
+ * contorno, e a nota ficou em mono, sem caixa.
+ */
 export function FerramentaCardHorizontal({ ferramenta, onVerMais }: FerramentaCardHorizontalProps) {
   return (
-    <Card className="hover:shadow-lg transition-all">
-      <CardContent className="p-4">
-        <div className="flex flex-col sm:flex-row gap-4 items-start">
-          {/* Logo */}
-          <ToolLogo 
-            logoUrl={ferramenta.logo_url}
-            toolName={ferramenta.nome}
-            linkFerramenta={ferramenta.link_ferramenta}
-            size="lg"
-          />
-          
-          {/* Informações Principais */}
-          <div className="flex-grow min-w-0">
-            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 mb-2">
-              <div className="flex-grow">
-                <h3 className="text-lg font-bold mb-1">
-                  {ferramenta.nome}
-                </h3>
-                <div className="flex flex-wrap gap-2 mb-2">
-                  <Badge variant="outline" className="text-xs">
-                    {ferramenta.categoria}
-                  </Badge>
-                  <Badge variant={ferramenta.gratuito ? "secondary" : "default"} className="text-xs">
-                    {ferramenta.gratuito ? "Gratuita" : "Paga"}
-                  </Badge>
-                  {ferramenta.vale_a_pena !== null && (
-                    <Badge 
-                      variant={ferramenta.vale_a_pena ? "default" : "destructive"}
-                      className="text-xs flex items-center gap-1"
-                    >
-                      {ferramenta.vale_a_pena ? (
-                        <><CheckCircle className="w-3 h-3" /> Vale a Pena</>
-                      ) : (
-                        <><XCircle className="w-3 h-3" /> Não Recomendado</>
-                      )}
-                    </Badge>
-                  )}
-                </div>
-                <p className="text-sm text-muted-foreground line-clamp-2">
-                  {ferramenta.objetivo}
-                </p>
-              </div>
-
-              {/* Avaliações */}
-              <div className="flex sm:flex-col gap-3 sm:gap-2 sm:items-end flex-shrink-0">
-                {/* Avaliação Mari */}
-                <div className="flex items-center gap-2 bg-muted/50 rounded-lg px-3 py-1.5">
-                  <Star className="w-4 h-4 text-status-warning fill-status-warning" />
-                  <div className="flex flex-col">
-                    <span className="text-xs text-muted-foreground whitespace-nowrap">Avaliação Mari</span>
-                    <span className="font-bold">{ferramenta.avaliacao_mari || 0}/5</span>
-                  </div>
-                </div>
-
-              </div>
-            </div>
-
-            {/* Ações */}
-            <div className="flex gap-2 mt-3">
-              <FavoriteButton 
-                tipo="ferramenta" 
-                itemId={ferramenta.id}
-                variant="ghost"
-                size="sm"
-              />
-              <Button
-                variant="default"
-                size="sm"
-                onClick={onVerMais}
-              >
-                Ver Detalhes
-              </Button>
-              {ferramenta.link_ferramenta && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  asChild
-                >
-                  <a
-                    href={ferramenta.link_ferramenta}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2"
-                  >
-                    <ExternalLink className="w-4 h-4" />
-                    Acessar
-                  </a>
-                </Button>
-              )}
-            </div>
+    <LinhaRecurso
+      marcador={
+        <ToolLogo
+          logoUrl={ferramenta.logo_url}
+          toolName={ferramenta.nome}
+          linkFerramenta={null}
+          size="md"
+        />
+      }
+      titulo={ferramenta.nome}
+      descricao={ferramenta.objetivo}
+      meta={
+        <>
+          <ChipMeta>{ferramenta.categoria}</ChipMeta>
+          <ChipMeta>{ferramenta.gratuito ? "Gratuita" : "Paga"}</ChipMeta>
+          <ChipVeredito valeAPena={ferramenta.vale_a_pena} />
+        </>
+      }
+      direita={
+        ferramenta.avaliacao_mari !== null ? (
+          <div className="pr-1">
+            <NotaMari nota={ferramenta.avaliacao_mari} className="justify-end" />
+            <span className="rotulo-mono block text-[9px]">Nota da Mari</span>
           </div>
-        </div>
-      </CardContent>
-    </Card>
+        ) : undefined
+      }
+      acoes={
+        <>
+          {ferramenta.link_ferramenta && (
+            <TooltipProvider delayDuration={250}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    asChild
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                  >
+                    <a
+                      href={ferramenta.link_ferramenta}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`Abrir ${ferramenta.nome}`}
+                    >
+                      <ExternalLink className="h-4 w-4" strokeWidth={1.75} />
+                    </a>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="top">Abrir o site</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
+          <FavoriteButton tipo="ferramenta" itemId={ferramenta.id} variant="ghost" size="sm" />
+        </>
+      }
+      aoClicar={onVerMais}
+    />
   );
 }
