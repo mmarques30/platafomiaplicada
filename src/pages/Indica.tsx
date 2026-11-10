@@ -7,9 +7,11 @@ import { NovaIndicacaoModal } from "@/components/indica/NovaIndicacaoModal";
 import { ResumoPrograma } from "@/components/indica/ResumoPrograma";
 import { PageContainer } from "@/components/shared/PageContainer";
 import { PageTitle } from "@/components/shared/PageTitle";
+import { MarcaIAplicada } from "@/components/shared/MarcaIAplicada";
 import { Button } from "@/components/ui/button";
 import { useIndicacoes } from "@/hooks/useIndicacoes";
 import { usePercentualDaProxima, useProgramaPapel } from "@/hooks/usePrograma";
+import { rotuloPapel } from "@/integrations/supabase/programa";
 import { listaCascata } from "@/lib/motion";
 
 const WHATSAPP_COMERCIAL = "5531990643023";
@@ -96,29 +98,47 @@ export default function Indica() {
 
   return (
     <PageContainer>
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <PageTitle
-          primary="IAplicada"
-          secondary="Indica"
-          description={
-            abreBase
-              ? "Você compartilha a base qualificada, a equipe conduz a venda e você acompanha cada conversa por aqui."
-              : "Você apresenta, a equipe conduz proposta e fechamento, e você acompanha o que cada indicação gerou."
-          }
-        />
-        <Button className="cta-lime" onClick={() => setModalAberto(true)}>
-          <Plus className="h-4 w-4" strokeWidth={2} />
-          {rotuloBotao}
-        </Button>
-      </div>
+      {/*
+        A abertura do Indica.
+        
+        Era um título solto com um botão ao lado e, embaixo, quatro cartões
+        chapados — a mesma forma de "título mais pilha" que as outras entradas
+        da plataforma já deixaram para trás. Agora é o painel de marca, com o
+        símbolo atrás e os quatro números em vidro por cima, como a tela
+        inicial, Meu progresso e Trilhas.
+      */}
+      <section className="painel-marca px-5 pb-6 pt-7 md:px-8 md:pb-8 md:pt-9">
+        <MarcaIAplicada className="marca-de-fundo -right-[14%] top-1/2 h-[190%] w-auto max-w-none -translate-y-1/2 rotate-[14deg] md:right-[1%] md:h-[155%]" />
 
-      <ResumoPrograma
-        papel={papel}
-        regra={regra}
-        percentualProxima={percentual}
-        indicacoes={indicacoes}
-        carregando={carregandoIndicacoes}
-      />
+        <div className="relative flex flex-col gap-7">
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+            <div className="min-w-0 flex-1">
+              <span className="rotulo-mono">{rotuloPapel(papel.papel)}</span>
+              <h1 className="font-serif-display mt-1.5 text-3xl leading-[1.05] tracking-tight text-foreground md:text-4xl lg:text-[44px]">
+                IAplicada <em className="font-serif-italic text-primary">Indica</em>
+              </h1>
+              <p className="mt-2.5 max-w-prose text-sm text-muted-foreground md:text-base">
+                {abreBase
+                  ? "Você compartilha a base qualificada, a equipe conduz a venda e você acompanha cada conversa por aqui."
+                  : "Você apresenta, a equipe conduz proposta e fechamento, e você acompanha o que cada indicação gerou."}
+              </p>
+            </div>
+
+            <Button className="cta-lime w-full shrink-0 sm:w-auto" onClick={() => setModalAberto(true)}>
+              <Plus className="h-4 w-4" strokeWidth={2} />
+              {rotuloBotao}
+            </Button>
+          </div>
+
+          <ResumoPrograma
+            papel={papel}
+            regra={regra}
+            percentualProxima={percentual}
+            indicacoes={indicacoes}
+            carregando={carregandoIndicacoes}
+          />
+        </div>
+      </section>
 
       <section className="space-y-4">
         <h2 className="rotulo-mono">Suas indicações</h2>

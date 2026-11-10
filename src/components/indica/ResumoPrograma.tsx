@@ -23,6 +23,9 @@ interface ResumoProgramaProps {
 /**
  * Os quatro números que a pessoa abre o painel para ver: o formato dela, o
  * quanto a próxima indicação vale, o que já entrou e o que está em andamento.
+ *
+ * Em vidro, porque vivem sobre o painel de marca da abertura do Indica — a
+ * marca passa através deles, como na tela inicial e em Meu progresso.
  */
 export function ResumoPrograma({
   papel,
@@ -35,7 +38,7 @@ export function ResumoPrograma({
     return (
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {[0, 1, 2, 3].map((i) => (
-          <CartaoMetricaSkeleton key={i} />
+          <CartaoMetricaSkeleton key={i} vidro />
         ))}
       </div>
     );
@@ -87,16 +90,19 @@ export function ResumoPrograma({
       className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
     >
       <CartaoMetrica
+        vidro
         rotulo="Seu formato"
         valor={<span className="text-2xl md:text-3xl">{rotuloPapel(papel.papel)}</span>}
         apoio={regra?.observacao ?? undefined}
       />
       <CartaoMetrica
+        vidro
         rotulo="Próxima fechada vale"
         valor={taxaProxima}
         apoio={apoioTaxa}
       />
       <CartaoMetrica
+        vidro
         rotulo="Já gerado"
         valor={<span className="text-2xl md:text-3xl">{emReais(totalGerado)}</span>}
         apoio={
@@ -106,6 +112,7 @@ export function ResumoPrograma({
         }
       />
       <CartaoMetrica
+        vidro
         rotulo="Em andamento"
         valor={emAndamento.length}
         apoio={
