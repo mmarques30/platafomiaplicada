@@ -9,16 +9,18 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { ToolLogo } from "@/components/shared/ToolLogo";
 import { FavoriteButton } from "@/components/shared/FavoriteButton";
 import { useMetodos, useFerramentasIA } from "@/hooks/useFerramentas";
-import { Zap, BookOpen, FileText, ExternalLink, ArrowLeft, Users, Sparkles, Copy, Check } from "lucide-react";
+import { Zap, BookOpen, FileText, ExternalLink, ArrowLeft, Sparkles, Copy, Check } from "lucide-react";
 import { ARSENAL_FERRAMENTAS, FERRAMENTA_INFO, normalizarFerramenta, ARSENAL_NIVEIS, ARSENAL_TIPOS } from "@/lib/metodosCategories";
 import { PageTitle } from "@/components/shared/PageTitle";
 import { PageContainer } from "@/components/shared/PageContainer";
 import { BarraFiltros } from "@/components/bibliotecas/BarraFiltros";
 import { ChipMeta, ChipNivel } from "@/components/bibliotecas/ChipsRecurso";
 import { CartaoRecurso, MarcadorCapa } from "@/components/bibliotecas/CartaoRecurso";
-import { MateriaisBibliotecaTab } from "@/components/biblioteca/MateriaisBibliotecaTab";
+import type { Database } from "@/integrations/supabase/types";
 import { ModelosProntosTab } from "@/components/bibliotecas/ModelosProntosTab";
 import { toast } from "sonner";
+
+type MetodoAplicar = Database["public"]["Tables"]["metodos_aplicar"]["Row"];
 
 export default function MetodosAplicar() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -38,6 +40,46 @@ export default function MetodosAplicar() {
       linkFerramenta: daBase?.link_ferramenta || info?.link || null,
     };
   };
+  /*
+   * O cartão de uma skill, num lugar só.
+   *
+   * A mesma skill era desenhada de dois jeitos na mesma aba: um cartão na
+   * lista e outro, menor e com outra hierarquia, em "últimas adicionadas".
+   * Quem via as últimas e depois abria a lista via a mesma coisa duas vezes,
+   * com duas caras. Agora é o cartão padrão das bibliotecas, nos dois.
+   */
+  const cartaoDeSkill = (skill: MetodoAplicar) => {
+    const daFerramenta = skill.ferramenta ? logoProps(skill.ferramenta) : null;
+    return (
+      <CartaoRecurso
+        key={skill.id}
+        chaveCapa={skill.titulo}
+        marcador={
+          daFerramenta ? (
+            <ToolLogo
+              logoUrl={daFerramenta.logoUrl}
+              toolName={skill.ferramenta as string}
+              linkFerramenta={daFerramenta.linkFerramenta}
+              size="lg"
+              className="border border-border/70 bg-card/80 backdrop-blur"
+            />
+          ) : (
+            <MarcadorCapa>
+              <Zap className="h-6 w-6 text-primary" strokeWidth={1.5} />
+            </MarcadorCapa>
+          )
+        }
+        capaRotulo={skill.categoria || "Skill"}
+        capaTitulo={skill.ferramenta || "Qualquer ferramenta"}
+        titulo={skill.titulo}
+        descricao={skill.descricao}
+        favorito={<FavoriteButton tipo="metodo" itemId={skill.id} variant="icon-only" size="sm" />}
+        rodape={<ChipNivel nivel={skill.nivel} />}
+        aoClicar={() => setDetailItem(skill)}
+      />
+    );
+  };
+
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFerramenta, setSelectedFerramenta] = useState<string | null>(null);
   const [selectedBibliotecaTipo, setSelectedBibliotecaTipo] = useState<string | null>(null);
@@ -147,7 +189,7 @@ export default function MetodosAplicar() {
       />
 
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 md:inline-flex md:w-auto mb-6">
+        <TabsList className="grid w-full grid-cols-3 md:inline-flex md:w-auto mb-6">
           <TabsTrigger 
             value="skills"
             className="gap-1 sm:gap-2 text-xs sm:text-sm"
@@ -161,13 +203,6 @@ export default function MetodosAplicar() {
           >
             <BookOpen className="h-4 w-4" />
             Biblioteca
-          </TabsTrigger>
-          <TabsTrigger 
-            value="materiais"
-            className="gap-1 sm:gap-2 text-xs sm:text-sm"
-          >
-            <Users className="h-4 w-4" />
-            Materiais
           </TabsTrigger>
           <TabsTrigger
             value="modelos"
@@ -228,39 +263,7 @@ export default function MetodosAplicar() {
               {/* Grid de skills */}
               {filteredSkills.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {filteredSkills.map(skill => {
-                    const daFerramenta = skill.ferramenta ? logoProps(skill.ferramenta) : null;
-                    return (
-                      <CartaoRecurso
-                        key={skill.id}
-                        chaveCapa={skill.titulo}
-                        marcador={
-                          daFerramenta ? (
-                            <ToolLogo
-                              logoUrl={daFerramenta.logoUrl}
-                              toolName={skill.ferramenta as string}
-                              linkFerramenta={daFerramenta.linkFerramenta}
-                              size="lg"
-                              className="border border-border/70 bg-card/80 backdrop-blur"
-                            />
-                          ) : (
-                            <MarcadorCapa>
-                              <Zap className="h-6 w-6 text-primary" strokeWidth={1.5} />
-                            </MarcadorCapa>
-                          )
-                        }
-                        capaRotulo={skill.categoria || "Skill"}
-                        capaTitulo={skill.ferramenta || "Qualquer ferramenta"}
-                        titulo={skill.titulo}
-                        descricao={skill.descricao}
-                        favorito={
-                          <FavoriteButton tipo="metodo" itemId={skill.id} variant="icon-only" size="sm" />
-                        }
-                        rodape={<ChipNivel nivel={skill.nivel} />}
-                        aoClicar={() => setDetailItem(skill)}
-                      />
-                    );
-                  })}
+                  {filteredSkills.map(skill => cartaoDeSkill(skill))}
                 </div>
               ) : (
                 <Card className="flex flex-col items-center justify-center py-12">
@@ -271,42 +274,43 @@ export default function MetodosAplicar() {
             </>
           ) : (
             <>
-              {/* Grid de ferramentas + card "Todas" */}
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-                {/* Card "Todas as skills" — pra ver tudo, incluindo skills sem ferramenta */}
-                <Card
-                  className="p-5 cursor-pointer transition-colors border hover:border-primary/50 flex flex-col items-center text-center gap-3"
-                  onClick={() => setSelectedFerramenta("todas")}
-                >
-                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-muted text-primary">
-                    <Sparkles className="h-5 w-5" strokeWidth={1.75} />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-sm text-foreground">Todas</h3>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      {skills.length} skill{skills.length !== 1 ? "s" : ""}
-                    </p>
-                  </div>
-                </Card>
+              {/*
+                A escolha da ferramenta.
+                
+                Eram cartões do shadcn com padding escrito à mão e a contagem
+                em texto cinza comum: a primeira coisa que a aba mostra, e a
+                única que não falava a língua do resto. Agora são ladrilhos de
+                superfície, com o logo grande, o nome e a contagem em mono —
+                e a contagem vira o dado, não uma legenda.
+              */}
+              <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
+                <LadrilhoFerramenta
+                  rotulo="Todas"
+                  contagem={skills.length}
+                  aoClicar={() => setSelectedFerramenta("todas")}
+                  marcador={
+                    <span className="grid h-14 w-14 place-items-center rounded-xl border border-border/70 bg-surface">
+                      <Sparkles className="h-6 w-6 text-primary" strokeWidth={1.5} />
+                    </span>
+                  }
+                />
 
-                {ARSENAL_FERRAMENTAS.map(ferramenta => {
-                  const count = contagemPorFerramenta[ferramenta.value] || 0;
-                  return (
-                    <Card
-                      key={ferramenta.value}
-                      className="p-5 cursor-pointer transition-colors border hover:border-primary/50 flex flex-col items-center text-center gap-3"
-                      onClick={() => setSelectedFerramenta(ferramenta.value)}
-                    >
-                      <ToolLogo toolName={ferramenta.label} {...logoProps(ferramenta.value)} size="lg" className="!bg-transparent" />
-                      <div>
-                        <h3 className="font-semibold text-sm">{ferramenta.label}</h3>
-                        <p className="text-xs text-muted-foreground mt-0.5">
-                          {count} skill{count !== 1 ? "s" : ""}
-                        </p>
-                      </div>
-                    </Card>
-                  );
-                })}
+                {ARSENAL_FERRAMENTAS.map(ferramenta => (
+                  <LadrilhoFerramenta
+                    key={ferramenta.value}
+                    rotulo={ferramenta.label}
+                    contagem={contagemPorFerramenta[ferramenta.value] || 0}
+                    aoClicar={() => setSelectedFerramenta(ferramenta.value)}
+                    marcador={
+                      <ToolLogo
+                        toolName={ferramenta.label}
+                        {...logoProps(ferramenta.value)}
+                        size="lg"
+                        className="border border-border/70 bg-surface"
+                      />
+                    }
+                  />
+                ))}
               </div>
 
               {/* Últimas skills adicionadas */}
@@ -316,35 +320,8 @@ export default function MetodosAplicar() {
                     <Sparkles className="h-4 w-4" />
                     Últimas skills adicionadas
                   </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {skills.slice(0, 6).map(skill => (
-                      <Card
-                        key={skill.id}
-                        onClick={() => setDetailItem(skill)}
-                        className="p-4 flex flex-col gap-2 hover:shadow-md hover:border-brand-strong/30 transition-all cursor-pointer"
-                      >
-                        <div className="flex items-start justify-between gap-2">
-                          <h3 className="font-medium text-sm line-clamp-1 flex-1">{skill.titulo}</h3>
-                          <div onClick={(e) => e.stopPropagation()}>
-                            <FavoriteButton tipo="metodo" itemId={skill.id} variant="ghost" className="h-7 w-7 shrink-0" />
-                          </div>
-                        </div>
-                        <p className="text-xs text-muted-foreground line-clamp-2">{skill.descricao}</p>
-                        <div className="flex items-center gap-1.5 flex-wrap">
-                          {normalizarFerramenta(skill.ferramenta) ? (
-                            <Badge variant="outline" className="gap-1.5 text-xs">
-                              <ToolLogo toolName={normalizarFerramenta(skill.ferramenta)!} {...logoProps(skill.ferramenta)} size="sm" className="!h-5 !w-5 !p-0" />
-                              {normalizarFerramenta(skill.ferramenta)}
-                            </Badge>
-                          ) : (
-                            <Badge variant="outline" className="text-xs text-muted-foreground">
-                              Sem ferramenta
-                            </Badge>
-                          )}
-                          {getNivelBadge(skill.nivel)}
-                        </div>
-                      </Card>
-                    ))}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {skills.slice(0, 6).map(skill => cartaoDeSkill(skill))}
                   </div>
                 </div>
               )}
@@ -432,10 +409,6 @@ export default function MetodosAplicar() {
         </TabsContent>
 
         {/* Tab Materiais */}
-        <TabsContent value="materiais" className="mt-0">
-          <MateriaisBibliotecaTab />
-        </TabsContent>
-
         {/* ============ Tab Modelos ============ */}
         <TabsContent value="modelos" className="mt-0">
           <ModelosProntosTab />
@@ -532,5 +505,43 @@ export default function MetodosAplicar() {
         </DialogContent>
       </Dialog>
     </PageContainer>
+  );
+}
+
+/**
+ * Um ladrilho de escolha de ferramenta.
+ *
+ * É a porta de entrada da aba Skills: seis quadrados que filtram a lista.
+ * Como só precisam dizer "qual ferramenta" e "quantas skills", não levam
+ * capa — levam a superfície da plataforma, o logo grande e a contagem em
+ * mono, que é como o resto do sistema escreve número.
+ */
+function LadrilhoFerramenta({
+  rotulo,
+  contagem,
+  marcador,
+  aoClicar,
+}: {
+  rotulo: string;
+  contagem: number;
+  marcador: React.ReactNode;
+  aoClicar: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={aoClicar}
+      className="superficie superficie-interativa group flex flex-col items-center gap-3 p-5 text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+    >
+      {marcador}
+      <span className="min-w-0">
+        <span className="block truncate text-sm font-medium text-foreground transition-colors group-hover:text-primary">
+          {rotulo}
+        </span>
+        <span className="rotulo-mono mt-1 block text-[10px]">
+          {contagem} {contagem === 1 ? "skill" : "skills"}
+        </span>
+      </span>
+    </button>
   );
 }
