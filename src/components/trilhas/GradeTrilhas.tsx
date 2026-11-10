@@ -1,120 +1,39 @@
 import { useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/useAuth";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { BarraFiltros, type FiltroSelecao } from "@/components/bibliotecas/BarraFiltros";
+import { useCatalogoTrilhas } from "@/hooks/useCatalogoTrilhas";
 import { CartaoTrilha } from "./CartaoTrilha";
 import { ClassificacaoIcons } from "./ClassificacaoIcons";
 import { listaCascata, aoMontar } from "@/lib/motion";
 
-interface Trilha {
-  id: string;
-  titulo: string;
-  imagem_url: string | null;
-  categoria: string | null;
-  classificacao: string | null;
-  ferramentas: string[];
-  ordem: number;
-  visivel_apenas_pro: boolean;
-  created_at: string;
-  totalVideos: number;
-  videosConcluidos: number;
-}
-
-const SELECT_BASE =
-  "id, titulo, imagem_url, categoria, classificacao, ordem, visivel_apenas_pro, created_at";
-
-/** A coluna `ferramentas` não existe em todos os ambientes; daí o fallback. */
-function faltaColunaFerramentas(erro: { code?: string; message?: string } | null) {
-  return (
-    erro?.code === "42703" ||
-    (erro?.message?.includes("ferramentas") && erro?.message?.includes("does not exist")) ||
-    false
-  );
-}
+const ORDENS: Record<string, string> = {
+  ordem: "Ordem das trilhas",
+  andamento: "Em andamento primeiro",
+  recentes: "Mais recentes",
+  antigos: "Mais antigas",
+};
 
 /**
  * O catálogo do Academy. Grade, não carrossel: quem chega aqui quer varrer o
  * que existe e ver de onde continuar, e o carrossel escondia a maior parte
  * atrás de um arrasto lateral.
  *
- * São três consultas, independentes da quantidade de trilhas: as trilhas, os
- * vídeos ativos e o que a pessoa já concluiu. O progresso é cruzado aqui.
+ * Os filtros eram dois seletores soltos numa linha, sem busca e sem dizer o
+ * que estava ligado: para limpar, a pessoa tinha de voltar seletor por
+ * seletor. Agora a página usa a mesma barra das bibliotecas — busca, chips do
+ * que está ativo com o X de cada um, "limpar tudo" e a contagem à direita.
+ * A classificação continua em ícones acima, porque é o filtro principal.
+ *
+ * Os dados vêm de `useCatalogoTrilhas`, o mesmo hook do painel de abertura,
+ * então a página inteira se monta com uma leitura só do catálogo.
  */
 export function GradeTrilhas() {
-  const { user } = useAuth();
+  const { data: trilhas, isLoading, isError } = useCatalogoTrilhas();
+  const [busca, setBusca] = useState("");
   const [ordenar, setOrdenar] = useState("ordem");
   const [classificacao, setClassificacao] = useState("todas");
   const [ferramenta, setFerramenta] = useState("todas");
-
-  const { data: trilhas, isLoading, isError } = useQuery({
-    queryKey: ["grade-trilhas", user?.id],
-    queryFn: async (): Promise<Trilha[]> => {
-      const completa = await supabase
-        .from("trilhas")
-        .select(`${SELECT_BASE}, ferramentas`)
-        .eq("visivel_mentorados", true)
-        .order("ordem");
-
-      let linhas: Array<Record<string, unknown>>;
-      if (completa.error && faltaColunaFerramentas(completa.error)) {
-        const simples = await supabase
-          .from("trilhas")
-          .select(SELECT_BASE)
-          .eq("visivel_mentorados", true)
-          .order("ordem");
-        if (simples.error) throw simples.error;
-        linhas = (simples.data ?? []) as unknown as Array<Record<string, unknown>>;
-      } else {
-        if (completa.error) throw completa.error;
-        linhas = (completa.data ?? []) as unknown as Array<Record<string, unknown>>;
-      }
-
-      const ids = linhas.map((t) => t.id as string);
-      if (ids.length === 0) return [];
-
-      const [videos, concluidos] = await Promise.all([
-        supabase.from("videos").select("id, trilha_id").eq("ativo", true).in("trilha_id", ids),
-        user?.id
-          ? supabase
-              .from("progresso_videos")
-              .select("video_id")
-              .eq("user_id", user.id)
-              .eq("completado", true)
-          : Promise.resolve({ data: [], error: null }),
-      ]);
-
-      if (videos.error) throw videos.error;
-
-      const vistos = new Set((concluidos.data ?? []).map((p) => p.video_id as string));
-      const total: Record<string, number> = {};
-      const feitos: Record<string, number> = {};
-      (videos.data ?? []).forEach((v) => {
-        const t = v.trilha_id as string | null;
-        if (!t) return;
-        total[t] = (total[t] ?? 0) + 1;
-        if (vistos.has(v.id as string)) feitos[t] = (feitos[t] ?? 0) + 1;
-      });
-
-      return linhas.map((t) => {
-        const id = t.id as string;
-        return {
-          ...(t as unknown as Omit<Trilha, "ferramentas" | "totalVideos" | "videosConcluidos">),
-          ferramentas: Array.isArray(t.ferramentas) ? (t.ferramentas as string[]) : [],
-          totalVideos: total[id] ?? 0,
-          videosConcluidos: feitos[id] ?? 0,
-        };
-      });
-    },
-  });
 
   const classificacoes = useMemo(() => {
     const cls = new Set((trilhas ?? []).map((t) => t.classificacao).filter(Boolean) as string[]);
@@ -129,6 +48,17 @@ export function GradeTrilhas() {
 
   const filtradas = useMemo(() => {
     let lista = [...(trilhas ?? [])];
+
+    const termo = busca.trim().toLowerCase();
+    if (termo) {
+      lista = lista.filter(
+        (t) =>
+          t.titulo.toLowerCase().includes(termo) ||
+          t.ferramentas.some((f) => f.toLowerCase().includes(termo)) ||
+          (t.classificacao ?? "").toLowerCase().includes(termo),
+      );
+    }
+
     if (classificacao !== "todas") lista = lista.filter((t) => t.classificacao === classificacao);
     if (ferramenta !== "todas") lista = lista.filter((t) => t.ferramentas.includes(ferramenta));
 
@@ -151,7 +81,33 @@ export function GradeTrilhas() {
         lista.sort((a, b) => a.ordem - b.ordem);
     }
     return lista;
-  }, [trilhas, classificacao, ferramenta, ordenar]);
+  }, [trilhas, busca, classificacao, ferramenta, ordenar]);
+
+  const filtros: FiltroSelecao[] = [
+    {
+      chave: "ordem",
+      rotuloVazio: "Ordenar",
+      rotuloLista: ORDENS.ordem,
+      valor: ordenar,
+      valorVazio: "ordem",
+      opcoes: ["andamento", "recentes", "antigos"],
+      aoMudar: setOrdenar,
+      formatar: (o) => ORDENS[o] ?? o,
+      larguraClasse: "w-[200px]",
+    },
+  ];
+
+  if (ferramentas.length > 0) {
+    filtros.push({
+      chave: "ferramenta",
+      rotuloVazio: "Ferramenta",
+      rotuloLista: "Todas as ferramentas",
+      valor: ferramenta,
+      valorVazio: "todas",
+      opcoes: ferramentas,
+      aoMudar: setFerramenta,
+    });
+  }
 
   if (isLoading) {
     return (
@@ -182,39 +138,14 @@ export function GradeTrilhas() {
         />
       )}
 
-      <div className="flex flex-wrap items-center gap-3">
-        <Select value={ordenar} onValueChange={setOrdenar}>
-          <SelectTrigger className="h-10 w-auto min-w-[170px] rounded-full">
-            <SelectValue placeholder="Ordenar por" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="ordem">Ordem das trilhas</SelectItem>
-            <SelectItem value="andamento">Em andamento primeiro</SelectItem>
-            <SelectItem value="recentes">Mais recentes</SelectItem>
-            <SelectItem value="antigos">Mais antigas</SelectItem>
-          </SelectContent>
-        </Select>
-
-        {ferramentas.length > 0 && (
-          <Select value={ferramenta} onValueChange={setFerramenta}>
-            <SelectTrigger className="h-10 w-auto min-w-[170px] rounded-full">
-              <SelectValue placeholder="Ferramenta" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="todas">Todas as ferramentas</SelectItem>
-              {ferramentas.map((f) => (
-                <SelectItem key={f} value={f}>
-                  {f}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        )}
-
-        <span className="rotulo-mono ml-auto">
-          {filtradas.length} {filtradas.length === 1 ? "trilha" : "trilhas"}
-        </span>
-      </div>
+      <BarraFiltros
+        busca={busca}
+        aoBuscar={setBusca}
+        placeholderBusca="Buscar trilha ou ferramenta..."
+        filtros={filtros}
+        total={filtradas.length}
+        substantivo="trilha"
+      />
 
       {filtradas.length === 0 ? (
         <p className="rounded-card border border-dashed border-border py-12 text-center text-sm text-muted-foreground">

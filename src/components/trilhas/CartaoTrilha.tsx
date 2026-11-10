@@ -66,10 +66,22 @@ export function CartaoTrilha({
           ) : (
             <div className="relative h-full w-full bg-gradient-to-br from-olive/25 via-surface to-card">
               <div className="absolute inset-0 dot-grid-bg opacity-40" />
-              <span className="absolute -bottom-4 right-2 font-serif-display text-[104px] leading-none text-foreground/[0.10]">
+              <span className="absolute -bottom-4 right-2 font-serif-display text-[104px] leading-none text-foreground/[0.16]">
                 {ordem + 1}
               </span>
             </div>
+          )}
+
+          {/* O véu da base, só sobre foto. Sem ele as etiquetas ficam sobre o
+              que a imagem tiver ali: às vezes céu claro, às vezes uma tela de
+              aplicativo branca. Sobre a arte da marca ele não entra — ali o
+              fundo já é escuro e controlado, e escurecer de novo apagaria o
+              número da trilha, que é o único desenho daquela capa. */}
+          {temImagem && (
+            <div
+              aria-hidden="true"
+              className="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-black/75 via-black/35 to-transparent"
+            />
           )}
 
           <span className="rotulo-mono absolute left-3 top-3 rounded-full bg-chrome/85 px-2.5 py-1 text-chrome-foreground backdrop-blur">
@@ -91,6 +103,15 @@ export function CartaoTrilha({
             <span className="absolute bottom-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-primary px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-primary-foreground">
               <Check className="h-3 w-3" strokeWidth={3} />
               Concluída
+            </span>
+          )}
+
+          {/* A porcentagem, na quina de baixo da capa. A barra diz "mais ou
+              menos aqui"; o número diz onde. Nos cartões sem progresso não
+              aparece nada: 0% em oito cartões é ruído. */}
+          {iniciada && (
+            <span className="numero-painel absolute bottom-3 right-3 rounded-full bg-chrome/85 px-2.5 py-1 text-[11px] text-chrome-foreground backdrop-blur">
+              {percentual}%
             </span>
           )}
         </div>

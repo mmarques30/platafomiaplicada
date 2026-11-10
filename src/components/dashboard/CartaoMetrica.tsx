@@ -59,34 +59,54 @@ export function CartaoMetrica({
   const chave = rotulo.toLowerCase().replace(/[^a-z0-9]+/g, "-");
 
   return (
+    /*
+     * No celular os três cartões empilham. Em bloco — rótulo, número,
+     * faísca e apoio, cada um na sua linha — cada cartão passava de 140px,
+     * e os três sozinhos comiam a tela inteira antes do primeiro conteúdo.
+     * Ali o rótulo e o número dividem uma linha; a faísca e o apoio seguem
+     * largos embaixo. A partir de `sm` volta tudo em bloco, como estava.
+     */
     <motion.div
       variants={itemCascata}
       className={cn(
-        "group flex flex-col gap-3 p-4 md:p-5",
+        "group grid grid-cols-[1fr_auto] items-baseline gap-x-3 gap-y-2 p-4",
+        "sm:flex sm:flex-col sm:items-stretch sm:gap-3 md:p-5",
         vidro ? "vidro vidro-interativo" : "superficie superficie-interativa",
         className,
       )}
     >
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex min-w-0 items-start justify-between gap-3">
         <span className="rotulo-mono">{rotulo}</span>
         {icone && (
-          <span className="shrink-0 text-muted-foreground transition-colors group-hover:text-primary">
+          <span className="hidden shrink-0 text-muted-foreground transition-colors group-hover:text-primary sm:block">
             {icone}
           </span>
         )}
       </div>
 
-      <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-        <span className="numero-painel text-[32px] text-foreground md:text-[38px]">{valor}</span>
+      <div className="flex flex-wrap items-baseline justify-end gap-x-2 gap-y-1 sm:justify-start">
+        <span className="numero-painel text-[28px] leading-none text-foreground sm:text-[32px] sm:leading-tight md:text-[38px]">
+          {valor}
+        </span>
         {unidade && <span className="text-sm text-muted-foreground">{unidade}</span>}
-        <ChipVariacao valor={variacao} inverter={inverterVariacao} className="ml-auto self-center" />
+        <ChipVariacao
+          valor={variacao}
+          inverter={inverterVariacao}
+          className="self-center sm:ml-auto"
+        />
       </div>
 
       {serie && serie.length > 1 && (
-        <Faisca dados={serie} id={chave} altura={38} colorirPelaTendencia={inverterVariacao} />
+        <div className="col-span-2 sm:w-full">
+          <Faisca dados={serie} id={chave} altura={38} colorirPelaTendencia={inverterVariacao} />
+        </div>
       )}
 
-      {apoio && <p className="text-xs leading-relaxed text-muted-foreground">{apoio}</p>}
+      {apoio && (
+        <p className="col-span-2 text-xs leading-relaxed text-muted-foreground sm:w-full">
+          {apoio}
+        </p>
+      )}
     </motion.div>
   );
 }

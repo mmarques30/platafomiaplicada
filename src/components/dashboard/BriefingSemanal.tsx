@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/hooks/useAuth";
@@ -60,13 +59,11 @@ export function BriefingSemanal() {
 
   if (loading) {
     return (
-      <Card className="border-l-4 border-primary">
-        <CardContent className="pt-5 pb-4 space-y-3">
-          <Skeleton className="h-3 w-32" />
-          <Skeleton className="h-5 w-3/4" />
-          <Skeleton className="h-4 w-full" />
-        </CardContent>
-      </Card>
+      <section className="superficie space-y-3 p-4 md:p-5">
+        <Skeleton className="h-3 w-32" />
+        <Skeleton className="h-5 w-3/4" />
+        <Skeleton className="h-4 w-full" />
+      </section>
     );
   }
 
@@ -78,27 +75,31 @@ export function BriefingSemanal() {
   };
 
   return (
-    <Card className="border-l-4 border-primary">
-      <CardContent className="pt-5 pb-4 space-y-3">
-        <span className="text-[10px] font-bold tracking-widest uppercase text-muted-foreground">
-          BRIEFING DA SEMANA
-        </span>
-        <h3 className="text-base font-semibold text-foreground leading-snug">
-          {briefing.titulo}
-        </h3>
-        <p className="text-sm text-muted-foreground leading-relaxed">
-          {briefing.resumo}
-        </p>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleDismiss}
-          className="mt-1 text-xs text-muted-foreground hover:text-foreground"
-        >
-          <Check className="h-3.5 w-3.5 mr-1" />
-          Entendido
-        </Button>
-      </CardContent>
-    </Card>
+    /*
+     * O briefing da segunda.
+     *
+     * Era um cartão com uma tarja lime de 4px na borda esquerda, do tempo em
+     * que todo aviso da plataforma se anunciava por uma barra colorida. A
+     * tarja gritava sem dizer nada: a mesma borda servia para erro, aviso e
+     * novidade. Aqui o que identifica o bloco é o rótulo em mono e o ponto
+     * lime ao lado dele, que é a linguagem do resto do painel.
+     */
+    <section className="superficie space-y-3 p-4 md:p-5">
+      <span className="rotulo-mono flex items-center gap-2">
+        <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-primary" />
+        Briefing da semana
+      </span>
+      <h3 className="text-base font-medium leading-snug text-foreground">{briefing.titulo}</h3>
+      <p className="text-sm leading-relaxed text-muted-foreground">{briefing.resumo}</p>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={handleDismiss}
+        className="-ml-2 mt-1 text-xs text-muted-foreground hover:text-foreground"
+      >
+        <Check className="mr-1 h-3.5 w-3.5" />
+        Entendido
+      </Button>
+    </section>
   );
 }

@@ -97,18 +97,37 @@ export default function Dashboard() {
           próprio ritmo desenhado. Antes disso só havia listas. */}
       <PainelRitmo />
 
-      {/* Uma coluna só. A régua é a ordem: primeiro o que tem data marcada,
-          depois o que a pessoa vai retomar, por último o que ela pode
-          explorar. Duas colunas deixavam um vazio grande sempre que um lado
-          era mais alto que o outro. */}
-      <div className="flex flex-col gap-4 md:gap-6">
-        <ProximoEncontro />
-        <BriefingSemanal />
-        <AcademyWelcomeCard />
-        <ContinuarDeOndeParou />
-        <SuasTrilhas />
-        <CentralConteudo />
+      {/*
+       * Coluna de trabalho e coluna de avisos.
+       *
+       * Até aqui o painel era uma pilha: seis blocos da largura da tela, um
+       * embaixo do outro, todos com o mesmo peso. Em telas largas isso
+       * esticava um cartão de agenda de 90px por 1400px de largura e obrigava
+       * a rolar para atravessar coisas que caberiam lado a lado.
+       *
+       * Duas colunas já tinham sido tentadas antes e foram desfeitas por um
+       * motivo real: quando um lado ficava vazio, sobrava um buraco do
+       * tamanho da coluna. A correção não era voltar para a pilha, era fazer
+       * a coluna desaparecer — `empty:hidden` some com a lateral quando os
+       * três avisos dela se recusam a renderizar, e a coluna de trabalho
+       * ocupa a largura inteira sem nada condicional aqui.
+       *
+       * No celular a lateral vem primeiro: é onde está o que tem data.
+       */}
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:gap-5">
+        <div className="flex min-w-0 flex-1 flex-col gap-4 empty:hidden">
+          <ContinuarDeOndeParou />
+          <SuasTrilhas />
+        </div>
+
+        <aside className="order-first flex w-full flex-col gap-4 empty:hidden lg:order-none lg:w-[348px] lg:shrink-0">
+          <ProximoEncontro />
+          <BriefingSemanal />
+          <AcademyWelcomeCard />
+        </aside>
       </div>
+
+      <CentralConteudo />
 
       <RankingTicker />
       {novidadesSemana && <NovidadesSemana />}
