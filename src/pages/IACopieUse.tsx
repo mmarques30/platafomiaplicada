@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,9 +12,11 @@ import {
 import { useIACopieUse } from "@/hooks/useFerramentas";
 import { IACopieUseCard } from "@/components/bibliotecas/IACopieUseCard";
 import { IACopieUseDetalhesModal } from "@/components/bibliotecas/IACopieUseDetalhesModal";
-import { Sparkles, Search } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { IACopieUseRow } from "@/components/bibliotecas/IACopieUseRow";
+import { BarraFiltros } from "@/components/bibliotecas/BarraFiltros";
+import { ListaRecursos } from "@/components/bibliotecas/LinhaRecurso";
 import { PageTitle } from "@/components/shared/PageTitle";
 import { PageContainer } from "@/components/shared/PageContainer";
 
@@ -58,54 +59,42 @@ export default function IACopieUse() {
         />
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-4 mb-6">
-        <div className="relative flex-1 min-w-0">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-          <Input
-            placeholder="Buscar ferramentas..."
-            value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
+      <BarraFiltros
+        busca={searchTerm}
+        aoBuscar={(v) => {
+          setSearchTerm(v);
+          setVisibleCount(ITEMS_PER_PAGE);
+        }}
+        placeholderBusca="Buscar modelos"
+        total={filteredIAs?.length}
+        substantivo="modelo"
+        filtros={[
+          {
+            chave: "categoria",
+            rotuloVazio: "Categoria",
+            rotuloLista: "Todas as categorias",
+            valor: selectedCategoria ?? "todas",
+            valorVazio: "todas",
+            opcoes: categorias,
+            aoMudar: (valor) => {
+              setSelectedCategoria(valor === "todas" ? null : valor);
               setVisibleCount(ITEMS_PER_PAGE);
-            }}
-            className="pl-10"
-          />
-        </div>
-        <Select
-          value={selectedCategoria || "todas"}
-          onValueChange={(value) => {
-            setSelectedCategoria(value === "todas" ? null : value);
-            setVisibleCount(ITEMS_PER_PAGE);
-          }}
-        >
-          <SelectTrigger className="w-full sm:w-[220px] shrink-0">
-            <SelectValue placeholder="Categoria" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="todas">Todas as categorias</SelectItem>
-            {categorias.map((categoria) => (
-              <SelectItem key={categoria} value={categoria}>
-                {categoria}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* Escolha da visão: duas abas, no mesmo peso do resto da página.
-          Eram dois botões de ícone, e o ativo vinha com o lime cheio do
-          botão primário — um alternador de visualização gritando mais que o
-          conteúdo. */}
-      <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as "cards" | "tabela")}>
-        <TabsList>
-          <TabsTrigger value="cards">Cartões</TabsTrigger>
-          <TabsTrigger value="tabela">Lista</TabsTrigger>
-        </TabsList>
-      </Tabs>
+            },
+          },
+        ]}
+        acoes={
+          <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as "cards" | "tabela")}>
+            <TabsList className="h-10">
+              <TabsTrigger value="cards">Cartões</TabsTrigger>
+              <TabsTrigger value="tabela">Lista</TabsTrigger>
+            </TabsList>
+          </Tabs>
+        }
+      />
 
       {isLoading ? (
         viewMode === "cards" ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-5">
+          <div className="grid auto-rows-fr grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
             {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
               <Card key={i} className="min-h-[220px]">
                 <CardContent className="p-5 space-y-3">
@@ -139,7 +128,7 @@ export default function IACopieUse() {
       ) : visibleIAs && visibleIAs.length > 0 ? (
         <>
           {viewMode === "cards" ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-5">
+            <div className="grid auto-rows-fr grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
               {visibleIAs.map((ia) => (
                 <IACopieUseCard
                   key={ia.id}
@@ -149,15 +138,11 @@ export default function IACopieUse() {
               ))}
             </div>
           ) : (
-            <Card>
+            <ListaRecursos>
               {visibleIAs.map((ia) => (
-                <IACopieUseRow
-                  key={ia.id}
-                  ia={ia}
-                  onClick={() => setSelectedIA(ia)}
-                />
+                <IACopieUseRow key={ia.id} ia={ia} onClick={() => setSelectedIA(ia)} />
               ))}
-            </Card>
+            </ListaRecursos>
           )}
           
           {hasMore && (
@@ -180,13 +165,6 @@ export default function IACopieUse() {
             </p>
           </CardContent>
         </Card>
-      )}
-
-      {!isLoading && filteredIAs && filteredIAs.length > 0 && (
-        <p className="pt-2 text-center text-xs text-muted-foreground/70">
-          {visibleIAs?.length} de {filteredIAs.length}{" "}
-          {filteredIAs.length === 1 ? "modelo" : "modelos"}
-        </p>
       )}
 
       <IACopieUseDetalhesModal
