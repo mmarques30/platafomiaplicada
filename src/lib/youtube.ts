@@ -19,11 +19,29 @@ export function extractYouTubeId(url: string): string | null {
   return null;
 }
 
-export function getYouTubeThumbnail(videoId: string, customThumbnail?: string | null): string {
-  if (customThumbnail && customThumbnail.trim() !== '') {
-    return customThumbnail;
-  }
-  return `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+/**
+ * O endereço da capa de um vídeo do YouTube.
+ *
+ * Devolvia `maxresdefault.jpg`, que o YouTube só gera quando o arquivo
+ * enviado tinha 720p ou mais. Para todo vídeo abaixo disso o endereço
+ * responde 404, e como esta função também alimenta a coluna `thumbnail_url`
+ * ao cadastrar um vídeo, o 404 ficava gravado no banco.
+ *
+ * `hqdefault.jpg` (480x360) é gerado para qualquer vídeo que exista, então é
+ * o padrão seguro aqui. Onde a qualidade importa — as capas que o aluno vê —
+ * quem desce a escada de tamanhos é o componente `CapaVideo`, que tenta o
+ * maxres primeiro e cai para este quando ele não existe.
+ *
+ * Sem id não há capa: devolver `.../vi//hqdefault.jpg` seria mais um 404.
+ */
+export function getYouTubeThumbnail(videoId?: string | null, customThumbnail?: string | null): string {
+  const personalizada = customThumbnail?.trim();
+  if (personalizada) return personalizada;
+
+  const id = videoId?.trim();
+  if (!id) return '/placeholder.svg';
+
+  return `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
 }
 
 export function getYouTubeDuration(videoId: string): Promise<number | null> {

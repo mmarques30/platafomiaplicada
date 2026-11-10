@@ -18,7 +18,6 @@ import { VideoMaterialsList } from "@/components/video/VideoMaterialsList";
 import { useVideoRating } from "@/hooks/useVideoRating";
 import { CustomVideoPlayer } from "@/components/video/CustomVideoPlayer";
 import { FavoriteButton } from "@/components/shared/FavoriteButton";
-import { getYouTubeThumbnail } from "@/lib/youtube";
 import { PageContainer } from "@/components/shared/PageContainer";
 
 export default function VideoPlayer() {
@@ -219,7 +218,7 @@ export default function VideoPlayer() {
                   startSeconds={progresso?.tempo_assistido || 0}
                   onTimeUpdate={handleTimeUpdate}
                   onEnded={handleVideoEnded}
-                  thumbnail={video.thumbnail_customizado_url || getYouTubeThumbnail(video.youtube_id)}
+                  thumbnail={video.thumbnail_customizado_url}
                   title={video.titulo}
                 />
               </CardContent>

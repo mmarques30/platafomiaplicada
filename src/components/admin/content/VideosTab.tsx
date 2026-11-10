@@ -7,7 +7,7 @@ import { Plus, Edit, Trash2 } from "lucide-react";
 import { VideoModal } from "./VideoModal";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { FilterBar } from "./FilterBar";
-import { getYouTubeThumbnail } from "@/lib/youtube";
+import { CapaVideo } from "@/components/shared/CapaVideo";
 
 export function VideosTab() {
   const { data: videos, isLoading } = useVideos();
@@ -166,11 +166,13 @@ export function VideosTab() {
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <img 
-                      src={getYouTubeThumbnail(video.youtube_id, video.thumbnail_customizado_url)} 
-                      alt={video.titulo}
-                      className="w-20 h-11 object-cover rounded border"
-                    />
+                    <div className="relative w-20 h-11 overflow-hidden rounded border">
+                      <CapaVideo
+                        youtubeId={video.youtube_id}
+                        capa={video.thumbnail_customizado_url}
+                        alt={video.titulo}
+                      />
+                    </div>
                   </TableCell>
                   <TableCell className="font-medium">{video.titulo}</TableCell>
                   <TableCell>{video.modulo?.titulo}</TableCell>

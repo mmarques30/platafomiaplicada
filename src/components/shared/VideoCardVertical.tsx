@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Play } from "lucide-react";
-import { getYouTubeThumbnail } from "@/lib/youtube";
+import { CapaVideo } from "@/components/shared/CapaVideo";
 import { FavoriteButton } from "./FavoriteButton";
 import { useContentAccessLogger } from "@/hooks/useContentAccessLogger";
 import { cn } from "@/lib/utils";
@@ -21,8 +21,6 @@ export function VideoCardVertical({
   thumbnail_customizado_url,
   trilha_id,
 }: VideoCardVerticalProps) {
-  const [imageLoaded, setImageLoaded] = useState(false);
-  const thumbnailUrl = getYouTubeThumbnail(youtube_id, thumbnail_customizado_url);
   const { logAccess } = useContentAccessLogger();
 
   const handleClick = () => {
@@ -36,18 +34,11 @@ export function VideoCardVertical({
       onClick={handleClick}
     >
       <div className="overflow-hidden rounded-xl border border-brand-hairline shadow-sm hover:shadow-lg transition-all duration-300 relative w-full bg-brand-cream aspect-[9/16]">
-        {!imageLoaded && (
-          <div className="absolute inset-0 bg-brand-hairline animate-pulse" />
-        )}
-        <img
-          src={thumbnailUrl}
+        <CapaVideo
+          youtubeId={youtube_id}
+          capa={thumbnail_customizado_url}
           alt={titulo}
-          loading="lazy"
-          onLoad={() => setImageLoaded(true)}
-          className={cn(
-            "block w-full h-full object-cover object-center transition-opacity duration-300",
-            imageLoaded ? "opacity-100" : "opacity-0"
-          )}
+          className="block object-center"
         />
 
         {/* Botão de Favoritar */}
