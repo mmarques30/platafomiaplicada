@@ -53,8 +53,14 @@ export function CartaoTrilha({
           "transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-elevated"
         )}
       >
-        {/* Capa: imagem da trilha ou arte da marca com o número. Nunca texto. */}
-        <div className="relative aspect-[4/3] w-full overflow-hidden bg-surface">
+        {/*
+          Capa: imagem da trilha ou arte da marca com o número. Nunca texto.
+
+          A caixa era 4:3 e as imagens são 16:9, então `object-cover` comia
+          um quarto da altura de toda capa — o que aparecia era o miolo da
+          foto, cortado em cima e embaixo. Em 16:9 a imagem entra inteira.
+        */}
+        <div className="relative aspect-[16/9] w-full overflow-hidden bg-surface">
           {temImagem ? (
             <img
               src={imagemUrl as string}

@@ -8,9 +8,6 @@ import { useAulaSemanal } from "@/hooks/useAulaSemanal";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useEffectivePlan } from "@/hooks/useUserPlan";
 import { useBusinessUserId } from "@/hooks/useBusinessUserId";
-import { useContratosBusiness } from "@/hooks/useContratosBusiness";
-import { useEtapasBusiness } from "@/hooks/useEtapasBusiness";
-import { useTasksByUser } from "@/hooks/useTasksBusiness";
 import { useMentoriaSessoes } from "@/hooks/useMentoriaSessoes";
 import { useNivelUsuario } from "@/hooks/useNivelUsuario";
 import { useSequenciaEstudo } from "@/hooks/useEvolucao";
@@ -24,6 +21,7 @@ import { CartaoMetrica, CartaoMetricaSkeleton } from "./CartaoMetrica";
 import { MarcaIAplicada } from "@/components/shared/MarcaIAplicada";
 import { useRitmoEstudo } from "@/hooks/useRitmoEstudo";
 import { listaCascata, aoMontar } from "@/lib/motion";
+import { cn } from "@/lib/utils";
 
 const TIMEZONE = "America/Sao_Paulo";
 
@@ -97,12 +95,16 @@ export function WelcomeHeader({ rodape }: WelcomeHeaderProps) {
     return u ? Math.floor((Date.now() - parseInt(u)) / (1000 * 60 * 60 * 24)) : 0;
   })();
 
-  // ── Business ──
+  /*
+   * ── Business ──
+   *
+   * Aqui havia mais três consultas: contrato, etapas do roadmap e tarefas.
+   * Serviam só para os dois números que saíram do painel, então saíram
+   * junto — eram três idas ao servidor em toda abertura para alimentar
+   * cartões que não existem mais.
+   */
   const rawBusinessUserId = useBusinessUserId();
   const businessUserId = rawBusinessUserId ?? user?.id;
-  const { contrato, isLoading: isLoadingContrato } = useContratosBusiness(isBusiness ? businessUserId : undefined);
-  const { data: etapas, isLoading: isLoadingEtapas } = useEtapasBusiness(isBusiness ? contrato?.id : undefined);
-  const { data: tasks, isLoading: isLoadingTasks } = useTasksByUser(isBusiness ? businessUserId : undefined);
   const { sessoes, isLoading: isLoadingSessoes } = useMentoriaSessoes(isBusiness ? businessUserId : undefined);
 
   // ── Academy ──
@@ -156,19 +158,11 @@ export function WelcomeHeader({ rodape }: WelcomeHeaderProps) {
     },
   });
 
-  const tarefasCriticas = tasks?.filter((t) => ["alta", "urgente"].includes(t.prioridade) && t.status !== "aprovado").length ?? 0;
-  const roadmapPercent = (() => {
-    const total = etapas?.length ?? 0;
-    const concluidas = etapas?.filter((e) => e.status === "concluida").length ?? 0;
-    return total > 0 ? Math.round((concluidas / total) * 100) : 0;
-  })();
-
   // As faíscas e a variação saem daqui. É o único registro com data que a
   // plataforma guarda do aluno, então é o único lugar de onde pode sair uma
   // comparação honesta com o período anterior.
   const { dados: ritmo } = useRitmoEstudo(!isVisitante);
 
-  const roadmapAnimado = useCountUp(roadmapPercent, 700);
   const emAndamentoAnimado = useCountUp(academyData?.emAndamento ?? 0, 700);
   const sequenciaAnimada = useCountUp(sequencia ?? 0, 700);
 
@@ -182,20 +176,13 @@ export function WelcomeHeader({ rodape }: WelcomeHeaderProps) {
       ?.filter((s) => s.status === "agendada" && isFuture(parseISO(s.data_sessao)))
       .sort((a, b) => parseISO(a.data_sessao).getTime() - parseISO(b.data_sessao).getTime())[0];
     const dayFull = proximaSessao ? format(parseISO(proximaSessao.data_sessao), "EEEE", { locale: ptBR }) : null;
-    const etapasConcluidas = etapas?.filter((e) => e.status === "concluida").length ?? 0;
 
+    /*
+     * Roadmap e Tarefas críticas saíram daqui a pedido: a operação não vai
+     * mais acompanhar o projeto por esses dois números. Sobra o que tem data
+     * marcada, que é o que o cliente abre o painel para ver.
+     */
     metricas = [
-      {
-        rotulo: "Roadmap",
-        valor: `${roadmapAnimado}%`,
-        apoio: etapas?.length ? `${etapasConcluidas} de ${etapas.length} etapas concluídas` : undefined,
-      },
-      {
-        rotulo: "Tarefas críticas",
-        valor: String(tarefasCriticas),
-        apoio: tarefasCriticas > 0 ? "Precisam de atenção agora" : "Nada travando no momento",
-        inverterVariacao: true,
-      },
       {
         rotulo: "Próximo encontro Insider",
         valor: dayFull ? (DAY_ABBR[dayFull] ?? dayFull.slice(0, 3)) : "—",
@@ -206,7 +193,7 @@ export function WelcomeHeader({ rodape }: WelcomeHeaderProps) {
     ];
     ctaLabel = "Ver encontros";
     ctaHref = "/encontros";
-    isLoadingMetricas = isLoadingContrato || isLoadingEtapas || isLoadingTasks || isLoadingSessoes;
+    isLoadingMetricas = isLoadingSessoes;
   } else if (isAcademy) {
     const faltamXp = Math.max(0, nivel.xpNecessario - nivel.xpAtual);
     metricas = [
@@ -244,16 +231,18 @@ export function WelcomeHeader({ rodape }: WelcomeHeaderProps) {
     isLoadingMetricas = isLoadingSkills;
   }
 
-  // ── Saudação ──
-  const temEntregaUrgente = isBusiness && tarefasCriticas > 0;
-  const cumprimento = temEntregaUrgente
-    ? "Atenção,"
-    : diasSemAcesso >= 4
+  /*
+   * ── Saudação ──
+   *
+   * O "Atenção," vinha da contagem de tarefas críticas, que saiu do painel.
+   * Sem esse número, o cumprimento volta a ser o da hora do dia ou o de
+   * quem sumiu por uns dias.
+   */
+  const cumprimento =
+    diasSemAcesso >= 4
     ? "Que bom te ver de volta,"
     : `Boa ${periodo},`;
-  const tagline = temEntregaUrgente
-    ? "Você tem entregas que precisam de atenção agora."
-    : aulaAtiva
+  const tagline = aulaAtiva
     ? `Aula desta semana: ${aulaAtiva.tema}`
     : diasSemAcesso >= 4
     ? `Faz ${diasSemAcesso} dias desde sua última visita. Por onde quer começar?`
@@ -306,7 +295,11 @@ export function WelcomeHeader({ rodape }: WelcomeHeaderProps) {
             data-welcome-kpis
             variants={listaCascata}
             {...aoMontar}
-            className="grid grid-cols-1 gap-3 sm:grid-cols-3 md:gap-4"
+            className={cn(
+              "grid grid-cols-1 gap-3 md:gap-4",
+              metricas.length > 1 && "sm:grid-cols-3",
+              metricas.length === 1 && "sm:max-w-sm",
+            )}
           >
             {isLoadingMetricas
               ? [0, 1, 2].map((i) => <CartaoMetricaSkeleton key={i} vidro />)
