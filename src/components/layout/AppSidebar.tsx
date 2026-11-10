@@ -45,6 +45,13 @@ const ROTAS_MATERIAIS = [
   "/metodos-aplicar",
 ];
 
+// O Insider também tem bloco próprio. Antes dele, as duas coisas que formam o
+// ambiente estavam em lugares que não se falavam: "Encontros Insider" era um
+// filho de Aprender, no meio das trilhas, e o "Indica" era um menu solto de
+// primeiro nível. Nada dizia que são o mesmo ambiente, e o convidado só
+// percebia o que não tinha pela ausência de um item de menu.
+const ROTAS_INSIDER = ["/insider", "/encontros", "/indica"];
+
 const PLANO_ROTULO: Record<string, string> = {
   academy: "Academy",
   business_parceria: "Academy",
@@ -136,6 +143,16 @@ export function AppSidebar() {
   const menus = getSidebarMenus(effectivePlan, ambienteEfetivo);
   const ehInsiderBusiness =
     ambienteEfetivo === "insider_business" || effectivePlan === "insider_business";
+  const ehInsiderConvidado =
+    ambienteEfetivo === "insider_convidado" || effectivePlan === "insider_convidado";
+
+  // O ambiente Insider aparece para quem é Insider — contratado ou convidado —
+  // e para quem já tem papel no programa de indicação sem ser nenhum dos dois.
+  const temAmbienteInsider =
+    !isVisitante && (temPapelPrograma || ehInsiderBusiness || ehInsiderConvidado);
+  // Os encontros são do Insider contratado: é a única visão em que o item
+  // aparece no bloco, e portanto a única em que ele sai de Aprender.
+  const encontrosNoInsider = temAmbienteInsider && ehInsiderBusiness;
 
   const temGrupoMeuProgresso = menus.some((m) => m.menu_key === "meu_progresso" && !m.parent_key);
   const todosOsPais = menus.filter(
@@ -172,6 +189,11 @@ export function AppSidebar() {
       .filter((menu) => menu.parent_key === chavePai)
       .filter((menu) => !HIDDEN_MENU_KEYS.includes(menu.menu_key))
       .filter((menu) => !CHAVES_BIBLIOTECA.includes(menu.menu_key))
+      // "Encontros Insider" continua filho de Aprender no menu_config, e para
+      // o Academy é ali que ele fica: a página lê o calendário de aulas, que é
+      // de todo mundo. Só sai daqui para quem o vê no bloco do Insider, que é
+      // quem tem o Insider contratado — senão o item apareceria duas vezes.
+      .filter((menu) => !(encontrosNoInsider && menu.menu_key === "encontros"))
       .filter(
         (menu) =>
           !["skills_lider", "skills_painel_lider"].includes(menu.menu_key) ||
@@ -232,6 +254,22 @@ export function AppSidebar() {
       { chave: "ia_copie_use", rotulo: "Modelos prontos", url: "/ia-copie-use" },
       { chave: "metodos_aplicar", rotulo: "Métodos práticos", url: "/metodos-aplicar" },
     ].filter((item) => isMenuVisible(item.chave)),
+    (item) => item.rotulo,
+  );
+
+  const rotaDeInsider = ROTAS_INSIDER.some(rotaCasa);
+
+  // O convidado fica com o Indica inteiro e sem os encontros, que são do
+  // Insider contratado. A porta fechada e o motivo estão na página de entrada:
+  // aqui o item simplesmente não entra.
+  const insider = porTamanhoDoNome(
+    [
+      { chave: "insider_visao", rotulo: "Meu Insider", url: "/insider" },
+      { chave: "indica", rotulo: "Indica", url: "/indica" },
+      ...(encontrosNoInsider
+        ? [{ chave: "encontros", rotulo: "Encontros", url: "/encontros" }]
+        : []),
+    ],
     (item) => item.rotulo,
   );
 
@@ -374,16 +412,36 @@ export function AppSidebar() {
                 );
               })}
 
-              {/* IAplicada Indica: quem já tem papel no programa, e o Insider
-                  Business, que é a quem o programa é oferecido. */}
-              {!isVisitante && (temPapelPrograma || ehInsiderBusiness) && (
-                <ItemPai
-                  rotulo="Indica"
-                  icone={<LucideIcons.Handshake className="h-[18px] w-[18px]" strokeWidth={1.75} />}
-                  para="/indica"
-                  ativo={rotaCasa("/indica")}
-                  recolhido={recolhido}
-                />
+              {/* O ambiente Insider: a entrada, o programa de indicação e os
+                  encontros. Menu pai com submenus, como Aprender e Materiais. */}
+              {temAmbienteInsider && (
+                <Collapsible open={rotaDeInsider || abertos.includes("insider")}>
+                  <ItemPai
+                    rotulo="Insider"
+                    icone={<LucideIcons.Gem className="h-[18px] w-[18px]" strokeWidth={1.75} />}
+                    para="/insider"
+                    ativo={rotaDeInsider}
+                    expansivel
+                    aberto={rotaDeInsider || abertos.includes("insider")}
+                    aoAlternar={() => alternar("insider")}
+                    aoNavegar={() => abrir("insider")}
+                    recolhido={recolhido}
+                  />
+                  {!recolhido && (
+                    <CollapsibleContent>
+                      <BlocoFilhos>
+                        {insider.map((item) => (
+                          <ItemFilho
+                            key={item.chave}
+                            rotulo={item.rotulo}
+                            para={item.url}
+                            ativo={rotaCasa(item.url)}
+                          />
+                        ))}
+                      </BlocoFilhos>
+                    </CollapsibleContent>
+                  )}
+                </Collapsible>
               )}
             </nav>
           </SidebarGroupContent>

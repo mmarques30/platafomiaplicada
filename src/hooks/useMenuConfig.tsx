@@ -65,8 +65,11 @@ export function useMenuConfig() {
         'squad', 'squad_lider'
       ],
 
-      // Insider não pago: a "outra visão" ainda vai ser definida. Por ora
-      // esconde tudo que depende de projeto contratado ou de plano pago.
+      // Insider convidado: a "outra visão" é o ambiente Insider. O convidado
+      // entra por /insider, usa o IAplicada Indica por inteiro — indica,
+      // acompanha o funil e recebe igual — e não tem os encontros, que são do
+      // Insider contratado. O que a lista abaixo esconde é o resto: conteúdo
+      // de plano pago e qualquer tela de projeto contratado.
       insider_convidado: [
         'trilhas', 'trilhas_skills', 'calendario',
         'evolucao', 'meu_diagnostico', 'minhas_duvidas',

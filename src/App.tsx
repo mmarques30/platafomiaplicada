@@ -26,8 +26,8 @@ import Evolucao from "./pages/Evolucao";
 import EvolucaoConquistas from "./pages/EvolucaoConquistas";
 import EvolucaoCertificados from "./pages/EvolucaoCertificados";
 import MinhaHistoria from "./pages/MinhaHistoria";
-import Ecossistema from "./pages/Ecossistema";
 import Indica from "./pages/Indica";
+import Insider from "./pages/Insider";
 import Encontros from "./pages/Encontros";
 import MentoriaDiagnostico from "./pages/MentoriaDiagnostico";
 import MeuDiagnostico from "./pages/MeuDiagnostico";
@@ -135,7 +135,7 @@ function AppContent() {
 
             {/* Aliases/redirects para evitar 404 por links antigos ou barra final */}
             
-            <Route path="/ecossistema" element={<Ecossistema />} />
+            <Route path="/insider" element={<Insider />} />
             <Route path="/indica" element={<Indica />} />
             <Route path="/encontros" element={<Encontros />} />
             
