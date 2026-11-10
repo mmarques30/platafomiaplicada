@@ -43,6 +43,11 @@ function segundaDaSemana(data: Date): Date {
  *
  * A regra de não mostrar nada com menos de três semanas de dados continua: um
  * gráfico de duas barras não é uma tendência, é um par de números.
+ *
+ * A altura é a da célula, não um número fixo. Com 260px travados o cartão
+ * parava antes do vizinho "Acesso rápido", que tem 350px, e sobrava um
+ * palmo de vazio embaixo dele — era o cartão parecendo curto, não a grade
+ * estando errada.
  */
 export function RitmoCard() {
   const { user } = useAuth();
@@ -110,7 +115,7 @@ export function RitmoCard() {
     };
   }, [data]);
 
-  if (isLoading) return <Skeleton className="h-[260px] rounded-[20px]" />;
+  if (isLoading) return <Skeleton className="h-full min-h-[260px] rounded-[20px]" />;
 
   // Sem três semanas de dados não há tendência para desenhar. Antes o
   // componente sumia, e a célula larga da grade virava um buraco com o bloco
@@ -118,7 +123,7 @@ export function RitmoCard() {
   // o que falta para o gráfico existir.
   if (!ritmo) {
     return (
-      <div className="h-[260px]">
+      <div className="h-full min-h-[260px]">
         <CartaoGrafico titulo="Seu ritmo, semana a semana">
           <div className="flex h-full flex-col items-center justify-center gap-2 text-center">
             <p className="text-sm text-muted-foreground">
@@ -143,7 +148,7 @@ export function RitmoCard() {
           : "Seu ritmo está estável.";
 
   return (
-    <div className="h-[260px]">
+    <div className="h-full min-h-[260px]">
       <CartaoGrafico
         titulo="Seu ritmo, semana a semana"
         leitura={leitura}

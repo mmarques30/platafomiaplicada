@@ -16,6 +16,7 @@ import { PageContainer } from "@/components/shared/PageContainer";
 import { BarraFiltros } from "@/components/bibliotecas/BarraFiltros";
 import { ChipMeta, ChipNivel } from "@/components/bibliotecas/ChipsRecurso";
 import { MateriaisBibliotecaTab } from "@/components/biblioteca/MateriaisBibliotecaTab";
+import { ModelosProntosTab } from "@/components/bibliotecas/ModelosProntosTab";
 import { toast } from "sonner";
 
 export default function MetodosAplicar() {
@@ -141,11 +142,11 @@ export default function MetodosAplicar() {
       <PageTitle
         primary="Métodos"
         secondary="práticos"
-        description="O passo a passo de quem já aplica IA no trabalho, com o material pronto para você seguir."
+        description="O passo a passo de quem já aplica IA no trabalho, com os modelos e o material prontos para você seguir."
       />
 
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-        <TabsList className="grid w-full grid-cols-3 md:inline-flex md:w-auto mb-6">
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 md:inline-flex md:w-auto mb-6">
           <TabsTrigger 
             value="skills"
             className="gap-1 sm:gap-2 text-xs sm:text-sm"
@@ -166,6 +167,13 @@ export default function MetodosAplicar() {
           >
             <Users className="h-4 w-4" />
             Materiais
+          </TabsTrigger>
+          <TabsTrigger
+            value="modelos"
+            className="gap-1 sm:gap-2 text-xs sm:text-sm"
+          >
+            <Copy className="h-4 w-4" />
+            Modelos
           </TabsTrigger>
         </TabsList>
 
@@ -419,6 +427,11 @@ export default function MetodosAplicar() {
         {/* Tab Materiais */}
         <TabsContent value="materiais" className="mt-0">
           <MateriaisBibliotecaTab />
+        </TabsContent>
+
+        {/* ============ Tab Modelos ============ */}
+        <TabsContent value="modelos" className="mt-0">
+          <ModelosProntosTab />
         </TabsContent>
       </Tabs>
 

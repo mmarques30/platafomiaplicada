@@ -51,7 +51,7 @@ export function FerramentasRanking({ ferramentas, onVerMais }: FerramentasRankin
       ["chatgpt", "gpt"],
       ["manus"],
       ["lovable"],
-      ["wisprflow", "wisperflow", "whisperflow", "wispr", "whisper"],
+      ["cursor"],
     ];
     const escolhidas: Ferramenta[] = [];
     for (const aliases of curado) {
@@ -96,8 +96,8 @@ export function FerramentasRanking({ ferramentas, onVerMais }: FerramentasRankin
               <ToolLogo
                 logoUrl={ferramenta.logo_url}
                 toolName={ferramenta.nome}
-                linkFerramenta={null}
-                size="sm"
+                linkFerramenta={ferramenta.link_ferramenta}
+                size="md"
               />
               <span className="min-w-0 flex-1">
                 <span className="block truncate text-[13px] font-medium text-foreground transition-colors group-hover:text-primary">

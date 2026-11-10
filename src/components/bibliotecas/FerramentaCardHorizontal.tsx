@@ -46,8 +46,8 @@ export function FerramentaCardHorizontal({ ferramenta, onVerMais }: FerramentaCa
         <ToolLogo
           logoUrl={ferramenta.logo_url}
           toolName={ferramenta.nome}
-          linkFerramenta={null}
-          size="md"
+          linkFerramenta={ferramenta.link_ferramenta}
+          size="lg"
         />
       }
       titulo={ferramenta.nome}

@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import { BarraFiltros, type FiltroSelecao } from "@/components/bibliotecas/BarraFiltros";
 import { useCatalogoTrilhas } from "@/hooks/useCatalogoTrilhas";
 import { CartaoTrilha } from "./CartaoTrilha";
-import { ClassificacaoIcons } from "./ClassificacaoIcons";
 import { listaCascata, aoMontar } from "@/lib/motion";
 
 const ORDENS: Record<string, string> = {
@@ -23,7 +22,11 @@ const ORDENS: Record<string, string> = {
  * que estava ligado: para limpar, a pessoa tinha de voltar seletor por
  * seletor. Agora a página usa a mesma barra das bibliotecas — busca, chips do
  * que está ativo com o X de cada um, "limpar tudo" e a contagem à direita.
- * A classificação continua em ícones acima, porque é o filtro principal.
+ *
+ * A classificação era uma fileira de ícones animados acima da barra. Eram
+ * bonitos e custavam uma faixa inteira da tela para fazer o que um seletor
+ * de 190px faz: escolher uma entre cinco. Agora ela é mais um filtro na
+ * barra, ao lado de ordenar, e a grade começa mais alto.
  *
  * Os dados vêm de `useCatalogoTrilhas`, o mesmo hook do painel de abertura,
  * então a página inteira se monta com uma leitura só do catálogo.
@@ -97,6 +100,19 @@ export function GradeTrilhas() {
     },
   ];
 
+  if (classificacoes.length > 0) {
+    filtros.push({
+      chave: "classificacao",
+      rotuloVazio: "Classificação",
+      rotuloLista: "Todas as classificações",
+      valor: classificacao,
+      valorVazio: "todas",
+      opcoes: classificacoes,
+      aoMudar: setClassificacao,
+      larguraClasse: "w-[190px]",
+    });
+  }
+
   if (ferramentas.length > 0) {
     filtros.push({
       chave: "ferramenta",
@@ -129,15 +145,6 @@ export function GradeTrilhas() {
 
   return (
     <div className="space-y-6">
-      {/* Classificação em ícones: é o filtro principal, então fica no topo. */}
-      {classificacoes.length > 0 && (
-        <ClassificacaoIcons
-          classificacoes={classificacoes}
-          activeFilter={classificacao}
-          onSelect={setClassificacao}
-        />
-      )}
-
       <BarraFiltros
         busca={busca}
         aoBuscar={setBusca}
